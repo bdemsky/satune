@@ -1,0 +1,6 @@
+#Ignoring netbeans configs
+nbproject/
+
+#Ignoring binary files
+src/bin/
+src/lib_cons_comp.so
