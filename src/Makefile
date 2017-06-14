@@ -4,7 +4,7 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-CPP_SOURCES := constraint.cc inc_solver.cc
+CPP_SOURCES := constraint.cc inc_solver.cc set.cc
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
