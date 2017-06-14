@@ -14,6 +14,7 @@
 #include <inttypes.h>
 
 class Constraint;
+class Boolean;
 class IncrementalSolver;
 class Set;
 class MutableSet;

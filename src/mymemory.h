@@ -34,8 +34,8 @@
 	void operator delete[](void *p, size_t size) { \
 		model_free(p); \
 	} \
-	void * operator new(size_t size, void *p) { 	\
-return p;																				\
+	void * operator new(size_t size, void *p) {     \
+		return p;                                                                                                                                                               \
 	}
 
 void *model_malloc(size_t size);
