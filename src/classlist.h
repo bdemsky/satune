@@ -13,16 +13,34 @@
 #include "mymemory.h"
 #include <inttypes.h>
 
-class Constraint;
-class Boolean;
-class IncrementalSolver;
-class Set;
-class MutableSet;
-class Element;
-class Function;
-class Predicate;
-class Table;
-class Order;
+struct Constraint;
+typedef struct Constraint Constraint;
+
+struct Boolean;
+typedef struct Boolean Boolean;
+
+struct IncrementalSolver;
+typedef struct IncrementSolver IncrementalSolver;
+
+struct Set;
+typedef struct Set Set;
+
+typedef struct Set MutableSet;
+
+struct Element;
+typedef struct Element Element;
+
+struct Function;
+typedef struct Function Function;
+
+struct Predicate;
+typedef struct Predicat Predicate;
+
+struct Table;
+typedef struct Table Table;
+
+struct Order;
+typedef struct Order Order;
 
 typedef unsigned int uint;
 typedef uint64_t VarType;
