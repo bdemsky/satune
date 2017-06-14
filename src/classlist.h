@@ -9,9 +9,15 @@
 
 #ifndef CLASSLIST_H
 #define CLASSLIST_H
-#include "hashset.h"
+//#include "hashset.h"
 #include "mymemory.h"
 #include <inttypes.h>
+#define bool int
+#define true 1
+#define false 0
+
+struct CSolver;
+typedef struct CSolver CSolver;
 
 struct Constraint;
 typedef struct Constraint Constraint;
@@ -20,7 +26,7 @@ struct Boolean;
 typedef struct Boolean Boolean;
 
 struct IncrementalSolver;
-typedef struct IncrementSolver IncrementalSolver;
+typedef struct IncrementalSolver IncrementalSolver;
 
 struct Set;
 typedef struct Set Set;
@@ -34,7 +40,7 @@ struct Function;
 typedef struct Function Function;
 
 struct Predicate;
-typedef struct Predicat Predicate;
+typedef struct Predicate Predicate;
 
 struct Table;
 typedef struct Table Table;

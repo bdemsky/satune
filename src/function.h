@@ -2,10 +2,7 @@
 #define FUNCTION_H
 #include "classlist.h"
 #include "mymemory.h"
-class Function {
-public:
 
-	MEMALLOC;
-private:
+struct Function {
 };
 #endif

@@ -3,10 +3,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 
-class Predicate {
-public:
+struct Predicate {
 
-	MEMALLOC;
-private:
 };
 #endif

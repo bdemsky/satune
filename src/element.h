@@ -3,11 +3,9 @@
 #include "classlist.h"
 #include "mymemory.h"
 
-class Element {
-public:
-	Element(Set *s);
-	MEMALLOC;
-private:
-	Set *set;
+struct Element {
+	Set * set;
 };
+
+Element * allocElement(Set *s);
 #endif

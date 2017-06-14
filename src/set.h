@@ -9,23 +9,19 @@
 #define SET_H
 
 #include "classlist.h"
-#include "stl-model.h"
+#include "structs.h"
 #include "mymemory.h"
 
-class Set {
-public:
-	Set(VarType t, uint64_t * elements, int num);
-	Set(VarType t, uint64_t lowrange, uint64_t highrange);
-	~Set();
-
-	MEMALLOC;
-private:
+struct Set {
 	VarType type;
 	bool isRange;
 	uint64_t low, high;
-
-protected:
-	ModelVector<uint64_t> *members;
+	VectorInt * members;
 };
+
+
+Set *allocSet(VarType t, uint64_t * elements, uint num);
+Set	* allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
+void freeSet(Set *set);
 #endif/* SET_H */
 

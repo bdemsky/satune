@@ -1,27 +1,28 @@
 #include "set.h"
 #include <stddef.h>
-#include <cassert>
 
-Set::Set(VarType t, uint64_t* elements, int num) :
-	type (t),
-	isRange(false),
-	low(0),
-	high(0),
-	members(new ModelVector<uint64_t>()) {
-	members->reserve(num);
-	for(int i=0;i<num;i++)
-		members->push_back(elements[i]);
+Set * allocSet(VarType t, uint64_t* elements, uint num) {
+	Set * tmp=(Set *)ourmalloc(sizeof(struct Set));
+	tmp->type=t;
+	tmp->isRange=false;
+	tmp->low=0;
+	tmp->high=0;
+	tmp->members=allocVectorArrayInt(elements, num);
+	return tmp;
 }
 
-Set::Set(VarType t, uint64_t lowrange, uint64_t highrange) :
-	type(t),
-	isRange(true),
-	low(lowrange),
-	high(highrange),
-	members(NULL) {
+Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
+	Set * tmp=(Set *)ourmalloc(sizeof(struct Set));
+	tmp->type=t;
+	tmp->isRange=true;
+	tmp->low=lowrange;
+	tmp->high=highrange;
+	tmp->members=NULL;
+	return tmp;
 }
 
-Set::~Set() {
-	if (isRange)
-		delete members;
+void freeSet(Set * set) {
+	if (set->isRange)
+		freeVectorInt(set->members);
+	ourfree(set);
 }

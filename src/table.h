@@ -3,9 +3,9 @@
 #include "classlist.h"
 #include "mymemory.h"
 
-class Table {
-public:
-	MEMALLOC;
-private:
+struct Table {
+	
 };
+
+Table * allocTable();
 #endif

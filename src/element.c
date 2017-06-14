@@ -1,5 +1,7 @@
 #include "element.h"
 
-Element::Element(Set * s) :
-	set(s) {
+Element *allocElement(Set * s) {
+	Element * tmp=(Element *)ouralloc(sizeof(Element));
+	tmp->set=s;
+	return tmp;
 }

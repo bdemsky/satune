@@ -3,9 +3,6 @@
 #include "classlist.h"
 #include "mymemory.h"
 
-class Boolean {
- public:
-	MEMALLOC;
- private:
+struct  Boolean {
 };
 #endif

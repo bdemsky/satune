@@ -2,64 +2,79 @@
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
-	tmp->constraint=allocVector();
+	tmp->constraint=allocDefVectorBoolean();
 	return tmp;
 }
 
-Set * createSet(CSolver * solver, Type type, uint64_t ** elements) {
-	
+Set * createSet(CSolver * solver, VarType type, uint64_t ** elements) {
+	return NULL;
 }
 
-Set * createSet(CSolver * solver, Type type, uint64_t lowrange, uint64_t highrange) {
+Set * createRangeSet(CSolver * solver, VarType type, uint64_t lowrange, uint64_t highrange) {
+	return NULL;
 }
 
-MutableSet * createMutableSet(CSolver * solver, Type type) {
+MutableSet * createMutableSet(CSolver * solver, VarType type) {
+	return NULL;
 }
 
-void CSolver::addItem(MutableSet * set, uint64_t element) {
+void addItem(CSolver *solver, MutableSet * set, uint64_t element) {
 }
 
-int64_t CSolver::createUniqueItem(MutableSet * set) {
+int64_t createUniqueItem(CSolver *solver, MutableSet * set) {
+	return 0;
 }
 
-Element * CSolver::getElementVar(Set * set) {
+Element * getElementVar(CSolver *solver, Set * set) {
+	return NULL;
 }
 
-Boolean * CSolver::getBooleanVar() {
+Boolean * getBooleanVar(CSolver *solver) {
+	return NULL;
 }
 
-Function * CSolver::createFunctionOperator(enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+	return NULL;
 }
 
-Function * CSolver::createFunctionOperator(enum ArithOp op) {
+Function * createFunctionOperatorPure(CSolver *solver, enum ArithOp op) {
+	return NULL;
 }
 
-Predicate * CSolver::createPredicateOperator(enum CompOp op, Set ** domain) {
+Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain) {
+	return NULL;
 }
 
-Table * CSolver::createTable(Set **domains, Set * range) {
+Table * createTable(CSolver *solver, Set **domains, Set * range) {
+	return NULL;
 }
 
-void CSolver::addTableEntry(Element ** inputs, Element *result) {
+void addTableEntry(CSolver *solver, Element ** inputs, Element *result) {
 }
 
-Function * CSolver::completeTable(struct Table *) {
+Function * completeTable(CSolver *solver, Table * table) {
+	return NULL;
 }
 
-Element * CSolver::applyFunction(Function * function, Element ** array) {
+Element * applyFunction(CSolver *solver, Function * function, Element ** array) {
+	return NULL;
 }
 
-Boolean * CSolver::applyPredicate(Predicate * predicate, Element ** inputs) {
+Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs) {
+	return NULL;
 }
 
-Boolean * CSolver::applyLogicalOperation(enum LogicOp op, Boolean ** array) {
+Boolean * applyLogicalOperation(CSolver *solver, enum LogicOp op, Boolean ** array) {
+	return NULL;
 }
 
-void CSolver::addBoolean(Boolean * constraint) {
+void addBoolean(CSolver *solver, Boolean * constraint) {
 }
 
-Order * CSolver::createOrder(enum OrderType type, Set * set) {
+Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {
+	return NULL;
 }
 
-Boolean * CSolver::orderedConstraint(Order * order, uint64_t first, uint64_t second) {
+Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64_t second) {
+	return NULL;
 }

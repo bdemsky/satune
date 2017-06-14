@@ -3,10 +3,6 @@
 #include "classlist.h"
 #include "mymemory.h"
 
-class Order {
-public:
-	MEMALLOC;
-
-private:
+struct Order {
 };
 #endif
