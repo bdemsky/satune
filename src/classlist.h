@@ -15,6 +15,14 @@
 
 class Constraint;
 class IncrementalSolver;
+class Set;
+class MutableSet;
+class Element;
+class Function;
+class Predicate;
+class Table;
+class Order;
 
 typedef unsigned int uint;
+typedef uint64_t VarType;
 #endif

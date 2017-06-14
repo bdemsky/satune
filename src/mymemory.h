@@ -34,7 +34,7 @@
 	void operator delete[](void *p, size_t size) { \
 		model_free(p); \
 	} \
-	void * operator new(size_t size, void *p) {																		/* placement new */ \
+	void * operator new(size_t size, void *p) {																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										/* placement new */ \
 		return p; \
 	}
 
