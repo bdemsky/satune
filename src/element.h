@@ -4,10 +4,10 @@
 #include "mymemory.h"
 
 class Element {
- public:
+public:
 	Element(Set *s);
 	MEMALLOC;
- private:
+private:
 	Set *set;
 };
 #endif

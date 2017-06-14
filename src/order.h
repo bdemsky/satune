@@ -4,9 +4,9 @@
 #include "mymemory.h"
 
 class Order {
- public:
+public:
 	MEMALLOC;
-	
- private:
+
+private:
 };
 #endif

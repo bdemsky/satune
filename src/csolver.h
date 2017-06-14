@@ -4,6 +4,9 @@
 #include "ops.h"
 
 class CSolver {
+public:
+	CSolver();
+
 	Set * createSet(Type type, uint64_t ** elements);
 	Set * createSet(Type type, uint64_t lowrange, uint64_t highrange);
 	MutableSet * createMutableSet(Type type);
@@ -15,7 +18,7 @@ class CSolver {
 	Constraint * getBooleanVar();
 
 	Function * createFunctionOperator(enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Constraint * overflowstatus);
-	Function * createFunctionOperator(enum ArithOp op);														//Does Not Overflow
+	Function * createFunctionOperator(enum ArithOp op);																																																										//Does Not Overflow
 	Predicate * createPredicateOperator(enum CompOp op, Set ** domain);
 
 	Table * createTable(Set **domains, Set * range);
@@ -30,5 +33,7 @@ class CSolver {
 
 	Order * createOrder(enum OrderType type, Set * set);
 	Constraint * orderedConstraint(Order * order, uint64_t first, uint64_t second);
+private:
+
 };
 #endif

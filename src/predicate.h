@@ -4,9 +4,9 @@
 #include "mymemory.h"
 
 class Predicate {
- public:
+public:
 
 	MEMALLOC;
- private:
+private:
 };
 #endif

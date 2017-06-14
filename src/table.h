@@ -4,8 +4,8 @@
 #include "mymemory.h"
 
 class Table {
- public:
+public:
 	MEMALLOC;
- private:
+private:
 };
 #endif

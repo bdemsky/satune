@@ -3,9 +3,9 @@
 #include "classlist.h"
 #include "mymemory.h"
 class Function {
- public:
-	
+public:
+
 	MEMALLOC;
- private:
+private:
 };
 #endif
