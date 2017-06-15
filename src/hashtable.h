@@ -30,11 +30,8 @@
  *
  * @tparam _Key    Type name for the key
  * @tparam _Val    Type name for the values to be stored
- * @tparam _KeyInt Integer type that is at least as large as _Key. Used for key
- *                 manipulation and storage.
- * @tparam _Shift  Logical shift to apply to all keys. Default 0.
  */
-#define HashTableDef(Name, _Key, _Val, _KeyInt, _Shift, hash_function, equals)\
+#define HashTableDef(Name, _Key, _Val, hash_function, equals)\
 	struct hashlistnode ## Name {																					\
 	_Key key;																															\
 	_Val val;																															\
@@ -56,15 +53,15 @@
 	void reset ## Name(HashTable ## Name * tab);													\
 	void resetandfree ## Name(HashTable ## Name * tab);										\
 	void put ## Name(HashTable ## Name * tab, _Key key, _Val val);				\
-	_Val get ## Name(HashTable ## Name * tab, _Key key) const;						\
+	_Val get ## Name(const HashTable ## Name * tab, _Key key);						\
 	_Val remove ## Name(HashTable ## Name * tab, _Key key);								\
-	unsigned int getSize ## Name(HashTable ## Name * tab, ) const;				\
-	bool contains ## Name(HashTable ## Name * tab, _Key key) const;				\
+	unsigned int getSizeTable ## Name(const HashTable ## Name * tab);			\
+	bool contains ## Name(const HashTable ## Name * tab, _Key key);				\
 	void resize ## Name(HashTable ## Name * tab, unsigned int newsize);		\
 	double getLoadFactor ## Name(HashTable ## Name * tab);								\
 	unsigned int getCapacity ## Name(HashTable ## Name * tab);
 
-#define HashTableDef(Name, _Key, _Val, _KeyInt, _Shift, hash_function, equals) \
+#define HashTableImpl(Name, _Key, _Val, hash_function, equals) \
 	HashTable ## Name * allocHashTable ## Name(unsigned int initialcapacity, double factor) {	\
 		HashTable ## Name * tab = (HashTable ## Name *) ourmalloc(sizeof(HashTable ## Name));	\
 		tab -> table = (struct hashlistnode ## Name *) ourcalloc(initialcapacity, sizeof(struct hashlistnode ## Name)); \
@@ -73,11 +70,12 @@
 		tab->capacity = initialcapacity;																		\
 		tab->capacitymask = initialcapacity - 1;														\
 																																				\
-		tab->threshold = (unsigned int)(initialcapacity * loadfactor);			\
+		tab->threshold = (unsigned int)(initialcapacity * factor);					\
 		tab->size = 0;																											\
+		return tab;																													\
 	}																																			\
 																																				\
-	void freeHashTable ## Name(HashTable ## Name * tab) {										\
+	void freeHashTable ## Name(HashTable ## Name * tab) {									\
 		ourfree(tab->table);																								\
 		if (tab->zero)																											\
 			ourfree(tab->zero);																								\
@@ -85,7 +83,7 @@
 	}																																			\
 																																				\
 	void reset ## Name(HashTable ## Name * tab) {													\
-		memset(tab->table, 0, capacity * sizeof(struct hashlistnode ## Name)); \
+		memset(tab->table, 0, tab->capacity * sizeof(struct hashlistnode ## Name)); \
 		if (tab->zero) {																										\
 			ourfree(tab->zero);																								\
 			tab->zero = NULL;																									\
@@ -124,8 +122,8 @@
 			return;																														\
 		}																																		\
 																																				\
-		if (tab->size > tab->threshold)																					\
-			resize(tab->capacity << 1);																				\
+		if (tab->size > tab->threshold)																			\
+			resize ## Name (tab, tab->capacity << 1);													\
 																																				\
 		struct hashlistnode ## Name *search;																\
 																																				\
@@ -148,7 +146,7 @@
 		tab->size++;																												\
 	}																																			\
 																																				\
-	_Val get ## Name(HashTable ## Name * tab, _Key key) const {						\
+	_Val get ## Name(const HashTable ## Name * tab, _Key key) {					\
 		struct hashlistnode ## Name *search;																\
 																																				\
 		if (!key) {																													\
@@ -211,12 +209,12 @@
 		return (_Val)0;																											\
 	}																																			\
 																																				\
-	unsigned int getSize ## Name(HashTable ## Name * tab, ) const {				\
+	unsigned int getSizeTable ## Name(const HashTable ## Name * tab) {		\
 		return tab->size;																										\
 	}																																			\
 																																				\
 																																				\
-	bool contains ## Name(HashTable ## Name * tab, _Key key) const {			\
+	bool contains ## Name(const HashTable ## Name * tab, _Key key) {			\
 		struct hashlistnode ## Name *search;																\
 		if (!key) {																													\
 			return tab->zero!=NULL;																						\
@@ -250,7 +248,7 @@
 		tab->capacity = newsize;																						\
 		tab->capacitymask = newsize - 1;																		\
 																																				\
-		tab->threshold = (unsigned int)(newsize * loadfactor);							\
+		tab->threshold = (unsigned int)(newsize * tab->loadfactor);					\
 																																				\
 		struct hashlistnode ## Name *bin = &oldtable[0];										\
 		struct hashlistnode ## Name *lastbin = &oldtable[oldcapacity];			\
