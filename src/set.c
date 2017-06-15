@@ -21,8 +21,8 @@ Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
 	return tmp;
 }
 
-void freeSet(Set * set) {
+void deleteSet(Set * set) {
 	if (set->isRange)
-		freeVectorInt(set->members);
+		deleteVectorInt(set->members);
 	ourfree(set);
 }

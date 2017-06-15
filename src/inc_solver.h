@@ -18,27 +18,7 @@
 #include "solver_interface.h"
 #include "classlist.h"
 
-class IncrementalSolver {
-public:
-	IncrementalSolver();
-	~IncrementalSolver();
-	void addClauseLiteral(int literal);
-	void finishedClauses();
-	void freeze(int variable);
-	int solve();
-	void startSolve();
-	int getSolution();
-
-	bool getValue(int variable);
-	void reset();
-	MEMALLOC;
-
-private:
-	void createSolver();
-	void killSolver();
-	void flushBuffer();
-	int readIntSolver();
-	void readSolver(void * buffer, ssize_t size);
+struct IncrementalSolver {
 	int * buffer;
 	int * solution;
 	int solutionsize;
@@ -47,4 +27,20 @@ private:
 	int to_solver_fd;
 	int from_solver_fd;
 };
+
+IncrementalSolver * allocIncrementalSolver();
+void deleteIncrementalSolver(IncrementalSolver * this);
+void addClauseLiteral(IncrementalSolver * this, int literal);
+void finishedClauses(IncrementalSolver * this);
+void freeze(IncrementalSolver * this, int variable);
+int solve(IncrementalSolver * this);
+void startSolve(IncrementalSolver * this);
+int getSolution(IncrementalSolver * this);
+bool getValueSolver(IncrementalSolver * this, int variable);
+void resetSolver(IncrementalSolver * this);
+void createSolver(IncrementalSolver * this);
+void killSolver(IncrementalSolver * this);
+void flushBufferSolver(IncrementalSolver * this);
+int readIntSolver(IncrementalSolver * this);
+void readSolver(IncrementalSolver * this, void * buffer, ssize_t size);
 #endif

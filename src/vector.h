@@ -16,7 +16,7 @@
 	type getVector ## name(Vector ## name *vector, uint index);						\
 	void setVector ## name(Vector ## name *vector, uint index, type item); \
 	uint getSizeVector ##name(Vector ##name *vector);											\
-	void freeVector ##name(Vector ##name *vector);												\
+	void deleteVector ##name(Vector ##name *vector);												\
 	void clearVector ##name(Vector ## name *vector);
 
 #define VectorImpl(name, type, defcap)																	\
@@ -51,7 +51,7 @@
 	uint getSizeVector ## name(Vector ## name *vector) {									\
 		return vector->size;																								\
 	}																																			\
-	void freeVector ##name(Vector ##name *vector) {												\
+	void deleteVector ##name(Vector ##name *vector) {											\
 		ourfree(vector->array);																							\
 		ourfree(vector);																										\
 	}																																			\

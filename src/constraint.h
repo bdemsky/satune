@@ -30,7 +30,7 @@ Constraint * allocUnaryConstraint(CType t, Constraint *l);
 Constraint * allocArrayConstraint(CType t, uint num, Constraint ** array);
 Constraint * allocVarConstraint(CType t, uint var);
 
-void freeConstraint(Constraint *);
+void deleteConstraint(Constraint *);
 void printConstraint(Constraint * c);
 void dumpConstraint(Constraint * c, IncrementalSolver *solver);
 uint getVarConstraint(Constraint * c) {ASSERT(c->type==VAR); return c->numoperandsorvar;}
@@ -38,7 +38,7 @@ VectorConstraint * simplify(Constraint * c);
 CType getType(Constraint * c) {return c->type;}
 bool isFalse(Constraint * c) {return c->type==FALSE;}
 bool isTrue(Constraint * c) {return c->type==TRUE;}
-void freeConstraint(Constraint * c);
+void internalfreeConstraint(Constraint * c);
 void freerecConstraint(Constraint * c);
 Constraint * cloneConstraint(Constraint * c);
 void setNegConstraint(Constraint * this, Constraint *c) {this->neg=c;}

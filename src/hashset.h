@@ -28,7 +28,7 @@
 	typedef struct HSIterator ## Name HSIterator ## Name;									\
 	HashTableDef(Name ## Set, _Key, LinkNode ## Name *, hash_function, equals); \
 	HSIterator ## Name * allocHSIterator ## Name(LinkNode ## Name *_curr, HashSet ## Name * _set); \
-	void freeIter ## Name(HSIterator ## Name *hsit);											\
+	void deleteIter ## Name(HSIterator ## Name *hsit);											\
 	bool hasNext ## Name(HSIterator ## Name *hsit);												\
 	_Key next ## Name(HSIterator ## Name *hsit);													\
 	_Key currKey ## Name(HSIterator ## Name *hsit);												\
@@ -41,7 +41,7 @@
 	typedef struct HashSet ## Name HashSet ## Name;												\
 																																				\
 	HashSet ## Name * allocHashSet ## Name (unsigned int initialcapacity, double factor);	\
-	void freeHashSet ## Name(struct HashSet ## Name * set);								\
+	void deleteHashSet ## Name(struct HashSet ## Name * set);								\
 	HashSet ## Name * copy ## Name(HashSet ## Name * set);								\
 	void resetSet ## Name(HashSet ## Name * set);													\
 	bool add ## Name(HashSet ## Name * set,_Key key);											\
@@ -63,7 +63,7 @@
 		return hsit;																												\
 	}																																			\
 																																				\
-	void freeIter ## Name(HSIterator ## Name *hsit) {											\
+	void deleteIter ## Name(HSIterator ## Name *hsit) {										\
 		ourfree(hsit);																											\
 	}																																			\
 																																				\
@@ -95,14 +95,14 @@
 		return set;																													\
 }																																				\
 																																				\
-	void freeHashSet ## Name(struct HashSet ## Name * set) {							\
+	void deleteHashSet ## Name(struct HashSet ## Name * set) {						\
 		LinkNode ## Name *tmp=set->list;																		\
 		while(tmp!=NULL) {																									\
 			LinkNode ## Name *tmpnext=tmp->next;															\
 			ourfree(tmp);																											\
 			tmp=tmpnext;																											\
 		}																																		\
-		freeHashTable ## Name ## Set(set->table);																	\
+		deleteHashTable ## Name ## Set(set->table);													\
 		ourfree(set);																												\
 	}																																			\
 																																				\
@@ -111,7 +111,7 @@
 		HSIterator ## Name * it=iterator ## Name(set);											\
 		while(hasNext ## Name(it))																					\
 			add ## Name(copy, next ## Name(it));															\
-		freeIter ## Name(it);																									\
+		deleteIter ## Name(it);																							\
 		return copy;																												\
 	}																																			\
 																																				\

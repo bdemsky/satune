@@ -49,7 +49,7 @@
 																																				\
 	typedef struct HashTable ## Name HashTable ## Name;										\
 	HashTable ## Name * allocHashTable ## Name(unsigned int initialcapacity, double factor); \
-	void freeHashTable ## Name(HashTable ## Name * tab);									\
+	void deleteHashTable ## Name(HashTable ## Name * tab);									\
 	void reset ## Name(HashTable ## Name * tab);													\
 	void resetandfree ## Name(HashTable ## Name * tab);										\
 	void put ## Name(HashTable ## Name * tab, _Key key, _Val val);				\
@@ -75,7 +75,7 @@
 		return tab;																													\
 	}																																			\
 																																				\
-	void freeHashTable ## Name(HashTable ## Name * tab) {									\
+	void deleteHashTable ## Name(HashTable ## Name * tab) {									\
 		ourfree(tab->table);																								\
 		if (tab->zero)																											\
 			ourfree(tab->zero);																								\

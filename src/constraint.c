@@ -9,7 +9,7 @@
 
 #include "constraint.h"
 #include "mymemory.h"
-//#include "inc_solver.h"
+#include "inc_solver.h"
 
 Constraint ctrue={TRUE, 0xffffffff, NULL, NULL};
 Constraint cfalse={FALSE, 0xffffffff, NULL, NULL};
@@ -60,31 +60,31 @@ Constraint * allocVarConstraint(CType t, uint v) {
 	return this;
 }
 
-void freeConstraint(Constraint *this) {
+void deleteConstraint(Constraint *this) {
 	if (this->operands!=NULL)
 		ourfree(this->operands);
 }
 
-/*void dumpConstraint(Constraint * this, IncrementalSolver *solver) {
+void dumpConstraint(Constraint * this, IncrementalSolver *solver) {
 	if (this->type==VAR) {
-		solver->addClauseLiteral(this->numoperandsorvar);
-		solver->addClauseLiteral(0);
+		addClauseLiteral(solver, this->numoperandsorvar);
+		addClauseLiteral(solver, 0);
 	} else if (this->type==NOTVAR) {
-		solver->addClauseLiteral(-this->numoperandsorvar);
-		solver->addClauseLiteral(0);
+		addClauseLiteral(solver, -this->numoperandsorvar);
+		addClauseLiteral(solver, 0);
 	} else {
 		ASSERT(this->type==OR);
 		for(uint i=0;i<this->numoperandsorvar;i++) {
 			Constraint *c=this->operands[i];
 			if (c->type==VAR) {
-				solver->addClauseLiteral(c->numoperandsorvar);
+				addClauseLiteral(solver, c->numoperandsorvar);
 			} else if (c->type==NOTVAR) {
-				solver->addClauseLiteral(-c->numoperandsorvar);
+				addClauseLiteral(solver, -c->numoperandsorvar);
 			} else ASSERT(0);
 		}
-		solver->addClauseLiteral(0);
+		addClauseLiteral(solver, 0);
 	}
-	}*/
+}
 
 void internalfreeConstraint(Constraint * this) {
 	switch(this->type) {
@@ -116,7 +116,7 @@ void freerecConstraint(Constraint *this) {
 				freerecConstraint(this->operands[i]);
 		}
 		this->type=BOGUS;
-		freeConstraint(this);
+		deleteConstraint(this);
 	}
 }
 
@@ -251,12 +251,12 @@ bool mergeandfree(VectorConstraint * to, VectorConstraint * from) {
 				freerecConstraint(getVectorConstraint(to, j));
 			clearVectorConstraint(to);
 			pushVectorConstraint(to, &ctrue);
-			freeVectorConstraint(from);
+			deleteVectorConstraint(from);
 			return true;
 		}
 		pushVectorConstraint(to, c);
 	}
-	freeVectorConstraint(from);
+	deleteVectorConstraint(from);
 	return false;
 }
 
