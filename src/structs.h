@@ -7,6 +7,7 @@
 
 VectorDef(Int, uint64_t, 4);
 VectorDef(Boolean, Boolean *, 4);
+VectorDef(Constraint, Constraint *, 4);
 VectorDef(Void, void *, 4);
 
 inline unsigned int Ptr_hash_function(void * hash) {

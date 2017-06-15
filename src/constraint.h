@@ -10,7 +10,7 @@
 #ifndef CONSTRAINT_H
 #define CONSTRAINT_H
 #include "classlist.h"
-#include "stl-model.h"
+#include "structs.h"
 
 enum ConstraintType {
 	TRUE, FALSE, IMPLIES, AND, OR, VAR, NOTVAR, BOGUS
@@ -18,41 +18,37 @@ enum ConstraintType {
 
 typedef enum ConstraintType CType;
 
-class Constraint {
-public:
-	Constraint(CType t, Constraint *l, Constraint *r);
-	Constraint(CType t, Constraint *l);
-	Constraint(CType t, uint num, Constraint ** array);
-	Constraint(CType t, uint var);
-	Constraint(CType t);
-	~Constraint();
-	void print();
-	void dumpConstraint(IncrementalSolver *solver);
-	uint getVar() {ASSERT(type==VAR); return numoperandsorvar;}
-	ModelVector<Constraint *> * simplify();
-	CType getType() {return type;}
-	bool isFalse() {return type==FALSE;}
-	bool isTrue() {return type==TRUE;}
-	void free();
-	void freerec();
-	Constraint * clone();
-	void setNeg(Constraint *c) {neg=c;}
-	Constraint *negate();
-
-	MEMALLOC;
-private:
+struct Constraint {
 	CType type;
 	uint numoperandsorvar;
 	Constraint ** operands;
 	Constraint *neg;
-	friend bool mergeandfree(ModelVector<Constraint *> * to, ModelVector<Constraint *> * from);
 };
+
+Constraint * allocConstraint(CType t, Constraint *l, Constraint *r);
+Constraint * allocUnaryConstraint(CType t, Constraint *l);
+Constraint * allocArrayConstraint(CType t, uint num, Constraint ** array);
+Constraint * allocVarConstraint(CType t, uint var);
+
+void freeConstraint(Constraint *);
+void printConstraint(Constraint * c);
+void dumpConstraint(Constraint * c, IncrementalSolver *solver);
+uint getVarConstraint(Constraint * c) {ASSERT(c->type==VAR); return c->numoperandsorvar;}
+VectorConstraint * simplify(Constraint * c);
+CType getType(Constraint * c) {return c->type;}
+bool isFalse(Constraint * c) {return c->type==FALSE;}
+bool isTrue(Constraint * c) {return c->type==TRUE;}
+void freeConstraint(Constraint * c);
+void freerecConstraint(Constraint * c);
+Constraint * cloneConstraint(Constraint * c);
+void setNegConstraint(Constraint * this, Constraint *c) {this->neg=c;}
+Constraint *negateConstraint(Constraint * c);
 
 extern Constraint ctrue;
 extern Constraint cfalse;
 
 Constraint * generateConstraint(uint numvars, Constraint ** vars, uint value);
 Constraint * generateLTConstraint(uint numvars, Constraint ** vars, uint value);
-Constraint * generateEquivConstraint(uint numvars, Constraint **var1, Constraint **var2);
+Constraint * generateEquivNVConstraint(uint numvars, Constraint **var1, Constraint **var2);
 Constraint * generateEquivConstraint(Constraint *var1, Constraint *var2);
 #endif

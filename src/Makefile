@@ -4,7 +4,7 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-C_SOURCES := set.c mutableset.c element.c function.c order.c table.c predicate.c boolean.c csolver.c structs.c
+C_SOURCES := set.c mutableset.c element.c function.c order.c table.c predicate.c boolean.c csolver.c structs.c constraint.c
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
