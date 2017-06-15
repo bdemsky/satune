@@ -11,7 +11,7 @@
 	typedef struct Vector ## name Vector ## name;													\
 	Vector ## name * allocVector ## name(uint capacity);									\
 	Vector ## name * allocDefVector ## name();														\
-	Vector ## name * allocVectorArray ## name(type * array, uint capacity); \
+	Vector ## name * allocVectorArray ## name(uint capacity, type * array); \
 	void pushVector ## name(Vector ## name *vector, type item);						\
 	type getVector ## name(Vector ## name *vector, uint index);						\
 	void setVector ## name(Vector ## name *vector, uint index, type item); \

@@ -7,7 +7,7 @@ Set * allocSet(VarType t, uint64_t* elements, uint num) {
 	tmp->isRange=false;
 	tmp->low=0;
 	tmp->high=0;
-	tmp->members=allocVectorArrayInt(elements, num);
+	tmp->members=allocVectorArrayInt(num, elements);
 	return tmp;
 }
 

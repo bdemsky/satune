@@ -4,7 +4,7 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-CPP_SOURCES := set.cc mutableset.cc element.cc function.cc order.cc table.cc predicate.cc boolean.cc csolver.cc structs.c
+C_SOURCES := set.c mutableset.c element.c function.c order.c table.c predicate.c boolean.c csolver.c structs.c
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
@@ -31,7 +31,7 @@ debug: CPPFLAGS += -DCONFIG_DEBUG
 debug: all
 
 PHONY += docs
-docs: *.cc *.h
+docs: *.c *.cc *.h
 	doxygen
 
 $(LIB_SO): $(OBJECTS)
@@ -63,6 +63,7 @@ tags:
 
 tabbing:
 	uncrustify -c C.cfg --no-backup *.cc
+	uncrustify -c C.cfg --no-backup *.c
 	uncrustify -c C.cfg --no-backup *.h
 
 .PHONY: $(PHONY)
