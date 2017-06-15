@@ -4,3 +4,4 @@ nbproject/
 #Ignoring binary files
 src/bin/
 src/lib_cons_comp.so
+/src/mymemory.cc

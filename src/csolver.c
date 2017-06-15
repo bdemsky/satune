@@ -1,36 +1,45 @@
 #include "csolver.h"
-
+#include "set.h"
+#include "mutableset.h"
+#include "element.h"
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
 	tmp->constraint=allocDefVectorBoolean();
+        tmp->uniqSec=1;
 	return tmp;
 }
 
-Set * createSet(CSolver * solver, VarType type, uint64_t ** elements) {
-	return NULL;
+Set * createSet(CSolver * solver, VarType type, uint64_t * elements, uint num) {
+    Set* set = allocSet(type, elements,num );
+    return set;
 }
 
 Set * createRangeSet(CSolver * solver, VarType type, uint64_t lowrange, uint64_t highrange) {
-	return NULL;
+    Set* rset = allocSetRange(type, lowrange, highrange);
+    return rset;
 }
 
 MutableSet * createMutableSet(CSolver * solver, VarType type) {
-	return NULL;
+    MutableSet* mset = allocMutableSet(type);
+    return mset;
 }
 
 void addItem(CSolver *solver, MutableSet * set, uint64_t element) {
+    addElementMSet(set, element);
 }
 
 int64_t createUniqueItem(CSolver *solver, MutableSet * set) {
-	return 0;
+    uint64_t uSec= solver->uniqSec++;
+    addElementMSet(set, uSec);
+    return uSec;
 }
 
 Element * getElementVar(CSolver *solver, Set * set) {
-	return NULL;
+    return allocElement(set);
 }
 
 Boolean * getBooleanVar(CSolver *solver) {
-	return NULL;
+    return NULL;
 }
 
 Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
@@ -69,6 +78,7 @@ Boolean * applyLogicalOperation(CSolver *solver, enum LogicOp op, Boolean ** arr
 }
 
 void addBoolean(CSolver *solver, Boolean * constraint) {
+    solver->
 }
 
 Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {

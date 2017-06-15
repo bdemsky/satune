@@ -6,10 +6,11 @@
 
 struct CSolver {
 	VectorBoolean * constraint;
+        uint64_t uniqSec;
 };
 	
 CSolver * allocCSolver();
-Set * createSet(CSolver *, VarType type, uint64_t ** elements);
+Set * createSet(CSolver *, VarType type, uint64_t * elements, uint num);
 Set * createRangeSet(CSolver *, VarType type, uint64_t lowrange, uint64_t highrange);
 MutableSet * createMutableSet(CSolver *, VarType type);
 

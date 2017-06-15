@@ -23,5 +23,6 @@ struct Set {
 Set *allocSet(VarType t, uint64_t * elements, uint num);
 Set	* allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
 void freeSet(Set *set);
+
 #endif/* SET_H */
 
