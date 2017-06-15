@@ -6,9 +6,11 @@
 #include "classlist.h"
 
 VectorDef(Int, uint64_t, 4);
+VectorDef(Void, void *, 4);
 VectorDef(Boolean, Boolean *, 4);
 VectorDef(Constraint, Constraint *, 4);
-VectorDef(Void, void *, 4);
+VectorDef(Set, Set *, 4);
+VectorDef(Element, Element *, 4);
 
 inline unsigned int Ptr_hash_function(void * hash) {
 	return (unsigned int)((uint64_t)hash >> 4);

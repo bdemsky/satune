@@ -8,4 +8,5 @@ struct Element {
 };
 
 Element * allocElement(Set *s);
+void deleteElement(Element *this);
 #endif

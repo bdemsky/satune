@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 Set * allocSet(VarType t, uint64_t* elements, uint num) {
-	Set * tmp=(Set *)ourmalloc(sizeof(struct Set));
+	Set * tmp=(Set *)ourmalloc(sizeof(Set));
 	tmp->type=t;
 	tmp->isRange=false;
 	tmp->low=0;
@@ -12,7 +12,7 @@ Set * allocSet(VarType t, uint64_t* elements, uint num) {
 }
 
 Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
-	Set * tmp=(Set *)ourmalloc(sizeof(struct Set));
+	Set * tmp=(Set *)ourmalloc(sizeof(Set));
 	tmp->type=t;
 	tmp->isRange=true;
 	tmp->low=lowrange;
@@ -22,7 +22,7 @@ Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
 }
 
 void deleteSet(Set * set) {
-	if (set->isRange)
+	if (!set->isRange)
 		deleteVectorInt(set->members);
 	ourfree(set);
 }

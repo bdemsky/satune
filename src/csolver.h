@@ -5,19 +5,21 @@
 #include "structs.h"
 
 struct CSolver {
-	VectorBoolean * constraint;
+	VectorBoolean * constraints;
+	VectorSet * sets;
+	VectorElement * elements;
 };
-	
+
 CSolver * allocCSolver();
-Set * createSet(CSolver *, VarType type, uint64_t ** elements);
+Set * createSet(CSolver *, VarType type, uint64_t * elements, uint num);
 Set * createRangeSet(CSolver *, VarType type, uint64_t lowrange, uint64_t highrange);
 MutableSet * createMutableSet(CSolver *, VarType type);
 
 void addItem(CSolver *, MutableSet * set, uint64_t element);
-int64_t createUniqueItem(CSolver *, MutableSet * set);
+uint64_t createUniqueItem(CSolver *, MutableSet * set);
 
 Element * getElementVar(CSolver *, Set * set);
-Boolean * getBooleanVar(CSolver *);
+Boolean * getBooleanVar(CSolver *, VarType type);
 
 Function * createFunctionOperator(CSolver *, enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
 //Does Not Overflow

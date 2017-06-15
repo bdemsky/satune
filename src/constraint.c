@@ -235,7 +235,7 @@ Constraint * generateEquivNVConstraint(uint numvars, Constraint **var1, Constrai
 Constraint * generateEquivConstraint(Constraint *var1, Constraint *var2) {
 	Constraint * imp1=allocConstraint(OR, negateConstraint(cloneConstraint(var1)), var2);
 	Constraint * imp2=allocConstraint(OR, var1, negateConstraint(cloneConstraint(var2)));
-																		
+
 	return allocConstraint(AND, imp1, imp2);
 }
 
