@@ -6,6 +6,8 @@ OBJ_DIR = bin
 
 C_SOURCES := set.c mutableset.c element.c function.c order.c table.c predicate.c boolean.c csolver.c structs.c constraint.c inc_solver.c
 
+TABBING_H := boolean.h classlist.h common.h config.h constraint.h csolver.h element.h function.h inc_solver.h mutableset.h mymemory.h ops.h order.h predicate.h set.h solver_interface.h structs.h table.h
+
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CPPFLAGS += -Iinclude -I.
@@ -63,7 +65,7 @@ tags:
 
 tabbing:
 	uncrustify -c C.cfg --no-backup *.c
-	uncrustify -c C.cfg --no-backup *.h
+	uncrustify -c C.cfg --no-backup $(TABBING_H)
 
 .PHONY: $(PHONY)
 
