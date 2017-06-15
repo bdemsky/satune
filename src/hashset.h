@@ -11,211 +11,180 @@
 #define HASH_SET_H
 #include "hashtable.h"
 
-template<typename _Key>
-struct LinkNode {
-	_Key key;
-	LinkNode<_Key> *prev;
-	LinkNode<_Key> *next;
-};
-
-template<typename _Key, typename _KeyInt, int _Shift, void *
-				 (* _malloc)(size_t), void * (* _calloc)(size_t, size_t), void (*_free)(void *), unsigned int (*hash_function
-																																																			 )(_Key), bool (*equals)(_Key, _Key)>
-class HashSet;
-
-template<typename _Key, typename _KeyInt, int _Shift, void * (* _malloc)(size_t), void * (* _calloc)(size_t, size_t), void (*_free)(void *), unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
-class HSIterator {
-public:
-	HSIterator(LinkNode<_Key> *_curr, HashSet <_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> * _set) :
-		curr(_curr),
-		set(_set)
-	{
-	}
-
-	/** Override: new operator */
-	void * operator new(size_t size) {
-		return _malloc(size);
-	}
-
-	/** Override: delete operator */
-	void operator delete(void *p, size_t size) {
-		_free(p);
-	}
-
-	/** Override: new[] operator */
-	void * operator new[](size_t size) {
-		return _malloc(size);
-	}
-
-	/** Override: delete[] operator */
-	void operator delete[](void *p, size_t size) {
-		_free(p);
-	}
-
-	bool hasNext() {
-		return curr!=NULL;
-	}
-
-	_Key next() {
-		_Key k=curr->key;
-		last=curr;
-		curr=curr->next;
-		return k;
-	}
-
-	_Key currKey() {
-		return last->key;
-	}
-
-	void remove() {
-		_Key k=last->key;
-		set->remove(k);
-	}
-
-private:
-	LinkNode<_Key> *curr;
-	LinkNode<_Key> *last;
-	HashSet <_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> * set;
-};
-
-template<typename _Key, typename _KeyInt, int _Shift = 0, void * (* _malloc)(size_t) = model_malloc, void * (* _calloc)(size_t, size_t) = model_calloc, void (*_free)(void *) = model_free, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
-class HashSet {
-public:
-	HashSet(unsigned int initialcapacity = 16, double factor = 0.5) :
-		table(new HashTable<_Key, LinkNode<_Key> *, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals>(initialcapacity, factor)),
-		list(NULL),
-		tail(NULL)
-	{
-	}
-
-	/** @brief Hashset destructor */
-	~HashSet() {
-		LinkNode<_Key> *tmp=list;
-		while(tmp!=NULL) {
-			LinkNode<_Key> *tmpnext=tmp->next;
-			_free(tmp);
-			tmp=tmpnext;
-		}
-		delete table;
-	}
-
-	HashSet<_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> * copy() {
-		HashSet<_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> *copy=new HashSet<_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals>(table->getCapacity(), table->getLoadFactor());
-		HSIterator<_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> * it=iterator();
-		while(it->hasNext())
-			copy->add(it->next());
-		delete it;
-		return copy;
-	}
-
-	void reset() {
-		LinkNode<_Key> *tmp=list;
-		while(tmp!=NULL) {
-			LinkNode<_Key> *tmpnext=tmp->next;
-			_free(tmp);
-			tmp=tmpnext;
-		}
-		list=tail=NULL;
-		table->reset();
-	}
-
-	/** @brief Adds a new key to the hashset.  Returns false if the key
-	 *  is already present. */
-
-	bool add(_Key key) {
-		LinkNode<_Key> * val=table->get(key);
-		if (val==NULL) {
-			LinkNode<_Key> * newnode=(LinkNode<_Key> *)_malloc(sizeof(struct LinkNode<_Key>));
-			newnode->prev=tail;
-			newnode->next=NULL;
-			newnode->key=key;
-			if (tail!=NULL)
-				tail->next=newnode;
-			else
-				list=newnode;
-			tail=newnode;
-			table->put(key, newnode);
-			return true;
-		} else
-			return false;
-	}
-
-	/** @brief Gets the original key corresponding to this one from the
-	 *  hashset.  Returns NULL if not present. */
-
-	_Key get(_Key key) {
-		LinkNode<_Key> * val=table->get(key);
-		if (val!=NULL)
-			return val->key;
-		else
-			return NULL;
-	}
-
-	_Key getFirstKey() {
-		return list->key;
-	}
-
-	bool contains(_Key key) {
-		return table->get(key)!=NULL;
-	}
-
-	bool remove(_Key key) {
-		LinkNode<_Key> * oldlinknode;
-		oldlinknode=table->get(key);
-		if (oldlinknode==NULL) {
-			return false;
-		}
-		table->remove(key);
-
-		//remove link node from the list
-		if (oldlinknode->prev==NULL)
-			list=oldlinknode->next;
-		else
-			oldlinknode->prev->next=oldlinknode->next;
-		if (oldlinknode->next!=NULL)
-			oldlinknode->next->prev=oldlinknode->prev;
-		else
-			tail=oldlinknode->prev;
-		_free(oldlinknode);
-		return true;
-	}
-
-	unsigned int getSize() {
-		return table->getSize();
-	}
-
-	bool isEmpty() {
-		return getSize()==0;
-	}
+#define HashSetDef(Name, _Key, _KeyInt, _Shift, hash_function, equals)	\
+	struct LinkNode ## Name{																							\
+	_Key key;																															\
+	struct LinkNode ## Name *prev;																				\
+	struct LinkNode ## Name *next;																				\
+	};																																		\
+	typedef struct LinkNode ## Name LinkNode ## Name;											\
+	struct HashSet ## Name;																								\
+	typedef struct HashSet ## Name HashSet ## Name;												\
+	struct HSIterator ## Name {																						\
+		LinkNode ## Name *curr;																							\
+		LinkNode ## Name *last;																							\
+		HashSet ## Name * set;																							\
+	};																																		\
+																																				\
+	HSIterator ## Name * allocHSIterator ## Name(LinkNode ## Name *_curr, HashSet ## Name * _set); \
+	void freeIter ## Name(HSIterator ## Name *hsit);											\
+	bool hasNext ## Name(HSIterator ## Name *hsit);												\
+	_Key next ## Name(HSIterator ## Name *hsit);													\
+	_Key currKey ## Name(HSIterator ## Name *hsit);												\
+	void remove ## Name(HSIterator ## Name *hsit);												\
+	struct HashSet ## Name {																							\
+		HashTable ## Name * table;																					\
+		LinkNode ## Name *list;																							\
+		LinkNode ## Name *tail;																							\
+	};																																		\
+	typedef struct HashSet ## Name HashSet ## Name;												\
+																																				\
+	HashSet ## Name * allocHashSet ## Name (unsigned int initialcapacity, double factor);	\
+	void freeHashSet ## Name(struct HashSet ## Name * set);								\
+	HashSet ## Name * copy ## Name(HashSet ## Name * set);								\
+	void reset ## Name(HashSet ## Name * set);														\
+	bool add ## Name(HashSet ## Name * set,_Key key);											\
+	_Key get ## Name(HashSet ## Name * set,_Key key);											\
+	_Key getFirstKey ## Name(HashSet ## Name * set);											\
+	bool contains ## Name(HashSet ## Name * set,_Key key);								\
+	bool remove ## Name(HashSet ## Name * set,_Key key);									\
+	unsigned int getSize ## Name(HashSet ## Name * set);									\
+	bool isEmpty ## Name(HashSet ## Name * set);													\
+	HSIterator ## Name * iterator ## Name(HashSet ## Name * set);
 
 
-
-	HSIterator<_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> * iterator() {
-		return new HSIterator<_Key, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals>(list, this);
-	}
-
-	/** Override: new operator */
-	void * operator new(size_t size) {
-		return _malloc(size);
-	}
-
-	/** Override: delete operator */
-	void operator delete(void *p, size_t size) {
-		_free(p);
-	}
-
-	/** Override: new[] operator */
-	void * operator new[](size_t size) {
-		return _malloc(size);
-	}
-
-	/** Override: delete[] operator */
-	void operator delete[](void *p, size_t size) {
-		_free(p);
-	}
-private:
-	HashTable<_Key, LinkNode<_Key>*, _KeyInt, _Shift, _malloc, _calloc, _free, hash_function, equals> * table;
-	LinkNode<_Key> *list;
-	LinkNode<_Key> *tail;
-};
+#define HashSetDef(Name, _Key, _KeyInt, _Shift, hash_function, equals)	\
+	HSIterator ## Name * allocHSIterator ## Name(LinkNode ## Name *_curr, HashSet ## Name * _set) { \
+		HSIterator ## Name * hsit = (HSIterator ## Name *) ouralloc(sizeof(HSIterator ## Name)); \
+		hsit->curr=_curr;																										\
+		hsit->set=_set;																											\
+	}																																			\
+																																				\
+	void freeIter ## Name(HSIterator ## Name *hsit) {											\
+		ourfree(hsit);																											\
+	}																																			\
+																																				\
+	bool hasNext ## Name(HSIterator ## Name *hsit) {											\
+		return hsit->curr!=NULL;																						\
+	}																																			\
+																																				\
+	_Key next ## Name(HSIterator ## Name *hsit) {													\
+		_Key k=hsit->curr->key;																							\
+		hsit->last=hsit->curr;																							\
+		hsit->curr=hsit->curr->next;																				\
+		return k;																														\
+	}																																			\
+																																				\
+	_Key currKey ## Name(HSIterator ## Name *hsit) {											\
+		return hsit->last->key;																							\
+	}																																			\
+																																				\
+	void remove ## Name(HSIterator ## Name *hsit) {												\
+		_Key k=hsit->last->key;																							\
+		remove ## Name(hsit->set, k);																				\
+	}																																			\
+																																				\
+	HashSet ## Name * allocHashSet ## Name (unsigned int initialcapacity, double factor) { \
+		HashSet ## Name * set = (HashSet ## Name *) ouralloc(sizeof(struct HashSet ## Name));	\
+		set->table=allocHashTable ## Name(initialcapcity, factor);					\
+		set->list=NULL;																											\
+		set->tail=NULL;																											\
+	}																																			\
+																																				\
+	void freeHashSet ## Name(struct HashSet ## Name * set) {							\
+		LinkNode ## Name *tmp=set->list;																		\
+		while(tmp!=NULL) {																									\
+			LinkNode ## Name *tmpnext=tmp->next;															\
+			ourfree(tmp);																											\
+			tmp=tmpnext;																											\
+		}																																		\
+		freeHashTable ## Name(set->table);																	\
+		ourfree(set);																												\
+	}																																			\
+																																				\
+	HashSet ## Name * copy ## Name(HashSet ## Name * set) {								\
+		HashSet ## Name *copy=new HashSet ## Name(getCapacity ## Name(set->table), getLoadFactor ## Name(set->table)); \
+		HSIterator ## Name * it=iterator ## Name(set);											\
+		while(hasNext ## Name(it))																					\
+			add ## Name(copy, next ## Name(it));															\
+		freeIt ## Name(it);																									\
+		return copy;																												\
+	}																																			\
+																																				\
+	void reset ## Name(HashSet ## Name * set) {														\
+		LinkNode ## Name *tmp=set->list;																		\
+		while(tmp!=NULL) {																									\
+			LinkNode ## Name *tmpnext=tmp->next;															\
+			ourfree(tmp);																											\
+			tmp=tmpnext;																											\
+		}																																		\
+		set->list=set->tail=NULL;																						\
+		reset ## Name(set->table);																					\
+	}																																			\
+																																				\
+	bool add ## Name(HashSet ## Name * set,_Key key) {										\
+		LinkNode ## Name * val=get ## Name(set->table, key);								\
+		if (val==NULL) {																										\
+			LinkNode ## Name * newnode=(LinkNode ## Name *)ourmalloc(sizeof(struct LinkNode ## Name)); \
+			newnode->prev=set->tail;																					\
+			newnode->next=NULL;																								\
+			newnode->key=key;																									\
+			if (set->tail!=NULL)																							\
+				set->tail->next=newnode;																				\
+			else																															\
+				set->list=newnode;																							\
+			set->tail=newnode;																								\
+			put ## Name(set->table, key, newnode);														\
+			return true;																											\
+		} else																															\
+			return false;																											\
+	}																																			\
+																																				\
+	_Key get ## Name(HashSet ## Name * set,_Key key) {										\
+		LinkNode ## Name * val=get ## Name(set->table, key);								\
+		if (val!=NULL)																											\
+			return val->key;																									\
+		else																																\
+			return NULL;																											\
+	}																																			\
+																																				\
+	_Key getFirstKey ## Name(HashSet ## Name * set) {											\
+		return set->list->key;																							\
+	}																																			\
+																																				\
+	bool contains ## Name(HashSet ## Name * set,_Key key) {								\
+		return get ## Name(set->table, key)!=NULL;													\
+	}																																			\
+																																				\
+	bool remove ## Name(HashSet ## Name * set,_Key key) {									\
+		LinkNode ## Name * oldlinknode;																			\
+		oldlinknode=get ## Name(set->table, key);														\
+		if (oldlinknode==NULL) {																						\
+			return false;																											\
+		}																																		\
+		remove ## Name(set->table, key);																		\
+																																				\
+		if (oldlinknode->prev==NULL)																				\
+			set->list=oldlinknode->next;																			\
+		else																																\
+			oldlinknode->prev->next=oldlinknode->next;												\
+		if (oldlinknode->next!=NULL)																				\
+			oldlinknode->next->prev=oldlinknode->prev;												\
+		else																																\
+			set->tail=oldlinknode->prev;																			\
+		ourfree(oldlinknode);																								\
+		return true;																												\
+	}																																			\
+																																				\
+	unsigned int getSize ## Name(HashSet ## Name * set) {									\
+		return getSize ## Name (set->table);																\
+	}																																			\
+																																				\
+	bool isEmpty ## Name(HashSet ## Name * set) {													\
+		return getSize ## Name(set)==0;																			\
+	}																																			\
+																																				\
+	HSIterator ## Name * iterator ## Name(HashSet ## Name * set) {				\
+		return allocHSIterator ## Name(set->list, this);										\
+	}	
 #endif
