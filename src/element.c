@@ -5,3 +5,7 @@ Element *allocElement(Set * s) {
 	tmp->set=s;
 	return tmp;
 }
+
+void deleteElement(Element *this) {
+	ourfree(this);
+}

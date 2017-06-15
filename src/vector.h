@@ -11,12 +11,13 @@
 	typedef struct Vector ## name Vector ## name;													\
 	Vector ## name * allocVector ## name(uint capacity);									\
 	Vector ## name * allocDefVector ## name();														\
-	Vector ## name * allocVectorArray ## name(type * array, uint capacity); \
+	Vector ## name * allocVectorArray ## name(uint capacity, type * array); \
 	void pushVector ## name(Vector ## name *vector, type item);						\
 	type getVector ## name(Vector ## name *vector, uint index);						\
 	void setVector ## name(Vector ## name *vector, uint index, type item); \
-	uint getSize ##name(Vector ##name *vector);														\
-	void freeVector ##name(Vector ##name *vector);
+	uint getSizeVector ##name(Vector ##name *vector);											\
+	void deleteVector ##name(Vector ##name *vector);												\
+	void clearVector ##name(Vector ## name *vector);
 
 #define VectorImpl(name, type, defcap)																	\
 	Vector ## name * allocDefVector ## name() {														\
@@ -47,11 +48,14 @@
 	void setVector ## name(Vector ## name * vector, uint index, type item) { \
 		vector->array[index]=item;																					\
 	}																																			\
-	uint getSize ## name(Vector ## name *vector) {												\
+	uint getSizeVector ## name(Vector ## name *vector) {									\
 		return vector->size;																								\
 	}																																			\
-	void freeVector ##name(Vector ##name *vector) {												\
+	void deleteVector ##name(Vector ##name *vector) {											\
 		ourfree(vector->array);																							\
 		ourfree(vector);																										\
+	}																																			\
+	void clearVector ##name(Vector ## name *vector) {											\
+		vector->size=0;																											\
 	}
 #endif

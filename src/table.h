@@ -4,7 +4,7 @@
 #include "mymemory.h"
 
 struct Table {
-	
+
 };
 
 Table * allocTable();

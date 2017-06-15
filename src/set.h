@@ -15,14 +15,14 @@
 struct Set {
 	VarType type;
 	bool isRange;
-	uint64_t low, high;
+	uint64_t low;//also used to count unique items
+	uint64_t high;
 	VectorInt * members;
 };
 
 
 Set *allocSet(VarType t, uint64_t * elements, uint num);
-Set	* allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
-void freeSet(Set *set);
-
+Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
+void deleteSet(Set *set);
 #endif/* SET_H */
 
