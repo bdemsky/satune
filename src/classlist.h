@@ -54,6 +54,12 @@ typedef struct ElementEncoding ElementEncoding;
 struct FunctionEncoding;
 typedef struct FunctionEncoding FunctionEncoding;
 
+typedef enum ArithOp ArithOp;
+typedef enum LogicOp LogicOp;
+typedef enum CompOp CompOp;
+typedef enum OrderType OrderType;
+typedef enum OverFlowBehavior OverFlowBehavior;
+
 typedef unsigned int uint;
 typedef uint64_t VarType;
 #endif

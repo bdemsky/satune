@@ -54,8 +54,8 @@ Boolean * getBooleanVar(CSolver *, VarType type);
 
 /** This function creates a function operator. */
 
-Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-																	enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
+Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,
+																	OverFlowBehavior overflowbehavior);
 
 /** This function creates a predicate operator. */
 
@@ -75,7 +75,7 @@ Function * completeTable(CSolver *, Table *);
 
 /** This function applies a function to the Elements in its input. */
 
-Element * applyFunction(CSolver *, Function * function, Element ** array);
+Element * applyFunction(CSolver *, Function * function, Element ** array, Boolean * overflowstatus);
 
 /** This function applies a predicate to the Elements in its input. */
 

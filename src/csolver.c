@@ -83,12 +83,12 @@ Boolean * getBooleanVar(CSolver *solver, VarType type) {
 	return boolean;
 }
 
-Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-																	enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,
+																	OverFlowBehavior overflowbehavior) {
 	return NULL;
 }
 
-Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain) {
+Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain) {
 	return allocPredicate(op, domain,numDomain);
 }
 
@@ -103,7 +103,7 @@ Function * completeTable(CSolver *solver, Table * table) {
 	return NULL;
 }
 
-Element * applyFunction(CSolver *solver, Function * function, Element ** array) {
+Element * applyFunction(CSolver *solver, Function * function, Element ** array, Boolean * overflowstatus) {
 	return NULL;
 }
 
@@ -111,7 +111,7 @@ Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inpu
 	return NULL;
 }
 
-Boolean * applyLogicalOperation(CSolver *solver, enum LogicOp op, Boolean ** array) {
+Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array) {
 	return NULL;
 }
 
@@ -119,7 +119,7 @@ void addBoolean(CSolver *this, Boolean * constraint) {
 	pushVectorBoolean(this->constraints, constraint);
 }
 
-Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {
+Order * createOrder(CSolver *solver, OrderType type, Set * set) {
 	return allocOrder(type, set);
 }
 
