@@ -12,7 +12,15 @@ Order* allocOrder(enum OrderType type, Set * set){
 }
 
 Boolean* getOrderConstraint(Order* order, uint64_t first, uint64_t second){
-    uint size = getSizeVectorInt(order->set->members);
+	//Probably a bad idea to do a O(n) search through the order...
+	//We have a hashset data structure, why not use it for O(1) search
+
+
+	//We don't like warnings
+	return NULL;
+
+	/*
+	uint size = getSizeVectorInt(order->set->members);
     //First we need to make sure that first and second are part of the list!
     bool exist1=false, exist2=false;
     for(int i=0; i<size; i++){
@@ -25,5 +33,5 @@ Boolean* getOrderConstraint(Order* order, uint64_t first, uint64_t second){
         }
     }
     ASSERT(exist1 && exist2);
-    
+	*/
 }
