@@ -4,11 +4,11 @@
 #include "mymemory.h"
 #include "ops.h"
 struct  Boolean {
-    VarType vtype;
-    enum BooleanType btype;
-    Order* order;
-    uint64_t first;
-    uint64_t second;
+	VarType vtype;
+	enum BooleanType btype;
+	Order* order;
+	uint64_t first;
+	uint64_t second;
 };
 
 Boolean* allocBoolean(VarType t);

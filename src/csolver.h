@@ -32,8 +32,8 @@ MutableSet * createMutableSet(CSolver *, VarType type);
 void addItem(CSolver *, MutableSet * set, uint64_t element);
 
 /** This function adds a new unique item to the set and returns it.
-		This function cannot be used in conjunction with manually adding
-		items to the set. */
+    This function cannot be used in conjunction with manually adding
+    items to the set. */
 
 uint64_t createUniqueItem(CSolver *, MutableSet * set);
 
@@ -48,7 +48,7 @@ Boolean * getBooleanVar(CSolver *, VarType type);
 /** This function creates a function operator. */
 
 Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-        enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
+																	enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
 
 /** This function creates a predicate operator. */
 
@@ -79,7 +79,7 @@ Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs);
 Boolean * applyLogicalOperation(CSolver *, enum LogicOp op, Boolean ** array);
 
 /** This function adds a boolean constraint to the set of constraints
-		to be satisfied */
+    to be satisfied */
 
 void addBoolean(CSolver *, Boolean * constraint);
 

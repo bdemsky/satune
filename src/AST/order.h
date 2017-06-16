@@ -5,9 +5,9 @@
 #include "structs.h"
 #include "ops.h"
 struct Order {
-    enum OrderType type;
-    Set * set;
-    VectorBoolean* constraints;
+	enum OrderType type;
+	Set * set;
+	VectorBoolean* constraints;
 };
 
 Order* allocOrder(enum OrderType type, Set * set);

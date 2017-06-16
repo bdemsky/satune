@@ -17,7 +17,7 @@ typedef union ElementPredicate ElementPredicate;
 
 struct FunctionEncoder {
 	FunctionEncoderType type;
-	bool isFunction; //true for function, false for predicate
+	bool isFunction;//true for function, false for predicate
 	ElementPredicate op;
 };
 

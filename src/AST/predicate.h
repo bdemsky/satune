@@ -6,8 +6,8 @@
 #include "structs.h"
 
 struct Predicate {
-    enum CompOp op;
-    VectorSet* domains;
+	enum CompOp op;
+	VectorSet* domains;
 };
 
 

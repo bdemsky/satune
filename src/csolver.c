@@ -24,7 +24,7 @@ void deleteSolver(CSolver *this) {
 	for(uint i=0;i<size;i++) {
 		deleteBoolean(getVectorBoolean(this->allBooleans, i));
 	}
-	
+
 	deleteVectorBoolean(this->allBooleans);
 
 	size=getSizeVectorSet(this->allSets);
@@ -78,22 +78,17 @@ Element * getElementVar(CSolver *this, Set * set) {
 }
 
 Boolean * getBooleanVar(CSolver *solver, VarType type) {
-    Boolean* boolean= allocBoolean(type);
-    pushVectorBoolean(solver->allBooleans, boolean);
-    return boolean;
+	Boolean* boolean= allocBoolean(type);
+	pushVectorBoolean(solver->allBooleans, boolean);
+	return boolean;
 }
 
-Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-        enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
 	return NULL;
 }
 
-//Function * createFunctionOperatorPure(CSolver *solver, enum ArithOp op) {
-//	return NULL;
-//}
-
 Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain) {
-    return allocPredicate(op, domain,numDomain);
+	return allocPredicate(op, domain,numDomain);
 }
 
 Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range) {
@@ -124,11 +119,11 @@ void addBoolean(CSolver *this, Boolean * constraint) {
 }
 
 Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {
-    return allocOrder(type, set);
+	return allocOrder(type, set);
 }
 
 Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64_t second) {
-    Boolean* constraint = allocBooleanOrder(order, first, second);
-    pushVectorBoolean(solver->allBooleans,constraint);
-    return constraint;
+	Boolean* constraint = allocBooleanOrder(order, first, second);
+	pushVectorBoolean(solver->allBooleans,constraint);
+	return constraint;
 }
