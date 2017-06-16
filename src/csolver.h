@@ -21,14 +21,15 @@ uint64_t createUniqueItem(CSolver *, MutableSet * set);
 Element * getElementVar(CSolver *, Set * set);
 Boolean * getBooleanVar(CSolver *, VarType type);
 
-Function * createFunctionOperator(CSolver *, enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
+Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
+        enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
 //Does Not Overflow
-Function * createFunctionOperatorPure(CSolver *, enum ArithOp op);
-Predicate * createPredicateOperator(CSolver *, enum CompOp op, Set ** domain);
+//Function * createFunctionOperatorPure(CSolver *, enum ArithOp op);
+Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain);
 
-Table * createTable(CSolver *, Set **domains, Set * range);
-void addTableEntry(CSolver *, Element ** inputs, Element *result);
-Function * completeTable(CSolver *, struct Table *);
+Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range);
+void addTableEntry(CSolver *solver, uint64_t* inputs, uint inputSize, uint64_t result);
+Function * completeTable(CSolver *, Table *);
 
 Element * applyFunction(CSolver *, Function * function, Element ** array);
 Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs);

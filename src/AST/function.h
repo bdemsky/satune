@@ -4,5 +4,7 @@
 #include "mymemory.h"
 
 struct Function {
+    
+    Table* table;
 };
 #endif
