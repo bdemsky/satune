@@ -4,13 +4,11 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-C_SOURCES := set.c mutableset.c element.c function.c order.c table.c predicate.c boolean.c csolver.c structs.c constraint.c inc_solver.c
-
-TABBING_H := boolean.h classlist.h common.h config.h constraint.h csolver.h element.h function.h inc_solver.h mutableset.h mymemory.h ops.h order.h predicate.h set.h solver_interface.h structs.h table.h
+C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
-CPPFLAGS += -Iinclude -I.
+CFLAGS += -IAST -ICollections -IBackend -I.
 LDFLAGS := -ldl -lrt -rdynamic
 SHARED := -shared
 
@@ -28,8 +26,11 @@ directories: ${OBJ_DIR}
 
 ${OBJ_DIR}:
 	${MKDIR_P} ${OBJ_DIR}
+	${MKDIR_P} ${OBJ_DIR}/AST
+	${MKDIR_P} ${OBJ_DIR}/Collections
+	${MKDIR_P} ${OBJ_DIR}/Backend
 
-debug: CPPFLAGS += -DCONFIG_DEBUG
+debug: CFLAGS += -DCONFIG_DEBUG
 debug: all
 
 PHONY += docs
@@ -37,16 +38,10 @@ docs: *.c *.cc *.h
 	doxygen
 
 $(LIB_SO): $(OBJECTS)
-	$(CXX) -g $(SHARED) -o $(LIB_SO) $+ $(LDFLAGS)
+	$(CC) -g $(SHARED) -o ${OBJ_DIR}/$(LIB_SO) $+ $(LDFLAGS)
 
 ${OBJ_DIR}/%.o: %.c
-	$(CC) -fPIC -c $< -o $@ $(CPPFLAGS) -Wno-unused-variable
-
-${OBJ_DIR}/%.o: %.cc
-	$(CXX) -MMD -MF $@.d -o $@ -fPIC -c $< $(CPPFLAGS)
-
-%.pdf: %.dot
-	dot -Tpdf $< -o $@
+	$(CC) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable
 
 -include $(OBJECTS:%=$OBJ_DIR/.%.d)
 
@@ -65,7 +60,7 @@ tags:
 
 tabbing:
 	uncrustify -c C.cfg --no-backup *.c
-	uncrustify -c C.cfg --no-backup $(TABBING_H)
+	uncrustify -c C.cfg --no-backup *.h */*.h
 
 .PHONY: $(PHONY)
 
