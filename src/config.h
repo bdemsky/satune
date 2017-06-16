@@ -23,6 +23,4 @@
 //#define CONFIG_ASSERT
 #endif
 
-//#define VERBOSE_CONSTRAINTS
-
 #endif

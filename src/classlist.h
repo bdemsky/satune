@@ -9,7 +9,7 @@
 
 #ifndef CLASSLIST_H
 #define CLASSLIST_H
-//#include "hashset.h"
+
 #include "mymemory.h"
 #include <inttypes.h>
 #define bool int

@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum ElementEncoderType {
-	ONEHOT, UNARY, BINARY, ONEHOTBINARY
+	ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
 };
 
 typedef enum ElementEncoderType ElementEncoderType;

@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum FunctionEncoderType {
-	ENUMERATEIMPLICATIONS
+	ENUMERATEIMPLICATIONS, CIRCUIT
 };
 
 typedef enum FunctionEncoderType FunctionEncoderType;
