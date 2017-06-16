@@ -5,6 +5,7 @@
 #include "AST/boolean.h"
 #include "AST/predicate.h"
 #include "AST/order.h"
+#include "table.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -12,6 +13,8 @@ CSolver * allocCSolver() {
 	tmp->allBooleans=allocDefVectorBoolean();
 	tmp->allSets=allocDefVectorSet();
 	tmp->allElements=allocDefVectorElement();
+	tmp->allPredicates = allocDefVectorPredicate();
+	tmp->allTables = allocDefVectorTable();
 	return tmp;
 }
 
@@ -38,7 +41,7 @@ void deleteSolver(CSolver *this) {
 	for(uint i=0;i<size;i++) {
 		deleteElement(getVectorElement(this->allElements, i));
 	}
-
+	//FIXME: Freeing alltables and allpredicates
 	deleteVectorElement(this->allElements);
 	ourfree(this);
 }
@@ -89,14 +92,19 @@ Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domai
 }
 
 Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain) {
-	return allocPredicate(op, domain,numDomain);
+	Predicate* predicate= allocPredicate(op, domain,numDomain);
+	pushVectorPredicate(solver->allPredicates, predicate);
+	return predicate;
 }
 
 Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range) {
-	return NULL;
+	Table* table= allocTable(domains,numDomain,range);
+	pushVectorTable(solver->allTables, table);
+	return table;
 }
 
-void addTableEntry(CSolver *solver, uint64_t* inputs, uint inputSize, uint64_t result) {
+void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSize, uint64_t result) {
+    addNewTableEntry(table,inputs, inputSize,result);
 }
 
 Function * completeTable(CSolver *solver, Table * table) {

@@ -54,6 +54,9 @@ typedef struct ElementEncoding ElementEncoding;
 struct FunctionEncoding;
 typedef struct FunctionEncoding FunctionEncoding;
 
+struct TableEntry;
+typedef struct TableEntry TableEntry;
+
 typedef unsigned int uint;
 typedef uint64_t VarType;
 #endif

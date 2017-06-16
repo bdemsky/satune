@@ -9,6 +9,8 @@ struct CSolver {
 	VectorBoolean * allBooleans;
 	VectorSet * allSets;
 	VectorElement * allElements;
+	VectorPredicate * allPredicates;
+	VectorTable * allTables;
 };
 
 /** Create a new solver instance. */
@@ -60,7 +62,7 @@ Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range)
 
 /** This function adds an input output relation to a table. */
 
-void addTableEntry(CSolver *solver, uint64_t* inputs, uint inputSize, uint64_t result);
+void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSize, uint64_t result);
 
 /** This function converts a completed table into a function. */
 
@@ -86,6 +88,6 @@ void addBoolean(CSolver *, Boolean * constraint);
 /** This function instantiates an order of type type over the set set. */
 Order * createOrder(CSolver *, enum OrderType type, Set * set);
 
-/** This function instantiates a predicate on two items in an order. */
+/** This function instantiates a boolean on two items in an order. */
 Boolean * orderConstraint(CSolver *, Order * order, uint64_t first, uint64_t second);
 #endif

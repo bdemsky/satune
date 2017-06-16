@@ -11,6 +11,9 @@ VectorDef(Boolean, Boolean *, 4);
 VectorDef(Constraint, Constraint *, 4);
 VectorDef(Set, Set *, 4);
 VectorDef(Element, Element *, 4);
+VectorDef(TableEntry, TableEntry *, 4);
+VectorDef(Predicate, Predicate *, 4);
+VectorDef(Table, Table *, 4);
 
 inline unsigned int Ptr_hash_function(void * hash) {
 	return (unsigned int)((uint64_t)hash >> 4);
