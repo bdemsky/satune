@@ -5,9 +5,16 @@
 #include "structs.h"
 
 struct CSolver {
+	/** This is a vector of constraints that must be satisfied. */
 	VectorBoolean * constraints;
+
+	/** This is a vector of all boolean structs that we have allocated. */
 	VectorBoolean * allBooleans;
+
+	/** This is a vector of all set structs that we have allocated. */
 	VectorSet * allSets;
+
+	/** This is a vector of all element structs that we have allocated. */
 	VectorElement * allElements;
 	VectorPredicate * allPredicates;
 	VectorTable * allTables;
@@ -49,8 +56,8 @@ Boolean * getBooleanVar(CSolver *, VarType type);
 
 /** This function creates a function operator. */
 
-Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-																	enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus);
+Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,
+																	OverFlowBehavior overflowbehavior);
 
 /** This function creates a predicate operator. */
 
@@ -70,7 +77,7 @@ Function * completeTable(CSolver *, Table *);
 
 /** This function applies a function to the Elements in its input. */
 
-Element * applyFunction(CSolver *, Function * function, Element ** array);
+Element * applyFunction(CSolver *, Function * function, Element ** array, Boolean * overflowstatus);
 
 /** This function applies a predicate to the Elements in its input. */
 

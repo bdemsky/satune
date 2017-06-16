@@ -11,8 +11,9 @@ enum OrderType {PARTIAL, TOTAL};
  *  FLAGIFFOVERFLOW -- flag is set iff the operation overflows
  *  IGNORE -- doesn't constrain output if the result cannot be represented
  *  WRAPAROUND -- wraps around like stand integer arithmetic
+ *  NOOVERFLOW -- client has ensured that overflow is impossible
  */
-enum OverFlowBehavior {IGNORE, WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW};
+enum OverFlowBehavior {IGNORE, WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW, NOOVERFLOW};
 
 enum BooleanType {_ORDER, _BOOLEAN};
 

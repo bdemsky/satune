@@ -1,11 +1,10 @@
 #include "csolver.h"
-#include "AST/set.h"
-#include "AST/mutableset.h"
-#include "AST/element.h"
-#include "AST/boolean.h"
-#include "AST/predicate.h"
-#include "AST/order.h"
-#include "table.h"
+#include "set.h"
+#include "mutableset.h"
+#include "element.h"
+#include "boolean.h"
+#include "predicate.h"
+#include "order.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -86,8 +85,8 @@ Boolean * getBooleanVar(CSolver *solver, VarType type) {
 	return boolean;
 }
 
-Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-        enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,
+																	OverFlowBehavior overflowbehavior) {
 	return NULL;
 }
 
@@ -111,7 +110,7 @@ Function * completeTable(CSolver *solver, Table * table) {
 	return NULL;
 }
 
-Element * applyFunction(CSolver *solver, Function * function, Element ** array) {
+Element * applyFunction(CSolver *solver, Function * function, Element ** array, Boolean * overflowstatus) {
 	return NULL;
 }
 
@@ -119,7 +118,7 @@ Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inpu
 	return NULL;
 }
 
-Boolean * applyLogicalOperation(CSolver *solver, enum LogicOp op, Boolean ** array) {
+Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array) {
 	return NULL;
 }
 
@@ -127,7 +126,7 @@ void addBoolean(CSolver *this, Boolean * constraint) {
 	pushVectorBoolean(this->constraints, constraint);
 }
 
-Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {
+Order * createOrder(CSolver *solver, OrderType type, Set * set) {
 	return allocOrder(type, set);
 }
 
