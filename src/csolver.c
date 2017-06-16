@@ -2,6 +2,8 @@
 #include "set.h"
 #include "mutableset.h"
 #include "element.h"
+#include "boolean.h"
+#include "predicate.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -66,26 +68,29 @@ Element * getElementVar(CSolver *this, Set * set) {
 }
 
 Boolean * getBooleanVar(CSolver *solver, VarType type) {
+    Boolean* boolean= allocBoolean(type);
+    pushVectorBoolean(solver->constraints, boolean);
+    return boolean;
+}
+
+Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
+        enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
 	return NULL;
 }
 
-Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, Set * range, enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+//Function * createFunctionOperatorPure(CSolver *solver, enum ArithOp op) {
+//	return NULL;
+//}
+
+Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain) {
+    return allocPredicate(op, domain,numDomain);
+}
+
+Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range) {
 	return NULL;
 }
 
-Function * createFunctionOperatorPure(CSolver *solver, enum ArithOp op) {
-	return NULL;
-}
-
-Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain) {
-	return NULL;
-}
-
-Table * createTable(CSolver *solver, Set **domains, Set * range) {
-	return NULL;
-}
-
-void addTableEntry(CSolver *solver, Element ** inputs, Element *result) {
+void addTableEntry(CSolver *solver, uint64_t* inputs, uint inputSize, uint64_t result) {
 }
 
 Function * completeTable(CSolver *solver, Table * table) {
@@ -109,9 +114,11 @@ void addBoolean(CSolver *this, Boolean * constraint) {
 }
 
 Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {
-	return NULL;
+    return allocOrder(type, set);
 }
 
 Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64_t second) {
-	return NULL;
+    Boolean* constraint = allocBooleanOrder(order, first, second);
+    pushVectorBoolean(solver->constraints,constraint);
+    return constraint;
 }

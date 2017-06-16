@@ -14,4 +14,6 @@ enum OrderType {PARTIAL, TOTAL};
  */
 enum OverFlowBehavior {IGNORE, WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW};
 
+enum BooleanType {_ORDER, _BOOLEAN};
+
 #endif
