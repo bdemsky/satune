@@ -23,7 +23,7 @@ endif
 
 MARKDOWN := ../docs/Markdown/Markdown.pl
 
-all: directories $(LIB_SO)
+all: directories ${OBJ_DIR}/$(LIB_SO)
 
 directories: ${OBJ_DIR}
 
@@ -41,7 +41,7 @@ PHONY += docs
 docs: $(C_SOURCES) $(HEADERS)
 	doxygen
 
-$(LIB_SO): $(OBJECTS)
+${OBJ_DIR}/$(LIB_SO): $(OBJECTS)
 	$(CC) -g $(SHARED) -o ${OBJ_DIR}/$(LIB_SO) $+ $(LDFLAGS)
 
 ${OBJ_DIR}/%.o: %.c
