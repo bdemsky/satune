@@ -9,7 +9,7 @@
 
 #ifndef CLASSLIST_H
 #define CLASSLIST_H
-//#include "hashset.h"
+
 #include "mymemory.h"
 #include <inttypes.h>
 #define bool int
@@ -47,6 +47,12 @@ typedef struct Table Table;
 
 struct Order;
 typedef struct Order Order;
+
+struct ElementEncoder;
+typedef struct ElementEncoder ElementEncoder;
+
+struct FunctionEncoder;
+typedef struct FunctionEncoder FunctionEncoder;
 
 typedef unsigned int uint;
 typedef uint64_t VarType;
