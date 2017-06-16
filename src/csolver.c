@@ -9,8 +9,9 @@
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
 	tmp->constraints=allocDefVectorBoolean();
-	tmp->sets=allocDefVectorSet();
-	tmp->elements=allocDefVectorElement();
+	tmp->allBooleans=allocDefVectorBoolean();
+	tmp->allSets=allocDefVectorSet();
+	tmp->allElements=allocDefVectorElement();
 	return tmp;
 }
 
@@ -18,37 +19,45 @@ CSolver * allocCSolver() {
 
 void deleteSolver(CSolver *this) {
 	deleteVectorBoolean(this->constraints);
-	uint size=getSizeVectorSet(this->sets);
+
+	uint size=getSizeVectorBoolean(this->allBooleans);
 	for(uint i=0;i<size;i++) {
-		deleteSet(getVectorSet(this->sets, i));
+		deleteBoolean(getVectorBoolean(this->allBooleans, i));
+	}
+	
+	deleteVectorBoolean(this->allBooleans);
+
+	size=getSizeVectorSet(this->allSets);
+	for(uint i=0;i<size;i++) {
+		deleteSet(getVectorSet(this->allSets, i));
 	}
 
-	deleteVectorSet(this->sets);
+	deleteVectorSet(this->allSets);
 
-	size=getSizeVectorElement(this->elements);
+	size=getSizeVectorElement(this->allElements);
 	for(uint i=0;i<size;i++) {
-		deleteElement(getVectorElement(this->elements, i));
+		deleteElement(getVectorElement(this->allElements, i));
 	}
 
-	deleteVectorElement(this->elements);
+	deleteVectorElement(this->allElements);
 	ourfree(this);
 }
 
 Set * createSet(CSolver * this, VarType type, uint64_t * elements, uint numelements) {
 	Set * set=allocSet(type, elements, numelements);
-	pushVectorSet(this->sets, set);
+	pushVectorSet(this->allSets, set);
 	return set;
 }
 
 Set * createRangeSet(CSolver * this, VarType type, uint64_t lowrange, uint64_t highrange) {
 	Set * set=allocSetRange(type, lowrange, highrange);
-	pushVectorSet(this->sets, set);
+	pushVectorSet(this->allSets, set);
 	return set;
 }
 
 MutableSet * createMutableSet(CSolver * this, VarType type) {
 	MutableSet * set=allocMutableSet(type);
-	pushVectorSet(this->sets, set);
+	pushVectorSet(this->allSets, set);
 	return set;
 }
 
@@ -64,13 +73,13 @@ uint64_t createUniqueItem(CSolver *solver, MutableSet * set) {
 
 Element * getElementVar(CSolver *this, Set * set) {
 	Element * element=allocElement(set);
-	pushVectorElement(this->elements, element);
+	pushVectorElement(this->allElements, element);
 	return element;
 }
 
 Boolean * getBooleanVar(CSolver *solver, VarType type) {
     Boolean* boolean= allocBoolean(type);
-    pushVectorBoolean(solver->constraints, boolean);
+    pushVectorBoolean(solver->allBooleans, boolean);
     return boolean;
 }
 
@@ -120,6 +129,6 @@ Order * createOrder(CSolver *solver, enum OrderType type, Set * set) {
 
 Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64_t second) {
     Boolean* constraint = allocBooleanOrder(order, first, second);
-    pushVectorBoolean(solver->constraints,constraint);
+    pushVectorBoolean(solver->allBooleans,constraint);
     return constraint;
 }

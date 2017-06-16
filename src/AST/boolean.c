@@ -9,9 +9,13 @@ Boolean* allocBoolean(VarType t){
 
 Boolean* allocBooleanOrder(Order* order,uint64_t first, uint64_t second){
     Boolean* tmp = (Boolean*) ourmalloc(sizeof (Boolean));
-    tmp ->btype= _ORDER;
+    tmp->btype= _ORDER;
     tmp->order = order;
     tmp->first=first;
     tmp->second=second;
 		return tmp;
+}
+
+void deleteBoolean(Boolean * this) {
+	ourfree(this);
 }

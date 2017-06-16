@@ -10,6 +10,7 @@ HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard Collections/*.h) $(wil
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
+CFLAGS := -Wall -g -O0
 CFLAGS += -IAST -ICollections -IBackend -I. -IEncoders
 LDFLAGS := -ldl -lrt -rdynamic
 SHARED := -shared

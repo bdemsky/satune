@@ -13,4 +13,6 @@ struct  Boolean {
 
 Boolean* allocBoolean(VarType t);
 Boolean* allocBooleanOrder(Order* order,uint64_t first, uint64_t second);
+void deleteBoolean(Boolean * this);
+
 #endif
