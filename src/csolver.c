@@ -1,10 +1,10 @@
 #include "csolver.h"
-#include "AST/set.h"
-#include "AST/mutableset.h"
-#include "AST/element.h"
-#include "AST/boolean.h"
-#include "AST/predicate.h"
-#include "AST/order.h"
+#include "set.h"
+#include "mutableset.h"
+#include "element.h"
+#include "boolean.h"
+#include "predicate.h"
+#include "order.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -84,7 +84,7 @@ Boolean * getBooleanVar(CSolver *solver, VarType type) {
 }
 
 Function * createFunctionOperator(CSolver *solver, enum ArithOp op, Set ** domain, uint numDomain, Set * range,
-        enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
+																	enum OverFlowBehavior overflowbehavior, Boolean * overflowstatus) {
 	return NULL;
 }
 

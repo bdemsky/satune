@@ -5,9 +5,16 @@
 #include "structs.h"
 
 struct CSolver {
+	/** This is a vector of constraints that must be satisfied. */
 	VectorBoolean * constraints;
+
+	/** This is a vector of all boolean structs that we have allocated. */
 	VectorBoolean * allBooleans;
+
+	/** This is a vector of all set structs that we have allocated. */
 	VectorSet * allSets;
+
+	/** This is a vector of all element structs that we have allocated. */
 	VectorElement * allElements;
 };
 
