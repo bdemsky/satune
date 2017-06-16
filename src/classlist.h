@@ -48,11 +48,11 @@ typedef struct Table Table;
 struct Order;
 typedef struct Order Order;
 
-struct ElementEncoder;
-typedef struct ElementEncoder ElementEncoder;
+struct ElementEncoding;
+typedef struct ElementEncoding ElementEncoding;
 
-struct FunctionEncoder;
-typedef struct FunctionEncoder FunctionEncoder;
+struct FunctionEncoding;
+typedef struct FunctionEncoding FunctionEncoding;
 
 typedef unsigned int uint;
 typedef uint64_t VarType;
