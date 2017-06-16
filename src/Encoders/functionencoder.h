@@ -8,11 +8,20 @@ enum FunctionEncoderType {
 
 typedef enum FunctionEncoderType FunctionEncoderType;
 
-struct FunctionEncoder {
-	FunctionEncoderType type;
-	Function * function;
+union ElementPredicate {
+	Element * function;
+	Boolean * predicate;
 };
 
-FunctionEncoder * allocFunctionEncoder(FunctionEncoderType type, Function *function);
+typedef union ElementPredicate ElementPredicate;
+
+struct FunctionEncoder {
+	FunctionEncoderType type;
+	bool isFunction; //true for function, false for predicate
+	ElementPredicate op;
+};
+
+FunctionEncoder * allocFunctionEncoder(FunctionEncoderType type, Element *function);
+FunctionEncoder * allocPredicateEncoder(FunctionEncoderType type, Boolean *predicate);
 void deleteFunctionEncoder(FunctionEncoder *this);
 #endif

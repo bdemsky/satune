@@ -1,8 +1,15 @@
 #include "functionencoder.h"
 
-FunctionEncoder * allocFunctionEncoder(FunctionEncoderType type, Function *function) {
+FunctionEncoder * allocFunctionEncoder(FunctionEncoderType type, Element *function) {
 	FunctionEncoder * this=(FunctionEncoder *)ourmalloc(sizeof(FunctionEncoder));
-	this->function=function;
+	this->op.function=function;
+	this->type=type;
+	return this;
+}
+
+FunctionEncoder * allocPredicateEncoder(FunctionEncoderType type, Boolean *predicate) {
+	FunctionEncoder * this=(FunctionEncoder *)ourmalloc(sizeof(FunctionEncoder));
+	this->op.predicate=predicate;
 	this->type=type;
 	return this;
 }
