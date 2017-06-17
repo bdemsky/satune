@@ -22,6 +22,11 @@ typedef struct CSolver CSolver;
 struct Constraint;
 typedef struct Constraint Constraint;
 
+typedef struct BooleanOrder BooleanOrder;
+typedef struct BooleanVar BooleanVar;
+typedef struct BooleanLogic BooleanLogic;
+typedef struct BooleanComp BooleanComp;
+
 struct Boolean;
 typedef struct Boolean Boolean;
 
@@ -62,6 +67,7 @@ typedef enum ArithOp ArithOp;
 typedef enum LogicOp LogicOp;
 typedef enum CompOp CompOp;
 typedef enum OrderType OrderType;
+typedef enum BooleanType BooleanType;
 typedef enum OverFlowBehavior OverFlowBehavior;
 
 typedef unsigned int uint;

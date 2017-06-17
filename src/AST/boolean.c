@@ -2,17 +2,17 @@
 
 Boolean* allocBoolean(VarType t) {
 	Boolean* tmp=(Boolean*) ourmalloc(sizeof (Boolean));
-	tmp->vtype=t;
-	tmp->btype=_BOOLEAN;
+	tmp->btype=BOOLEANVAR;
+	tmp->var.vtype=t;
 	return tmp;
 }
 
-Boolean* allocBooleanOrder(Order* order,uint64_t first, uint64_t second) {
+Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	Boolean* tmp=(Boolean*) ourmalloc(sizeof (Boolean));
-	tmp->btype=_ORDER;
-	tmp->order=order;
-	tmp->first=first;
-	tmp->second=second;
+	tmp->btype=ORDERCONST;
+	tmp->order.order=order;
+	tmp->order.first=first;
+	tmp->order.second=second;
 	return tmp;
 }
 
