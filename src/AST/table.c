@@ -11,6 +11,7 @@ Table * allocTable(Set **domains, uint numDomain, Set * range){
         pushVectorSet(table->domains, domains[i]);
     }
     table->range =range;
+		return table;
 }
 
 void addNewTableEntry(Table* table, uint64_t* inputs, uint inputSize, uint64_t result){

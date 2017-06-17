@@ -14,8 +14,8 @@
 #ifndef TABLEENTRY_H
 #define TABLEENTRY_H
 
-#include "classlist.h";
-#include "mymemory.h";
+#include "classlist.h"
+#include "mymemory.h"
 struct TableEntry{
     uint64_t output;
     uint64_t inputs[];

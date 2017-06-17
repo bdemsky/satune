@@ -5,6 +5,7 @@
 #include "boolean.h"
 #include "predicate.h"
 #include "order.h"
+#include "table.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
