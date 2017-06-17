@@ -5,11 +5,11 @@
 #include "structs.h"
 #include "ops.h"
 struct Order {
-	enum OrderType type;
+	OrderType type;
 	Set * set;
 	VectorBoolean* constraints;
 };
 
-Order* allocOrder(enum OrderType type, Set * set);
+Order* allocOrder(OrderType type, Set * set);
 Boolean* getOrderConstraint(Order* order,uint64_t first, uint64_t second);
 #endif

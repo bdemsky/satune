@@ -41,7 +41,7 @@ bool isTrue(Constraint * c) {return c->type==TRUE;}
 void internalfreeConstraint(Constraint * c);
 void freerecConstraint(Constraint * c);
 Constraint * cloneConstraint(Constraint * c);
-void setNegConstraint(Constraint * this, Constraint *c) {this->neg=c;}
+void setNegConstraint(Constraint * This, Constraint *c) {This->neg=c;}
 Constraint *negateConstraint(Constraint * c);
 
 extern Constraint ctrue;

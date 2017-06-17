@@ -1,19 +1,19 @@
 #include "functionencoding.h"
 
 FunctionEncoding * allocFunctionEncoding(FunctionEncodingType type, Element *function) {
-	FunctionEncoding * this=(FunctionEncoding *)ourmalloc(sizeof(FunctionEncoding));
-	this->op.function=function;
-	this->type=type;
-	return this;
+	FunctionEncoding * This=(FunctionEncoding *)ourmalloc(sizeof(FunctionEncoding));
+	This->op.function=function;
+	This->type=type;
+	return This;
 }
 
 FunctionEncoding * allocPredicateEncoding(FunctionEncodingType type, Boolean *predicate) {
-	FunctionEncoding * this=(FunctionEncoding *)ourmalloc(sizeof(FunctionEncoding));
-	this->op.predicate=predicate;
-	this->type=type;
-	return this;
+	FunctionEncoding * This=(FunctionEncoding *)ourmalloc(sizeof(FunctionEncoding));
+	This->op.predicate=predicate;
+	This->type=type;
+	return This;
 }
 
-void deleteFunctionEncoding(FunctionEncoding *this) {
-	ourfree(this);
+void deleteFunctionEncoding(FunctionEncoding *This) {
+	ourfree(This);
 }

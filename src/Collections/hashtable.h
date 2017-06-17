@@ -24,7 +24,7 @@
  * @brief A simple, custom hash table
  *
  * By default it is model_malloc, but you can pass in your own allocation
- * functions. Note that this table does not support the value 0 (NULL) used as
+ * functions. Note that This table does not support the value 0 (NULL) used as
  * a key and is designed primarily with pointer-based keys in mind. Other
  * primitive key types are supported only for non-zero values.
  *

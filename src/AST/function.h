@@ -5,10 +5,10 @@
 #include "ops.h"
 #include "structs.h"
 struct Function {
-	enum ArithOp op;
+	ArithOp op;
 	VectorSet* domains;
 	Set * range;
-	enum OverFlowBehavior overflowbehavior;
+	OverFlowBehavior overflowbehavior;
 	Table* table;
 };
 #endif

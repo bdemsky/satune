@@ -6,10 +6,10 @@
 #include "structs.h"
 
 struct Predicate {
-	enum CompOp op;
+	CompOp op;
 	VectorSet* domains;
 };
 
 
-Predicate* allocPredicate(enum CompOp op, Set ** domain, uint numDomain);
+Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain);
 #endif

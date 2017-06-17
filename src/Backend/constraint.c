@@ -15,67 +15,67 @@ Constraint ctrue={TRUE, 0xffffffff, NULL, NULL};
 Constraint cfalse={FALSE, 0xffffffff, NULL, NULL};
 
 Constraint * allocConstraint(CType t, Constraint *l, Constraint *r) {
-	Constraint *this=(Constraint *) ourmalloc(sizeof(Constraint));
-	this->type=t;
-	this->numoperandsorvar=2;
-	this->operands=(Constraint **)ourmalloc(2*sizeof(Constraint *));
-	this->neg=NULL;
+	Constraint *This=(Constraint *) ourmalloc(sizeof(Constraint));
+	This->type=t;
+	This->numoperandsorvar=2;
+	This->operands=(Constraint **)ourmalloc(2*sizeof(Constraint *));
+	This->neg=NULL;
 	ASSERT(l!=NULL);
 	//if (type==IMPLIES) {
 	//type=OR;
 	//	operands[0]=l->negate();
 	//	} else {
-	this->operands[0]=l;
+	This->operands[0]=l;
 	//	}
-	this->operands[1]=r;
-	return this;
+	This->operands[1]=r;
+	return This;
 }
 
 Constraint * allocUnaryConstraint(CType t, Constraint *l) {
-	Constraint *this=(Constraint *) ourmalloc(sizeof(Constraint));
-	this->type=t;
-	this->numoperandsorvar=1;
-	this->operands=(Constraint **) ourmalloc(sizeof(Constraint *));
-	this->neg=NULL;
-	this->operands[0]=l;
-	return this;
+	Constraint *This=(Constraint *) ourmalloc(sizeof(Constraint));
+	This->type=t;
+	This->numoperandsorvar=1;
+	This->operands=(Constraint **) ourmalloc(sizeof(Constraint *));
+	This->neg=NULL;
+	This->operands[0]=l;
+	return This;
 }
 
 Constraint * allocArrayConstraint(CType t, uint num, Constraint **array) {
-	Constraint *this=(Constraint *) ourmalloc(sizeof(Constraint));
-	this->type=t;
-	this->numoperandsorvar=num;
-	this->operands=(Constraint **) ourmalloc(num*sizeof(Constraint *));
-	this->neg=NULL;
-	memcpy(this->operands, array, num*sizeof(Constraint *));
-	return this;
+	Constraint *This=(Constraint *) ourmalloc(sizeof(Constraint));
+	This->type=t;
+	This->numoperandsorvar=num;
+	This->operands=(Constraint **) ourmalloc(num*sizeof(Constraint *));
+	This->neg=NULL;
+	memcpy(This->operands, array, num*sizeof(Constraint *));
+	return This;
 }
 
 Constraint * allocVarConstraint(CType t, uint v) {
-	Constraint *this=(Constraint *) ourmalloc(sizeof(Constraint));
-	this->type=t;
-	this->numoperandsorvar=v;
-	this->operands=NULL;
-	this->neg=NULL;
-	return this;
+	Constraint *This=(Constraint *) ourmalloc(sizeof(Constraint));
+	This->type=t;
+	This->numoperandsorvar=v;
+	This->operands=NULL;
+	This->neg=NULL;
+	return This;
 }
 
-void deleteConstraint(Constraint *this) {
-	if (this->operands!=NULL)
-		ourfree(this->operands);
+void deleteConstraint(Constraint *This) {
+	if (This->operands!=NULL)
+		ourfree(This->operands);
 }
 
-void dumpConstraint(Constraint * this, IncrementalSolver *solver) {
-	if (this->type==VAR) {
-		addClauseLiteral(solver, this->numoperandsorvar);
+void dumpConstraint(Constraint * This, IncrementalSolver *solver) {
+	if (This->type==VAR) {
+		addClauseLiteral(solver, This->numoperandsorvar);
 		addClauseLiteral(solver, 0);
-	} else if (this->type==NOTVAR) {
-		addClauseLiteral(solver, -this->numoperandsorvar);
+	} else if (This->type==NOTVAR) {
+		addClauseLiteral(solver, -This->numoperandsorvar);
 		addClauseLiteral(solver, 0);
 	} else {
-		ASSERT(this->type==OR);
-		for(uint i=0;i<this->numoperandsorvar;i++) {
-			Constraint *c=this->operands[i];
+		ASSERT(This->type==OR);
+		for(uint i=0;i<This->numoperandsorvar;i++) {
+			Constraint *c=This->operands[i];
 			if (c->type==VAR) {
 				addClauseLiteral(solver, c->numoperandsorvar);
 			} else if (c->type==NOTVAR) {
@@ -86,8 +86,8 @@ void dumpConstraint(Constraint * this, IncrementalSolver *solver) {
 	}
 }
 
-void internalfreeConstraint(Constraint * this) {
-	switch(this->type) {
+void internalfreeConstraint(Constraint * This) {
+	switch(This->type) {
 	case TRUE:
 	case FALSE:
 	case NOTVAR:
@@ -96,13 +96,13 @@ void internalfreeConstraint(Constraint * this) {
 	case BOGUS:
 		ASSERT(0);
 	default:
-		this->type=BOGUS;
-		ourfree(this);
+		This->type=BOGUS;
+		ourfree(This);
 	}
 }
 
-void freerecConstraint(Constraint *this) {
-	switch(this->type) {
+void freerecConstraint(Constraint *This) {
+	switch(This->type) {
 	case TRUE:
 	case FALSE:
 	case NOTVAR:
@@ -111,18 +111,18 @@ void freerecConstraint(Constraint *this) {
 	case BOGUS:
 		ASSERT(0);
 	default:
-		if (this->operands!=NULL) {
-			for(uint i=0;i<this->numoperandsorvar;i++)
-				freerecConstraint(this->operands[i]);
+		if (This->operands!=NULL) {
+			for(uint i=0;i<This->numoperandsorvar;i++)
+				freerecConstraint(This->operands[i]);
 		}
-		this->type=BOGUS;
-		deleteConstraint(this);
+		This->type=BOGUS;
+		deleteConstraint(This);
 	}
 }
 
 
-void printConstraint(Constraint * this) {
-	switch(this->type) {
+void printConstraint(Constraint * This) {
+	switch(This->type) {
 	case TRUE:
 		model_print("true");
 		break;
@@ -131,54 +131,54 @@ void printConstraint(Constraint * this) {
 		break;
 	case IMPLIES:
 		model_print("(");
-		printConstraint(this->operands[0]);
+		printConstraint(This->operands[0]);
 		model_print(")");
 		model_print("=>");
 		model_print("(");
-		printConstraint(this->operands[1]);
+		printConstraint(This->operands[1]);
 		model_print(")");
 		break;
 	case AND:
 	case OR:
 		model_print("(");
-		for(uint i=0;i<this->numoperandsorvar;i++) {
+		for(uint i=0;i<This->numoperandsorvar;i++) {
 			if (i!=0) {
-				if (this->type==AND)
+				if (This->type==AND)
 					model_print(" ^ ");
 				else
 					model_print(" v ");
 			}
-			printConstraint(this->operands[i]);
+			printConstraint(This->operands[i]);
 		}
 		model_print(")");
 		break;
 	case VAR:
-		model_print("t%u",this->numoperandsorvar);
+		model_print("t%u",This->numoperandsorvar);
 		break;
 	case NOTVAR:
-		model_print("!t%u",this->numoperandsorvar);
+		model_print("!t%u",This->numoperandsorvar);
 		break;
 	default:
 		ASSERT(0);
 	}
 }
 
-Constraint * cloneConstraint(Constraint * this) {
-	switch(this->type) {
+Constraint * cloneConstraint(Constraint * This) {
+	switch(This->type) {
 	case TRUE:
 	case FALSE:
 	case VAR:
 	case NOTVAR:
-		return this;
+		return This;
 	case IMPLIES:
-		return allocConstraint(IMPLIES, cloneConstraint(this->operands[0]), cloneConstraint(this->operands[1]));
+		return allocConstraint(IMPLIES, cloneConstraint(This->operands[0]), cloneConstraint(This->operands[1]));
 	case AND:
 	case OR: {
-		Constraint *array[this->numoperandsorvar];
-		for(uint i=0;i<this->numoperandsorvar;i++) {
-			array[i]=cloneConstraint(this->operands[i]);
+		Constraint *array[This->numoperandsorvar];
+		for(uint i=0;i<This->numoperandsorvar;i++) {
+			array[i]=cloneConstraint(This->operands[i]);
 		}
-		return allocArrayConstraint(this->type, this->numoperandsorvar, array);
+		return allocArrayConstraint(This->type, This->numoperandsorvar, array);
 	}
 	default:
 		ASSERT(0);
@@ -260,107 +260,107 @@ bool mergeandfree(VectorConstraint * to, VectorConstraint * from) {
 	return false;
 }
 
-VectorConstraint * simplifyConstraint(Constraint * this) {
-	switch(this->type) {
+VectorConstraint * simplifyConstraint(Constraint * This) {
+	switch(This->type) {
 	case TRUE:
 	case VAR:
 	case NOTVAR:
 	case FALSE: {
 		VectorConstraint * vec=allocDefVectorConstraint();
-		pushVectorConstraint(vec, this);
+		pushVectorConstraint(vec, This);
 		return vec;
 	}
 	case AND: {
 		VectorConstraint *vec=allocDefVectorConstraint();
-		for(uint i=0;i<this->numoperandsorvar;i++) {
-			VectorConstraint * subvec=simplifyConstraint(this->operands[i]);
+		for(uint i=0;i<This->numoperandsorvar;i++) {
+			VectorConstraint * subvec=simplifyConstraint(This->operands[i]);
 			if (mergeandfree(vec, subvec)) {
-				for(uint j=i+1;j<this->numoperandsorvar;j++) {
-					freerecConstraint(this->operands[j]);
+				for(uint j=i+1;j<This->numoperandsorvar;j++) {
+					freerecConstraint(This->operands[j]);
 				}
-				internalfreeConstraint(this);
+				internalfreeConstraint(This);
 				return vec;
 			}
 		}
-		internalfreeConstraint(this);
+		internalfreeConstraint(This);
 		return vec;
 	}
 	case OR: {
-		for(uint i=0;i<this->numoperandsorvar;i++) {
-			Constraint *c=this->operands[i];
+		for(uint i=0;i<This->numoperandsorvar;i++) {
+			Constraint *c=This->operands[i];
 			switch(c->type) {
 			case TRUE: {
 				VectorConstraint * vec=allocDefVectorConstraint();
 				pushVectorConstraint(vec, c);
-				freerecConstraint(this);
+				freerecConstraint(This);
 				return vec;
 			}
 			case FALSE: {
-				Constraint *array[this->numoperandsorvar-1];
+				Constraint *array[This->numoperandsorvar-1];
 				uint index=0;
-				for(uint j=0;j<this->numoperandsorvar;j++) {
+				for(uint j=0;j<This->numoperandsorvar;j++) {
 					if (j!=i)
-						array[index++]=this->operands[j];
+						array[index++]=This->operands[j];
 				}
 				Constraint *cn=allocArrayConstraint(OR, index, array);
 				VectorConstraint *vec=simplifyConstraint(cn);
-				internalfreeConstraint(this);
+				internalfreeConstraint(This);
 				return vec;
 			}
 			case VAR:
 			case NOTVAR:
 				break;
 			case OR: {
-				uint nsize=this->numoperandsorvar+c->numoperandsorvar-1;
+				uint nsize=This->numoperandsorvar+c->numoperandsorvar-1;
 				Constraint *array[nsize];
 				uint index=0;
-				for(uint j=0;j<this->numoperandsorvar;j++)
+				for(uint j=0;j<This->numoperandsorvar;j++)
 					if (j!=i)
-						array[index++]=this->operands[j];
+						array[index++]=This->operands[j];
 				for(uint j=0;j<c->numoperandsorvar;j++)
 					array[index++]=c->operands[j];
 				Constraint *cn=allocArrayConstraint(OR, nsize, array);
 				VectorConstraint *vec=simplifyConstraint(cn);
-				internalfreeConstraint(this);
+				internalfreeConstraint(This);
 				internalfreeConstraint(c);
 				return vec;
 			}
 			case IMPLIES: {
-				uint nsize=this->numoperandsorvar+1;
+				uint nsize=This->numoperandsorvar+1;
 				Constraint *array[nsize];
 				uint index=0;
-				for(uint j=0;j<this->numoperandsorvar;j++)
+				for(uint j=0;j<This->numoperandsorvar;j++)
 					if (j!=i)
-						array[index++]=this->operands[j];
+						array[index++]=This->operands[j];
 				array[index++]=negateConstraint(c->operands[0]);
 				array[index++]=c->operands[1];
 				Constraint *cn=allocArrayConstraint(OR, nsize, array);
 				VectorConstraint *vec=simplifyConstraint(cn);
-				internalfreeConstraint(this);
+				internalfreeConstraint(This);
 				internalfreeConstraint(c);
 				return vec;
 			}
 			case AND: {
-				Constraint *array[this->numoperandsorvar];
+				Constraint *array[This->numoperandsorvar];
 
 				VectorConstraint *vec=allocDefVectorConstraint();
 				for(uint j=0;j<c->numoperandsorvar;j++) {
 					//copy other elements
-					for(uint k=0;k<this->numoperandsorvar;k++) {
+					for(uint k=0;k<This->numoperandsorvar;k++) {
 						if (k!=i) {
-							array[k]=cloneConstraint(this->operands[k]);
+							array[k]=cloneConstraint(This->operands[k]);
 						}
 					}
 
 					array[i]=cloneConstraint(c->operands[j]);
-					Constraint *cn=allocArrayConstraint(OR, this->numoperandsorvar, array);
+					Constraint *cn=allocArrayConstraint(OR, This->numoperandsorvar, array);
 					VectorConstraint * newvec=simplifyConstraint(cn);
 					if (mergeandfree(vec, newvec)) {
-						freerecConstraint(this);
+						freerecConstraint(This);
 						return vec;
 					}
 				}
-				freerecConstraint(this);
+				freerecConstraint(This);
 				return vec;
 			}
 			default:
@@ -369,18 +369,18 @@ VectorConstraint * simplifyConstraint(Constraint * this) {
 			//continue on to next item
 		}
 		VectorConstraint * vec=allocDefVectorConstraint();
-		if (this->numoperandsorvar==1) {
-			Constraint *c=this->operands[0];
-			freerecConstraint(this);
+		if (This->numoperandsorvar==1) {
+			Constraint *c=This->operands[0];
+			freerecConstraint(This);
 			pushVectorConstraint(vec, c);
 		} else
-			pushVectorConstraint(vec, this);
+			pushVectorConstraint(vec, This);
 		return vec;
 	}
 	case IMPLIES: {
-		Constraint *cn=allocConstraint(OR, negateConstraint(this->operands[0]), this->operands[1]);
+		Constraint *cn=allocConstraint(OR, negateConstraint(This->operands[0]), This->operands[1]);
 		VectorConstraint * vec=simplifyConstraint(cn);
-		internalfreeConstraint(this);
+		internalfreeConstraint(This);
 		return vec;
 	}
 	default:
@@ -389,29 +389,29 @@ VectorConstraint * simplifyConstraint(Constraint * this) {
 	}
 }
 
-Constraint * negateConstraint(Constraint * this) {
-	switch(this->type) {
+Constraint * negateConstraint(Constraint * This) {
+	switch(This->type) {
 	case TRUE:
 		return &cfalse;
 	case FALSE:
 		return &ctrue;
 	case NOTVAR:
 	case VAR:
-		return this->neg;
+		return This->neg;
 	case IMPLIES: {
-		Constraint *l=this->operands[0];
-		Constraint *r=this->operands[1];
-		this->operands[0]=r;
-		this->operands[1]=l;
-		return this;
+		Constraint *l=This->operands[0];
+		Constraint *r=This->operands[1];
+		This->operands[0]=r;
+		This->operands[1]=l;
+		return This;
 	}
 	case AND:
 	case OR: {
-		for(uint i=0;i<this->numoperandsorvar;i++) {
-			this->operands[i]=negateConstraint(this->operands[i]);
+		for(uint i=0;i<This->numoperandsorvar;i++) {
+			This->operands[i]=negateConstraint(This->operands[i]);
 		}
-		this->type=(this->type==AND) ? OR : AND;
-		return this;
+		This->type=(This->type==AND) ? OR : AND;
+		return This;
 	}
 	default:
 		ASSERT(0);

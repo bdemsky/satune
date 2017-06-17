@@ -1,19 +1,19 @@
 #include "elementencoding.h"
 
 ElementEncoding * allocElementEncoding(ElementEncodingType type, Element *element) {
-	ElementEncoding * this=(ElementEncoding *)ourmalloc(sizeof(ElementEncoding));
-	this->element=element;
-	this->type=type;
-	this->variables=NULL;
-	this->encodingArray=NULL;
-	this->numVars=0;
-	return this;
+	ElementEncoding * This=(ElementEncoding *)ourmalloc(sizeof(ElementEncoding));
+	This->element=element;
+	This->type=type;
+	This->variables=NULL;
+	This->encodingArray=NULL;
+	This->numVars=0;
+	return This;
 }
 
-void deleteElementEncoding(ElementEncoding *this) {
-	if (this->variables!=NULL)
-		ourfree(this->variables);
-	if (this->encodingArray!=NULL)
-		ourfree(this->encodingArray);
-	ourfree(this);
+void deleteElementEncoding(ElementEncoding *This) {
+	if (This->variables!=NULL)
+		ourfree(This->variables);
+	if (This->encodingArray!=NULL)
+		ourfree(This->encodingArray);
+	ourfree(This);
 }

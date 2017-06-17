@@ -13,83 +13,83 @@
 #include "common.h"
 
 IncrementalSolver * allocIncrementalSolver() {
-	IncrementalSolver *this=(IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
-	this->buffer=((int *)ourmalloc(sizeof(int)*IS_BUFFERSIZE));
-	this->solution=NULL;
-	this->solutionsize=0;
-	this->offset=0;
-	createSolver(this);
-	return this;
+	IncrementalSolver *This=(IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
+	This->buffer=((int *)ourmalloc(sizeof(int)*IS_BUFFERSIZE));
+	This->solution=NULL;
+	This->solutionsize=0;
+	This->offset=0;
+	createSolver(This);
+	return This;
 }
 
-void deleteIncrementalSolver(IncrementalSolver * this) {
-	killSolver(this);
-	ourfree(this->buffer);
-	if (this->solution != NULL)
-		ourfree(this->solution);
+void deleteIncrementalSolver(IncrementalSolver * This) {
+	killSolver(This);
+	ourfree(This->buffer);
+	if (This->solution != NULL)
+		ourfree(This->solution);
 }
 
-void resetSolver(IncrementalSolver * this) {
-	killSolver(this);
-	this->offset = 0;
-	createSolver(this);
+void resetSolver(IncrementalSolver * This) {
+	killSolver(This);
+	This->offset = 0;
+	createSolver(This);
 }
 
-void addClauseLiteral(IncrementalSolver * this, int literal) {
-	this->buffer[this->offset++]=literal;
-	if (this->offset==IS_BUFFERSIZE) {
-		flushBufferSolver(this);
+void addClauseLiteral(IncrementalSolver * This, int literal) {
+	This->buffer[This->offset++]=literal;
+	if (This->offset==IS_BUFFERSIZE) {
+		flushBufferSolver(This);
 	}
 }
 
-void finishedClauses(IncrementalSolver * this) {
-	addClauseLiteral(this, 0);
+void finishedClauses(IncrementalSolver * This) {
+	addClauseLiteral(This, 0);
 }
 
-void freeze(IncrementalSolver * this, int variable) {
-	addClauseLiteral(this, IS_FREEZE);
-	addClauseLiteral(this, variable);
+void freeze(IncrementalSolver * This, int variable) {
+	addClauseLiteral(This, IS_FREEZE);
+	addClauseLiteral(This, variable);
 }
 
-int solve(IncrementalSolver * this) {
+int solve(IncrementalSolver * This) {
 	//add an empty clause
-	startSolve(this);
-	return getSolution(this);
+	startSolve(This);
+	return getSolution(This);
 }
 
 
-void startSolve(IncrementalSolver *this) {
-	addClauseLiteral(this, IS_RUNSOLVER);
-	flushBufferSolver(this);
+void startSolve(IncrementalSolver *This) {
+	addClauseLiteral(This, IS_RUNSOLVER);
+	flushBufferSolver(This);
 }
 
-int getSolution(IncrementalSolver * this) {
-	int result=readIntSolver(this);
+int getSolution(IncrementalSolver * This) {
+	int result=readIntSolver(This);
 	if (result == IS_SAT) {
-		int numVars=readIntSolver(this);
-		if (numVars > this->solutionsize) {
-			if (this->solution != NULL)
-				ourfree(this->solution);
-			this->solution = (int *) ourmalloc((numVars+1)*sizeof(int));
-			this->solution[0] = 0;
+		int numVars=readIntSolver(This);
+		if (numVars > This->solutionsize) {
+			if (This->solution != NULL)
+				ourfree(This->solution);
+			This->solution = (int *) ourmalloc((numVars+1)*sizeof(int));
+			This->solution[0] = 0;
 		}
-		readSolver(this, &this->solution[1], numVars * sizeof(int));
+		readSolver(This, &This->solution[1], numVars * sizeof(int));
 	}
 	return result;
 }
 
-int readIntSolver(IncrementalSolver * this) {
+int readIntSolver(IncrementalSolver * This) {
 	int value;
-	readSolver(this, &value, 4);
+	readSolver(This, &value, 4);
 	return value;
 }
 
-void readSolver(IncrementalSolver * this, void * tmp, ssize_t size) {
+void readSolver(IncrementalSolver * This, void * tmp, ssize_t size) {
 	char *result = (char *) tmp;
 	ssize_t bytestoread=size;
 	ssize_t bytesread=0;
 	do {
-		ssize_t n=read(this->from_solver_fd, &((char *)result)[bytesread], bytestoread);
+		ssize_t n=read(This->from_solver_fd, &((char *)result)[bytesread], bytestoread);
 		if (n == -1) {
 			model_print("Read failure\n");
 			exit(-1);
@@ -99,22 +99,22 @@ void readSolver(IncrementalSolver * this, void * tmp, ssize_t size) {
 	} while(bytestoread != 0);
 }
 
-bool getValueSolver(IncrementalSolver * this, int variable) {
-	return this->solution[variable];
+bool getValueSolver(IncrementalSolver * This, int variable) {
+	return This->solution[variable];
 }
 
-void createSolver(IncrementalSolver * this) {
+void createSolver(IncrementalSolver * This) {
 	int to_pipe[2];
 	int from_pipe[2];
 	if (pipe(to_pipe) || pipe(from_pipe)) {
 		model_print("Error creating pipe.\n");
 		exit(-1);
 	}
-	if ((this->solver_pid = fork()) == -1) {
+	if ((This->solver_pid = fork()) == -1) {
 		model_print("Error forking.\n");
 		exit(-1);
 	}
-	if (this->solver_pid == 0) {
+	if (This->solver_pid == 0) {
 		//Solver process
 		close(to_pipe[1]);
 		close(from_pipe[0]);
@@ -131,36 +131,36 @@ void createSolver(IncrementalSolver * this) {
 		close(fd);
 	} else {
 		//Our process
-		this->to_solver_fd = to_pipe[1];
-		this->from_solver_fd = from_pipe[0];
+		This->to_solver_fd = to_pipe[1];
+		This->from_solver_fd = from_pipe[0];
 		close(to_pipe[0]);
 		close(from_pipe[1]);
 	}
 }
 
-void killSolver(IncrementalSolver * this) {
-	close(this->to_solver_fd);
-	close(this->from_solver_fd);
+void killSolver(IncrementalSolver * This) {
+	close(This->to_solver_fd);
+	close(This->from_solver_fd);
 	//Stop the solver
-	if (this->solver_pid > 0) {
+	if (This->solver_pid > 0) {
 		int status;
-		kill(this->solver_pid, SIGKILL);
-		waitpid(this->solver_pid, &status, 0);
+		kill(This->solver_pid, SIGKILL);
+		waitpid(This->solver_pid, &status, 0);
 	}
 }
 
-void flushBufferSolver(IncrementalSolver * this) {
-	ssize_t bytestowrite=sizeof(int)*this->offset;
+void flushBufferSolver(IncrementalSolver * This) {
+	ssize_t bytestowrite=sizeof(int)*This->offset;
 	ssize_t byteswritten=0;
 	do {
-		ssize_t n=write(this->to_solver_fd, &((char *)this->buffer)[byteswritten], bytestowrite);
+		ssize_t n=write(This->to_solver_fd, &((char *)This->buffer)[byteswritten], bytestowrite);
 		if (n == -1) {
 			perror("Write failure\n");
-			model_print("to_solver_fd=%d\n",this->to_solver_fd);
+			model_print("to_solver_fd=%d\n",This->to_solver_fd);
 			exit(-1);
 		}
 		bytestowrite -= n;
 		byteswritten += n;
 	} while(bytestowrite != 0);
-	this->offset = 0;
+	This->offset = 0;
 }

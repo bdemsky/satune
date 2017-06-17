@@ -23,5 +23,5 @@ struct FunctionEncoding {
 
 FunctionEncoding * allocFunctionEncoding(FunctionEncodingType type, Element *function);
 FunctionEncoding * allocPredicateEncoding(FunctionEncodingType type, Boolean *predicate);
-void deleteFunctionEncoding(FunctionEncoding *this);
+void deleteFunctionEncoding(FunctionEncoding *This);
 #endif

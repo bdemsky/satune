@@ -6,6 +6,6 @@ Element *allocElement(Set * s) {
 	return tmp;
 }
 
-void deleteElement(Element *this) {
-	ourfree(this);
+void deleteElement(Element *This) {
+	ourfree(This);
 }

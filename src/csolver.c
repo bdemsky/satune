@@ -20,47 +20,47 @@ CSolver * allocCSolver() {
 
 /** This function tears down the solver and the entire AST */
 
-void deleteSolver(CSolver *this) {
-	deleteVectorBoolean(this->constraints);
+void deleteSolver(CSolver *This) {
+	deleteVectorBoolean(This->constraints);
 
-	uint size=getSizeVectorBoolean(this->allBooleans);
+	uint size=getSizeVectorBoolean(This->allBooleans);
 	for(uint i=0;i<size;i++) {
-		deleteBoolean(getVectorBoolean(this->allBooleans, i));
+		deleteBoolean(getVectorBoolean(This->allBooleans, i));
 	}
 
-	deleteVectorBoolean(this->allBooleans);
+	deleteVectorBoolean(This->allBooleans);
 
-	size=getSizeVectorSet(this->allSets);
+	size=getSizeVectorSet(This->allSets);
 	for(uint i=0;i<size;i++) {
-		deleteSet(getVectorSet(this->allSets, i));
+		deleteSet(getVectorSet(This->allSets, i));
 	}
 
-	deleteVectorSet(this->allSets);
+	deleteVectorSet(This->allSets);
 
-	size=getSizeVectorElement(this->allElements);
+	size=getSizeVectorElement(This->allElements);
 	for(uint i=0;i<size;i++) {
-		deleteElement(getVectorElement(this->allElements, i));
+		deleteElement(getVectorElement(This->allElements, i));
 	}
 	//FIXME: Freeing alltables and allpredicates
-	deleteVectorElement(this->allElements);
-	ourfree(this);
+	deleteVectorElement(This->allElements);
+	ourfree(This);
 }
 
-Set * createSet(CSolver * this, VarType type, uint64_t * elements, uint numelements) {
+Set * createSet(CSolver * This, VarType type, uint64_t * elements, uint numelements) {
 	Set * set=allocSet(type, elements, numelements);
-	pushVectorSet(this->allSets, set);
+	pushVectorSet(This->allSets, set);
 	return set;
 }
 
-Set * createRangeSet(CSolver * this, VarType type, uint64_t lowrange, uint64_t highrange) {
+Set * createRangeSet(CSolver * This, VarType type, uint64_t lowrange, uint64_t highrange) {
 	Set * set=allocSetRange(type, lowrange, highrange);
-	pushVectorSet(this->allSets, set);
+	pushVectorSet(This->allSets, set);
 	return set;
 }
 
-MutableSet * createMutableSet(CSolver * this, VarType type) {
+MutableSet * createMutableSet(CSolver * This, VarType type) {
 	MutableSet * set=allocMutableSet(type);
-	pushVectorSet(this->allSets, set);
+	pushVectorSet(This->allSets, set);
 	return set;
 }
 
@@ -74,9 +74,9 @@ uint64_t createUniqueItem(CSolver *solver, MutableSet * set) {
 	return element;
 }
 
-Element * getElementVar(CSolver *this, Set * set) {
+Element * getElementVar(CSolver *This, Set * set) {
 	Element * element=allocElement(set);
-	pushVectorElement(this->allElements, element);
+	pushVectorElement(This->allElements, element);
 	return element;
 }
 
@@ -91,7 +91,7 @@ Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, ui
 	return NULL;
 }
 
-Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain) {
+Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain) {
 	Predicate* predicate= allocPredicate(op, domain,numDomain);
 	pushVectorPredicate(solver->allPredicates, predicate);
 	return predicate;
@@ -123,8 +123,8 @@ Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array) {
 	return NULL;
 }
 
-void addBoolean(CSolver *this, Boolean * constraint) {
-	pushVectorBoolean(this->constraints, constraint);
+void addBoolean(CSolver *This, Boolean * constraint) {
+	pushVectorBoolean(This->constraints, constraint);
 }
 
 Order * createOrder(CSolver *solver, OrderType type, Set * set) {

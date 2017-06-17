@@ -61,7 +61,7 @@ Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, ui
 
 /** This function creates a predicate operator. */
 
-Predicate * createPredicateOperator(CSolver *solver, enum CompOp op, Set ** domain, uint numDomain);
+Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain);
 
 /** This function creates an empty instance table.*/
 
@@ -85,7 +85,7 @@ Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs);
 
 /** This function applies a logical operation to the Booleans in its input. */
 
-Boolean * applyLogicalOperation(CSolver *, enum LogicOp op, Boolean ** array);
+Boolean * applyLogicalOperation(CSolver *, LogicOp op, Boolean ** array);
 
 /** This function adds a boolean constraint to the set of constraints
     to be satisfied */
@@ -93,7 +93,7 @@ Boolean * applyLogicalOperation(CSolver *, enum LogicOp op, Boolean ** array);
 void addBoolean(CSolver *, Boolean * constraint);
 
 /** This function instantiates an order of type type over the set set. */
-Order * createOrder(CSolver *, enum OrderType type, Set * set);
+Order * createOrder(CSolver *, OrderType type, Set * set);
 
 /** This function instantiates a boolean on two items in an order. */
 Boolean * orderConstraint(CSolver *, Order * order, uint64_t first, uint64_t second);

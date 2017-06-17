@@ -8,6 +8,8 @@
 		This is a little sketchy, but apparently legit.
 		https://www.python.org/dev/peps/pep-3123/ */
 
+#define GETBOOLEANTYPE(o) (((Boolean *)(o))->btype)
+
 struct Boolean {
 	BooleanType btype;
 };
@@ -42,6 +44,6 @@ struct BooleanComp {
 
 Boolean * allocBoolean(VarType t);
 Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);
-void deleteBoolean(Boolean * this);
+void deleteBoolean(Boolean * This);
 
 #endif

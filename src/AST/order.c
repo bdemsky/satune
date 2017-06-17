@@ -3,7 +3,7 @@
 #include "set.h"
 
 
-Order* allocOrder(enum OrderType type, Set * set){
+Order* allocOrder(OrderType type, Set * set){
     Order* order = (Order*)ourmalloc(sizeof(Order));
     order->set=set;
     order->constraints = allocDefVectorBoolean();

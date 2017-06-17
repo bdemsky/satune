@@ -17,5 +17,5 @@ struct ElementEncoding {
 };
 
 ElementEncoding * allocElementEncoding(ElementEncodingType type, Element *element);
-void deleteElementEncoding(ElementEncoding *this);
+void deleteElementEncoding(ElementEncoding *This);
 #endif

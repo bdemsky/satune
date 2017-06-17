@@ -29,18 +29,18 @@ struct IncrementalSolver {
 };
 
 IncrementalSolver * allocIncrementalSolver();
-void deleteIncrementalSolver(IncrementalSolver * this);
-void addClauseLiteral(IncrementalSolver * this, int literal);
-void finishedClauses(IncrementalSolver * this);
-void freeze(IncrementalSolver * this, int variable);
-int solve(IncrementalSolver * this);
-void startSolve(IncrementalSolver * this);
-int getSolution(IncrementalSolver * this);
-bool getValueSolver(IncrementalSolver * this, int variable);
-void resetSolver(IncrementalSolver * this);
-void createSolver(IncrementalSolver * this);
-void killSolver(IncrementalSolver * this);
-void flushBufferSolver(IncrementalSolver * this);
-int readIntSolver(IncrementalSolver * this);
-void readSolver(IncrementalSolver * this, void * buffer, ssize_t size);
+void deleteIncrementalSolver(IncrementalSolver * This);
+void addClauseLiteral(IncrementalSolver * This, int literal);
+void finishedClauses(IncrementalSolver * This);
+void freeze(IncrementalSolver * This, int variable);
+int solve(IncrementalSolver * This);
+void startSolve(IncrementalSolver * This);
+int getSolution(IncrementalSolver * This);
+bool getValueSolver(IncrementalSolver * This, int variable);
+void resetSolver(IncrementalSolver * This);
+void createSolver(IncrementalSolver * This);
+void killSolver(IncrementalSolver * This);
+void flushBufferSolver(IncrementalSolver * This);
+int readIntSolver(IncrementalSolver * This);
+void readSolver(IncrementalSolver * This, void * buffer, ssize_t size);
 #endif
