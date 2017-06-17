@@ -4,37 +4,41 @@
 #include "mymemory.h"
 #include "ops.h"
 
+/** 
+		This is a little sketchy, but apparently legit.
+		https://www.python.org/dev/peps/pep-3123/ */
+
+struct Boolean {
+	BooleanType btype;
+};
+
 struct BooleanOrder {
+	Boolean base;
 	Order* order;
 	uint64_t first;
 	uint64_t second;
 };
 
 struct BooleanVar {
+	Boolean base;
 	VarType vtype;
 };
 
 struct BooleanLogic {
+	Boolean base;
 	LogicOp op;
 	Boolean * left;
 	Boolean * right;
 };
 
 struct BooleanComp {
+	Boolean base;
 	CompOp op;
 	Boolean * left;
 	Boolean * right;
 };
 
-struct Boolean {
-	BooleanType btype;
-	union {
-		BooleanOrder order;
-		BooleanVar var;
-		BooleanLogic logic;
-		BooleanComp comp;
-	};
-};
+
 
 Boolean * allocBoolean(VarType t);
 Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);

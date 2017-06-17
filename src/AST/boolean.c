@@ -1,19 +1,19 @@
 #include "boolean.h"
 
 Boolean* allocBoolean(VarType t) {
-	Boolean* tmp=(Boolean*) ourmalloc(sizeof (Boolean));
-	tmp->btype=BOOLEANVAR;
-	tmp->var.vtype=t;
-	return tmp;
+	BooleanVar* tmp=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
+	tmp->base.btype=BOOLEANVAR;
+	tmp->vtype=t;
+	return & tmp->base;
 }
 
 Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
-	Boolean* tmp=(Boolean*) ourmalloc(sizeof (Boolean));
-	tmp->btype=ORDERCONST;
-	tmp->order.order=order;
-	tmp->order.first=first;
-	tmp->order.second=second;
-	return tmp;
+	BooleanOrder* tmp=(BooleanOrder *) ourmalloc(sizeof (BooleanOrder));
+	tmp->base.btype=ORDERCONST;
+	tmp->order=order;
+	tmp->first=first;
+	tmp->second=second;
+	return & tmp -> base;
 }
 
 void deleteBoolean(Boolean * this) {
