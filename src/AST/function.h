@@ -4,6 +4,7 @@
 #include "mymemory.h"
 #include "ops.h"
 #include "structs.h"
+
 struct Function {
 	ArithOp op;
 	VectorSet* domains;

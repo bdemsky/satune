@@ -3,6 +3,7 @@
 Element *allocElement(Set * s) {
 	Element * tmp=(Element *)ourmalloc(sizeof(Element));
 	tmp->set=s;
+	tmp->encoding=NULL;
 	return tmp;
 }
 

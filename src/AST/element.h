@@ -5,6 +5,7 @@
 
 struct Element {
 	Set * set;
+	ElementEncoding * encoding;
 };
 
 Element * allocElement(Set *s);
