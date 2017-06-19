@@ -1,7 +1,9 @@
 #include "orderencoding.h"
 
-OrderEncoding * allocOrderEncoding() {
+OrderEncoding * allocOrderEncoding(OrderEncodingType type, Order *order) {
 	OrderEncoding *This=ourmalloc(sizeof(OrderEncoding));
+	This->type=type;
+	This->order=order;
 	return This;
 }
 
