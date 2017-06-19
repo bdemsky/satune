@@ -15,9 +15,10 @@
 	void pushVector ## name(Vector ## name *vector, type item);           \
 	type getVector ## name(Vector ## name *vector, uint index);           \
 	void setVector ## name(Vector ## name *vector, uint index, type item); \
-	uint getSizeVector ## name(Vector ## name *vector);                     \
-	void deleteVector ## name(Vector ## name *vector);                        \
-	void clearVector ## name(Vector ## name *vector);
+	uint getSizeVector ## name(Vector ## name *vector);										\
+	void deleteVector ## name(Vector ## name *vector);										\
+	void clearVector ## name(Vector ## name *vector);											\
+	type * exposeArray ## name(Vector ## name * vector);
 
 #define VectorImpl(name, type, defcap)                                  \
 	Vector ## name * allocDefVector ## name() {                           \
@@ -57,5 +58,8 @@
 	}                                                                     \
 	void clearVector ## name(Vector ## name *vector) {                     \
 		vector->size=0;                                                     \
+	}																																			\
+	type * exposeArray ## name(Vector ## name * vector) {									\
+		return vector->array;																								\
 	}
 #endif

@@ -17,3 +17,4 @@ void deleteElementEncoding(ElementEncoding *This) {
 		ourfree(This->encodingArray);
 	ourfree(This);
 }
+
