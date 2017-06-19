@@ -1,0 +1,8 @@
+(1) Elements/BooleanVars should link back to expressions that use them
+
+(2) Need to introduce variables in encoding of functions....
+
+(3) Some cases can do variable elimination of introduced variables...
+
+(4) Might need to indicate what variables we can query about in
+future?
