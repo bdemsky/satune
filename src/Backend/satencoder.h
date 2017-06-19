@@ -10,5 +10,6 @@ struct SATEncoder {
 
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
-
+void encodeAllSATEncoder(SATEncoder *This, CSolver *csolver);
+void encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);
 #endif
