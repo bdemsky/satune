@@ -7,10 +7,9 @@
 
 Table * allocTable(Set **domains, uint numDomain, Set * range){
     Table* table = (Table*) ourmalloc(sizeof(Table));
-    table->domains = allocDefVectorSet();
-    for(int i=0; i<numDomain; i++){
-        pushVectorSet(table->domains, domains[i]);
-    }
+		table->numDomains=numDomain;
+    table->domains = ourmalloc(numDomain*sizeof(Set *));
+		memcpy(table->domains, domains, numDomain * sizeof(Set *));
     table->range =range;
 		return table;
 }
@@ -21,16 +20,12 @@ void addNewTableEntry(Table* table, uint64_t* inputs, uint inputSize, uint64_t r
 }
 
 void deleteTable(Table* table){
-    uint size = getSizeVectorSet(table->domains);
-    for(uint i=0; i<size; i++){
-	deleteSet(getVectorSet(table->domains,i));
-    }
-    ourfree(table->domains);
-    ourfree(table->range);
-    size = getSizeVectorTableEntry(table->entries);
-    for(uint i=0; i<size; i++){
-	deleteTableEntry(getVectorTableEntry(table->entries, i));
-    }
-    ourfree(table);
+	ourfree(table->domains);
+	uint size = getSizeVectorTableEntry(table->entries);
+	for(uint i=0; i<size; i++){
+		deleteTableEntry(getVectorTableEntry(table->entries, i));
+	}
+	deleteVectorTableEntry(table->entries);
+	ourfree(table);
 }
 

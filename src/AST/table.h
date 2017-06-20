@@ -5,9 +5,10 @@
 #include "structs.h"
 
 struct Table {
-    VectorSet* domains;
-    Set * range;
-    VectorTableEntry* entries;
+	Set ** domains;
+	Set * range;
+	uint numDomains;
+	VectorTableEntry* entries;
 };
 
 Table * allocTable(Set **domains, uint numDomain, Set * range);
