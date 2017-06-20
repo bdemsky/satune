@@ -19,7 +19,10 @@
 	void deleteVector ## name(Vector ## name *vector);                    \
 	void clearVector ## name(Vector ## name *vector);                     \
 	void deleteVectorArray ## name(Vector ## name *vector);								\
-	type * exposeArray ## name(Vector ## name * vector);
+	type * exposeArray ## name(Vector ## name * vector);									\
+	void allocInlineVector ## name(Vector ## name * vector, uint capacity); \
+	void allocInlineDefVector ## name(Vector ## name * vector);						\
+	void allocInlineVectorArray ## name(Vector ## name * vector, uint capacity, type * array);
 
 #define VectorImpl(name, type, defcap)                                  \
 	Vector ## name * allocDefVector ## name() {                           \
@@ -65,5 +68,17 @@
 	}																																			\
 	void deleteVectorArray ## name(Vector ## name *vector) {							\
 		ourfree(vector->array);                                             \
+	}																																			\
+	void allocInlineVector ## name(Vector ## name * vector, uint capacity) { \
+		vector->size = 0;                                                      \
+		vector->capacity = capacity;																							\
+		vector->array = (type *) ourcalloc(1, sizeof(type) * capacity);			\
+	}																																			\
+	void allocInlineDefVector ## name(Vector ## name * vector) {					\
+		allocInlineVector ## name(vector, defcap);													\
+	}																																			\
+	void allocInlineVectorArray ## name(Vector ## name * vector, uint capacity, type * array) {	\
+		allocInlineVector ##name(vector, capacity);													\
+		memcpy(vector->array, array, capacity * sizeof(type));							\
 	}
 #endif
