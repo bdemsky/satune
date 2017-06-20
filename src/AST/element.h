@@ -9,20 +9,20 @@
 
 //FIXME:TALK ABOUT ELEMENT
 struct Element {
-    	ElementType type;
+	ElementType type;
 };
 
 struct ElementSet {
-    Element base;
-    Set * set;
-    ElementEncoding * encoding;
+	Element base;
+	Set * set;
+	ElementEncoding * encoding;
 };
 
-struct ElementFunction{
-    Element base;
-    Function * function;
-    VectorElement* Elements;
-    Boolean * overflowstatus;
+struct ElementFunction {
+	Element base;
+	Function * function;
+	VectorElement* Elements;
+	Boolean * overflowstatus;
 };
 
 Element * allocElementSet(Set *s);

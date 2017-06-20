@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   tableentry.h
  * Author: hamed
  *
@@ -16,13 +16,13 @@
 
 #include "classlist.h"
 #include "mymemory.h"
-struct TableEntry{
-    uint64_t output;
-    uint64_t inputs[];
+struct TableEntry {
+	uint64_t output;
+	uint64_t inputs[];
 };
 
 TableEntry* allocTableEntry(uint64_t* inputs, uint inputSize, uint64_t result);
 void deleteTableEntry(TableEntry* tableEntry);
 
-#endif /* TABLEENTRY_H */
+#endif/* TABLEENTRY_H */
 

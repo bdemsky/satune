@@ -7,8 +7,8 @@
 
 #define GETFUNCTIONTYPE(o) (((Function*)o)->type)
 
-struct Function{
-    FunctionType type;
+struct Function {
+	FunctionType type;
 };
 
 struct FunctionOperator {
@@ -20,7 +20,7 @@ struct FunctionOperator {
 	OverFlowBehavior overflowbehavior;
 };
 
-struct FunctionTable{
+struct FunctionTable {
 	Function base;
 	Table* table;
 };

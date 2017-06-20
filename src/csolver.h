@@ -16,16 +16,16 @@ struct CSolver {
 
 	/** This is a vector of all element structs that we have allocated. */
 	VectorElement * allElements;
-	
+
 	/** This is a vector of all predicate structs that we have allocated. */
 	VectorPredicate * allPredicates;
-	
+
 	/** This is a vector of all table structs that we have allocated. */
 	VectorTable * allTables;
-	
+
 	/** This is a vector of all order structs that we have allocated. */
 	VectorOrder * allOrders;
-	
+
 	/** This is a vector of all function structs that we have allocated. */
 	VectorFunction* allFunctions;
 };

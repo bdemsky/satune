@@ -49,7 +49,7 @@ void deleteSolver(CSolver *This) {
 		deleteTable(getVectorTable(This->allTables, i));
 	}
 	deleteVectorTable(This->allTables);
-	
+
 	size=getSizeVectorPredicate(This->allPredicates);
 	for(uint i=0;i<size;i++) {
 		deletePredicate(getVectorPredicate(This->allPredicates, i));
@@ -61,7 +61,7 @@ void deleteSolver(CSolver *This) {
 		deleteOrder(getVectorOrder(This->allOrders, i));
 	}
 	deleteVectorOrder(This->allOrders);
-	
+
 	size=getSizeVectorFunction(This->allFunctions);
 	for(uint i=0;i<size;i++) {
 		deleteFunction(getVectorFunction(This->allFunctions, i));
@@ -111,9 +111,9 @@ Boolean * getBooleanVar(CSolver *solver, VarType type) {
 }
 
 Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior) {
-    Function* function = allocFunctionOperator(op, domain, numDomain, range, overflowbehavior);
-    pushVectorFunction(solver->allFunctions, function);
-    return function;
+	Function* function = allocFunctionOperator(op, domain, numDomain, range, overflowbehavior);
+	pushVectorFunction(solver->allFunctions, function);
+	return function;
 }
 
 Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain) {
@@ -129,29 +129,29 @@ Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range)
 }
 
 void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSize, uint64_t result) {
-    addNewTableEntry(table,inputs, inputSize,result);
+	addNewTableEntry(table,inputs, inputSize,result);
 }
 
 Function * completeTable(CSolver *solver, Table * table) {
-    Function* function = allocFunctionTable(table);
-    pushVectorFunction(solver->allFunctions,function);
-    return function;
+	Function* function = allocFunctionTable(table);
+	pushVectorFunction(solver->allFunctions,function);
+	return function;
 }
 
 Element * applyFunction(CSolver *solver, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus) {
-    Element* element= allocElementFunction(function,array,numArrays,overflowstatus);
-    pushVectorElement(solver->allElements, element);
-    return element;
+	Element* element= allocElementFunction(function,array,numArrays,overflowstatus);
+	pushVectorElement(solver->allElements, element);
+	return element;
 }
 
 Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs, uint numInputs) {
-    Boolean* boolean= allocBooleanPredicate(predicate, inputs, numInputs);
-    pushVectorBoolean(solver->allBooleans, boolean);
-    return boolean;
+	Boolean* boolean= allocBooleanPredicate(predicate, inputs, numInputs);
+	pushVectorBoolean(solver->allBooleans, boolean);
+	return boolean;
 }
 
 Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array, uint asize) {
-    return allocBooleanLogicArray(solver, op, array, asize);
+	return allocBooleanLogicArray(solver, op, array, asize);
 }
 
 void addBoolean(CSolver *This, Boolean * constraint) {
