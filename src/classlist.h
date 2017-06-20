@@ -55,6 +55,12 @@ typedef struct Function Function;
 struct Predicate;
 typedef struct Predicate Predicate;
 
+struct PredicateTable;
+typedef struct PredicateTable PredicateTable;
+
+struct PredicateOperator;
+typedef struct PredicateOperator PredicateOperator;
+
 struct Table;
 typedef struct Table Table;
 

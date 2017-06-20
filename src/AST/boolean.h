@@ -41,12 +41,6 @@ struct BooleanPredicate{
     VectorElement* inputs;
 };
 
-struct TablePredicate{
-    BooleanPredicate predicate;
-    Table* table;
-};
-
-
 Boolean * allocBoolean(VarType t);
 Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs);

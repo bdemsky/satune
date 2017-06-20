@@ -5,9 +5,25 @@
 #include "ops.h"
 #include "structs.h"
 
+#define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
+
 struct Predicate {
+	PredicateType type;
+};
+
+struct PredicateOperator {
+	Predicate base;
 	CompOp op;
-	VectorSet* domains;
+	Set** domains;
+	int numDomains;
+};
+
+struct PredicateTable {
+	Predicate base;
+	Set** domains;
+	int numDomains;
+	Table* table;
+	UndefinedBehavior undefinedbehavior;
 };
 
 

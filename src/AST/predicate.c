@@ -3,16 +3,28 @@
 
 
 Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain){
-    Predicate* predicate = (Predicate*) ourmalloc(sizeof(Predicate));
-    predicate->domains = allocDefVectorSet();
-    for(uint i=0; i<numDomain; i++)
-        pushVectorSet(predicate->domains,domain[i]);
-    predicate->op=op;
-    return predicate;
+	PredicateOperator* predicate = ourmalloc(sizeof(PredicateOperator));
+	GETPREDICATETYPE(predicate)=OPERATORPRED;
+	predicate->numDomains=numDomain;
+	predicate->domains = ourmalloc(numDomain * sizeof(Set *));
+	memcpy(predicate->domains, domain, numDomain * sizeof(Set *));
+	predicate->op=op;
+	return &predicate->base;
 }
 
 void deletePredicate(Predicate* predicate){
-    deleteVectorSet(predicate->domains);
-    ourfree(predicate);
+	switch(GETPREDICATETYPE(predicate)) {
+	case OPERATORPRED: {
+		PredicateOperator * operpred=(PredicateOperator *) predicate;
+		ourfree(operpred->domains);
+		break;
+	}
+	case TABLEPRED: {
+		break;
+	}
+	}
+
+	//need to handle freeing array...
+	ourfree(predicate);
 }
 
