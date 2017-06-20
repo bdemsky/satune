@@ -4,6 +4,7 @@ Boolean* allocBoolean(VarType t) {
 	BooleanVar* tmp=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
 	GETBOOLEANTYPE(tmp)=BOOLEANVAR;
 	tmp->vtype=t;
+	tmp->var=NULL;
 	return & tmp->base;
 }
 

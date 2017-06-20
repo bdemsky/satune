@@ -6,6 +6,7 @@
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
+	This->varcount=1;
 	return This;
 }
 
@@ -39,8 +40,19 @@ Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) 
 	return NULL;
 }
 
+Constraint * getNewVarSATEncoder(SATEncoder *This) {
+	Constraint * var=allocVarConstraint(VAR, This->varcount);
+	Constraint * varneg=allocVarConstraint(NOTVAR, This->varcount++);
+	setNegConstraint(var, varneg);
+	setNegConstraint(varneg, var);
+	return var;
+}
+
 Constraint * encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint) {
-	return NULL;
+	if (constraint->var == NULL) {
+		constraint->var=getNewVarSATEncoder(This);
+	}
+	return constraint->var;
 }
 
 Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) {
