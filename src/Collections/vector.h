@@ -18,6 +18,7 @@
 	uint getSizeVector ## name(Vector ## name *vector);                   \
 	void deleteVector ## name(Vector ## name *vector);                    \
 	void clearVector ## name(Vector ## name *vector);                     \
+	void deleteVectorArray ## name(Vector ## name *vector);								\
 	type * exposeArray ## name(Vector ## name * vector);
 
 #define VectorImpl(name, type, defcap)                                  \
@@ -61,5 +62,8 @@
 	}                                                                     \
 	type * exposeArray ## name(Vector ## name * vector) {                 \
 		return vector->array;                                               \
+	}																																			\
+	void deleteVectorArray ## name(Vector ## name *vector) {							\
+		ourfree(vector->array);                                             \
 	}
 #endif
