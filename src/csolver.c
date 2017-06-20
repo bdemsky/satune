@@ -61,7 +61,7 @@ void deleteSolver(CSolver *This) {
 	for(uint i=0;i<size;i++) {
 		deleteFunction(getVectorFunction(This->allFunctions, i));
 	}
-	deleteVectorOrder(This->allFunctions);
+	deleteVectorFunction(This->allFunctions);
 	ourfree(This);
 }
 
@@ -94,7 +94,7 @@ uint64_t createUniqueItem(CSolver *solver, MutableSet * set) {
 }
 
 Element * getElementVar(CSolver *This, Set * set) {
-	Element * element=allocElement(set);
+	Element * element=allocElementSet(set);
 	pushVectorElement(This->allElements, element);
 	return element;
 }
@@ -134,15 +134,19 @@ Function * completeTable(CSolver *solver, Table * table) {
 }
 
 Element * applyFunction(CSolver *solver, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus) {
-	return NULL;
+    Element* element= allocElementFunction(function,array,numArrays,overflowstatus);
+    pushVectorElement(solver->allElements, element);
+    return element;
 }
 
 Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs, uint numInputs) {
-	return NULL;
+    Boolean* boolean= allocBooleanPredicate(predicate, inputs, numInputs);
+    pushVectorBoolean(solver->allBooleans, boolean);
+    return boolean;
 }
 
-Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array) {
-	return NULL;
+Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array, uint asize) {
+    return allocBooleanLogicArray(solver, op, array, asize);
 }
 
 void addBoolean(CSolver *This, Boolean * constraint) {

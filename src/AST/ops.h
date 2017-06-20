@@ -23,9 +23,12 @@ typedef enum OrderType OrderType;
 enum OverFlowBehavior {IGNORE, WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW, NOOVERFLOW};
 typedef enum OverFlowBehavior OverFlowBehavior;
 
-enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, COMPARE};
+enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, COMPARE, PREDICATEOP};
 typedef enum BooleanType BooleanType;
 
 enum FunctionType {TABLEFUNC, OPERATORFUNC};
 typedef enum FunctionType FunctionType;
+
+enum ElementType {ELEMSET, ELEMFUNCRETURN};
+typedef enum ElementType ElementType;
 #endif

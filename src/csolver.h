@@ -95,7 +95,7 @@ Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs, ui
 
 /** This function applies a logical operation to the Booleans in its input. */
 
-Boolean * applyLogicalOperation(CSolver *, LogicOp op, Boolean ** array);
+Boolean * applyLogicalOperation(CSolver *, LogicOp op, Boolean ** array, uint asize);
 
 /** This function adds a boolean constraint to the set of constraints
     to be satisfied */
