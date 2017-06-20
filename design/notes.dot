@@ -1,0 +1,7 @@
+digraph "Passes" {
+TreeConstruction->TreeRewriting;
+TreeRewriting->EncodingSelection;
+EncodingSelection->Encoding;
+Encoding->SATOptimization;
+SATOptimization->CNFSATConversion;
+}

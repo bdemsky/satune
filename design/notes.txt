@@ -9,3 +9,52 @@ future?
 
 (5) Could simplify output of functions...  Maybe several outputs have
 same effect...
+
+
+Work/Passes:
+
+(1) TreeConstruction --- need backwards links...
+BooleanVar/ElementVar should be able to query all of its uses.  Should
+go all the way up...
+
+(2) Naive Encoding Pass --- add an encoding to every Element/Function...
+
+(3) Encoder Pass --- implement encodings into constraint objects...
+
+(4) Test...  Make sure the thing works...
+
+Next basic implementation phase:
+(1) Extend Naive Encoder Pass to test other encodings
+(2) Build more clever function encodings strategies (e.g., equals, add, etc)...
+(3) Test
+
+Actual research:
+
+(1) TreeRewriting --- probably should do Equivalent Subexpression
+Elimination (Don't have the same expression appear twice, instead
+simply link to it again).  Possibly good to do in TreeConstruction...
+This could be lower priority as it isn't really essential to make
+things work.  Should also probably be switchable on/off...
+
+(2) Advanced TreeRewriting --- can rewrite functions/predicates to
+eliminate unused entries or to eliminate effectively identical
+outputs...  e.g., consider a function f() that can output the values
+1,3, 5, 7, and its output is only ever compared to 3...  We could
+rewrite the values 1, 5, and 7 to be the same value.
+
+(3) Advanced Encoding Strategies
+  a) encoding alignment --- making binary index encodings over
+different sets work together
+
+  b) Implement K-Map for function encoding
+
+(4) Implement search framework --- probably simulated annealing over a
+population of strategies...  search framework should probably be able
+to turn on/off nearly any optimization we have...
+
+(5) Implement backend translation strategies....do optimizations and
+implement other simplifcation strategies
+
+(6) Convert SATCheck to use Constraint Compiler...not sure about order...
+
+(7) Profile system....
