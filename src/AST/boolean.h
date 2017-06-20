@@ -35,17 +35,15 @@ struct BooleanLogic {
 	Boolean * right;
 };
 
-struct BooleanComp {
-	Boolean base;
-	CompOp op;
-	Boolean * left;
-	Boolean * right;
-};
-
 struct BooleanPredicate{
     Boolean base;
     Predicate * predicate;
     VectorElement* inputs;
+};
+
+struct TablePredicate{
+    BooleanPredicate predicate;
+    Table* table;
 };
 
 

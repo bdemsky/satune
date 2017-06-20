@@ -8,7 +8,8 @@
 
 void baseBinaryIndexElementAssign(ElementEncoding *This) {
 	Element * element=This->element;
-	Set * set=element->set;
+	ASSERT(element->type == ELEMSET);
+	Set * set= ((ElementSet*)element)->set;
 	ASSERT(set->isRange==false);
 	uint size=getSizeVectorInt(set->members);
 	uint encSize=NEXTPOW2(size);

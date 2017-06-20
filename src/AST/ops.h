@@ -23,7 +23,7 @@ typedef enum OrderType OrderType;
 enum OverFlowBehavior {IGNORE, WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW, NOOVERFLOW};
 typedef enum OverFlowBehavior OverFlowBehavior;
 
-enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, COMPARE, PREDICATEOP};
+enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, COMPARE, PREDICATEOP, TABLEPREDICATEOP};
 typedef enum BooleanType BooleanType;
 
 enum FunctionType {TABLEFUNC, OPERATORFUNC};

@@ -10,13 +10,12 @@
 //FIXME:TALK ABOUT ELEMENT
 struct Element {
     	ElementType type;
-	Set * set;
-	ElementEncoding * encoding;
 };
 
 struct ElementSet {
     Element base;
     Set * set;
+    ElementEncoding * encoding;
 };
 
 struct ElementFunction{
@@ -26,7 +25,7 @@ struct ElementFunction{
     Boolean * overflowstatus;
 };
 
-Element * allocElement(Set *s);
+Element * allocElementSet(Set *s);
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 void deleteElement(Element *This);
 #endif

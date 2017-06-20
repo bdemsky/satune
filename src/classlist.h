@@ -28,7 +28,6 @@ typedef struct Constraint Constraint;
 typedef struct BooleanOrder BooleanOrder;
 typedef struct BooleanVar BooleanVar;
 typedef struct BooleanLogic BooleanLogic;
-typedef struct BooleanComp BooleanComp;
 typedef struct BooleanPredicate BooleanPredicate;
 
 struct Boolean;

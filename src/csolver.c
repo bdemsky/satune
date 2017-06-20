@@ -99,7 +99,7 @@ uint64_t createUniqueItem(CSolver *solver, MutableSet * set) {
 }
 
 Element * getElementVar(CSolver *This, Set * set) {
-	Element * element=allocElement(set);
+	Element * element=allocElementSet(set);
 	pushVectorElement(This->allElements, element);
 	return element;
 }
