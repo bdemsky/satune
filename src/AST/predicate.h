@@ -10,6 +10,11 @@ struct Predicate {
 	VectorSet* domains;
 };
 
+struct TablePredicate{
+    CompOp op;
+    Table* table;
+};
+
 
 Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain);
 void deletePredicate(Predicate* predicate);
