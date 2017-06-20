@@ -12,4 +12,6 @@ struct Order {
 
 Order* allocOrder(OrderType type, Set * set);
 Boolean* getOrderConstraint(Order* order,uint64_t first, uint64_t second);
+void deleteOrder(Order* order);
+
 #endif

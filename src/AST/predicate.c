@@ -10,3 +10,9 @@ Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain){
     predicate->op=op;
     return predicate;
 }
+
+void deletePredicate(Predicate* predicate){
+    deleteVectorSet(predicate->domains);
+    ourfree(predicate);
+}
+

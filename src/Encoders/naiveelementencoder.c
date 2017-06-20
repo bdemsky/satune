@@ -3,7 +3,7 @@
 #include "element.h"
 #include "set.h"
 #include "common.h"
-#include "struct.h"
+#include "structs.h"
 
 void baseBinaryIndexElementAssign(ElementEncoding *This) {
 	Element * element=This->element;

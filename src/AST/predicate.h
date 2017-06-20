@@ -12,4 +12,5 @@ struct Predicate {
 
 
 Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain);
+void deletePredicate(Predicate* predicate);
 #endif

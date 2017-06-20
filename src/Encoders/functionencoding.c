@@ -14,6 +14,6 @@ FunctionEncoding * allocPredicateEncoding(FunctionEncodingType type, Boolean *pr
 	return This;
 }
 
-void deleteFunctionEncoding(FunctionEncoding *This) {
-	ourfree(This);
+void deleteFunctionEncoding(FunctionEncoding *fe) {
+	ourfree(fe);
 }

@@ -1,6 +1,7 @@
 #include "order.h"
 #include "structs.h"
 #include "set.h"
+#include "boolean.h"
 
 
 Order* allocOrder(OrderType type, Set * set){
@@ -34,4 +35,13 @@ Boolean* getOrderConstraint(Order* order, uint64_t first, uint64_t second){
     }
     ASSERT(exist1 && exist2);
 	*/
+}
+
+void deleteOrder(Order* order){
+    uint size = getSizeVectorBoolean( order->constraints );
+    for(uint i=0; i<size; i++){
+	deleteBoolean( getVectorBoolean(order->constraints, i) );
+    }
+    deleteSet( order->set);
+    ourfree(order);
 }

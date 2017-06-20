@@ -8,3 +8,7 @@ TableEntry* allocTableEntry(uint64_t* inputs, uint inputSize, uint64_t result){
     }
     return te;
 }
+
+void deleteTableEntry(TableEntry* tableEntry){
+    ourfree(tableEntry);
+}

@@ -41,6 +41,9 @@ typedef struct Set MutableSet;
 struct Element;
 typedef struct Element Element;
 
+typedef struct FunctionOperator FunctionOperator;
+typedef struct FunctionTable FunctionTable;
+
 struct Function;
 typedef struct Function Function;
 

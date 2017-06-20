@@ -25,4 +25,7 @@ typedef enum OverFlowBehavior OverFlowBehavior;
 
 enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, COMPARE};
 typedef enum BooleanType BooleanType;
+
+enum FunctionType {TABLEFUNC, OPERATORFUNC};
+typedef enum FunctionType FunctionType;
 #endif
