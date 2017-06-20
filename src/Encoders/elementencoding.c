@@ -15,6 +15,15 @@ void deleteElementEncoding(ElementEncoding *This) {
 		ourfree(This->variables);
 	if (This->encodingArray!=NULL)
 		ourfree(This->encodingArray);
+	if (This->inUseArray!=NULL)
+		ourfree(This->inUseArray);
 	ourfree(This);
 }
 
+void allocEncodingArrayElement(ElementEncoding *This, uint size) {
+	This->encodingArray=ourcalloc(1, sizeof(uint64_t)*size);
+}
+
+void allocInUseArrayElement(ElementEncoding *This, uint size) {
+	This->inUseArray=ourcalloc(1, size >> 6);
+}
