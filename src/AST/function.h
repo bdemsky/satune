@@ -5,7 +5,6 @@
 #include "ops.h"
 #include "structs.h"
 
-
 #define GETFUNCTIONTYPE(o) (((Function*)o)->type)
 
 struct Function{

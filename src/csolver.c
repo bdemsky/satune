@@ -30,33 +30,38 @@ void deleteSolver(CSolver *This) {
 	for(uint i=0;i<size;i++) {
 		deleteBoolean(getVectorBoolean(This->allBooleans, i));
 	}
-
 	deleteVectorBoolean(This->allBooleans);
 
 	size=getSizeVectorSet(This->allSets);
 	for(uint i=0;i<size;i++) {
 		deleteSet(getVectorSet(This->allSets, i));
 	}
-
 	deleteVectorSet(This->allSets);
 
 	size=getSizeVectorElement(This->allElements);
 	for(uint i=0;i<size;i++) {
 		deleteElement(getVectorElement(This->allElements, i));
 	}
+	deleteVectorElement(This->allElements);
+
 	size=getSizeVectorTable(This->allTables);
 	for(uint i=0;i<size;i++) {
 		deleteTable(getVectorTable(This->allTables, i));
 	}
+	deleteVectorTable(This->allTables);
+	
 	size=getSizeVectorPredicate(This->allPredicates);
 	for(uint i=0;i<size;i++) {
 		deletePredicate(getVectorPredicate(This->allPredicates, i));
 	}
+	deleteVectorPredicate(This->allPredicates);
+
 	size=getSizeVectorOrder(This->allOrders);
 	for(uint i=0;i<size;i++) {
 		deleteOrder(getVectorOrder(This->allOrders, i));
 	}
 	deleteVectorOrder(This->allOrders);
+	
 	size=getSizeVectorFunction(This->allFunctions);
 	for(uint i=0;i<size;i++) {
 		deleteFunction(getVectorFunction(This->allFunctions, i));
@@ -94,7 +99,7 @@ uint64_t createUniqueItem(CSolver *solver, MutableSet * set) {
 }
 
 Element * getElementVar(CSolver *This, Set * set) {
-	Element * element=allocElementSet(set);
+	Element * element=allocElement(set);
 	pushVectorElement(This->allElements, element);
 	return element;
 }

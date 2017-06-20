@@ -7,8 +7,11 @@
 
 #define GETELEMENTTYPE(o) (((Element*)o)->type)
 
+//FIXME:TALK ABOUT ELEMENT
 struct Element {
-	ElementType type;
+    	ElementType type;
+	Set * set;
+	ElementEncoding * encoding;
 };
 
 struct ElementSet {
@@ -23,7 +26,7 @@ struct ElementFunction{
     Boolean * overflowstatus;
 };
 
-Element * allocElementSet(Set *s);
+Element * allocElement(Set *s);
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 void deleteElement(Element *This);
 #endif

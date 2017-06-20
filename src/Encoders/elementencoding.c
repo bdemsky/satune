@@ -1,7 +1,7 @@
 #include "elementencoding.h"
 
 ElementEncoding * allocElementEncoding(ElementEncodingType type, Element *element) {
-	ElementEncoding * This=(ElementEncoding *)ourmalloc(sizeof(ElementEncoding));
+	ElementEncoding * This=ourmalloc(sizeof(ElementEncoding));
 	This->element=element;
 	This->type=type;
 	This->variables=NULL;

@@ -1,11 +1,12 @@
 #include "element.h"
 #include "structs.h"
-
-Element *allocElementSet(Set * s) {
-	ElementSet * tmp=(ElementSet *)ourmalloc(sizeof(ElementSet));
+//FIXME: ELEMENTSET?
+Element *allocElement(Set * s) {
+	Element * tmp=(Element *)ourmalloc(sizeof(Element));
 	GETELEMENTTYPE(tmp)= ELEMSET;
 	tmp->set=s;
-	return &tmp->base;
+	tmp->encoding=NULL;
+	return tmp;
 }
 
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus){

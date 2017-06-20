@@ -18,6 +18,9 @@
 
 struct CSolver;
 typedef struct CSolver CSolver;
+struct SATEncoder;
+typedef struct SATEncoder SATEncoder;
+
 
 struct Constraint;
 typedef struct Constraint Constraint;
@@ -36,7 +39,6 @@ typedef struct IncrementalSolver IncrementalSolver;
 
 struct Set;
 typedef struct Set Set;
-
 typedef struct Set MutableSet;
 
 typedef struct ElementFunction ElementFunction;
@@ -65,6 +67,9 @@ typedef struct ElementEncoding ElementEncoding;
 
 struct FunctionEncoding;
 typedef struct FunctionEncoding FunctionEncoding;
+
+struct OrderEncoding;
+typedef struct OrderEncoding OrderEncoding;
 
 struct TableEntry;
 typedef struct TableEntry TableEntry;

@@ -25,6 +25,7 @@ struct BooleanOrder {
 struct BooleanVar {
 	Boolean base;
 	VarType vtype;
+	Constraint * var;
 };
 
 struct BooleanLogic {

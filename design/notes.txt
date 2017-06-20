@@ -6,3 +6,6 @@
 
 (4) Might need to indicate what variables we can query about in
 future?
+
+(5) Could simplify output of functions...  Maybe several outputs have
+same effect...
