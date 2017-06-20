@@ -16,6 +16,5 @@ Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);
 Constraint * encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint);
 Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint);
-Constraint * encodeCompareSATEncoder(SATEncoder *This, BooleanComp * constraint);
 
 #endif

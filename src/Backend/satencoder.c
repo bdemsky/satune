@@ -31,8 +31,6 @@ Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
 		return encodeVarSATEncoder(This, (BooleanVar *) constraint);
 	case LOGICOP:
 		return encodeLogicSATEncoder(This, (BooleanLogic *) constraint);
-	case COMPARE:
-		return encodeCompareSATEncoder(This, (BooleanComp *) constraint);
 	}
 }
 
@@ -77,9 +75,5 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 	case L_IMPLIES:
 		return allocConstraint(IMPLIES, left, right);
 	}
-	return NULL;
-}
-
-Constraint * encodeCompareSATEncoder(SATEncoder *This, BooleanComp * constraint) {
 	return NULL;
 }
