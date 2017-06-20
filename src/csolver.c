@@ -6,6 +6,7 @@
 #include "predicate.h"
 #include "order.h"
 #include "table.h"
+#include "function.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -15,6 +16,8 @@ CSolver * allocCSolver() {
 	tmp->allElements=allocDefVectorElement();
 	tmp->allPredicates = allocDefVectorPredicate();
 	tmp->allTables = allocDefVectorTable();
+	tmp->allOrders = allocDefVectorOrder();
+	tmp->allFunctions = allocDefVectorFunction();
 	return tmp;
 }
 
@@ -41,8 +44,24 @@ void deleteSolver(CSolver *This) {
 	for(uint i=0;i<size;i++) {
 		deleteElement(getVectorElement(This->allElements, i));
 	}
-	//FIXME: Freeing alltables and allpredicates
-	deleteVectorElement(This->allElements);
+	size=getSizeVectorTable(This->allTables);
+	for(uint i=0;i<size;i++) {
+		deleteTable(getVectorTable(This->allTables, i));
+	}
+	size=getSizeVectorPredicate(This->allPredicates);
+	for(uint i=0;i<size;i++) {
+		deletePredicate(getVectorPredicate(This->allPredicates, i));
+	}
+	size=getSizeVectorOrder(This->allOrders);
+	for(uint i=0;i<size;i++) {
+		deleteOrder(getVectorOrder(This->allOrders, i));
+	}
+	deleteVectorOrder(This->allOrders);
+	size=getSizeVectorFunction(This->allFunctions);
+	for(uint i=0;i<size;i++) {
+		deleteFunction(getVectorFunction(This->allFunctions, i));
+	}
+	deleteVectorFunction(This->allFunctions);
 	ourfree(This);
 }
 
@@ -86,9 +105,10 @@ Boolean * getBooleanVar(CSolver *solver, VarType type) {
 	return boolean;
 }
 
-Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,
-																	OverFlowBehavior overflowbehavior) {
-	return NULL;
+Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior) {
+    Function* function = allocFunctionOperator(op, domain, numDomain, range, overflowbehavior);
+    pushVectorFunction(solver->allFunctions, function);
+    return function;
 }
 
 Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain) {
@@ -108,14 +128,16 @@ void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSi
 }
 
 Function * completeTable(CSolver *solver, Table * table) {
+    Function* function = allocFunctionTable(table);
+    pushVectorFunction(solver->allFunctions,function);
+    return function;
+}
+
+Element * applyFunction(CSolver *solver, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus) {
 	return NULL;
 }
 
-Element * applyFunction(CSolver *solver, Function * function, Element ** array, Boolean * overflowstatus) {
-	return NULL;
-}
-
-Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs) {
+Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs, uint numInputs) {
 	return NULL;
 }
 
@@ -128,7 +150,9 @@ void addBoolean(CSolver *This, Boolean * constraint) {
 }
 
 Order * createOrder(CSolver *solver, OrderType type, Set * set) {
-	return allocOrder(type, set);
+	Order* order = allocOrder(type, set);
+	pushVectorOrder(solver->allOrders, order);
+	return order;
 }
 
 Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64_t second) {

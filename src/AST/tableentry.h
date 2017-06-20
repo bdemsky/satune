@@ -22,6 +22,7 @@ struct TableEntry{
 };
 
 TableEntry* allocTableEntry(uint64_t* inputs, uint inputSize, uint64_t result);
+void deleteTableEntry(TableEntry* tableEntry);
 
 #endif /* TABLEENTRY_H */
 

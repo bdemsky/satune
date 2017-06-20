@@ -12,5 +12,5 @@ struct Table {
 
 Table * allocTable(Set **domains, uint numDomain, Set * range);
 void addNewTableEntry(Table* table, uint64_t* inputs, uint inputSize, uint64_t result);
-
+void deleteTable(Table* table);
 #endif

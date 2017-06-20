@@ -16,8 +16,18 @@ struct CSolver {
 
 	/** This is a vector of all element structs that we have allocated. */
 	VectorElement * allElements;
+	
+	/** This is a vector of all predicate structs that we have allocated. */
 	VectorPredicate * allPredicates;
+	
+	/** This is a vector of all table structs that we have allocated. */
 	VectorTable * allTables;
+	
+	/** This is a vector of all order structs that we have allocated. */
+	VectorOrder * allOrders;
+	
+	/** This is a vector of all function structs that we have allocated. */
+	VectorFunction* allFunctions;
 };
 
 /** Create a new solver instance. */
@@ -77,11 +87,11 @@ Function * completeTable(CSolver *, Table *);
 
 /** This function applies a function to the Elements in its input. */
 
-Element * applyFunction(CSolver *, Function * function, Element ** array, Boolean * overflowstatus);
+Element * applyFunction(CSolver *, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 
 /** This function applies a predicate to the Elements in its input. */
 
-Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs);
+Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs, uint numInputs);
 
 /** This function applies a logical operation to the Booleans in its input. */
 

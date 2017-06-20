@@ -5,11 +5,27 @@
 #include "ops.h"
 #include "structs.h"
 
-struct Function {
-	ArithOp op;
-	VectorSet* domains;
-	Set * range;
-	OverFlowBehavior overflowbehavior;
-	Table* table;
+#define GETFUNCTIONTYPE(o) (((Function*)o)->type)
+
+struct Function{
+    FunctionType type;
 };
+
+struct FunctionOperator {
+    Function base;
+    ArithOp op;
+    VectorSet* domains;
+    Set * range;
+    OverFlowBehavior overflowbehavior;
+};
+
+struct FunctionTable{
+    Function base;
+    Table* table;
+};
+
+Function* allocFunctionOperator( ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior);
+Function* allocFunctionTable (Table* table);
+void deleteFunction(Function* This);
+
 #endif
