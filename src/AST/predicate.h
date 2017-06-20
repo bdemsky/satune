@@ -14,14 +14,12 @@ struct Predicate {
 struct PredicateOperator {
 	Predicate base;
 	CompOp op;
-	Set** domains;
-	int numDomains;
+	Set ** domains;
+	uint numDomains;
 };
 
 struct PredicateTable {
 	Predicate base;
-	Set** domains;
-	int numDomains;
 	Table* table;
 	UndefinedBehavior undefinedbehavior;
 };

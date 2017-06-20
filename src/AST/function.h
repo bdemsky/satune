@@ -12,16 +12,17 @@ struct Function{
 };
 
 struct FunctionOperator {
-    Function base;
-    ArithOp op;
-    VectorSet* domains;
-    Set * range;
-    OverFlowBehavior overflowbehavior;
+	Function base;
+	ArithOp op;
+	uint numDomains;
+	Set ** domains;
+	Set * range;
+	OverFlowBehavior overflowbehavior;
 };
 
 struct FunctionTable{
-    Function base;
-    Table* table;
+	Function base;
+	Table* table;
 };
 
 Function* allocFunctionOperator( ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior);

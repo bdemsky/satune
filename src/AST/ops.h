@@ -26,7 +26,7 @@ typedef enum OverFlowBehavior OverFlowBehavior;
 enum UndefinedBehavior {IGNOREBEHAVIOR, FLAGFORCEUNDEFINED, UNDEFINEDSETSFLAG, FLAGIFFUNDEFINED};
 typedef enum UndefinedBehavior UndefinedBehavior;
 
-enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, COMPARE, PREDICATEOP, TABLEPREDICATEOP};
+enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, PREDICATEOP, TABLEPREDICATEOP};
 typedef enum BooleanType BooleanType;
 
 enum FunctionType {TABLEFUNC, OPERATORFUNC};
