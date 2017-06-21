@@ -22,7 +22,8 @@ struct ElementSet {
 struct ElementFunction {
 	Element base;
 	Function * function;
-	VectorElement* Elements;
+	Element ** inputs;
+	uint numInputs;
 	Boolean * overflowstatus;
 };
 

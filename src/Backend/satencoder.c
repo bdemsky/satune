@@ -3,6 +3,7 @@
 #include "csolver.h"
 #include "boolean.h"
 #include "constraint.h"
+#include "common.h"
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
@@ -32,7 +33,7 @@ Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
 	case LOGICOP:
 		return encodeLogicSATEncoder(This, (BooleanLogic *) constraint);
 	default:
-		printf("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
+		model_print("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
 		exit(-1);
 	}
 }
@@ -78,9 +79,7 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 	case L_IMPLIES:
 		return allocConstraint(IMPLIES, array[0], array[1]);
 	default:
-		printf("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
+		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
 		exit(-1);
 	}
-	
-	return NULL;
 }

@@ -41,7 +41,8 @@ struct BooleanLogic {
 struct BooleanPredicate {
 	Boolean base;
 	Predicate * predicate;
-	VectorElement* inputs;
+	Element** inputs;
+	int numInputs;
 };
 
 Boolean * allocBoolean(VarType t);

@@ -26,7 +26,9 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 	BooleanPredicate* This = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
 	GETBOOLEANTYPE(This)= PREDICATEOP;
 	This->predicate=predicate;
-	This->inputs= allocVectorArrayElement (numInputs,inputs);
+	This->inputs=ourmalloc(sizeof(Element*)*numInputs);
+	memcpy(This->inputs, inputs, sizeof(Element*)*numInputs);
+	This->numInputs=numInputs;
 	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
 
 	for(uint i=0;i<numInputs;i++) {
@@ -38,7 +40,7 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize){
 	BooleanLogic * This = ourmalloc(sizeof(BooleanLogic));
 	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
-	This->array = ourmalloc(sizeof(Boolean *)*asize);
+	This->array=ourmalloc(sizeof(Boolean *)*asize);
 	memcpy(This->array, array, sizeof(Boolean *)*asize);
 	for(uint i=0;i<asize;i++) {
 		pushVectorBoolean(GETBOOLEANPARENTS(array[i]), (Boolean *)This);
@@ -50,7 +52,7 @@ Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, 
 void deleteBoolean(Boolean * This) {
 	switch(GETBOOLEANTYPE(This)){
 		case PREDICATEOP:
-			deleteVectorArrayElement( ((BooleanPredicate*)This)->inputs );
+			ourfree(((BooleanPredicate*)This)->inputs );
 			break;
 		default:
 			break;
