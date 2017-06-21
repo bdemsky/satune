@@ -31,6 +31,9 @@ Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
 		return encodeVarSATEncoder(This, (BooleanVar *) constraint);
 	case LOGICOP:
 		return encodeLogicSATEncoder(This, (BooleanLogic *) constraint);
+	default:
+		printf("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
+		exit(-1);
 	}
 }
 
@@ -54,27 +57,30 @@ Constraint * encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint) {
 }
 
 Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) {
-	/*
-	Constraint *left=encodeConstraintSATEncoder(This, constraint->left);
-	Constraint *right=NULL;
-	if (constraint->right!=NULL)
-		right=encodeConstraintSATEncoder(This, constraint->right);
+	Constraint * array[constraint->numArray];
+	for(uint i=0;i<constraint->numArray;i++)
+		array[i]=encodeConstraintSATEncoder(This, constraint->array[i]);
+
 	switch(constraint->op) {
 	case L_AND:
-		return allocConstraint(AND, left, right);
+		return allocArrayConstraint(AND, constraint->numArray, array);
 	case L_OR:
-		return allocConstraint(OR, left, right);
+		return allocArrayConstraint(OR, constraint->numArray, array);
 	case L_NOT:
-		return negateConstraint(allocConstraint(OR, left, NULL));
+		return negateConstraint(allocConstraint(OR, array[0], NULL));
 	case L_XOR: {
-		Constraint * nleft=negateConstraint(cloneConstraint(left));
-		Constraint * nright=negateConstraint(cloneConstraint(right));
+		Constraint * nleft=negateConstraint(cloneConstraint(array[0]));
+		Constraint * nright=negateConstraint(cloneConstraint(array[1]));
 		return allocConstraint(OR,
-													 allocConstraint(AND, left, nright),
-													 allocConstraint(AND, nleft, right));
+													 allocConstraint(AND, array[0], nright),
+													 allocConstraint(AND, nleft, array[1]));
 	}
 	case L_IMPLIES:
-		return allocConstraint(IMPLIES, left, right);
-		}*/
+		return allocConstraint(IMPLIES, array[0], array[1]);
+	default:
+		printf("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
+		exit(-1);
+	}
+	
 	return NULL;
 }
