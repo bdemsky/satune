@@ -4,20 +4,25 @@
 Element *allocElementSet(Set * s) {
 	ElementSet * tmp=(ElementSet *)ourmalloc(sizeof(ElementSet));
 	GETELEMENTTYPE(tmp)= ELEMSET;
+	GETPARENTSVECTOR(tmp) = allocDefVectorVoid();
+	GETSTRUCTTYPE(tmp) = _ELEMENT;
 	tmp->set=s;
 	tmp->encoding=NULL;
 	return &tmp->base;
 }
 
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus){
-    ElementFunction* ef = (ElementFunction*) ourmalloc(sizeof(ElementFunction));
-    GETELEMENTTYPE(ef)= ELEMFUNCRETURN;
-    ef->function=function;
-    ef->overflowstatus = overflowstatus;
-    ef->Elements = allocVectorArrayElement(numArrays, array);
-    return &ef->base;
+	ElementFunction* tmp = (ElementFunction*) ourmalloc(sizeof(ElementFunction));
+	GETELEMENTTYPE(tmp)= ELEMFUNCRETURN;
+	GETPARENTSVECTOR(tmp) = allocDefVectorVoid();
+	GETSTRUCTTYPE(tmp) = _ELEMENT;
+	tmp->function=function;
+	tmp->overflowstatus = overflowstatus;
+	tmp->Elements = allocVectorArrayElement(numArrays, array);
+	return &tmp->base;
 }
 
 void deleteElement(Element *This) {
+	DELETEPARENTSVECTOR(This);
 	ourfree(This);
 }

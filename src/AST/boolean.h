@@ -4,7 +4,7 @@
 #include "mymemory.h"
 #include "ops.h"
 #include "structs.h"
-
+#include "structtype.h"
 /**
     This is a little sketchy, but apparently legit.
     https://www.python.org/dev/peps/pep-3123/ */
@@ -12,6 +12,7 @@
 #define GETBOOLEANTYPE(o) (((Boolean *)(o))->btype)
 
 struct Boolean {
+	Struct stype;
 	BooleanType btype;
 };
 

@@ -140,12 +140,14 @@ Function * completeTable(CSolver *solver, Table * table) {
 
 Element * applyFunction(CSolver *solver, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus) {
 	Element* element= allocElementFunction(function,array,numArrays,overflowstatus);
+	ADDNEWPARENTTOOBJECTARRAY(array, numArrays, element);
 	pushVectorElement(solver->allElements, element);
 	return element;
 }
 
 Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs, uint numInputs) {
 	Boolean* boolean= allocBooleanPredicate(predicate, inputs, numInputs);
+	ADDNEWPARENTTOOBJECTARRAY(inputs, numInputs, boolean);
 	pushVectorBoolean(solver->allBooleans, boolean);
 	return boolean;
 }

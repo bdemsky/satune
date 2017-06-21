@@ -3,7 +3,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "ops.h"
-#include "structs.h"
+
 
 #define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
 

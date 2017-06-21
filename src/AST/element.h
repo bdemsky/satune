@@ -4,11 +4,12 @@
 #include "mymemory.h"
 #include "ops.h"
 #include "structs.h"
+#include "structtype.h"
 
 #define GETELEMENTTYPE(o) (((Element*)o)->type)
 
-//FIXME:TALK ABOUT ELEMENT
 struct Element {
+	Struct stype;
 	ElementType type;
 };
 

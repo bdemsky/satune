@@ -23,7 +23,6 @@ void deletePredicate(Predicate* predicate){
 		break;
 	}
 	}
-
 	//need to handle freeing array...
 	ourfree(predicate);
 }

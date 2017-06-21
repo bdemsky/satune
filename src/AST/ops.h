@@ -37,4 +37,8 @@ typedef enum PredicateType PredicateType;
 
 enum ElementType {ELEMSET, ELEMFUNCRETURN};
 typedef enum ElementType ElementType;
+
+enum StructType {_BOOLEAN, _ELEMENT};
+typedef enum StructType StructType;
+
 #endif
