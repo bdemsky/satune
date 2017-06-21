@@ -2,15 +2,15 @@
 #define ELEMENT_H
 #include "classlist.h"
 #include "mymemory.h"
-#include "ops.h"
 #include "structs.h"
-#include "structtype.h"
+#include "astnode.h"
 
-#define GETELEMENTTYPE(o) (((Element*)o)->type)
+#define GETELEMENTTYPE(o) GETASTNODETYPE(o)
+#define GETELEMENTPARENTS(o) (&((Element*)o)->parents)
 
 struct Element {
-	Struct stype;
-	ElementType type;
+	ASTNode base;
+	VectorASTNode parents;
 };
 
 struct ElementSet {

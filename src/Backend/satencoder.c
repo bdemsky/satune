@@ -24,7 +24,7 @@ void encodeAllSATEncoder(SATEncoder * This, CSolver *csolver) {
 }
 
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
-	switch(constraint->btype) {
+	switch(GETBOOLEANTYPE(constraint)) {
 	case ORDERCONST:
 		return encodeOrderSATEncoder(This, (BooleanOrder *) constraint);
 	case BOOLEANVAR:
@@ -54,6 +54,7 @@ Constraint * encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint) {
 }
 
 Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) {
+	/*
 	Constraint *left=encodeConstraintSATEncoder(This, constraint->left);
 	Constraint *right=NULL;
 	if (constraint->right!=NULL)
@@ -74,6 +75,6 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 	}
 	case L_IMPLIES:
 		return allocConstraint(IMPLIES, left, right);
-	}
+		}*/
 	return NULL;
 }

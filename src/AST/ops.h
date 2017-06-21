@@ -26,19 +26,13 @@ typedef enum OverFlowBehavior OverFlowBehavior;
 enum UndefinedBehavior {IGNOREBEHAVIOR, FLAGFORCEUNDEFINED, UNDEFINEDSETSFLAG, FLAGIFFUNDEFINED};
 typedef enum UndefinedBehavior UndefinedBehavior;
 
-enum BooleanType {ORDERCONST, BOOLEANVAR, LOGICOP, PREDICATEOP, TABLEPREDICATEOP};
-typedef enum BooleanType BooleanType;
-
 enum FunctionType {TABLEFUNC, OPERATORFUNC};
 typedef enum FunctionType FunctionType;
 
 enum PredicateType {TABLEPRED, OPERATORPRED};
 typedef enum PredicateType PredicateType;
 
-enum ElementType {ELEMSET, ELEMFUNCRETURN};
-typedef enum ElementType ElementType;
-
-enum StructType {_BOOLEAN, _ELEMENT};
-typedef enum StructType StructType;
+enum ASTNodeType {ORDERCONST, BOOLEANVAR, LOGICOP, PREDICATEOP, TABLEPREDICATEOP, ELEMSET, ELEMFUNCRETURN};
+typedef enum ASTNodeType ASTNodeType;
 
 #endif

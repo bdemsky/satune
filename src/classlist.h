@@ -30,6 +30,9 @@ typedef struct BooleanVar BooleanVar;
 typedef struct BooleanLogic BooleanLogic;
 typedef struct BooleanPredicate BooleanPredicate;
 
+struct ASTNode;
+typedef struct ASTNode ASTNode;
+
 struct Boolean;
 typedef struct Boolean Boolean;
 

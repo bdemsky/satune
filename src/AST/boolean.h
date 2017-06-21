@@ -4,16 +4,18 @@
 #include "mymemory.h"
 #include "ops.h"
 #include "structs.h"
-#include "structtype.h"
+#include "astnode.h"
+
 /**
     This is a little sketchy, but apparently legit.
     https://www.python.org/dev/peps/pep-3123/ */
 
-#define GETBOOLEANTYPE(o) (((Boolean *)(o))->btype)
+#define GETBOOLEANTYPE(o) GETASTNODETYPE(o)
+#define GETBOOLEANPARENTS(o) (&((Boolean *)(o))->parents)
 
 struct Boolean {
-	Struct stype;
-	BooleanType btype;
+	ASTNode base;
+	VectorBoolean parents;
 };
 
 struct BooleanOrder {
@@ -32,8 +34,8 @@ struct BooleanVar {
 struct BooleanLogic {
 	Boolean base;
 	LogicOp op;
-	Boolean * left;
-	Boolean * right;
+	Boolean ** array;
+	uint numArray;
 };
 
 struct BooleanPredicate {

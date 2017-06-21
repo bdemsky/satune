@@ -1,62 +1,50 @@
 #include "boolean.h"
 #include "structs.h"
 #include "csolver.h"
+#include "element.h"
 
 Boolean* allocBoolean(VarType t) {
 	BooleanVar* tmp=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
 	GETBOOLEANTYPE(tmp)=BOOLEANVAR;
-	GETSTRUCTTYPE(tmp) = _BOOLEAN;
-	GETPARENTSVECTOR(tmp) = allocDefVectorVoid();
 	tmp->vtype=t;
 	tmp->var=NULL;
+	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
 	return & tmp->base;
 }
 
 Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	BooleanOrder* tmp=(BooleanOrder *) ourmalloc(sizeof (BooleanOrder));
 	GETBOOLEANTYPE(tmp)=ORDERCONST;
-	GETSTRUCTTYPE(tmp) = _BOOLEAN;
-	GETPARENTSVECTOR(tmp) = allocDefVectorVoid();
 	tmp->order=order;
 	tmp->first=first;
 	tmp->second=second;
+	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
 	return & tmp -> base;
 }
 
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs){
-	BooleanPredicate* tmp = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
-	GETBOOLEANTYPE(tmp)= PREDICATEOP;
-	GETSTRUCTTYPE(tmp) = _BOOLEAN;
-	GETPARENTSVECTOR(tmp) = allocDefVectorVoid();
-	tmp->predicate=predicate;
-	tmp->inputs= allocVectorArrayElement (numInputs,inputs);
-	return & tmp->base;
+	BooleanPredicate* This = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
+	GETBOOLEANTYPE(This)= PREDICATEOP;
+	This->predicate=predicate;
+	This->inputs= allocVectorArrayElement (numInputs,inputs);
+	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+
+	for(uint i=0;i<numInputs;i++) {
+		pushVectorASTNode(GETELEMENTPARENTS(inputs[i]), (ASTNode *)This);
+	}
+	return & This->base;
 }
 
-Boolean * allocBooleanLogic(LogicOp op, Boolean * left, Boolean* right){
-	BooleanLogic* tmp = (BooleanLogic*) ourmalloc(sizeof(BooleanLogic));
-	GETBOOLEANTYPE(tmp) = LOGICOP;
-	GETSTRUCTTYPE(tmp) = _BOOLEAN;
-	GETPARENTSVECTOR(tmp) = allocDefVectorVoid();
-	tmp->op=op;
-	tmp->left=left;
-	tmp->right=right;
-	return &tmp->base;
-}
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize){
-	ASSERT(asize>=2);
-	Boolean* boolean = allocBooleanLogic(op,array[0], array[1]);
-	ADDNEWPARENT(array[0], boolean);
-	ADDNEWPARENT(array[1], boolean);
-	pushVectorBoolean(solver->allBooleans,boolean);
-	for(uint i=2; i<asize; i++){
-		Boolean* oldBoolean = boolean;
-		boolean=allocBooleanLogic(op,oldBoolean, array[i]);
-		ADDNEWPARENT(oldBoolean, boolean);
-		ADDNEWPARENT(array[i], boolean);
-		pushVectorBoolean(solver->allBooleans,boolean);
+	BooleanLogic * This = ourmalloc(sizeof(BooleanLogic));
+	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+	This->array = ourmalloc(sizeof(Boolean *)*asize);
+	memcpy(This->array, array, sizeof(Boolean *)*asize);
+	for(uint i=0;i<asize;i++) {
+		pushVectorBoolean(GETBOOLEANPARENTS(array[i]), (Boolean *)This);
 	}
-	return boolean;
+	pushVectorBoolean(solver->allBooleans, (Boolean *) This);
+	return & This->base;
 }
 
 void deleteBoolean(Boolean * This) {
@@ -67,6 +55,6 @@ void deleteBoolean(Boolean * This) {
 		default:
 			break;
 	}
-	DELETEPARENTSVECTOR(This);
+	deleteVectorArrayBoolean(GETBOOLEANPARENTS(This));
 	ourfree(This);
 }
