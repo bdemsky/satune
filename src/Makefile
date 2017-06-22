@@ -63,7 +63,7 @@ tags:
 	ctags -R
 
 tabbing:
-	uncrustify -c C.cfg --no-backup *.c
+	uncrustify -c C.cfg --no-backup *.c */*.c
 	uncrustify -c C.cfg --no-backup *.h */*.h
 
 wc:
