@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum FunctionEncodingType {
-	ENUMERATEIMPLICATIONS, CIRCUIT
+	FUNC_UNASSIGNED, ENUMERATEIMPLICATIONS, CIRCUIT
 };
 
 typedef enum FunctionEncodingType FunctionEncodingType;
@@ -21,7 +21,7 @@ struct FunctionEncoding {
 	ElementPredicate op;
 };
 
-FunctionEncoding * allocFunctionEncoding(FunctionEncodingType type, Element *function);
-FunctionEncoding * allocPredicateEncoding(FunctionEncodingType type, Boolean *predicate);
+void initFunctionEncoding(FunctionEncoding *encoding, Element *function);
+void initPredicateEncoding(FunctionEncoding *encoding, Boolean *predicate);
 void deleteFunctionEncoding(FunctionEncoding *This);
 #endif

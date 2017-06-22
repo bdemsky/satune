@@ -5,6 +5,7 @@
 #include "ops.h"
 #include "structs.h"
 #include "astnode.h"
+#include "functionencoding.h"
 
 /**
     This is a little sketchy, but apparently legit.
@@ -40,6 +41,7 @@ struct BooleanLogic {
 struct BooleanPredicate {
 	Boolean base;
 	Predicate * predicate;
+	FunctionEncoding encoding;
 	ArrayElement inputs;
 };
 

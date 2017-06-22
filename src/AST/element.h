@@ -4,6 +4,8 @@
 #include "mymemory.h"
 #include "structs.h"
 #include "astnode.h"
+#include "functionencoding.h"
+#include "elementencoding.h"
 
 #define GETELEMENTTYPE(o) GETASTNODETYPE(o)
 #define GETELEMENTPARENTS(o) (&((Element*)o)->parents)
@@ -16,7 +18,7 @@ struct Element {
 struct ElementSet {
 	Element base;
 	Set * set;
-	ElementEncoding * encoding;
+	ElementEncoding encoding;
 };
 
 struct ElementFunction {
@@ -24,6 +26,8 @@ struct ElementFunction {
 	Function * function;
 	ArrayElement inputs;
 	Boolean * overflowstatus;
+	FunctionEncoding functionencoding;
+	ElementEncoding domainencoding;
 };
 
 Element * allocElementSet(Set *s);

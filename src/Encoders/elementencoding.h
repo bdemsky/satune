@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum ElementEncodingType {
-	ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
+	ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
 };
 
 typedef enum ElementEncodingType ElementEncodingType;
@@ -17,7 +17,7 @@ struct ElementEncoding {
 	uint numVars;	/* Number of variables */
 };
 
-ElementEncoding * allocElementEncoding(ElementEncodingType type, Element *element);
+void initElementEncoding(ElementEncoding *This, Element *element);
 void deleteElementEncoding(ElementEncoding *This);
 void baseBinaryIndexElementAssign(ElementEncoding *This);
 void allocEncodingArrayElement(ElementEncoding *This, uint size);

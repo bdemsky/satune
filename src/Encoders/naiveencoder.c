@@ -1,6 +1,8 @@
-#include "naiveelementencoder.h"
+#include "naiveencoder.h"
 #include "elementencoding.h"
 #include "element.h"
+#include "functionencoding.h"
+#include "function.h"
 #include "set.h"
 #include "common.h"
 #include "structs.h"
@@ -21,4 +23,3 @@ void baseBinaryIndexElementAssign(ElementEncoding *This) {
 		setInUseElement(This, i);
 	}
 }
-

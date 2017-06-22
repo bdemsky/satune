@@ -32,6 +32,8 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 	for(uint i=0;i<numInputs;i++) {
 		pushVectorASTNode(GETELEMENTPARENTS(inputs[i]), (ASTNode *)This);
 	}
+	initPredicateEncoding(&This->encoding, (Boolean *) This);
+
 	return & This->base;
 }
 
@@ -45,11 +47,14 @@ Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, 
 
 void deleteBoolean(Boolean * This) {
 	switch(GETBOOLEANTYPE(This)){
-		case PREDICATEOP:
-			deleteInlineArrayElement(& ((BooleanPredicate*)This)->inputs );
-			break;
-		default:
-			break;
+	case PREDICATEOP: {
+		BooleanPredicate *bp=(BooleanPredicate *)This;
+		deleteInlineArrayElement(& bp->inputs );
+		deleteFunctionEncoding(& bp->encoding);
+		break;
+	}
+	default:
+		break;
 	}
 	deleteVectorArrayBoolean(GETBOOLEANPARENTS(This));
 	ourfree(This);
