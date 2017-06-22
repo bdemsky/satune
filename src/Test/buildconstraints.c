@@ -11,5 +11,8 @@ int main(int numargs, char ** argv) {
 	Element * inputs[]={e1, e2};
 	Boolean * b=applyPredicate(solver, equals, inputs, 2);
 	addBoolean(solver, b);
+	Order * o=createOrder(solver, TOTAL, s);
+	Boolean * oc=orderConstraint(solver, o, 1, 2);
+	addBoolean(solver, oc);
 	deleteSolver(solver);
 }

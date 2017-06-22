@@ -7,7 +7,7 @@
 struct Order {
 	OrderType type;
 	Set * set;
-	VectorBoolean* constraints;
+	VectorBoolean constraints;
 };
 
 Order* allocOrder(OrderType type, Set * set);
