@@ -34,6 +34,10 @@ struct CSolver {
 
 CSolver * allocCSolver();
 
+/** Delete solver instance. */
+
+void deleteSolver(CSolver * This);
+
 /** This function creates a set containing the elements passed in the array. */
 
 Set * createSet(CSolver *, VarType type, uint64_t * elements, uint num);

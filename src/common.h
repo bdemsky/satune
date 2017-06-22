@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include "config.h"
 
+/*
 extern int model_out;
 extern int model_err;
 extern int switch_alloc;
@@ -26,6 +27,10 @@ extern int switch_alloc;
 #define model_print(fmt, ...) do { model_dprintf(model_out, fmt, ## __VA_ARGS__); } while (0)
 
 #define model_print_err(fmt, ...) do { model_dprintf(model_err, fmt, ## __VA_ARGS__); } while (0)
+
+*/
+
+#define model_print printf
 
 #define NEXTPOW2(x) (1<<(sizeof(uint)*8-__builtin_clz(x-1)))
 

@@ -37,6 +37,9 @@ ${OBJ_DIR}:
 debug: CFLAGS += -DCONFIG_DEBUG
 debug: all
 
+test: all
+	make -C Test
+
 PHONY += docs
 docs: $(C_SOURCES) $(HEADERS)
 	doxygen

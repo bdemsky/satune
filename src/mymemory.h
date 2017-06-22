@@ -19,9 +19,16 @@
 
 #include "config.h"
 
+/*
 void * ourmalloc(size_t size);
 void ourfree(void *ptr);
 void * ourcalloc(size_t count, size_t size);
 void * ourrealloc(void *ptr, size_t size);
+*/
+
+static inline void * ourmalloc(size_t size) { return malloc(size); }
+static inline void ourfree(void *ptr) { free(ptr); }
+static inline void * ourcalloc(size_t count, size_t size) { return calloc(count, size); }
+static inline void * ourrealloc(void *ptr, size_t size) { return realloc(ptr, size); }
 
 #endif/* _MY_MEMORY_H */
