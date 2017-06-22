@@ -4,7 +4,11 @@
 #include "hashtable.h"
 #include "hashset.h"
 #include "classlist.h"
+#include "array.h"
 
+ArrayDef(Element, Element *);
+ArrayDef(Boolean, Boolean *);
+ArrayDef(Set, Set *);
 VectorDef(Int, uint64_t, 4);
 VectorDef(Boolean, Boolean *, 4);
 VectorDef(Constraint, Constraint *, 4);

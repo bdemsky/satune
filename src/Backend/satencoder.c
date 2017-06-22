@@ -32,14 +32,12 @@ Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
 		return encodeVarSATEncoder(This, (BooleanVar *) constraint);
 	case LOGICOP:
 		return encodeLogicSATEncoder(This, (BooleanLogic *) constraint);
+	case PREDICATEOP:
+		return encodePredicateSATEncoder(This, (BooleanPredicate *) constraint);
 	default:
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
 		exit(-1);
 	}
-}
-
-Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
-	return NULL;
 }
 
 Constraint * getNewVarSATEncoder(SATEncoder *This) {
@@ -58,18 +56,20 @@ Constraint * encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint) {
 }
 
 Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) {
-	Constraint * array[constraint->numArray];
-	for(uint i=0;i<constraint->numArray;i++)
-		array[i]=encodeConstraintSATEncoder(This, constraint->array[i]);
+	Constraint * array[getSizeArrayBoolean(&constraint->inputs)];
+	for(uint i=0;i<getSizeArrayBoolean(&constraint->inputs);i++)
+		array[i]=encodeConstraintSATEncoder(This, getArrayBoolean(&constraint->inputs, i));
 
 	switch(constraint->op) {
 	case L_AND:
-		return allocArrayConstraint(AND, constraint->numArray, array);
+		return allocArrayConstraint(AND, getSizeArrayBoolean(&constraint->inputs), array);
 	case L_OR:
-		return allocArrayConstraint(OR, constraint->numArray, array);
+		return allocArrayConstraint(OR, getSizeArrayBoolean(&constraint->inputs), array);
 	case L_NOT:
-		return negateConstraint(allocConstraint(OR, array[0], NULL));
+		ASSERT(constraint->numArray==1);
+		return negateConstraint(array[0]);
 	case L_XOR: {
+		ASSERT(constraint->numArray==2);
 		Constraint * nleft=negateConstraint(cloneConstraint(array[0]));
 		Constraint * nright=negateConstraint(cloneConstraint(array[1]));
 		return allocConstraint(OR,
@@ -77,9 +77,20 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 													 allocConstraint(AND, nleft, array[1]));
 	}
 	case L_IMPLIES:
+		ASSERT(constraint->numArray==2);
 		return allocConstraint(IMPLIES, array[0], array[1]);
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
 		exit(-1);
 	}
+}
+
+Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
+	//TO IMPLEMENT
+	return NULL;
+}
+
+Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
+	//TO IMPLEMENT
+	return NULL;
 }

@@ -5,9 +5,8 @@
 #include "structs.h"
 
 struct Table {
-	Set ** domains;
+	ArraySet domains;
 	Set * range;
-	uint numDomains;
 	VectorTableEntry* entries;
 };
 

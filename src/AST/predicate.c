@@ -1,13 +1,9 @@
 #include "predicate.h"
-#include "structs.h"
-
 
 Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain){
 	PredicateOperator* predicate = ourmalloc(sizeof(PredicateOperator));
 	GETPREDICATETYPE(predicate)=OPERATORPRED;
-	predicate->numDomains=numDomain;
-	predicate->domains = ourmalloc(numDomain * sizeof(Set *));
-	memcpy(predicate->domains, domain, numDomain * sizeof(Set *));
+	allocInlineArrayInitSet(&predicate->domains, domain, numDomain);
 	predicate->op=op;
 	return &predicate->base;
 }
@@ -16,7 +12,7 @@ void deletePredicate(Predicate* predicate){
 	switch(GETPREDICATETYPE(predicate)) {
 	case OPERATORPRED: {
 		PredicateOperator * operpred=(PredicateOperator *) predicate;
-		ourfree(operpred->domains);
+		deleteInlineArraySet(&operpred->domains);
 		break;
 	}
 	case TABLEPRED: {

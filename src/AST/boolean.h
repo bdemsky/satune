@@ -34,15 +34,13 @@ struct BooleanVar {
 struct BooleanLogic {
 	Boolean base;
 	LogicOp op;
-	Boolean ** array;
-	uint numArray;
+	ArrayBoolean inputs;
 };
 
 struct BooleanPredicate {
 	Boolean base;
 	Predicate * predicate;
-	Element** inputs;
-	int numInputs;
+	ArrayElement inputs;
 };
 
 Boolean * allocBoolean(VarType t);

@@ -37,7 +37,8 @@
 	}                                                                     \
 	Vector ## name * allocVectorArray ## name(uint capacity, type * array)  { \
 		Vector ## name * tmp = allocVector ## name(capacity);               \
-		memcpy(tmp->array, array, capacity * sizeof(type));                 \
+		tmp->size=capacity;																									\
+		memcpy(tmp->array, array, capacity * sizeof(type));									\
 		return tmp;                                                         \
 	}                                                                     \
 	void pushVector ## name(Vector ## name *vector, type item) {          \
@@ -79,6 +80,7 @@
 	}																																			\
 	void allocInlineVectorArray ## name(Vector ## name * vector, uint capacity, type * array) {	\
 		allocInlineVector ##name(vector, capacity);													\
-		memcpy(vector->array, array, capacity * sizeof(type));							\
+		vector->size=capacity;																							\
+		memcpy(vector->array, array, capacity * sizeof(type));	\
 	}
 #endif

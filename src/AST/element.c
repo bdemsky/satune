@@ -15,9 +15,7 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	GETELEMENTTYPE(tmp)= ELEMFUNCRETURN;
 	tmp->function=function;
 	tmp->overflowstatus = overflowstatus;
-	tmp->inputs=ourmalloc(sizeof(Element *)*numArrays);
-	tmp->numInputs=numArrays;
-	memcpy(tmp->inputs, array, numArrays*sizeof(Element *));
+	allocInlineArrayInitElement(&tmp->inputs, array, numArrays);
 	allocInlineDefVectorASTNode(GETELEMENTPARENTS(tmp));
 	for(uint i=0;i<numArrays;i++)
 		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) tmp);
@@ -27,7 +25,7 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 void deleteElement(Element *This) {
 	switch(GETELEMENTTYPE(This)) {
 	case ELEMFUNCRETURN:
-		ourfree(((ElementFunction *)This)->inputs);
+		deleteInlineArrayElement(&((ElementFunction *)This)->inputs);
 		break;
 	default:
 		;

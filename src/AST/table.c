@@ -7,9 +7,7 @@
 
 Table * allocTable(Set **domains, uint numDomain, Set * range){
     Table* table = (Table*) ourmalloc(sizeof(Table));
-		table->numDomains=numDomain;
-    table->domains = ourmalloc(numDomain*sizeof(Set *));
-		memcpy(table->domains, domains, numDomain * sizeof(Set *));
+		allocInlineArrayInitSet(&table->domains, domains, numDomain);
     table->range =range;
 		return table;
 }
@@ -20,7 +18,7 @@ void addNewTableEntry(Table* table, uint64_t* inputs, uint inputSize, uint64_t r
 }
 
 void deleteTable(Table* table){
-	ourfree(table->domains);
+	deleteInlineArraySet(&table->domains);
 	uint size = getSizeVectorTableEntry(table->entries);
 	for(uint i=0; i<size; i++){
 		deleteTableEntry(getVectorTableEntry(table->entries, i));

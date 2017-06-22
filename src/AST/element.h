@@ -22,8 +22,7 @@ struct ElementSet {
 struct ElementFunction {
 	Element base;
 	Function * function;
-	Element ** inputs;
-	uint numInputs;
+	ArrayElement inputs;
 	Boolean * overflowstatus;
 };
 

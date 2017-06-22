@@ -32,7 +32,7 @@ typedef enum FunctionType FunctionType;
 enum PredicateType {TABLEPRED, OPERATORPRED};
 typedef enum PredicateType PredicateType;
 
-enum ASTNodeType {ORDERCONST, BOOLEANVAR, LOGICOP, PREDICATEOP, TABLEPREDICATEOP, ELEMSET, ELEMFUNCRETURN};
+enum ASTNodeType {ORDERCONST, BOOLEANVAR, LOGICOP, PREDICATEOP, ELEMSET, ELEMFUNCRETURN};
 typedef enum ASTNodeType ASTNodeType;
 
 #endif
