@@ -23,11 +23,11 @@ void baseBinaryIndexElementAssign(ElementEncoding *This);
 void allocEncodingArrayElement(ElementEncoding *This, uint size);
 void allocInUseArrayElement(ElementEncoding *This, uint size);
 
-inline bool isinUseElement(ElementEncoding *This, uint offset) {
+static inline bool isinUseElement(ElementEncoding *This, uint offset) {
 	return (This->inUseArray[(offset>>6)] >> (offset & 63)) &0x1;
 }
 
-inline void setInUseElement(ElementEncoding *This, uint offset) {
+static inline void setInUseElement(ElementEncoding *This, uint offset) {
 	This->inUseArray[(offset>>6)] |= 1 << (offset & 63);
 }
 #endif

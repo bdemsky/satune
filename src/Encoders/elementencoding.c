@@ -5,6 +5,7 @@ void initElementEncoding(ElementEncoding * This, Element *element) {
 	This->type=ELEM_UNASSIGNED;
 	This->variables=NULL;
 	This->encodingArray=NULL;
+	This->inUseArray=NULL;
 	This->numVars=0;
 }
 

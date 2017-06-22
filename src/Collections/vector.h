@@ -29,7 +29,7 @@
 		return allocVector ## name(defcap);                                 \
 	}                                                                     \
 	Vector ## name * allocVector ## name(uint capacity) {                 \
-		Vector ## name * tmp = (Vector ## name *)ourmalloc(sizeof(type));  \
+		Vector ## name * tmp = (Vector ## name *)ourmalloc(sizeof(Vector ## name));  \
 		tmp->size = 0;                                                      \
 		tmp->capacity = capacity;                                           \
 		tmp->array = (type *) ourcalloc(1, sizeof(type) * capacity);          \
