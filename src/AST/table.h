@@ -7,7 +7,7 @@
 struct Table {
 	ArraySet domains;
 	Set * range;
-	VectorTableEntry* entries;
+	VectorTableEntry entries;
 };
 
 Table * allocTable(Set **domains, uint numDomain, Set * range);
