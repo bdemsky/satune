@@ -1,13 +1,12 @@
 #include "elementencoding.h"
 
-ElementEncoding * allocElementEncoding(ElementEncodingType type, Element *element) {
-	ElementEncoding * This=ourmalloc(sizeof(ElementEncoding));
+void initElementEncoding(ElementEncoding * This, Element *element) {
 	This->element=element;
-	This->type=type;
+	This->type=ELEM_UNASSIGNED;
 	This->variables=NULL;
 	This->encodingArray=NULL;
+	This->inUseArray=NULL;
 	This->numVars=0;
-	return This;
 }
 
 void deleteElementEncoding(ElementEncoding *This) {
@@ -17,7 +16,6 @@ void deleteElementEncoding(ElementEncoding *This) {
 		ourfree(This->encodingArray);
 	if (This->inUseArray!=NULL)
 		ourfree(This->inUseArray);
-	ourfree(This);
 }
 
 void allocEncodingArrayElement(ElementEncoding *This, uint size) {

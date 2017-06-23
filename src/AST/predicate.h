@@ -3,7 +3,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "ops.h"
-
+#include "structs.h"
 
 #define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
 
@@ -14,8 +14,7 @@ struct Predicate {
 struct PredicateOperator {
 	Predicate base;
 	CompOp op;
-	Set ** domains;
-	uint numDomains;
+	ArraySet domains;
 };
 
 struct PredicateTable {

@@ -14,8 +14,7 @@ struct Function {
 struct FunctionOperator {
 	Function base;
 	ArithOp op;
-	uint numDomains;
-	Set ** domains;
+	ArraySet domains;
 	Set * range;
 	OverFlowBehavior overflowbehavior;
 };

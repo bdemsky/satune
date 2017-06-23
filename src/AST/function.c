@@ -6,9 +6,7 @@
 Function* allocFunctionOperator( ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior){
 	FunctionOperator* This = (FunctionOperator*) ourmalloc(sizeof(FunctionOperator));
 	GETFUNCTIONTYPE(This)=OPERATORFUNC;
-	This->numDomains=numDomain;
-	This->domains = ourmalloc(numDomain * sizeof(Set *));
-	memcpy(This->domains, domain, numDomain * sizeof(Set *));
+	allocInlineArrayInitSet(&This->domains, domain, numDomain);
 	This->op=op;
 	This->overflowbehavior = overflowbehavior;
 	This->range=range;
@@ -27,7 +25,7 @@ void deleteFunction(Function* This){
 	case TABLEFUNC:
 		break;
 	case OPERATORFUNC:
-		ourfree(((FunctionOperator*) This)->domains);
+		deleteInlineArraySet(&((FunctionOperator*) This)->domains);
 		break;
 	default:
 		ASSERT(0);

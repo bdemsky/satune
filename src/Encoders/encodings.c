@@ -4,7 +4,7 @@
 #include "element.h"
 #include "common.h"
 #include "boolean.h"
-#include "naiveelementencoder.h"
+#include "naiveencoder.h"
 
 Encodings* allocEncodings(){
 	Encodings* This = (Encodings*) ourmalloc(sizeof(Encodings));

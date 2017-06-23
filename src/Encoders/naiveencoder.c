@@ -1,12 +1,29 @@
-
-#include "naivefunctionencoder.h"
-#include "functionencoding.h"
-#include "common.h"
+#include "naiveencoder.h"
+#include "elementencoding.h"
 #include "element.h"
-#include "boolean.h"
+#include "functionencoding.h"
 #include "function.h"
-#include "table.h"
-#include "tableentry.h"
+#include "set.h"
+#include "common.h"
+#include "structs.h"
+#include <strings.h>
+
+void baseBinaryIndexElementAssign(ElementEncoding *This) {
+	Element * element=This->element;
+	ASSERT(element->type == ELEMSET);
+	Set * set= ((ElementSet*)element)->set;
+	ASSERT(set->isRange==false);
+	uint size=getSizeVectorInt(set->members);
+	uint encSize=NEXTPOW2(size);
+	allocEncodingArrayElement(This, encSize);
+	allocInUseArrayElement(This, encSize);
+
+	for(uint i=0;i<size;i++) {
+		This->encodingArray[i]=getVectorInt(set->members, i);
+		setInUseElement(This, i);
+	}
+}
+
 
 void naiveEncodeFunctionPredicate(Encodings* encodings, FunctionEncoding *This){
 	if(This->isFunction) {
@@ -44,11 +61,11 @@ void naiveEncodeEnumeratedFunction(Encodings* encodings, FunctionEncoding* This)
 
 void naiveEncodeEnumTableFunc(Encodings* encodings, ElementFunction* This){
 	ASSERT(GETFUNCTIONTYPE(This->function)==TABLEFUNC);
-	VectorElement* elements= This->Elements;
-	Table* table = ((FunctionTable*) This->function)->table;
-	uint size = getSizeVectorTableEntry(table->entries);
+	ArrayElement* elements= &This->inputs;
+	Table* table = ((FunctionTable*) (This->function))->table;
+	uint size = getSizeVectorTableEntry(&table->entries);
 	for(uint i=0; i<size; i++){
-		TableEntry* entry = getVectorTableEntry(table->entries, i);
+		TableEntry* entry = getVectorTableEntry(&table->entries, i);
 		//FIXME: generate Constraints
 	}
 	

@@ -1,14 +1,13 @@
 #include "tableentry.h"
+#include <string.h>
 
 TableEntry* allocTableEntry(uint64_t* inputs, uint inputSize, uint64_t result){
-    TableEntry* te = (TableEntry*) ourmalloc(sizeof(TableEntry)+inputSize*sizeof(uint64_t));
-    te->output=result;
-    for(int i=0; i<inputSize; i++){
-	te->inputs[i]=inputs[i];
-    }
-    return te;
+	TableEntry* te = (TableEntry*) ourmalloc(sizeof(TableEntry)+inputSize*sizeof(uint64_t));
+	te->output=result;
+	memcpy(te->inputs, inputs, inputSize * sizeof(uint64_t));
+	return te;
 }
 
 void deleteTableEntry(TableEntry* tableEntry){
-    ourfree(tableEntry);
+	ourfree(tableEntry);
 }

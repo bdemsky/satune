@@ -5,6 +5,7 @@
 #include "ops.h"
 #include "structs.h"
 #include "astnode.h"
+#include "functionencoding.h"
 
 /**
     This is a little sketchy, but apparently legit.
@@ -34,14 +35,14 @@ struct BooleanVar {
 struct BooleanLogic {
 	Boolean base;
 	LogicOp op;
-	Boolean ** array;
-	uint numArray;
+	ArrayBoolean inputs;
 };
 
 struct BooleanPredicate {
 	Boolean base;
 	Predicate * predicate;
-	VectorElement* inputs;
+	FunctionEncoding encoding;
+	ArrayElement inputs;
 };
 
 Boolean * allocBoolean(VarType t);

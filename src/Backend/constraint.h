@@ -33,15 +33,15 @@ Constraint * allocVarConstraint(CType t, uint var);
 void deleteConstraint(Constraint *);
 void printConstraint(Constraint * c);
 void dumpConstraint(Constraint * c, IncrementalSolver *solver);
-inline uint getVarConstraint(Constraint * c) {ASSERT(c->type==VAR); return c->numoperandsorvar;}
+static inline uint getVarConstraint(Constraint * c) {ASSERT(c->type==VAR); return c->numoperandsorvar;}
 VectorConstraint * simplify(Constraint * c);
-inline CType getType(Constraint * c) {return c->type;}
-inline bool isFalse(Constraint * c) {return c->type==FALSE;}
-inline bool isTrue(Constraint * c) {return c->type==TRUE;}
+static inline CType getType(Constraint * c) {return c->type;}
+static inline bool isFalse(Constraint * c) {return c->type==FALSE;}
+static inline bool isTrue(Constraint * c) {return c->type==TRUE;}
 void internalfreeConstraint(Constraint * c);
 void freerecConstraint(Constraint * c);
 Constraint * cloneConstraint(Constraint * c);
-inline void setNegConstraint(Constraint * This, Constraint *c) {This->neg=c;}
+static inline void setNegConstraint(Constraint * This, Constraint *c) {This->neg=c;}
 Constraint *negateConstraint(Constraint * c);
 
 extern Constraint ctrue;
