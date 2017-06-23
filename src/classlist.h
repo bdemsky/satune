@@ -82,6 +82,9 @@ typedef struct OrderEncoding OrderEncoding;
 struct TableEntry;
 typedef struct TableEntry TableEntry;
 
+struct Encodings;
+typedef struct Encodings Encodings;
+
 typedef unsigned int uint;
 typedef uint64_t VarType;
 #endif

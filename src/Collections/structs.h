@@ -16,6 +16,8 @@ VectorDef(Table, Table *, 4);
 VectorDef(Order, Order *, 4);
 VectorDef(Function, Function *, 4);
 VectorDef(ASTNode, ASTNode *, 4);
+VectorDef(FunctionEncoding, FunctionEncoding *, 4);
+VectorDef(ElementEncoding, ElementEncoding *, 4);
 
 inline unsigned int Ptr_hash_function(void * hash) {
 	return (unsigned int)((uint64_t)hash >> 4);
@@ -26,5 +28,9 @@ inline bool Ptr_equals(void * key1, void * key2) {
 }
 
 HashTableDef(Void, void *, void *, Ptr_hash_function, Ptr_equals);
+HashTableDef(ElemToEncod, Element *, ElementEncoding *, Ptr_hash_function, Ptr_equals);
+HashTableDef(VoidToFuncEncod, void *, FunctionEncoding *, Ptr_hash_function, Ptr_equals);
+
 HashSetDef(Void, void *, Ptr_hash_function, Ptr_equals);
+
 #endif

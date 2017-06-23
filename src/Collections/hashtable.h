@@ -20,6 +20,9 @@
 #include "mymemory.h"
 #include "common.h"
 
+#define HT_DEFAULT_FACTOR 0.75
+#define HT_INITIAL_CAPACITY 16
+
 /**
  * @brief A simple, custom hash table
  *
