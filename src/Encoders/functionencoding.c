@@ -11,7 +11,6 @@ void initPredicateEncoding(FunctionEncoding *This,  Boolean *predicate) {
 }
 
 void deleteFunctionEncoding(FunctionEncoding *This) {
-	ourfree(This);
 }
 
 void setFunctionEncodingType(FunctionEncoding* encoding, FunctionEncodingType type){
