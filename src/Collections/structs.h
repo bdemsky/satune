@@ -21,8 +21,6 @@ VectorDef(Element, Element *, 4);
 VectorDef(Order, Order *, 4);
 VectorDef(TableEntry, TableEntry *, 4);
 VectorDef(ASTNode, ASTNode *, 4);
-VectorDef(FunctionEncoding, FunctionEncoding *, 4);
-VectorDef(ElementEncoding, ElementEncoding *, 4);
 VectorDef(Int, uint64_t, 4);
 
 

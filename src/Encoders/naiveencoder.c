@@ -11,7 +11,7 @@
 #include "table.h"
 #include <strings.h>
 
-void makeEncodingDecisions(CSolver* csolver){
+void naiveEncodingDecision(CSolver* csolver){
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
 		Element* element = getVectorElement(csolver->allElements, i);
