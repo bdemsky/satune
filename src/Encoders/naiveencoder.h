@@ -4,7 +4,7 @@
 
 //For now, This function just simply goes through elements/functions and 
 //assigns a predefined Encoding to each of them
-void makeEncodingDecisions(CSolver* csolver);
+void naiveEncodingDecision(CSolver* csolver);
 void encode(CSolver* csolver);
 void baseBinaryIndexElementAssign(ElementEncoding *This);
 void naiveEncodeFunctionPredicate( FunctionEncoding *This);
