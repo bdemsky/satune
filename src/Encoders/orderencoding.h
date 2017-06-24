@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum OrderEncodingType {
-	PAIRWISE
+	ORDER_UNASSIGNED, PAIRWISE
 };
 
 typedef enum OrderEncodingType OrderEncodingType;
@@ -13,7 +13,7 @@ struct OrderEncoding {
 	Order *order;
 };
 
-OrderEncoding * allocOrderEncoding(OrderEncodingType type, Order *order);
+void allocOrderEncoding(OrderEncoding * This, Order *order);
 void deleteOrderEncoding(OrderEncoding *This);
 
 #endif

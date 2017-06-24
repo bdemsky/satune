@@ -4,13 +4,15 @@
 #include "mymemory.h"
 #include "structs.h"
 #include "ops.h"
+#include "orderencoding.h"
+
 struct Order {
 	OrderType type;
 	Set * set;
 	VectorBoolean constraints;
+	OrderEncoding order;
 };
 
 Order* allocOrder(OrderType type, Set * set);
 void deleteOrder(Order* order);
-
 #endif
