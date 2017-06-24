@@ -6,7 +6,40 @@
 #include "set.h"
 #include "common.h"
 #include "structs.h"
+#include "csolver.h"
+#include "boolean.h"
+#include "table.h"
 #include <strings.h>
+
+void assignEncoding(CSolver* csolver){
+	uint size = getSizeVectorElement(csolver->allElements);
+	for(uint i=0; i<size; i++){
+		Element* element = getVectorElement(csolver->allElements, i);
+		switch(GETELEMENTTYPE(element)){
+			case ELEMSET:
+				setElementEncodingType(&((ElementSet*)element)->encoding, BINARYINDEX);
+				baseBinaryIndexElementAssign(&((ElementSet*)element)->encoding);
+				break;
+			case ELEMFUNCRETURN: 
+				setFunctionEncodingType(&((ElementFunction*)element)->functionencoding, ENUMERATEIMPLICATIONS);
+				break;
+			default:
+				ASSERT(0);
+		}
+	}
+	
+	size = getSizeVectorBoolean(csolver->allBooleans);
+	for(uint i=0; i<size; i++){
+		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
+		switch(GETBOOLEANTYPE(predicate)){
+			case PREDICATEOP:
+				setFunctionEncodingType(&((BooleanPredicate*)predicate)->encoding, ENUMERATEIMPLICATIONS);
+				break;
+			default:
+				continue;
+		} 
+	}
+}
 
 void baseBinaryIndexElementAssign(ElementEncoding *This) {
 	Element * element=This->element;
@@ -25,16 +58,45 @@ void baseBinaryIndexElementAssign(ElementEncoding *This) {
 }
 
 
-void naiveEncodeFunctionPredicate(Encodings* encodings, FunctionEncoding *This){
+void encode(CSolver* csolver){
+	uint size = getSizeVectorElement(csolver->allElements);
+	for(uint i=0; i<size; i++){
+		Element* element = getVectorElement(csolver->allElements, i);
+		switch(GETELEMENTTYPE(element)){
+			case ELEMFUNCRETURN: 
+				naiveEncodeFunctionPredicate(&((ElementFunction*)element)->functionencoding);
+				break;
+			default:
+				continue;
+		}
+	}
+	
+	size = getSizeVectorBoolean(csolver->allBooleans);
+	for(uint i=0; i<size; i++){
+		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
+		switch(GETBOOLEANTYPE(predicate)){
+			case PREDICATEOP:
+				naiveEncodeFunctionPredicate(&((BooleanPredicate*)predicate)->encoding);
+				break;
+			default:
+				continue;
+		} 
+	}
+}
+
+void naiveEncodeFunctionPredicate(FunctionEncoding *This){
 	if(This->isFunction) {
 		ASSERT(GETELEMENTTYPE(This->op.function)==ELEMFUNCRETURN);
-		if(This->type==CIRCUIT){
-			naiveEncodeCircuitFunction(encodings, This);
-		} else if( This->type == ENUMERATEIMPLICATIONS){
-			naiveEncodeEnumeratedFunction(encodings, This);
-		} else
-			ASSERT(0);
-			
+		switch(This->type){
+			case ENUMERATEIMPLICATIONS:
+				naiveEncodeEnumeratedFunction(This);
+				break;
+			case CIRCUIT:
+				naiveEncodeCircuitFunction(This);
+				break;
+			default:
+				ASSERT(0);
+		}
 	}else {
 		ASSERT(GETBOOLEANTYPE(This->op.predicate) == PREDICATEOP);
 		BooleanPredicate* predicate = (BooleanPredicate*)This->op.predicate;
@@ -44,22 +106,26 @@ void naiveEncodeFunctionPredicate(Encodings* encodings, FunctionEncoding *This){
 }
 
 
-void naiveEncodeCircuitFunction(Encodings* encodings, FunctionEncoding* This){
+void naiveEncodeCircuitFunction(FunctionEncoding* This){
 	
 }
 
-void naiveEncodeEnumeratedFunction(Encodings* encodings, FunctionEncoding* This){
+void naiveEncodeEnumeratedFunction(FunctionEncoding* This){
 	ElementFunction* ef =(ElementFunction*)This->op.function;
 	Function * function = ef->function;
-	if(GETFUNCTIONTYPE(function)==TABLEFUNC){
-		naiveEncodeEnumTableFunc(encodings, ef);
-	}else if (GETFUNCTIONTYPE(function)== OPERATORFUNC){
-		naiveEncodeEnumOperatingFunc(encodings, ef);
-	}else 
-		ASSERT(0);
+	switch(GETFUNCTIONTYPE(function)){
+		case TABLEFUNC:
+			naiveEncodeEnumTableFunc(ef);
+			break;
+		case OPERATORFUNC:
+			naiveEncodeEnumOperatingFunc(ef);
+			break;
+		default:
+			ASSERT(0);
+	} 
 }
 
-void naiveEncodeEnumTableFunc(Encodings* encodings, ElementFunction* This){
+void naiveEncodeEnumTableFunc(ElementFunction* This){
 	ASSERT(GETFUNCTIONTYPE(This->function)==TABLEFUNC);
 	ArrayElement* elements= &This->inputs;
 	Table* table = ((FunctionTable*) (This->function))->table;
@@ -71,6 +137,6 @@ void naiveEncodeEnumTableFunc(Encodings* encodings, ElementFunction* This){
 	
 }
 
-void naiveEncodeEnumOperatingFunc(Encodings* encodings, ElementFunction* This){
+void naiveEncodeEnumOperatingFunc(ElementFunction* This){
 	
 }

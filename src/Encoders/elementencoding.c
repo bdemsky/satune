@@ -25,3 +25,7 @@ void allocEncodingArrayElement(ElementEncoding *This, uint size) {
 void allocInUseArrayElement(ElementEncoding *This, uint size) {
 	This->inUseArray=ourcalloc(1, size >> 6);
 }
+
+void setElementEncodingType(ElementEncoding* This, ElementEncodingType type){
+	This->type = type;
+}

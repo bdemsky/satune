@@ -35,9 +35,6 @@ inline bool Ptr_equals(void * key1, void * key2) {
 }
 
 HashTableDef(Void, void *, void *, Ptr_hash_function, Ptr_equals);
-HashTableDef(ElemToEncod, Element *, ElementEncoding *, Ptr_hash_function, Ptr_equals);
-HashTableDef(VoidToFuncEncod, void *, FunctionEncoding *, Ptr_hash_function, Ptr_equals);
-
 HashSetDef(Void, void *, Ptr_hash_function, Ptr_equals);
 
 

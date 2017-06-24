@@ -18,6 +18,7 @@ struct ElementEncoding {
 };
 
 void initElementEncoding(ElementEncoding *This, Element *element);
+void setElementEncodingType(ElementEncoding* This, ElementEncodingType type);
 void deleteElementEncoding(ElementEncoding *This);
 void baseBinaryIndexElementAssign(ElementEncoding *This);
 void allocEncodingArrayElement(ElementEncoding *This, uint size);
