@@ -1,5 +1,7 @@
 #include "element.h"
 #include "structs.h"
+#include "set.h"
+#include "constraint.h"
 
 Element *allocElementSet(Set * s) {
 	ElementSet * tmp=(ElementSet *)ourmalloc(sizeof(ElementSet));
@@ -22,6 +24,52 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	initElementEncoding(&tmp->domainencoding, (Element *) tmp);
 	initFunctionEncoding(&tmp->functionencoding, (Element *) tmp);
 	return &tmp->base;
+}
+
+uint getElementSize(Element* This){
+	switch(GETELEMENTTYPE(This)){
+		case ELEMSET:
+			return getSetSize( ((ElementSet*)This)->set );
+			break;
+		case ELEMFUNCRETURN:
+			ASSERT(0);
+		default:
+			ASSERT(0);
+	}
+	return -1;
+}
+
+
+Constraint * getElementValueConstraint(Element* This, uint64_t value) {
+	switch(GETELEMENTTYPE(This)){
+		case ELEMSET:
+			; //Statement is needed for a label and This is a NOPE
+			ElementSet* elemSet= ((ElementSet*)This);
+			uint size = getSetSize(elemSet->set);
+			for(uint i=0; i<size; i++){
+				if( GETELEMENTENCODING(elemSet)->encodingArray[i]==value){
+					return generateBinaryConstraint(GETELEMENTENCODING(elemSet)->numVars,
+						GETELEMENTENCODING(elemSet)->variables, i);
+				}
+			}
+			break;
+		case ELEMFUNCRETURN:
+			break;
+		default:
+			ASSERT(0);
+	}
+	ASSERT(0);
+	return NULL;
+}
+
+Constraint * generateBinaryConstraint(uint numvars, Constraint ** vars, uint value) {
+	Constraint *carray[numvars];
+	for(uint j=0;j<numvars;j++) {
+		carray[j]=((value&1)==1) ? vars[j] : negateConstraint(vars[j]);
+		value=value>>1;
+	}
+
+	return allocArrayConstraint(AND, numvars, carray);
 }
 
 void deleteElement(Element *This) {

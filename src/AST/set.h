@@ -23,6 +23,7 @@ struct Set {
 
 Set *allocSet(VarType t, uint64_t * elements, uint num);
 Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
+uint getSetSize(Set* set);
 void deleteSet(Set *set);
 #endif/* SET_H */
 

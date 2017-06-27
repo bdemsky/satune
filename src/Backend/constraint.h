@@ -47,7 +47,7 @@ Constraint *negateConstraint(Constraint * c);
 extern Constraint ctrue;
 extern Constraint cfalse;
 
-Constraint * generateConstraint(uint numvars, Constraint ** vars, uint value);
+Constraint * generateBinaryConstraint(uint numvars, Constraint ** vars, uint value);
 Constraint * generateLTConstraint(uint numvars, Constraint ** vars, uint value);
 Constraint * generateEquivNVConstraint(uint numvars, Constraint **var1, Constraint **var2);
 Constraint * generateEquivConstraint(Constraint *var1, Constraint *var2);

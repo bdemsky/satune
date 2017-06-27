@@ -9,19 +9,30 @@
 #include "csolver.h"
 #include "boolean.h"
 #include "table.h"
+#include "tableentry.h"
+#include "constraint.h"
 #include <strings.h>
 
-void naiveEncodingDecision(CSolver* csolver){
+NaiveEncoder* allocNaiveEncoder(){
+	NaiveEncoder* encoder = (NaiveEncoder*) ourmalloc(sizeof(NaiveEncoder));
+	allocInlineDefVectorConstraint(GETNAIVEENCODERALLCONSTRAINTS(encoder));
+	allocInlineDefVectorConstraint(GETNAIVEENCODERVARS(encoder));
+	encoder->varindex=0;
+	return encoder;
+}
+
+void naiveEncodingDecision(CSolver* csolver, NaiveEncoder* encoder){
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
 		Element* element = getVectorElement(csolver->allElements, i);
 		switch(GETELEMENTTYPE(element)){
 			case ELEMSET:
-				setElementEncodingType(&((ElementSet*)element)->encoding, BINARYINDEX);
-				baseBinaryIndexElementAssign(&((ElementSet*)element)->encoding);
+				setElementEncodingType(GETELEMENTENCODING(element), BINARYINDEX);
+				baseBinaryIndexElementAssign(GETELEMENTENCODING(element));
+				generateElementEncodingVariables(encoder,GETELEMENTENCODING(element));
 				break;
 			case ELEMFUNCRETURN: 
-				setFunctionEncodingType(&((ElementFunction*)element)->functionencoding, ENUMERATEIMPLICATIONS);
+				setFunctionEncodingType(GETFUNCTIONENCODING(element), ENUMERATEIMPLICATIONS);
 				break;
 			default:
 				ASSERT(0);
@@ -33,12 +44,28 @@ void naiveEncodingDecision(CSolver* csolver){
 		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
 		switch(GETBOOLEANTYPE(predicate)){
 			case PREDICATEOP:
-				setFunctionEncodingType(&((BooleanPredicate*)predicate)->encoding, ENUMERATEIMPLICATIONS);
+				setFunctionEncodingType(GETFUNCTIONENCODING(predicate), ENUMERATEIMPLICATIONS);
 				break;
 			default:
 				continue;
 		} 
 	}
+}
+
+
+void getArrayNewVars(NaiveEncoder* encoder, uint num, Constraint **carray) {
+	for(uint i=0;i<num;i++)
+		carray[i]=getNewVar(encoder);
+}
+
+Constraint * getNewVar(NaiveEncoder* encoder) {
+	Constraint* var = allocVarConstraint(VAR, encoder->varindex);
+	Constraint* notVar = allocVarConstraint(NOTVAR, encoder->varindex);
+	setNegConstraint(var, notVar);
+	setNegConstraint(notVar, var);
+	pushVectorConstraint(GETNAIVEENCODERVARS(encoder), var);	
+	encoder->varindex++;
+	return var;
 }
 
 void baseBinaryIndexElementAssign(ElementEncoding *This) {
@@ -55,16 +82,22 @@ void baseBinaryIndexElementAssign(ElementEncoding *This) {
 		This->encodingArray[i]=getVectorInt(set->members, i);
 		setInUseElement(This, i);
 	}
+	This->numVars = NUMBITS(size-1);
+	This->variables = ourmalloc(sizeof(Constraint*)* This->numVars);
+	
+	
 }
 
 
 void encode(CSolver* csolver){
+	NaiveEncoder* encoder = allocNaiveEncoder();
+	naiveEncodingDecision( csolver, encoder);
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
 		Element* element = getVectorElement(csolver->allElements, i);
 		switch(GETELEMENTTYPE(element)){
 			case ELEMFUNCRETURN: 
-				naiveEncodeFunctionPredicate(&((ElementFunction*)element)->functionencoding);
+				naiveEncodeFunctionPredicate(encoder, GETFUNCTIONENCODING(element));
 				break;
 			default:
 				continue;
@@ -76,7 +109,7 @@ void encode(CSolver* csolver){
 		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
 		switch(GETBOOLEANTYPE(predicate)){
 			case PREDICATEOP:
-				naiveEncodeFunctionPredicate(&((BooleanPredicate*)predicate)->encoding);
+				naiveEncodeFunctionPredicate(encoder, GETFUNCTIONENCODING(predicate));
 				break;
 			default:
 				continue;
@@ -84,15 +117,15 @@ void encode(CSolver* csolver){
 	}
 }
 
-void naiveEncodeFunctionPredicate(FunctionEncoding *This){
+void naiveEncodeFunctionPredicate(NaiveEncoder* encoder, FunctionEncoding *This){
 	if(This->isFunction) {
 		ASSERT(GETELEMENTTYPE(This->op.function)==ELEMFUNCRETURN);
 		switch(This->type){
 			case ENUMERATEIMPLICATIONS:
-				naiveEncodeEnumeratedFunction(This);
+				naiveEncodeEnumeratedFunction(encoder, This);
 				break;
 			case CIRCUIT:
-				naiveEncodeCircuitFunction(This);
+				naiveEncodeCircuitFunction(encoder, This);
 				break;
 			default:
 				ASSERT(0);
@@ -105,38 +138,49 @@ void naiveEncodeFunctionPredicate(FunctionEncoding *This){
 	}
 }
 
-
-void naiveEncodeCircuitFunction(FunctionEncoding* This){
-	
-}
-
-void naiveEncodeEnumeratedFunction(FunctionEncoding* This){
+void naiveEncodeEnumeratedFunction(NaiveEncoder* encoder, FunctionEncoding* This){
 	ElementFunction* ef =(ElementFunction*)This->op.function;
-	Function * function = ef->function;
-	switch(GETFUNCTIONTYPE(function)){
+	switch(GETFUNCTIONTYPE(ef->function)){
 		case TABLEFUNC:
-			naiveEncodeEnumTableFunc(ef);
+			naiveEncodeEnumTableFunc(encoder, ef);
 			break;
 		case OPERATORFUNC:
-			naiveEncodeEnumOperatingFunc(ef);
+			naiveEncodeEnumOperatingFunc(encoder, ef);
 			break;
 		default:
 			ASSERT(0);
 	} 
 }
 
-void naiveEncodeEnumTableFunc(ElementFunction* This){
+void naiveEncodeEnumTableFunc(NaiveEncoder* encoder, ElementFunction* This){
 	ASSERT(GETFUNCTIONTYPE(This->function)==TABLEFUNC);
 	ArrayElement* elements= &This->inputs;
 	Table* table = ((FunctionTable*) (This->function))->table;
 	uint size = getSizeVectorTableEntry(&table->entries);
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(&table->entries, i);
-		//FIXME: generate Constraints
+		uint inputNum =getSizeArrayElement(elements);
+		Element* el= getArrayElement(elements, i);
+		Constraint* carray[inputNum];
+		for(uint j=0; j<inputNum; j++){
+			 carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
+		}
+		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
+			getElementValueConstraint(table->range, entry->output));
+		pushVectorConstraint( GETNAIVEENCODERALLCONSTRAINTS(encoder), row);
 	}
 	
 }
 
-void naiveEncodeEnumOperatingFunc(ElementFunction* This){
+void naiveEncodeEnumOperatingFunc(NaiveEncoder* encoder, ElementFunction* This){
 	
+}
+
+
+void naiveEncodeCircuitFunction(NaiveEncoder* encoder, FunctionEncoding* This){
+	
+}
+
+void deleteNaiveEncoder(NaiveEncoder* encoder){
+	deleteVectorArrayConstraint(&encoder->vars);
 }

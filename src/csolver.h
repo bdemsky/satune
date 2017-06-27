@@ -79,7 +79,7 @@ Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, u
 
 /** This function creates an empty instance table.*/
 
-Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range);
+Table * createTable(CSolver *solver, Element **domains, uint numDomain, Element * range);
 
 /** This function adds an input output relation to a table. */
 

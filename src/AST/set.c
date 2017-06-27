@@ -21,6 +21,14 @@ Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
 	return tmp;
 }
 
+uint getSetSize(Set* set){
+	if(set->isRange){
+		return set->high- set->low+1;
+	}else{
+		return getSizeVectorInt(set->members);
+	}
+}
+
 void deleteSet(Set * set) {
 	if (!set->isRange)
 		deleteVectorInt(set->members);

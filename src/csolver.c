@@ -122,7 +122,7 @@ Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, u
 	return predicate;
 }
 
-Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range) {
+Table * createTable(CSolver *solver, Element **domains, uint numDomain, Element * range) {
 	Table* table= allocTable(domains,numDomain,range);
 	pushVectorTable(solver->allTables, table);
 	return table;

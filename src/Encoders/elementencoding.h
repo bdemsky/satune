@@ -1,6 +1,7 @@
 #ifndef ELEMENTENCODING_H
 #define ELEMENTENCODING_H
 #include "classlist.h"
+#include "naiveencoder.h"
 
 enum ElementEncodingType {
 	ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
@@ -31,4 +32,8 @@ static inline bool isinUseElement(ElementEncoding *This, uint offset) {
 static inline void setInUseElement(ElementEncoding *This, uint offset) {
 	This->inUseArray[(offset>>6)] |= 1 << (offset & 63);
 }
+
+void generateBinaryIndexEncodingVars(NaiveEncoder* encode, ElementEncoding* This);
+void generateElementEncodingVariables(NaiveEncoder* encoder, ElementEncoding* This);
+
 #endif
