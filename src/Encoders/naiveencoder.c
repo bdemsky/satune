@@ -10,7 +10,8 @@
 #include "boolean.h"
 #include "table.h"
 #include "tableentry.h"
-#include "constraint.h"
+//THIS FILE SHOULD HAVE NOTHING TO DO WITH CONSTRAINTS...
+//#include "constraint.h"
 #include <strings.h>
 
 NaiveEncoder* allocNaiveEncoder(){
@@ -53,11 +54,16 @@ void naiveEncodingDecision(CSolver* csolver, NaiveEncoder* encoder){
 }
 
 
+// THIS SHOULD NOT BE HERE
+/*
 void getArrayNewVars(NaiveEncoder* encoder, uint num, Constraint **carray) {
 	for(uint i=0;i<num;i++)
 		carray[i]=getNewVar(encoder);
 }
+*/
 
+// THIS SHOULD NOT BE HERE
+/*
 Constraint * getNewVar(NaiveEncoder* encoder) {
 	Constraint* var = allocVarConstraint(VAR, encoder->varindex);
 	Constraint* notVar = allocVarConstraint(NOTVAR, encoder->varindex);
@@ -67,6 +73,7 @@ Constraint * getNewVar(NaiveEncoder* encoder) {
 	encoder->varindex++;
 	return var;
 }
+*/
 
 void baseBinaryIndexElementAssign(ElementEncoding *This) {
 	Element * element=This->element;
