@@ -62,16 +62,6 @@ Constraint * getElementValueConstraint(Element* This, uint64_t value) {
 	return NULL;
 }
 
-Constraint * generateBinaryConstraint(uint numvars, Constraint ** vars, uint value) {
-	Constraint *carray[numvars];
-	for(uint j=0;j<numvars;j++) {
-		carray[j]=((value&1)==1) ? vars[j] : negateConstraint(vars[j]);
-		value=value>>1;
-	}
-
-	return allocArrayConstraint(AND, numvars, carray);
-}
-
 void deleteElement(Element *This) {
 	switch(GETELEMENTTYPE(This)) {
 	case ELEMFUNCRETURN: {

@@ -186,6 +186,16 @@ Constraint * cloneConstraint(Constraint * This) {
 	}
 }
 
+Constraint * generateBinaryConstraint(uint numvars, Constraint ** vars, uint value) {
+	Constraint *carray[numvars];
+	for(uint j=0;j<numvars;j++) {
+		carray[j]=((value&1)==1) ? vars[j] : negateConstraint(vars[j]);
+		value=value>>1;
+	}
+
+	return allocArrayConstraint(AND, numvars, carray);
+}
+
 /** Generates a constraint to ensure that all encodings are less than value */
 Constraint * generateLTConstraint(uint numvars, Constraint ** vars, uint value) {
 	Constraint *orarray[numvars];
