@@ -28,12 +28,12 @@ void naiveEncodingDecision(CSolver* csolver, NaiveEncoder* encoder){
 		Element* element = getVectorElement(csolver->allElements, i);
 		switch(GETELEMENTTYPE(element)){
 			case ELEMSET:
-				setElementEncodingType(GETELEMENTENCODING(element), BINARYINDEX);
-				baseBinaryIndexElementAssign(GETELEMENTENCODING(element));
-				generateElementEncodingVariables(encoder,GETELEMENTENCODING(element));
+				setElementEncodingType(getElementEncoding(element), BINARYINDEX);
+				baseBinaryIndexElementAssign(getElementEncoding(element));
+				generateElementEncodingVariables(encoder,getElementEncoding(element));
 				break;
 			case ELEMFUNCRETURN: 
-				setFunctionEncodingType(GETFUNCTIONENCODING(element), ENUMERATEIMPLICATIONS);
+				setFunctionEncodingType(getFunctionEncoding(element), ENUMERATEIMPLICATIONS);
 				break;
 			default:
 				ASSERT(0);
@@ -45,7 +45,7 @@ void naiveEncodingDecision(CSolver* csolver, NaiveEncoder* encoder){
 		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
 		switch(GETBOOLEANTYPE(predicate)){
 			case PREDICATEOP:
-				setFunctionEncodingType(GETFUNCTIONENCODING(predicate), ENUMERATEIMPLICATIONS);
+				setFunctionEncodingType(getFunctionEncoding(predicate), ENUMERATEIMPLICATIONS);
 				break;
 			default:
 				continue;
@@ -104,7 +104,7 @@ void encode(CSolver* csolver){
 		Element* element = getVectorElement(csolver->allElements, i);
 		switch(GETELEMENTTYPE(element)){
 			case ELEMFUNCRETURN: 
-				naiveEncodeFunctionPredicate(encoder, GETFUNCTIONENCODING(element));
+				naiveEncodeFunctionPredicate(encoder, getFunctionEncoding(element));
 				break;
 			default:
 				continue;
@@ -116,7 +116,7 @@ void encode(CSolver* csolver){
 		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
 		switch(GETBOOLEANTYPE(predicate)){
 			case PREDICATEOP:
-				naiveEncodeFunctionPredicate(encoder, GETFUNCTIONENCODING(predicate));
+				naiveEncodeFunctionPredicate(encoder, getFunctionEncoding(predicate));
 				break;
 			default:
 				continue;

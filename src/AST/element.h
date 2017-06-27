@@ -10,15 +10,6 @@
 
 #define GETELEMENTTYPE(o) GETASTNODETYPE(o)
 #define GETELEMENTPARENTS(o) (&((Element*)o)->parents)
-#define GETELEMENTENCODING(e) (GETELEMENTTYPE(e)==ELEMSET?	\
-		&((ElementSet*)e)->encoding:	\
-		GETELEMENTTYPE(e)==ELEMFUNCRETURN?	\
-		&((ElementFunction*)e)->domainencoding: NULL)
-// Should be called on the element or boolean
-#define GETFUNCTIONENCODING(f) (GETASTNODETYPE(f) == ELEMFUNCRETURN?	\
-		&((ElementFunction*)f)->functionencoding:	\
-		GETASTNODETYPE(f) == PREDICATEOP?	\
-		&((BooleanPredicate*)f)->encoding: NULL)
 		
 struct Element {
 	ASTNode base;
@@ -43,6 +34,18 @@ struct ElementFunction {
 Element * allocElementSet(Set *s);
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 void deleteElement(Element *This);
+
+inline ElementEncoding* getElementEncoding(Element* This){
+	switch(GETELEMENTTYPE(This)){
+		case ELEMSET:
+			return &((ElementSet*)This)->encoding;
+		case ELEMFUNCRETURN:		
+			return &((ElementFunction*)This)->domainencoding;
+		default:
+			ASSERT(0);
+	}
+	return NULL;
+}
 
 uint getElementSize(Element* This);
 Constraint * getElementValueConstraint(Element* This, uint64_t value);

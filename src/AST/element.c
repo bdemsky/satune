@@ -47,9 +47,9 @@ Constraint * getElementValueConstraint(Element* This, uint64_t value) {
 			ElementSet* elemSet= ((ElementSet*)This);
 			uint size = getSetSize(elemSet->set);
 			for(uint i=0; i<size; i++){
-				if( GETELEMENTENCODING(elemSet)->encodingArray[i]==value){
-					return generateBinaryConstraint(GETELEMENTENCODING(elemSet)->numVars,
-						GETELEMENTENCODING(elemSet)->variables, i);
+				if( getElementEncoding(elemSet)->encodingArray[i]==value){
+					return generateBinaryConstraint(getElementEncoding(elemSet)->numVars,
+						getElementEncoding(elemSet)->variables, i);
 				}
 			}
 			break;

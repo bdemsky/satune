@@ -21,6 +21,18 @@ struct FunctionEncoding {
 	ElementPredicate op;
 };
 
+inline FunctionEncoding* getFunctionEncoding(ASTNode func){
+	switch(GETASTNODETYPE(func)){
+		case ELEMFUNCRETURN:
+			return &((ElementFunction*)func)->functionencoding;
+		case PREDICATEOP:
+			return &((BooleanPredicate*)func)->encoding;
+		default:
+			ASSERT(0);
+	}
+	return NULL;
+}
+
 void initFunctionEncoding(FunctionEncoding *encoding, Element *function);
 void initPredicateEncoding(FunctionEncoding *encoding, Boolean *predicate);
 void setFunctionEncodingType(FunctionEncoding* encoding, FunctionEncodingType type);
