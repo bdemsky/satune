@@ -51,7 +51,7 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize);
 void deleteBoolean(Boolean * This);
 
-inline FunctionEncoding* getPredicateFunctionEncoding(BooleanPredicate* func){
+static inline FunctionEncoding* getPredicateFunctionEncoding(BooleanPredicate* func){
 	return &func->encoding;
 }
 

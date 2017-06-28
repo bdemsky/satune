@@ -11,10 +11,10 @@ struct SATEncoder {
 	VectorConstraint allConstraints;
 };
 
-inline VectorConstraint* getSATEncoderVars(SATEncoder* ne){
+static inline VectorConstraint* getSATEncoderVars(SATEncoder* ne){
 	return &ne->vars;
 }
-inline VectorConstraint* getSATEncoderAllConstraints(SATEncoder* ne){
+static inline VectorConstraint* getSATEncoderAllConstraints(SATEncoder* ne){
 	return &ne->allConstraints;
 }
 SATEncoder * allocSATEncoder();
