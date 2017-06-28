@@ -5,12 +5,12 @@
 #include "structs.h"
 
 struct Table {
-	ArrayElement domains;
-	Element * range;
+	ArraySet domains;
+	Set * range;
 	VectorTableEntry entries;
 };
 
-Table * allocTable(Element **domains, uint numDomain, Element * range);
+Table * allocTable(Set **domains, uint numDomain, Set * range);
 void addNewTableEntry(Table* table, uint64_t* inputs, uint inputSize, uint64_t result);
 void deleteTable(Table* table);
 #endif

@@ -47,6 +47,11 @@ inline ElementEncoding* getElementEncoding(Element* This){
 	return NULL;
 }
 
+
+inline FunctionEncoding* getElementFunctionEncoding(ElementFunction* func){
+	return &func->functionencoding;
+}
+
 uint getElementSize(Element* This);
 Constraint * getElementValueConstraint(Element* This, uint64_t value);
 #endif

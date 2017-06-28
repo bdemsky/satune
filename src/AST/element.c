@@ -44,16 +44,17 @@ Constraint * getElementValueConstraint(Element* This, uint64_t value) {
 	switch(GETELEMENTTYPE(This)){
 		case ELEMSET:
 			; //Statement is needed for a label and This is a NOPE
-			ElementSet* elemSet= ((ElementSet*)This);
-			uint size = getSetSize(elemSet->set);
+			uint size = getSetSize(((ElementSet*)This)->set);
+			//FIXME
 			for(uint i=0; i<size; i++){
-				if( getElementEncoding(elemSet)->encodingArray[i]==value){
-					return generateBinaryConstraint(getElementEncoding(elemSet)->numVars,
-						getElementEncoding(elemSet)->variables, i);
+				if( getElementEncoding(This)->encodingArray[i]==value){
+					return generateBinaryConstraint(getElementEncoding(This)->numVars,
+						getElementEncoding(This)->variables, i);
 				}
 			}
 			break;
 		case ELEMFUNCRETURN:
+			ASSERT(0);
 			break;
 		default:
 			ASSERT(0);

@@ -33,7 +33,7 @@ static inline void setInUseElement(ElementEncoding *This, uint offset) {
 	This->inUseArray[(offset>>6)] |= 1 << (offset & 63);
 }
 
-void generateBinaryIndexEncodingVars(NaiveEncoder* encode, ElementEncoding* This);
-void generateElementEncodingVariables(NaiveEncoder* encoder, ElementEncoding* This);
+void generateBinaryIndexEncodingVars(SATEncoder* encode, ElementEncoding* This);
+void generateElementEncodingVariables(SATEncoder* encoder, ElementEncoding* This);
 
 #endif

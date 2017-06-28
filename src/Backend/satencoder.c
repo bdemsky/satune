@@ -4,9 +4,16 @@
 #include "boolean.h"
 #include "constraint.h"
 #include "common.h"
+#include "element.h"
+#include "function.h"
+#include "tableentry.h"
+#include "table.h"
+
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
+	allocInlineDefVectorConstraint(getSATEncoderAllConstraints(This));
+	allocInlineDefVectorConstraint(getSATEncoderVars(This));
 	This->varcount=1;
 	return This;
 }
@@ -21,6 +28,20 @@ void encodeAllSATEncoder(SATEncoder * This, CSolver *csolver) {
 	for(uint i=0;i<size;i++) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		encodeConstraintSATEncoder(This, constraint);
+	}
+	
+	size = getSizeVectorElement(csolver->allElements);
+	for(uint i=0; i<size; i++){
+		Element* element = getVectorElement(csolver->allElements, i);
+		switch(GETELEMENTTYPE(element)){
+			case ELEMFUNCRETURN: 
+				encodeFunctionElementSATEncoder(This, (ElementFunction*) element);
+				break;
+			default:	
+				continue;
+				//ElementSets that aren't used in any constraints/functions
+				//will be eliminated.
+		}
 	}
 }
 
@@ -40,11 +61,17 @@ Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
 	}
 }
 
+void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Constraint **carray) {
+	for(uint i=0;i<num;i++)
+		carray[i]=getNewVarSATEncoder(encoder);
+}
+
 Constraint * getNewVarSATEncoder(SATEncoder *This) {
 	Constraint * var=allocVarConstraint(VAR, This->varcount);
 	Constraint * varneg=allocVarConstraint(NOTVAR, This->varcount++);
 	setNegConstraint(var, varneg);
 	setNegConstraint(varneg, var);
+	pushVectorConstraint(getSATEncoderVars(This), var);
 	return var;
 }
 
@@ -92,5 +119,56 @@ Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) 
 
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
 	//TO IMPLEMENT
+	
+	return NULL;
+}
+
+Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This){
+	switch(GETFUNCTIONTYPE(This->function)){
+		case TABLEFUNC:
+			return encodeTableElementFunctionSATEncoder(encoder, This);
+		case OPERATORFUNC:
+			return encodeOperatorElementFunctionSATEncoder(encoder, This);
+		default:
+			ASSERT(0);
+	}
+	//FIXME
+	return NULL;
+}
+
+Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
+	switch(getElementFunctionEncoding(This)->type){
+		case ENUMERATEIMPLICATIONS:
+			return encodeEnumTableElemFunctionSATEncoder(encoder, This);
+			break;
+		default:
+			ASSERT(0);
+	}
+	//FIXME
+	return NULL;
+}
+
+Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder,ElementFunction* This){
+	return NULL;
+}
+
+Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
+	ASSERT(GETFUNCTIONTYPE(This->function)==TABLEFUNC);
+	ArrayElement* elements= &This->inputs;
+	Table* table = ((FunctionTable*) (This->function))->table;
+	uint size = getSizeVectorTableEntry(&table->entries);
+	for(uint i=0; i<size; i++){
+		TableEntry* entry = getVectorTableEntry(&table->entries, i);
+		uint inputNum =getSizeArrayElement(elements);
+		Element* el= getArrayElement(elements, i);
+		Constraint* carray[inputNum];
+		for(uint j=0; j<inputNum; j++){
+			 carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
+		}
+		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
+			getElementValueConstraint((Element*)This, entry->output));
+		pushVectorConstraint( getSATEncoderAllConstraints(encoder), row);
+	}
+	//FIXME
 	return NULL;
 }
