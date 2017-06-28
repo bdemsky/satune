@@ -5,6 +5,7 @@
 #include "structs.h"
 #include "ops.h"
 #include "orderencoding.h"
+#include "boolean.h"
 
 struct Order {
 	OrderType type;
@@ -14,5 +15,7 @@ struct Order {
 };
 
 Order* allocOrder(OrderType type, Set * set);
+void addOrderConstraint(Order* order, BooleanOrder* constraint);
+void setOrderEncodingType(Order* order, OrderEncodingType type);
 void deleteOrder(Order* order);
 #endif

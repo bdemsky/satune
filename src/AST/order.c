@@ -13,6 +13,14 @@ Order* allocOrder(OrderType type, Set * set){
 	return order;
 }
 
+void addOrderConstraint(Order* order, BooleanOrder* constraint){
+	pushVectorBoolean( &order->constraints, (Boolean) constraint);
+}
+
+void setOrderEncodingType(Order* order, OrderEncodingType type){
+	order->order.type = type;
+}
+
 void deleteOrder(Order* order){
 	deleteVectorArrayBoolean(& order->constraints);
 	deleteOrderEncoding(& order->order);

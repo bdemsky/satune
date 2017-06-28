@@ -8,6 +8,7 @@
 #include "function.h"
 #include "tableentry.h"
 #include "table.h"
+#include "order.h"
 
 
 SATEncoder * allocSATEncoder() {
@@ -113,8 +114,10 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 }
 
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
-	//TO IMPLEMENT
-	return NULL;
+	if(constraint->var== NULL){
+		constraint->var = getNewVarSATEncoder(This);
+	}
+	return constraint->var;
 }
 
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
@@ -132,7 +135,6 @@ Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction
 		default:
 			ASSERT(0);
 	}
-	//FIXME
 	return NULL;
 }
 
@@ -144,7 +146,6 @@ Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFun
 		default:
 			ASSERT(0);
 	}
-	//FIXME
 	return NULL;
 }
 
@@ -157,6 +158,7 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 	ArrayElement* elements= &This->inputs;
 	Table* table = ((FunctionTable*) (This->function))->table;
 	uint size = getSizeVectorTableEntry(&table->entries);
+	Constraint* constraints[size]; //FIXME: should add a space for the case that didn't match any entries
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(&table->entries, i);
 		uint inputNum =getSizeArrayElement(elements);
@@ -167,8 +169,9 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		}
 		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
 			getElementValueConstraint((Element*)This, entry->output));
-		pushVectorConstraint( getSATEncoderAllConstraints(encoder), row);
+		constraints[i]=row;
 	}
-	//FIXME
-	return NULL;
+	Constraint* result = allocArrayConstraint(OR, size, constraints);
+	pushVectorConstraint( getSATEncoderAllConstraints(encoder), result);
+	return result;
 }

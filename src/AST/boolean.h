@@ -24,6 +24,7 @@ struct BooleanOrder {
 	Order* order;
 	uint64_t first;
 	uint64_t second;
+	Constraint* var;
 };
 
 struct BooleanVar {

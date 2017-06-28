@@ -10,6 +10,7 @@
 #include "boolean.h"
 #include "table.h"
 #include "tableentry.h"
+#include "order.h"
 #include <strings.h>
 
 
@@ -36,11 +37,14 @@ void naiveEncodingDecision(CSolver* csolver, SATEncoder* encoder){
 	
 	size = getSizeVectorBoolean(csolver->allBooleans);
 	for(uint i=0; i<size; i++){
-		Boolean* predicate = getVectorBoolean(csolver->allBooleans, i);
-		switch(GETBOOLEANTYPE(predicate)){
+		Boolean* boolean = getVectorBoolean(csolver->allBooleans, i);
+		switch(GETBOOLEANTYPE(boolean)){
 			case PREDICATEOP:
-				setFunctionEncodingType(getPredicateFunctionEncoding((BooleanPredicate*)predicate),
+				setFunctionEncodingType(getPredicateFunctionEncoding((BooleanPredicate*)boolean),
 					ENUMERATEIMPLICATIONS);
+				break;
+			case ORDERCONST:
+				setOrderEncodingType( ((BooleanOrder*)boolean)->order, PAIRWISE );
 				break;
 			default:
 				continue;
