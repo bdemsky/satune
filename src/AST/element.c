@@ -50,6 +50,11 @@ Set* getElementSet(Element* This){
 	return NULL;
 }
 
+FIXME()!!!!
+
+/** This function belongs in the backend...Elements should not touch
+		binary constraints nor should they touch their encoders... */
+
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(This);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
