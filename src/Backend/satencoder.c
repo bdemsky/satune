@@ -13,8 +13,6 @@
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
-	allocInlineDefVectorConstraint(getSATEncoderAllConstraints(This));
-	allocInlineDefVectorConstraint(getSATEncoderVars(This));
 	This->varcount=1;
 	return This;
 }
@@ -24,6 +22,13 @@ void deleteSATEncoder(SATEncoder *This) {
 }
 
 void initializeConstraintVars(CSolver* csolver, SATEncoder* This){
+	/** We really should not walk the free list to generate constraint
+			variables...walk the constraint tree instead.  Or even better
+			yet, just do this as you need to during the encodeAllSATEncoder
+			walk.  */
+
+	FIXME!!!!(); // Make sure Hamed sees comment above
+
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
 		Element* element = getVectorElement(csolver->allElements, i);
@@ -80,7 +85,6 @@ Constraint * getNewVarSATEncoder(SATEncoder *This) {
 	Constraint * varneg=allocVarConstraint(NOTVAR, This->varcount++);
 	setNegConstraint(var, varneg);
 	setNegConstraint(varneg, var);
-	pushVectorConstraint(getSATEncoderVars(This), var);
 	return var;
 }
 
@@ -177,13 +181,15 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		Element* el= getArrayElement(elements, i);
 		Constraint* carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
-			 carray[inputNum] = getElementValueBinaryIndexConstraint(el, entry->inputs[j]);
+			FIXME!!!!();
+			//This next line should not assume a particular encoding type for the element...  just a generic element encoding function that should choose the appropriate encoding...
+			
+			carray[inputNum] = getElementValueBinaryIndexConstraint(el, entry->inputs[j]);
 		}
 		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
 			getElementValueBinaryIndexConstraint((Element*)This, entry->output));
 		constraints[i]=row;
 	}
 	Constraint* result = allocArrayConstraint(OR, size, constraints);
-	pushVectorConstraint( getSATEncoderAllConstraints(encoder), result);
 	return result;
 }

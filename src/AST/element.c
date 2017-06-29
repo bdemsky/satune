@@ -50,16 +50,10 @@ Set* getElementSet(Element* This){
 	return NULL;
 }
 
-uint getElemEncodingInUseVarsSize(ElementEncoding* This){
-	uint size=0;
-	for(uint i=0; i<This->encArraySize; i++){
-		if(isinUseElement(This, i)){
-			size++;
-		}
-	}
-	return size;
-}
+FIXME()!!!!
 
+/** This function belongs in the backend...Elements should not touch
+		binary constraints nor should they touch their encoders... */
 
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(This);

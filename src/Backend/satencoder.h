@@ -6,17 +6,8 @@
 
 struct SATEncoder {
 	uint varcount;
-	//regarding managing memory 
-	VectorConstraint vars;
-	VectorConstraint allConstraints;
 };
 
-static inline VectorConstraint* getSATEncoderVars(SATEncoder* ne){
-	return &ne->vars;
-}
-static inline VectorConstraint* getSATEncoderAllConstraints(SATEncoder* ne){
-	return &ne->allConstraints;
-}
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
 void initializeConstraintVars(CSolver* csolver, SATEncoder* This);
