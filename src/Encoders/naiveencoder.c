@@ -21,17 +21,9 @@ void naiveEncodingDecision(CSolver* csolver){
 		//Whether it's a ElementFunction or ElementSet we should do the followings:
 		setElementEncodingType(getElementEncoding(element), BINARYINDEX);
 		baseBinaryIndexElementAssign(getElementEncoding(element));
-		switch(GETELEMENTTYPE(element)){
-			case ELEMSET:
-				//FIXME: Move next line to satEncoderInitializer!
-//				generateElementEncodingVariables(encoder,getElementEncoding(element));
-				break;
-			case ELEMFUNCRETURN: 
-				setFunctionEncodingType(getElementFunctionEncoding((ElementFunction*)element),
-					ENUMERATEIMPLICATIONS);
-				break;
-			default:
-				ASSERT(0);
+		if(GETELEMENTTYPE(element) == ELEMFUNCRETURN){
+			setFunctionEncodingType(getElementFunctionEncoding((ElementFunction*)element),
+				ENUMERATEIMPLICATIONS);
 		}
 	}
 	

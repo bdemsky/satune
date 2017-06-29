@@ -22,11 +22,10 @@ struct ElementEncoding {
 void initElementEncoding(ElementEncoding *This, Element *element);
 void setElementEncodingType(ElementEncoding* This, ElementEncodingType type);
 void deleteElementEncoding(ElementEncoding *This);
-void baseBinaryIndexElementAssign(ElementEncoding *This);
 void allocEncodingArrayElement(ElementEncoding *This, uint size);
 void allocInUseArrayElement(ElementEncoding *This, uint size);
-//FIXME:
-//uint addNewVariableToEncodingArray(ElementEncoding* This, uint64_t);
+//FIXME
+//uint addNewVariableToEncodingArray(ElementEncoding* This, uint64_t var);
 static inline bool isinUseElement(ElementEncoding *This, uint offset) {
 	return (This->inUseArray[(offset>>6)] >> (offset & 63)) &0x1;
 }
