@@ -50,17 +50,6 @@ Set* getElementSet(Element* This){
 	return NULL;
 }
 
-uint getElemEncodingInUseVarsSize(ElementEncoding* This){
-	uint size=0;
-	for(uint i=0; i<This->encArraySize; i++){
-		if(isinUseElement(This, i)){
-			size++;
-		}
-	}
-	return size;
-}
-
-
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(This);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);

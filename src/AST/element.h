@@ -51,6 +51,5 @@ static inline FunctionEncoding* getElementFunctionEncoding(ElementFunction* func
 	return &func->functionencoding;
 }
 
-uint getElemEncodingInUseVarsSize(ElementEncoding* This);
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value);
 #endif

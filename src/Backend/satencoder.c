@@ -13,8 +13,6 @@
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
-	allocInlineDefVectorConstraint(getSATEncoderAllConstraints(This));
-	allocInlineDefVectorConstraint(getSATEncoderVars(This));
 	This->varcount=1;
 	return This;
 }
@@ -80,7 +78,6 @@ Constraint * getNewVarSATEncoder(SATEncoder *This) {
 	Constraint * varneg=allocVarConstraint(NOTVAR, This->varcount++);
 	setNegConstraint(var, varneg);
 	setNegConstraint(varneg, var);
-	pushVectorConstraint(getSATEncoderVars(This), var);
 	return var;
 }
 
@@ -184,6 +181,5 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		constraints[i]=row;
 	}
 	Constraint* result = allocArrayConstraint(OR, size, constraints);
-	pushVectorConstraint( getSATEncoderAllConstraints(encoder), result);
 	return result;
 }

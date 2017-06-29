@@ -43,8 +43,7 @@ void setElementEncodingType(ElementEncoding* This, ElementEncodingType type){
 
 void generateBinaryIndexEncodingVars(SATEncoder* encoder, ElementEncoding* This){
 	ASSERT(This->type==BINARYINDEX);
-	uint size = getElemEncodingInUseVarsSize(This);
-	allocElementConstraintVariables(This, NUMBITS(size-1));
+	allocElementConstraintVariables(This, NUMBITS(This->encArraySize-1));
 	getArrayNewVarsSATEncoder(encoder, This->numVars, This->variables);
 }
 
