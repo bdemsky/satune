@@ -33,7 +33,7 @@ Set* getElementSet(Element* This){
 		case ELEMSET:
 			return ((ElementSet*)This)->set;
 		case ELEMFUNCRETURN:
-			;//Nope is needed for label assignment. i.e. next instruction isn't 
+			;//Nope is needed for label assignment. i.e. next instruction isn't a statement 
 			Function* func = ((ElementFunction*)This)->function;
 			switch(GETFUNCTIONTYPE(func)){
 				case TABLEFUNC:
@@ -45,25 +45,6 @@ Set* getElementSet(Element* This){
 			}
 		default:
 			ASSERT(0);
-	}
-	ASSERT(0);
-	return NULL;
-}
-
-FIXME()!!!!
-
-/** This function belongs in the backend...Elements should not touch
-		binary constraints nor should they touch their encoders... */
-
-Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value) {
-	ASTNodeType type = GETELEMENTTYPE(This);
-	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
-	ElementEncoding* elemEnc = getElementEncoding(This);
-	for(uint i=0; i<elemEnc->encArraySize; i++){
-		if( isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value){
-			return generateBinaryConstraint(elemEnc->numVars,
-				elemEnc->variables, i);
-		}
 	}
 	ASSERT(0);
 	return NULL;

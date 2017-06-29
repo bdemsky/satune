@@ -27,13 +27,51 @@ void initializeConstraintVars(CSolver* csolver, SATEncoder* This){
 			yet, just do this as you need to during the encodeAllSATEncoder
 			walk.  */
 
-	FIXME!!!!(); // Make sure Hamed sees comment above
+//	FIXME!!!!(); // Make sure Hamed sees comment above
 
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
 		Element* element = getVectorElement(csolver->allElements, i);
 		generateElementEncodingVariables(This,getElementEncoding(element));
 	}
+}
+
+
+Constraint * getElementValueConstraint(Element* This, uint64_t value) {
+	switch(getElementEncoding(This)->type){
+		case ONEHOT:
+			ASSERT(0);
+			break;
+		case UNARY:
+			ASSERT(0);
+			break;
+		case BINARYINDEX:
+			ASSERT(0);
+			break;
+		case ONEHOTBINARY:
+			return getElementValueBinaryIndexConstraint(This, value);
+			break;
+		case BINARYVAL:
+			ASSERT(0);
+			break;
+		default:
+			ASSERT(0);
+			break;
+	}
+	return NULL;
+}
+Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value) {
+	ASTNodeType type = GETELEMENTTYPE(This);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ElementEncoding* elemEnc = getElementEncoding(This);
+	for(uint i=0; i<elemEnc->encArraySize; i++){
+		if( isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value){
+			return generateBinaryConstraint(elemEnc->numVars,
+				elemEnc->variables, i);
+		}
+	}
+	ASSERT(0);
+	return NULL;
 }
 
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
@@ -181,10 +219,7 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		Element* el= getArrayElement(elements, i);
 		Constraint* carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
-			FIXME!!!!();
-			//This next line should not assume a particular encoding type for the element...  just a generic element encoding function that should choose the appropriate encoding...
-			
-			carray[inputNum] = getElementValueBinaryIndexConstraint(el, entry->inputs[j]);
+			carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
 		}
 		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
 			getElementValueBinaryIndexConstraint((Element*)This, entry->output));
