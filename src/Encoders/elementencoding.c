@@ -11,6 +11,7 @@ void initElementEncoding(ElementEncoding * This, Element *element) {
 	This->encodingArray=NULL;
 	This->inUseArray=NULL;
 	This->numVars=0;
+	This->encArraySize=0;
 }
 
 void deleteElementEncoding(ElementEncoding *This) {
@@ -24,6 +25,7 @@ void deleteElementEncoding(ElementEncoding *This) {
 
 void allocEncodingArrayElement(ElementEncoding *This, uint size) {
 	This->encodingArray=ourcalloc(1, sizeof(uint64_t)*size);
+	This->encArraySize=size;
 }
 
 void allocInUseArrayElement(ElementEncoding *This, uint size) {
@@ -41,7 +43,7 @@ void setElementEncodingType(ElementEncoding* This, ElementEncodingType type){
 
 void generateBinaryIndexEncodingVars(SATEncoder* encoder, ElementEncoding* This){
 	ASSERT(This->type==BINARYINDEX);
-	uint size = getElementSize(This->element);
+	uint size = getElemEncodingInUseVarsSize(This);
 	allocElementConstraintVariables(This, NUMBITS(size-1));
 	getArrayNewVarsSATEncoder(encoder, This->numVars, This->variables);
 }

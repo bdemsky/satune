@@ -111,4 +111,7 @@ Order * createOrder(CSolver *, OrderType type, Set * set);
 
 /** This function instantiates a boolean on two items in an order. */
 Boolean * orderConstraint(CSolver *, Order * order, uint64_t first, uint64_t second);
+
+/** When everything is done, the client calls this function and then csolver starts to encode*/
+void encode(CSolver*);
 #endif

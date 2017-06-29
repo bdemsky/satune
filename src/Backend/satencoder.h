@@ -19,7 +19,8 @@ static inline VectorConstraint* getSATEncoderAllConstraints(SATEncoder* ne){
 }
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
-void encodeAllSATEncoder(SATEncoder *This, CSolver *csolver);
+void initializeConstraintVars(CSolver* csolver, SATEncoder* This);
+void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This);
 Constraint * getNewVarSATEncoder(SATEncoder *This);
 void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Constraint **carray);
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);

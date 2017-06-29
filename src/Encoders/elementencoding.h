@@ -15,6 +15,7 @@ struct ElementEncoding {
 	Constraint ** variables;/* List Variables Used To Encode Element */
 	uint64_t * encodingArray;	/* List the Variables in the appropriate order */
 	uint64_t * inUseArray;/* Bitmap to track variables in use */
+	uint encArraySize;
 	uint numVars;	/* Number of variables */
 };
 
@@ -24,7 +25,8 @@ void deleteElementEncoding(ElementEncoding *This);
 void baseBinaryIndexElementAssign(ElementEncoding *This);
 void allocEncodingArrayElement(ElementEncoding *This, uint size);
 void allocInUseArrayElement(ElementEncoding *This, uint size);
-
+//FIXME:
+//uint addNewVariableToEncodingArray(ElementEncoding* This, uint64_t);
 static inline bool isinUseElement(ElementEncoding *This, uint offset) {
 	return (This->inUseArray[(offset>>6)] >> (offset & 63)) &0x1;
 }

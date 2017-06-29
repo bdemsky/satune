@@ -7,6 +7,7 @@
 #include "order.h"
 #include "table.h"
 #include "function.h"
+#include "satencoder.h"
 
 CSolver * allocCSolver() {
 	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -168,4 +169,14 @@ Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64
 	Boolean* constraint = allocBooleanOrder(order, first, second);
 	pushVectorBoolean(solver->allBooleans,constraint);
 	return constraint;
+}
+
+void encode(CSolver* solver){
+	naiveEncodingDecision(solver);
+	SATEncoder* satEncoder = allocSATEncoder();
+	initializeConstraintVars(solver, satEncoder);
+	encodeAllSATEncoder(solver, satEncoder);
+	//For now, let's just delete it, and in future for doing queries 
+	//we may need it.
+	deleteSATEncoder(satEncoder);
 }

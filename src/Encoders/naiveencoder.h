@@ -11,7 +11,7 @@
  * @param csolver
  * @param encoder
  */
-void naiveEncodingDecision(CSolver* csolver, SATEncoder* encoder);
+void naiveEncodingDecision(CSolver* csolver);
 void baseBinaryIndexElementAssign(ElementEncoding *This);
 
 #endif

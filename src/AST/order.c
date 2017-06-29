@@ -14,7 +14,7 @@ Order* allocOrder(OrderType type, Set * set){
 }
 
 void addOrderConstraint(Order* order, BooleanOrder* constraint){
-	pushVectorBoolean( &order->constraints, (Boolean) constraint);
+	pushVectorBoolean( &order->constraints, (Boolean*) constraint);
 }
 
 void setOrderEncodingType(Order* order, OrderEncodingType type){

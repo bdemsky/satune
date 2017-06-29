@@ -23,7 +23,15 @@ void deleteSATEncoder(SATEncoder *This) {
 	ourfree(This);
 }
 
-void encodeAllSATEncoder(SATEncoder * This, CSolver *csolver) {
+void initializeConstraintVars(CSolver* csolver, SATEncoder* This){
+	uint size = getSizeVectorElement(csolver->allElements);
+	for(uint i=0; i<size; i++){
+		Element* element = getVectorElement(csolver->allElements, i);
+		generateElementEncodingVariables(This,getElementEncoding(element));
+	}
+}
+
+void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 	VectorBoolean *constraints=csolver->constraints;
 	uint size=getSizeVectorBoolean(constraints);
 	for(uint i=0;i<size;i++) {
@@ -143,13 +151,17 @@ Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFun
 		case ENUMERATEIMPLICATIONS:
 			return encodeEnumTableElemFunctionSATEncoder(encoder, This);
 			break;
+		case CIRCUIT:
+			ASSERT(0);
+			break;
 		default:
 			ASSERT(0);
 	}
 	return NULL;
 }
 
-Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder,ElementFunction* This){
+Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
+	//FIXME: for now it just adds/substracts inputs exhustively
 	return NULL;
 }
 
@@ -165,10 +177,10 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		Element* el= getArrayElement(elements, i);
 		Constraint* carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
-			 carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
+			 carray[inputNum] = getElementValueBinaryIndexConstraint(el, entry->inputs[j]);
 		}
 		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
-			getElementValueConstraint((Element*)This, entry->output));
+			getElementValueBinaryIndexConstraint((Element*)This, entry->output));
 		constraints[i]=row;
 	}
 	Constraint* result = allocArrayConstraint(OR, size, constraints);

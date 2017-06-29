@@ -9,8 +9,7 @@
 #include "boolean.h"
 
 #define GETELEMENTTYPE(o) GETASTNODETYPE(o)
-#define GETELEMENTPARENTS(o) (&((Element*)o)->parents)
-		
+#define GETELEMENTPARENTS(o) (&((Element*)o)->parents)		
 struct Element {
 	ASTNode base;
 	VectorASTNode parents;
@@ -34,7 +33,7 @@ struct ElementFunction {
 Element * allocElementSet(Set *s);
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 void deleteElement(Element *This);
-
+Set* getElementSet(Element* This);
 static inline ElementEncoding* getElementEncoding(Element* This){
 	switch(GETELEMENTTYPE(This)){
 		case ELEMSET:
@@ -52,6 +51,6 @@ static inline FunctionEncoding* getElementFunctionEncoding(ElementFunction* func
 	return &func->functionencoding;
 }
 
-uint getElementSize(Element* This);
-Constraint * getElementValueConstraint(Element* This, uint64_t value);
+uint getElemEncodingInUseVarsSize(ElementEncoding* This);
+Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value);
 #endif

@@ -2,6 +2,8 @@
 #include "structs.h"
 #include "set.h"
 #include "constraint.h"
+#include "function.h"
+#include "table.h"
 
 Element *allocElementSet(Set * s) {
 	ElementSet * tmp=(ElementSet *)ourmalloc(sizeof(ElementSet));
@@ -26,38 +28,48 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	return &tmp->base;
 }
 
-uint getElementSize(Element* This){
+Set* getElementSet(Element* This){
 	switch(GETELEMENTTYPE(This)){
 		case ELEMSET:
-			return getSetSize( ((ElementSet*)This)->set );
-			break;
+			return ((ElementSet*)This)->set;
 		case ELEMFUNCRETURN:
-			ASSERT(0);
+			;//Nope is needed for label assignment. i.e. next instruction isn't 
+			Function* func = ((ElementFunction*)This)->function;
+			switch(GETFUNCTIONTYPE(func)){
+				case TABLEFUNC:
+					return ((FunctionTable*)func)->table->range;
+				case OPERATORFUNC:
+					return ((FunctionOperator*)func)->range;
+				default:
+					ASSERT(0);
+			}
 		default:
 			ASSERT(0);
 	}
-	return -1;
+	ASSERT(0);
+	return NULL;
+}
+
+uint getElemEncodingInUseVarsSize(ElementEncoding* This){
+	uint size=0;
+	for(uint i=0; i<This->encArraySize; i++){
+		if(isinUseElement(This, i)){
+			size++;
+		}
+	}
+	return size;
 }
 
 
-Constraint * getElementValueConstraint(Element* This, uint64_t value) {
-	switch(GETELEMENTTYPE(This)){
-		case ELEMSET:
-			; //Statement is needed for a label and This is a NOPE
-			uint size = getSetSize(((ElementSet*)This)->set);
-			//FIXME
-			for(uint i=0; i<size; i++){
-				if( getElementEncoding(This)->encodingArray[i]==value){
-					return generateBinaryConstraint(getElementEncoding(This)->numVars,
-						getElementEncoding(This)->variables, i);
-				}
-			}
-			break;
-		case ELEMFUNCRETURN:
-			ASSERT(0);
-			break;
-		default:
-			ASSERT(0);
+Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value) {
+	ASTNodeType type = GETELEMENTTYPE(This);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ElementEncoding* elemEnc = getElementEncoding(This);
+	for(uint i=0; i<elemEnc->encArraySize; i++){
+		if( isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value){
+			return generateBinaryConstraint(elemEnc->numVars,
+				elemEnc->variables, i);
+		}
 	}
 	ASSERT(0);
 	return NULL;

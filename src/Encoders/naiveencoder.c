@@ -14,17 +14,17 @@
 #include <strings.h>
 
 
-void naiveEncodingDecision(CSolver* csolver, SATEncoder* encoder){
+void naiveEncodingDecision(CSolver* csolver){
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
 		Element* element = getVectorElement(csolver->allElements, i);
+		//Whether it's a ElementFunction or ElementSet we should do the followings:
+		setElementEncodingType(getElementEncoding(element), BINARYINDEX);
+		baseBinaryIndexElementAssign(getElementEncoding(element));
 		switch(GETELEMENTTYPE(element)){
 			case ELEMSET:
-				setElementEncodingType(getElementEncoding(element), BINARYINDEX);
-				//FIXME:Should be moved to SATEncoder
-				baseBinaryIndexElementAssign(getElementEncoding(element));
-				generateElementEncodingVariables(encoder,getElementEncoding(element));
-				//
+				//FIXME: Move next line to satEncoderInitializer!
+//				generateElementEncodingVariables(encoder,getElementEncoding(element));
 				break;
 			case ELEMFUNCRETURN: 
 				setFunctionEncodingType(getElementFunctionEncoding((ElementFunction*)element),
@@ -54,22 +54,16 @@ void naiveEncodingDecision(CSolver* csolver, SATEncoder* encoder){
 
 void baseBinaryIndexElementAssign(ElementEncoding *This) {
 	Element * element=This->element;
-	ASSERT(element->type == ELEMSET);
-	Set * set= ((ElementSet*)element)->set;
+	Set * set= getElementSet(element);
 	ASSERT(set->isRange==false);
 	uint size=getSizeVectorInt(set->members);
 	uint encSize=NEXTPOW2(size);
 	allocEncodingArrayElement(This, encSize);
 	allocInUseArrayElement(This, encSize);
-
 	for(uint i=0;i<size;i++) {
 		This->encodingArray[i]=getVectorInt(set->members, i);
 		setInUseElement(This, i);
 	}
-	This->numVars = NUMBITS(size-1);
-	This->variables = ourmalloc(sizeof(Constraint*)* This->numVars);
-	
-	
 }
 
 
