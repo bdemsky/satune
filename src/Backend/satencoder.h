@@ -22,6 +22,10 @@ Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * const
 Constraint * encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint);
 Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint);
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
+Constraint * encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
+Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
+Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
+
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value);
 Constraint * getElementValueConstraint(Element* This, uint64_t value);
 

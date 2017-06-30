@@ -9,6 +9,7 @@
 #include "tableentry.h"
 #include "table.h"
 #include "order.h"
+#include "predicate.h"
 
 
 SATEncoder * allocSATEncoder() {
@@ -82,19 +83,20 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		encodeConstraintSATEncoder(This, constraint);
 	}
 	
-	size = getSizeVectorElement(csolver->allElements);
-	for(uint i=0; i<size; i++){
-		Element* element = getVectorElement(csolver->allElements, i);
-		switch(GETELEMENTTYPE(element)){
-			case ELEMFUNCRETURN: 
-				encodeFunctionElementSATEncoder(This, (ElementFunction*) element);
-				break;
-			default:	
-				continue;
-				//ElementSets that aren't used in any constraints/functions
-				//will be eliminated.
-		}
-	}
+//	FIXME: Following line for element!
+//	size = getSizeVectorElement(csolver->allElements);
+//	for(uint i=0; i<size; i++){
+//		Element* element = getVectorElement(csolver->allElements, i);
+//		switch(GETELEMENTTYPE(element)){
+//			case ELEMFUNCRETURN: 
+//				encodeFunctionElementSATEncoder(This, (ElementFunction*) element);
+//				break;
+//			default:	
+//				continue;
+//				//ElementSets that aren't used in any constraints/functions
+//				//will be eliminated.
+//		}
+//	}
 }
 
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
@@ -220,8 +222,48 @@ Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * const
 }
 
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
-	//TO IMPLEMENT
-	
+	switch(GETPREDICATETYPE(constraint) ){
+		case TABLEPRED:
+			return encodeTablePredicateSATEncoder(This, constraint);
+		case OPERATORPRED:
+			return encodeOperatorPredicateSATEncoder(This, constraint);
+		default:
+			ASSERT(0);
+	}
+	return NULL;
+}
+
+Constraint * encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	switch(constraint->encoding.type){
+		case ENUMERATEIMPLICATIONS:
+			return encodeEnumTablePredicateSATEncoder(This, constraint);
+		case CIRCUIT:
+			ASSERT(0);
+			break;
+		default:
+			ASSERT(0);
+	}
+	return NULL;
+}
+
+Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	TableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
+	uint size = getSizeVectorTableEntry(entries);
+	for(uint i=0; i<size; i++){
+		TableEntry* entry = getVectorTableEntry(entries, i);
+		
+	}
+}
+
+Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	switch(constraint->encoding.type){
+		case ENUMERATEIMPLICATIONS:
+			break;
+		case CIRCUIT:
+			break;
+		default:
+			ASSERT(0);
+	}
 	return NULL;
 }
 
