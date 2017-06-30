@@ -2,6 +2,7 @@
 #include "structs.h"
 #include "csolver.h"
 #include "element.h"
+#include "order.h"
 
 Boolean* allocBoolean(VarType t) {
 	BooleanVar* tmp=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
@@ -18,7 +19,7 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	tmp->order=order;
 	tmp->first=first;
 	tmp->second=second;
-	tmp->var=NULL;
+	pushVectorBoolean(&order->constraints, &tmp->base);
 	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
 	return & tmp -> base;
 }

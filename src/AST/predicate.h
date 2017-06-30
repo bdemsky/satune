@@ -24,6 +24,7 @@ struct PredicateTable {
 };
 
 
-Predicate* allocPredicate(CompOp op, Set ** domain, uint numDomain);
+Predicate* allocPredicateOperator(CompOp op, Set ** domain, uint numDomain);
+Predicate* allocPredicateTable(Table* table, UndefinedBehavior undefBehavior);
 void deletePredicate(Predicate* predicate);
 #endif

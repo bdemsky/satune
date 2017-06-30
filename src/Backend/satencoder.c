@@ -164,10 +164,59 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 }
 
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
-	if(constraint->var== NULL){
-		constraint->var = getNewVarSATEncoder(This);
+	switch( constraint->order->type){
+		case PARTIAL:
+			return encodePartialOrderSATEncoder(This, constraint);
+		case TOTAL:
+			return encodeTotalOrderSATEncoder(This, constraint);
+		default:
+			ASSERT(0);
 	}
-	return constraint->var;
+	return NULL;
+}
+
+Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
+	ASSERT(boolOrder->order->type == TOTAL);
+	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
+	if( containsBoolConst(boolToConsts, boolOrder) ){
+		return getBoolConst(boolToConsts, boolOrder);
+	} else {
+		Constraint* constraint = getNewVarSATEncoder(This); 
+		putBoolConst(boolToConsts,boolOrder, constraint);
+		VectorBoolean* orderConstrs = &boolOrder->order->constraints;
+		uint size= getSizeVectorBoolean(orderConstrs);
+		for(uint i=0; i<size; i++){
+			ASSERT(GETBOOLEANTYPE( getVectorBoolean(orderConstrs, i)) == ORDERCONST );
+			BooleanOrder* tmp = (BooleanPredicate*)getVectorBoolean(orderConstrs, i);
+			BooleanOrder* newBool;
+			Constraint* first, second;
+			if(tmp->second==boolOrder->first){
+				newBool = (BooleanOrder*)allocBooleanOrder(tmp->order,tmp->first,boolOrder->second);
+				first = encodeTotalOrderSATEncoder(This, tmp);
+				second = constraint;
+				
+			}else if (boolOrder->second == tmp->first){
+				newBool = (BooleanOrder*)allocBooleanOrder(tmp->order,boolOrder->first,tmp->second);
+				first = constraint;
+				second = encodeTotalOrderSATEncoder(This, tmp);
+			}else
+				continue;
+			Constraint* transConstr= encodeTotalOrderSATEncoder(This, newBool);
+			generateTransOrderConstraintSATEncoder(This, first, second, transConstr );
+		}
+		return constraint;
+	}
+	
+	return NULL;
+}
+
+Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *first,Constraint *second,Constraint *third){
+	//FIXME: first we should add the the constraint to the satsolver!
+	return allocConstraint(IMPLIES, allocConstraint(AND, first, second), third);
+}
+
+Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
+	return NULL;
 }
 
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {

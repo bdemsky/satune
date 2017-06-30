@@ -118,7 +118,7 @@ Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, ui
 }
 
 Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain) {
-	Predicate* predicate= allocPredicate(op, domain,numDomain);
+	Predicate* predicate= allocPredicateOperator(op, domain,numDomain);
 	pushVectorPredicate(solver->allPredicates, predicate);
 	return predicate;
 }

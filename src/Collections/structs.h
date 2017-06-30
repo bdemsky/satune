@@ -32,8 +32,17 @@ inline bool Ptr_equals(void * key1, void * key2) {
 	return key1 == key2;
 }
 
-HashTableDef(Void, void *, void *, Ptr_hash_function, Ptr_equals);
-HashSetDef(Void, void *, Ptr_hash_function, Ptr_equals);
+inline unsigned int BooleanOrder_hash_Function(BooleanOrder* This){
+	return ((This->first+This->second)(This->first+This->second+1))/2 + This->second;
+}
 
+inline unsigned int BooleanOrder_equals(BooleanOrder* key1, BooleanOrder* key2){
+	return key1->first== key2->first && key1->second == key2->second;
+}
+
+HashTableDef(Void, void *, void *, Ptr_hash_function, Ptr_equals);
+HashTableDef(BoolConst, BooleanOrder *, Constraint *, BooleanOrder_hash_Function, BooleanOrder_equals);
+
+HashSetDef(Void, void *, Ptr_hash_function, Ptr_equals);
 
 #endif

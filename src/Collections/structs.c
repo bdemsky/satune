@@ -12,3 +12,5 @@ VectorImpl(Order, Order *, 4);
 VectorImpl(TableEntry, TableEntry *, 4);
 VectorImpl(ASTNode, ASTNode *, 4);
 VectorImpl(Int, uint64_t, 4);
+
+HashTableImpl(BoolConst, BooleanOrder *, Constraint *, BooleanOrder_hash_Function, BooleanOrder_equals);

@@ -10,6 +10,7 @@
 struct Order {
 	OrderType type;
 	Set * set;
+	HashTableBoolConst* boolsToConstraints;
 	VectorBoolean constraints;
 	OrderEncoding order;
 };

@@ -10,6 +10,7 @@ Order* allocOrder(OrderType type, Set * set){
 	allocInlineDefVectorBoolean(& order->constraints);
 	order->type=type;
 	allocOrderEncoding(& order->order, order);
+	order->boolsToConstraints = allocHashTableBoolConst(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	return order;
 }
 
@@ -24,5 +25,6 @@ void setOrderEncodingType(Order* order, OrderEncodingType type){
 void deleteOrder(Order* order){
 	deleteVectorArrayBoolean(& order->constraints);
 	deleteOrderEncoding(& order->order);
+	deleteHashTableBoolConst(order->boolsToConstraints);
 	ourfree(order);
 }
