@@ -13,7 +13,7 @@ Predicate* allocPredicateTable(Table* table, UndefinedBehavior undefBehavior){
 	GETPREDICATETYPE(predicate) = TABLEPRED;
 	predicate->table=table;
 	predicate->undefinedbehavior=undefBehavior;
-	return predicate;
+	return &predicate->base;
 }
 
 void deletePredicate(Predicate* predicate){

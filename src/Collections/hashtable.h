@@ -34,7 +34,7 @@
  * @tparam _Key    Type name for the key
  * @tparam _Val    Type name for the values to be stored
  */
-#define HashTableDef(Name, _Key, _Val, hash_function, equals)\
+#define HashTableDef(Name, _Key, _Val)\
 	struct hashlistnode ## Name {                                         \
 		_Key key;                                                             \
 		_Val val;                                                             \

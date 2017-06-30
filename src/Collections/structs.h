@@ -24,25 +24,10 @@ VectorDef(ASTNode, ASTNode *, 4);
 VectorDef(Int, uint64_t, 4);
 
 
-inline unsigned int Ptr_hash_function(void * hash) {
-	return (unsigned int)((uint64_t)hash >> 4);
-}
 
-inline bool Ptr_equals(void * key1, void * key2) {
-	return key1 == key2;
-}
+HashTableDef(Void, void *, void *);
+HashTableDef(BoolConst, BooleanOrder *, Constraint *);
 
-inline unsigned int BooleanOrder_hash_Function(BooleanOrder* This){
-	return ((This->first+This->second)(This->first+This->second+1))/2 + This->second;
-}
-
-inline unsigned int BooleanOrder_equals(BooleanOrder* key1, BooleanOrder* key2){
-	return key1->first== key2->first && key1->second == key2->second;
-}
-
-HashTableDef(Void, void *, void *, Ptr_hash_function, Ptr_equals);
-HashTableDef(BoolConst, BooleanOrder *, Constraint *, BooleanOrder_hash_Function, BooleanOrder_equals);
-
-HashSetDef(Void, void *, Ptr_hash_function, Ptr_equals);
+HashSetDef(Void, void *);
 
 #endif

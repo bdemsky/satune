@@ -187,9 +187,9 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 		uint size= getSizeVectorBoolean(orderConstrs);
 		for(uint i=0; i<size; i++){
 			ASSERT(GETBOOLEANTYPE( getVectorBoolean(orderConstrs, i)) == ORDERCONST );
-			BooleanOrder* tmp = (BooleanPredicate*)getVectorBoolean(orderConstrs, i);
+			BooleanOrder* tmp = (BooleanOrder*)getVectorBoolean(orderConstrs, i);
 			BooleanOrder* newBool;
-			Constraint* first, second;
+			Constraint* first, *second;
 			if(tmp->second==boolOrder->first){
 				newBool = (BooleanOrder*)allocBooleanOrder(tmp->order,tmp->first,boolOrder->second);
 				first = encodeTotalOrderSATEncoder(This, tmp);

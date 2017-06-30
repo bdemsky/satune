@@ -11,7 +11,7 @@
 #define HASH_SET_H
 #include "hashtable.h"
 
-#define HashSetDef(Name, _Key, hash_function, equals)                   \
+#define HashSetDef(Name, _Key)																					\
 	struct LinkNode ## Name {                                             \
 		_Key key;                                                           \
 		struct LinkNode ## Name *prev;                                      \
@@ -26,7 +26,7 @@
 		HashSet ## Name * set;                                              \
 	};                                                                    \
 	typedef struct HSIterator ## Name HSIterator ## Name;                 \
-	HashTableDef(Name ## Set, _Key, LinkNode ## Name *, hash_function, equals); \
+	HashTableDef(Name ## Set, _Key, LinkNode ## Name *);									\
 	HSIterator ## Name * allocHSIterator ## Name(LinkNode ## Name *_curr, HashSet ## Name * _set); \
 	void deleteIter ## Name(HSIterator ## Name *hsit);                      \
 	bool hasNext ## Name(HSIterator ## Name *hsit);                       \
