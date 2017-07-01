@@ -5,6 +5,7 @@
 #define NEGATE_EDGE 1
 #define EDGE_IS_VAR_CONSTANT 2
 #define VAR_SHIFT 2
+#define EDGE_MASK (NEGATE_EDGE | EDGE_IS_VAR_CONSTANT)
 
 struct Edge;
 typedef struct Edge Edge;
@@ -39,6 +40,7 @@ struct Node {
 
 #define DEFAULT_CNF_ARRAY_SIZE 256
 #define LOAD_FACTOR 0.25
+#define enableMatching 1
 
 struct CNF {
 	uint varcount;
@@ -54,6 +56,49 @@ typedef struct CNF CNF;
 static inline Edge constraintNegate(Edge e) {
 	Edge enew = { (Node *) (((uintptr_t) e.node_ptr) ^ NEGATE_EDGE)};
 	return enew;
+}
+
+static inline bool sameNodeVarEdge(Edge e1, Edge e2) {
+	return ! (((uintptr_t) e1.node_ptr ^ (uintptr_t) e2.node_ptr) & (~ (uintptr_t) NEGATE_EDGE));
+}
+
+static inline bool sameSignEdge(Edge e1, Edge e2) {
+	return !(((uintptr_t) e1.node_ptr ^ (uintptr_t) e2.node_ptr) & NEGATE_EDGE);
+}
+
+static inline bool sameNodeOppSign(Edge e1, Edge e2) {
+	return (((uintptr_t) e1.node_ptr) ^ ((uintptr_t)e2.node_ptr)) == NEGATE_EDGE;
+}
+
+static inline bool isNegEdge(Edge e) {
+	return ((uintptr_t)e.node_ptr) & NEGATE_EDGE;
+}
+
+static inline bool isNodeEdge(Edge e) {
+	return !(((uintptr_t)e.node_ptr) & EDGE_IS_VAR_CONSTANT);
+}
+
+static inline bool isNegNodeEdge(Edge e) {
+	return (((uintptr_t) e.node_ptr) & (NEGATE_EDGE | EDGE_IS_VAR_CONSTANT)) == NEGATE_EDGE;
+}
+
+static inline Node * getNodePtrFromEdge(Edge e) {
+	return (Node *) (((uintptr_t) e.node_ptr) & ~((uintptr_t) EDGE_MASK));
+}
+
+static inline NodeType getNodeType(Edge e) {
+	Node * n=getNodePtrFromEdge(e);
+	return n->flags.type;
+}
+
+static inline uint getNodeSize(Edge e) {
+	Node * n=getNodePtrFromEdge(e);
+	return n->numEdges;
+}
+
+static inline Edge * getEdgeArray(Edge e) {
+	Node * n=getNodePtrFromEdge(e);
+	return n->edges;
 }
 
 uint hashNode(NodeType type, uint numEdges, Edge * edges);

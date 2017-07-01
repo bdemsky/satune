@@ -1,5 +1,6 @@
 #include "nodeedge.h"
 #include <string.h>
+#include <stdlib.h>
 
 CNF * createCNF() {
 	CNF * cnf=ourmalloc(sizeof(CNF));
@@ -117,20 +118,67 @@ Edge constraintOR2(CNF * cnf, Edge left, Edge right) {
 	return constraintNegate(eand);
 }
 
+int comparefunction(const Edge * e1, const Edge * e2) {
+	return ((uintptr_t)e1->node_ptr)-((uintptr_t)e2->node_ptr);
+}
+
 Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
+	qsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *)) comparefunction);
+	int initindex=0;
+	while(initindex<numEdges && edges[initindex].node_ptr == E_True.node_ptr)
+		initindex++;
+
+	uint remainSize=numEdges-initindex;
+
+	if (remainSize == 0)
+		return E_True;
+	else if (remainSize == 1)
+		return edges[initindex];
+	else if (edges[initindex].node_ptr==E_False.node_ptr)
+		return E_False;
+
+	/** De-duplicate array */
+	uint lowindex=0;
+	edges[lowindex++]=edges[initindex++];
+
+	for(;initindex<numEdges;initindex++) {
+		Edge e1=edges[lowindex];
+		Edge e2=edges[initindex];
+		if (sameNodeVarEdge(e1, e2)) {
+			if (!sameSignEdge(e1, e2)) {
+				return E_False;
+			}
+		} else
+			edges[lowindex++]=edges[initindex];
+	}
+	if (lowindex==1)
+		return edges[0];
+
+	if (enableMatching && lowindex==2 &&
+			isNegNodeEdge(edges[0]) && isNegNodeEdge(edges[1]) &&
+			getNodeType(edges[0]) == NodeType_AND &&
+			getNodeType(edges[1]) == NodeType_AND &&
+			getNodeSize(edges[0]) == 2 &&
+			getNodeSize(edges[1]) == 2) {
+		Edge * e0edges=getEdgeArray(edges[0]);
+		Edge * e1edges=getEdgeArray(edges[1]);
+		if (sameNodeOppSign(e0edges[0], e1edges[0])) {
+			return constraintNegate(constraintITE(cnf, e0edges[0], e0edges[1], e1edges[1]));
+		} else if (sameNodeOppSign(e0edges[0], e1edges[1])) {
+			return constraintNegate(constraintITE(cnf, e0edges[0], e0edges[1], e1edges[0]));
+		} else if (sameNodeOppSign(e0edges[1], e1edges[0])) {
+			return constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[1]));
+		} else if (sameNodeOppSign(e0edges[1], e1edges[1])) {
+			return constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[0]));
+		}
+	}
+	
 	return createNode(cnf, NodeType_AND, numEdges, edges);
 }
 
 Edge constraintAND2(CNF * cnf, Edge left, Edge right) {
-	Edge edges[2];
-	if ((uintptr_t)left.node_ptr<(uintptr_t)right.node_ptr) {
-		edges[0]=left;
-		edges[1]=right;
-	} else {
-		edges[0]=right;
-		edges[1]=left;
-	}
-	return createNode(cnf, NodeType_AND, 2, edges);
+	Edge edges[2]={left, right};
+	return constraintAND(cnf, 2, edges);
 }
 
 Edge constraintIMPLIES(CNF * cnf, Edge left, Edge right) {
