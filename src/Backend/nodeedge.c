@@ -13,6 +13,12 @@ CNF * createCNF() {
 }
 
 void deleteCNF(CNF * cnf) {
+	for(uint i=0;i<cnf->capacity;i++) {
+		Node *n=cnf->node_array[i];
+		if (n!=NULL)
+			ourfree(n);
+	}
+	ourfree(cnf->node_array);
 	ourfree(cnf);
 }
 
@@ -116,7 +122,14 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 }
 
 Edge constraintAND2(CNF * cnf, Edge left, Edge right) {
-	Edge edges[2]={left, right};
+	Edge edges[2];
+	if ((uintptr_t)left.node_ptr<(uintptr_t)right.node_ptr) {
+		edges[0]=left;
+		edges[1]=right;
+	} else {
+		edges[0]=right;
+		edges[1]=left;
+	}
 	return createNode(cnf, NodeType_AND, 2, edges);
 }
 
@@ -129,7 +142,14 @@ Edge constraintIMPLIES(CNF * cnf, Edge left, Edge right) {
 }
 
 Edge constraintIFF(CNF * cnf, Edge left, Edge right) {
-	Edge edges[]={left, right};
+	Edge edges[2];
+	if ((uintptr_t)left.node_ptr < (uintptr_t) right.node_ptr) {
+		edges[0]=left;
+		edges[1]=right;
+	} else {
+		edges[0]=right;
+		edges[1]=left;
+	}
 	return createNode(cnf, NodeType_IFF, 2, edges);
 }
 
