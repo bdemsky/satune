@@ -191,7 +191,7 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 			ASSERT(GETBOOLEANTYPE( getVectorBoolean(orderConstrs, i)) == ORDERCONST );
 			BooleanOrder* tmp = (BooleanOrder*)getVectorBoolean(orderConstrs, i);
 			BooleanOrder* newBool;
-			Constraint *first, *second;
+			Constraint* first, *second;
 			if(tmp->second==boolOrder->first){
 				newBool = (BooleanOrder*)allocBooleanOrder(tmp->order,tmp->first,boolOrder->second);
 				first = encodeTotalOrderSATEncoder(This, tmp);
@@ -247,12 +247,13 @@ Constraint * encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate 
 }
 
 Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
-	TableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
+	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
 	uint size = getSizeVectorTableEntry(entries);
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(entries, i);
 		
 	}
+	return NULL;
 }
 
 Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
