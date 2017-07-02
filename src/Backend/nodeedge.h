@@ -91,6 +91,14 @@ static inline NodeType getNodeType(Edge e) {
 	return n->flags.type;
 }
 
+static inline bool equalsEdge(Edge e1, Edge e2) {
+	return e1.node_ptr == e2.node_ptr;
+}
+
+static inline bool ltEdge(Edge e1, Edge e2) {
+	return (uintptr_t) e1.node_ptr < (uintptr_t) e2.node_ptr;
+}
+
 static inline uint getNodeSize(Edge e) {
 	Node * n=getNodePtrFromEdge(e);
 	return n->numEdges;
@@ -99,6 +107,15 @@ static inline uint getNodeSize(Edge e) {
 static inline Edge * getEdgeArray(Edge e) {
 	Node * n=getNodePtrFromEdge(e);
 	return n->edges;
+}
+
+static inline Edge getNonNeg(Edge e) {
+	Edge enew={(Node *)(((uintptr_t)e.node_ptr)&(~((uintptr_t)NEGATE_EDGE)))};
+	return enew;
+}
+
+static inline bool edgeIsConst(Edge e) {
+	return (((uintptr_t) e.node_ptr) & ~((uintptr_t)NEGATE_EDGE)) == EDGE_IS_VAR_CONSTANT;
 }
 
 uint hashNode(NodeType type, uint numEdges, Edge * edges);

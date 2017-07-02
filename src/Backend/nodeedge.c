@@ -95,7 +95,7 @@ bool compareNodes(Node * node, NodeType type, uint numEdges, Edge *edges) {
 		return false;
 	Edge *nodeedges=node->edges;
 	for(uint i=0;i<numEdges;i++) {
-		if (nodeedges[i].node_ptr!=edges[i].node_ptr)
+		if (!equalsEdge(nodeedges[i], edges[i]))
 			return false;
 	}
 	return true;
@@ -125,7 +125,7 @@ int comparefunction(const Edge * e1, const Edge * e2) {
 Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 	qsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *)) comparefunction);
 	int initindex=0;
-	while(initindex<numEdges && edges[initindex].node_ptr == E_True.node_ptr)
+	while(initindex<numEdges && equalsEdge(edges[initindex], E_True))
 		initindex++;
 
 	uint remainSize=numEdges-initindex;
@@ -134,7 +134,7 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 		return E_True;
 	else if (remainSize == 1)
 		return edges[initindex];
-	else if (edges[initindex].node_ptr==E_False.node_ptr)
+	else if (equalsEdge(edges[initindex], E_False))
 		return E_False;
 
 	/** De-duplicate array */
@@ -190,20 +190,63 @@ Edge constraintIMPLIES(CNF * cnf, Edge left, Edge right) {
 }
 
 Edge constraintIFF(CNF * cnf, Edge left, Edge right) {
-	Edge edges[2];
-	if ((uintptr_t)left.node_ptr < (uintptr_t) right.node_ptr) {
-		edges[0]=left;
-		edges[1]=right;
+	bool negate=sameSignEdge(left, right);
+	Edge lpos=getNonNeg(left);
+	Edge rpos=getNonNeg(right);
+
+	Edge e;
+	if (equalsEdge(lpos, rpos)) {
+		e=E_True;
+	} else if (ltEdge(lpos, rpos)) {
+		Edge edges[]={lpos, rpos};
+		e=(edgeIsConst(lpos)) ? rpos : createNode(cnf, NodeType_IFF, 2, edges);
 	} else {
-		edges[0]=right;
-		edges[1]=left;
+		Edge edges[]={rpos, lpos};
+		e=(edgeIsConst(rpos)) ? lpos : createNode(cnf, NodeType_IFF, 2, edges);
 	}
-	return createNode(cnf, NodeType_IFF, 2, edges);
+	if (negate)
+		e=constraintNegate(e);
+	return e;
 }
 
 Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge) {
-	Edge edges[]={cond, thenedge, elseedge};
-	return createNode(cnf, NodeType_ITE, 3, edges);
+	if (isNegEdge(cond)) {
+		cond=constraintNegate(cond);
+		Edge tmp=thenedge;
+		thenedge=elseedge;
+		elseedge=tmp;
+	}
+	
+	bool negate = isNegEdge(thenedge);
+	if (negate) {
+		thenedge=constraintNegate(thenedge);
+		elseedge=constraintNegate(elseedge);
+	}
+
+	Edge result;
+	if (equalsEdge(cond, E_True)) {
+		result=thenedge;
+	} else if (equalsEdge(thenedge, E_True) || equalsEdge(cond, thenedge)) {
+		result=constraintOR(cnf,  2, (Edge[]) {cond, elseedge});
+	}	else if (equalsEdge(elseedge, E_True) || sameNodeOppSign(cond, elseedge)) {
+		result=constraintIMPLIES(cnf, cond, thenedge);
+	} else if (equalsEdge(thenedge, E_False) || equalsEdge(cond, elseedge)) {
+		result=constraintAND(cnf, 2, (Edge[]) {cond, thenedge});
+	} else if (equalsEdge(thenedge, elseedge)) {
+		result=thenedge;
+	} else if (sameNodeOppSign(thenedge, elseedge)) {
+		if (ltEdge(cond, thenedge)) {
+			result=createNode(cnf, NodeType_IFF, 2, (Edge[]) {cond, thenedge});
+		} else {
+			result=createNode(cnf, NodeType_IFF, 2, (Edge[]) {thenedge, cond});
+		}
+	} else {
+		Edge edges[]={cond, thenedge, elseedge};
+		result=createNode(cnf, NodeType_ITE, 3, edges);
+	}
+	if (negate)
+		result=constraintNegate(result);
+	return result;
 }
 
 Edge constraintNewVar(CNF *cnf) {
