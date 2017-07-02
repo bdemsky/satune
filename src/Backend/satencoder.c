@@ -10,7 +10,8 @@
 #include "table.h"
 #include "order.h"
 #include "predicate.h"
-
+#include "orderpair.h"
+#include "set.h"
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
@@ -165,6 +166,7 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 	}
 }
 
+
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
 	switch( constraint->order->type){
 		case PARTIAL:
@@ -177,8 +179,76 @@ Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) 
 	return NULL;
 }
 
+
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
 	ASSERT(boolOrder->order->type == TOTAL);
+	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
+	OrderPair* pair = allocOrderPair(boolOrder->first, boolOrder->second);
+	if( !containsBoolConst(boolToConsts, pair) ){
+		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
+	}
+	Constraint* constraint = getOrderConstraint(boolToConsts, pair);
+	deleteOrderPair(pair);
+	return constraint;
+}
+
+void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
+	ASSERT(order->type == TOTAL);
+	VectorInt* mems = order->set->members;
+	HashTableBoolConst* table = order->boolsToConstraints;
+	uint size = getSizeVectorInt(mems);
+	for(uint i=0; i<size; i++){
+		uint64_t valueI = getVectorInt(mems, i);
+		for(uint j=i+1; j<size;j++){
+			uint64_t valueJ = getVectorInt(mems, j);
+			OrderPair* pairIJ = allocOrderPair(valueI, valueJ);
+			ASSERT(!containsBoolConst(table, pairIJ));
+			Constraint* constIJ = getNewVarSATEncoder(This);
+			putBoolConst(table, pairIJ, constIJ);
+			for(uint k=j+1; k<size; k++){
+				uint64_t valueK = getVectorInt(mems, k);
+				OrderPair* pairJK = allocOrderPair(valueJ, valueK);
+				OrderPair* pairIK = allocOrderPair(valueI, valueK);
+				Constraint* constJK, *constIK;
+				if(!containsBoolConst(table, pairJK)){
+					constJK = getNewVarSATEncoder(This);
+					putBoolConst(table, pairJK, constJK);
+				}
+				if(!containsBoolConst(table, pairIK)){
+					constIK = getNewVarSATEncoder(This);
+					putBoolConst(table, pairIK, constIK);
+				}
+				generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK); 
+			}
+		}
+	}
+}
+
+Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair){
+	ASSERT(pair->first!= pair->second);
+	Constraint* constraint= getBoolConst(table, pair);
+	ASSERT(constraint!= NULL);
+	if(pair->first > pair->second)
+		return constraint;
+	else
+		return negateConstraint(constraint);
+}
+
+Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *constIJ,Constraint *constJK,Constraint *constIK){
+	//FIXME: first we should add the the constraint to the satsolver!
+	Constraint *carray[] = {constIJ, constJK, negateConstraint(constIK)};
+	Constraint * loop1= allocArrayConstraint(OR, 3, carray);
+	Constraint * carray2[] = {negateConstraint(constIJ), negateConstraint(constJK), constIK};
+	Constraint * loop2= allocArrayConstraint(OR, 3,carray2 );
+	return allocConstraint(AND, loop1, loop2);
+}
+
+Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
+	// FIXME: we can have this implementation for partial order. Basically,
+	// we compute the transitivity between two order constraints specified by the client! (also can be used
+	// when client specify sparse constraints for the total order!)
+	ASSERT(boolOrder->order->type == PARTIAL);
+/*
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
 	if( containsBoolConst(boolToConsts, boolOrder) ){
 		return getBoolConst(boolToConsts, boolOrder);
@@ -208,16 +278,7 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 		}
 		return constraint;
 	}
-	
-	return NULL;
-}
-
-Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *first,Constraint *second,Constraint *third){
-	//FIXME: first we should add the the constraint to the satsolver!
-	return allocConstraint(IMPLIES, allocConstraint(AND, first, second), third);
-}
-
-Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
+*/	
 	return NULL;
 }
 

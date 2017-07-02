@@ -19,6 +19,9 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	tmp->order=order;
 	tmp->first=first;
 	tmp->second=second;
+	//FIXME: what if client calls this function with the same arguments?
+	//Instead of vector we should keep a hashtable from PAIR->BOOLEANOrder with
+	//asymmetric hash function.  
 	pushVectorBoolean(&order->constraints, &tmp->base);
 	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
 	return & tmp -> base;
