@@ -72,7 +72,6 @@ Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value)
 				elemEnc->variables, i);
 		}
 	}
-	ASSERT(0);
 	return NULL;
 }
 
@@ -297,6 +296,7 @@ Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 Constraint * encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
 	switch(constraint->encoding.type){
 		case ENUMERATEIMPLICATIONS:
+		case ENUMERATEIMPLICATIONSNEGATE:
 			return encodeEnumTablePredicateSATEncoder(This, constraint);
 		case CIRCUIT:
 			ASSERT(0);
@@ -309,12 +309,26 @@ Constraint * encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate 
 
 Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
 	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
+	FunctionEncodingType encType = constraint->encoding.type;
 	uint size = getSizeVectorTableEntry(entries);
+	Constraint* constraints[size]; //FIXME: should add a space for the case that didn't match any entries
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(entries, i);
-		
+		if(encType==ENUMERATEIMPLICATIONS && entry->output!= true)
+			continue;
+		else if(encType==ENUMERATEIMPLICATIONSNEGATE && entry->output !=false)
+			continue;
+		ArrayElement* inputs = &constraint->inputs;
+		uint inputNum =getSizeArrayElement(inputs);
+		Constraint* carray[inputNum];
+		Element* el = getArrayElement(inputs, i);
+		for(uint j=0; j<inputNum; j++){
+			carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
+		}
+		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
 	}
-	return NULL;
+	Constraint* result= allocArrayConstraint(OR, size, constraints);
+	return encType==ENUMERATEIMPLICATIONS? result: negateConstraint(result);
 }
 
 Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
