@@ -178,16 +178,29 @@ Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) 
 	return NULL;
 }
 
+Constraint * getPairConstraint(SATEncoder *This, HashTableBoolConst * table, OrderPair * pair) {
+	ASSERT(pair->first < pair->second);
+	if (!containsBoolConst(table, pair)) {
+		Constraint *constraint = getNewVarSATEncoder(This);
+		OrderPair * paircopy = allocOrderPair(pair->first, pair->second);
+		putBoolConst(table, paircopy, constraint);
+		return constraint;
+	} else
+		return getBoolConst(table, pair);
+}
 
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
 	ASSERT(boolOrder->order->type == TOTAL);
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
-	OrderPair* pair = allocOrderPair(boolOrder->first, boolOrder->second);
-	if( !containsBoolConst(boolToConsts, pair) ){
-		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
+	OrderPair pair;
+	if (boolOrder->first < boolOrder->second) {
+		pair.first=boolOrder->first;
+		pair.second=boolOrder->second;
+	} else {
+		pair.first=boolOrder->second;
+		pair.second=boolOrder->first;
 	}
-	Constraint* constraint = getOrderConstraint(boolToConsts, pair);
-	deleteOrderPair(pair);
+	Constraint* constraint = getPairConstraint(This, boolToConsts, & pair);
 	return constraint;
 }
 
@@ -200,23 +213,14 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 		uint64_t valueI = getVectorInt(mems, i);
 		for(uint j=i+1; j<size;j++){
 			uint64_t valueJ = getVectorInt(mems, j);
-			OrderPair* pairIJ = allocOrderPair(valueI, valueJ);
-			ASSERT(!containsBoolConst(table, pairIJ));
-			Constraint* constIJ = getNewVarSATEncoder(This);
-			putBoolConst(table, pairIJ, constIJ);
+			OrderPair pairIJ = {valueI, valueJ};
+			Constraint* constIJ=getPairConstraint(This, table, & pairIJ);
 			for(uint k=j+1; k<size; k++){
 				uint64_t valueK = getVectorInt(mems, k);
-				OrderPair* pairJK = allocOrderPair(valueJ, valueK);
-				OrderPair* pairIK = allocOrderPair(valueI, valueK);
-				Constraint* constJK, *constIK;
-				if(!containsBoolConst(table, pairJK)){
-					constJK = getNewVarSATEncoder(This);
-					putBoolConst(table, pairJK, constJK);
-				}
-				if(!containsBoolConst(table, pairIK)){
-					constIK = getNewVarSATEncoder(This);
-					putBoolConst(table, pairIK, constIK);
-				}
+				OrderPair pairJK = {valueJ, valueK};
+				OrderPair pairIK = {valueI, valueK};
+				Constraint* constIK = getPairConstraint(This, table, & pairIK);
+				Constraint* constJK = getPairConstraint(This, table, & pairJK);
 				generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK); 
 			}
 		}
