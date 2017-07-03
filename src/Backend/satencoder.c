@@ -179,27 +179,32 @@ Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) 
 }
 
 Constraint * getPairConstraint(SATEncoder *This, HashTableBoolConst * table, OrderPair * pair) {
-	ASSERT(pair->first < pair->second);
+	bool negate = false;
+	OrderPair flipped;
+	if (pair->first > pair->second) {
+		negate=true;
+		flipped.first=pair->second;
+		flipped.second=pair->first;
+		pair = &flipped;
+	}
+	Constraint * constraint;
 	if (!containsBoolConst(table, pair)) {
-		Constraint *constraint = getNewVarSATEncoder(This);
+		constraint = getNewVarSATEncoder(This);
 		OrderPair * paircopy = allocOrderPair(pair->first, pair->second);
 		putBoolConst(table, paircopy, constraint);
-		return constraint;
 	} else
-		return getBoolConst(table, pair);
+		constraint = getBoolConst(table, pair);
+	if (negate)
+		return negateConstraint(constraint);
+	else
+		return constraint;
+	
 }
 
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
 	ASSERT(boolOrder->order->type == TOTAL);
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
-	OrderPair pair;
-	if (boolOrder->first < boolOrder->second) {
-		pair.first=boolOrder->first;
-		pair.second=boolOrder->second;
-	} else {
-		pair.first=boolOrder->second;
-		pair.second=boolOrder->first;
-	}
+	OrderPair pair={boolOrder->first, boolOrder->second};
 	Constraint* constraint = getPairConstraint(This, boolToConsts, & pair);
 	return constraint;
 }
