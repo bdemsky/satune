@@ -282,7 +282,7 @@ Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * const
 }
 
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
-	switch(GETPREDICATETYPE(constraint) ){
+	switch(GETPREDICATETYPE(constraint->predicate) ){
 		case TABLEPRED:
 			return encodeTablePredicateSATEncoder(This, constraint);
 		case OPERATORPRED:
@@ -311,7 +311,7 @@ Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredic
 	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
 	FunctionEncodingType encType = constraint->encoding.type;
 	uint size = getSizeVectorTableEntry(entries);
-	Constraint* constraints[size]; //FIXME: should add a space for the case that didn't match any entries
+	Constraint* constraints[size];
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(entries, i);
 		if(encType==ENUMERATEIMPLICATIONS && entry->output!= true)
@@ -323,24 +323,46 @@ Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredic
 		Constraint* carray[inputNum];
 		Element* el = getArrayElement(inputs, i);
 		for(uint j=0; j<inputNum; j++){
-			carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
+			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
 		}
 		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
 	}
 	Constraint* result= allocArrayConstraint(OR, size, constraints);
+	//FIXME: if it didn't match with any entry
 	return encType==ENUMERATEIMPLICATIONS? result: negateConstraint(result);
 }
 
 Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
 	switch(constraint->encoding.type){
 		case ENUMERATEIMPLICATIONS:
-			break;
+			return encodeEnumOperatorPredicateSATEncoder(This, constraint);
 		case CIRCUIT:
+			ASSERT(0);
 			break;
 		default:
 			ASSERT(0);
 	}
 	return NULL;
+}
+
+Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	ASSERT(GETPREDICATETYPE(constraint)==OPERATORPRED);
+	PredicateOperator* predicate = (PredicateOperator*)constraint->predicate;
+	ASSERT(predicate->op == EQUALS); //For now, we just only support equals
+	//getting maximum size of in common elements between two sets!
+	uint size=getSizeVectorInt( getArraySet( &predicate->domains, 0)->members);
+	uint64_t commonElements [size];
+	getEqualitySetIntersection(predicate, &size, commonElements);
+	Constraint*  carray[size];
+	Element* elem1 = getArrayElement( &constraint->inputs, 0);
+	Element* elem2 = getArrayElement( &constraint->inputs, 1);
+	for(uint i=0; i<size; i++){
+		
+		carray[i] =  allocConstraint(AND, getElementValueConstraint(elem1, commonElements[i]),
+			getElementValueConstraint(elem2, commonElements[i]) );
+	}
+	//FIXME: the case when there is no intersection ....
+	return allocArrayConstraint(OR, size, carray);
 }
 
 Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This){
