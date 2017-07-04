@@ -82,21 +82,6 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		encodeConstraintSATEncoder(This, constraint);
 	}
-	
-//	FIXME: Following line for element!
-//	size = getSizeVectorElement(csolver->allElements);
-//	for(uint i=0; i<size; i++){
-//		Element* element = getVectorElement(csolver->allElements, i);
-//		switch(GETELEMENTTYPE(element)){
-//			case ELEMFUNCRETURN: 
-//				encodeFunctionElementSATEncoder(This, (ElementFunction*) element);
-//				break;
-//			default:	
-//				continue;
-//				//ElementSets that aren't used in any constraints/functions
-//				//will be eliminated.
-//		}
-//	}
 }
 
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
@@ -330,8 +315,10 @@ Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredic
 		ArrayElement* inputs = &constraint->inputs;
 		uint inputNum =getSizeArrayElement(inputs);
 		Constraint* carray[inputNum];
-		Element* el = getArrayElement(inputs, i);
 		for(uint j=0; j<inputNum; j++){
+			Element* el = getArrayElement(inputs, j);
+			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN)
+				encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
 			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
 		}
 		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
@@ -364,9 +351,12 @@ Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPre
 	getEqualitySetIntersection(predicate, &size, commonElements);
 	Constraint*  carray[size];
 	Element* elem1 = getArrayElement( &constraint->inputs, 0);
+	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN)
+		encodeFunctionElementSATEncoder(This, (ElementFunction*) elem1);
 	Element* elem2 = getArrayElement( &constraint->inputs, 1);
+	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
+		encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
 	for(uint i=0; i<size; i++){
-		
 		carray[i] =  allocConstraint(AND, getElementValueConstraint(elem1, commonElements[i]),
 			getElementValueConstraint(elem2, commonElements[i]) );
 	}
@@ -414,10 +404,10 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(&table->entries, i);
 		uint inputNum =getSizeArrayElement(elements);
-		Element* el= getArrayElement(elements, i);
 		Constraint* carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
-			carray[inputNum] = getElementValueConstraint(el, entry->inputs[j]);
+			Element* el= getArrayElement(elements, j);
+			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
 		}
 		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
 			getElementValueBinaryIndexConstraint((Element*)This, entry->output));
