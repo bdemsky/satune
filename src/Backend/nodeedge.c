@@ -12,6 +12,7 @@ CNF * createCNF() {
 	cnf->node_array=ourcalloc(1, sizeof(Node *)*cnf->capacity);
 	cnf->size=0;
 	cnf->maxsize=(uint)(((double)cnf->capacity)*LOAD_FACTOR);
+	cnf->enableMatching=true;
 	allocInlineDefVectorEdge(& cnf->constraints);
  return cnf;
 }
@@ -161,7 +162,7 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 	if (lowindex==1)
 		return edges[0];
 
-	if (enableMatching && lowindex==2 &&
+	if (cnf->enableMatching && lowindex==2 &&
 			isNegNodeEdge(edges[0]) && isNegNodeEdge(edges[1]) &&
 			getNodeType(edges[0]) == NodeType_AND &&
 			getNodeType(edges[1]) == NodeType_AND &&
@@ -282,6 +283,8 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
 
 	clearVectorEdge(stack);pushVectorEdge(stack, e);
 
+	bool isMatching=cnf->enableMatching;
+	
 	while(getSizeVectorEdge(stack) != 0) {
 		Edge e=lastVectorEdge(stack); popVectorEdge(stack);
 		bool polarity=isNegEdge(e);
@@ -300,13 +303,39 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
 			if (n->flags.type == NodeType_ITE||
 					n->flags.type == NodeType_IFF) {
 				n->intAnnot[polarity]=0;
-				Edge tst=n->edges[0];
+				Edge cond=n->edges[0];
 				Edge thenedge=n->edges[1];
 				Edge elseedge=n->flags.type == NodeType_IFF? constraintNegate(thenedge): n->edges[2];
-				
+				thenedge=constraintNegateIf(thenedge, !polarity);
+				elseedge=constraintNegateIf(elseedge, !polarity);
+				thenedge=constraintAND2(cnf, cond, thenedge);
+				cond=constraintNegate(cond);
+				elseedge=constraintAND2(cnf, cond, elseedge);
+				thenedge=constraintNegate(thenedge);
+				elseedge=constraintNegate(elseedge);
+				cnf->enableMatching=false;
+				Edge succ1=constraintAND2(cnf, thenedge, elseedge);
+				n->ptrAnnot[polarity]=succ1.node_ptr;
+				cnf->enableMatching=isMatching;
+				pushVectorEdge(stack, succ1);
+				if (getExpanded(n, !polarity)) {
+					Edge succ2={(Node *)n->ptrAnnot[!polarity]};
+					Node *n1=getNodePtrFromEdge(succ1);
+					Node *n2=getNodePtrFromEdge(succ2);
+					n1->ptrAnnot[0]=succ2.node_ptr;
+					n2->ptrAnnot[0]=succ1.node_ptr;
+					n1->ptrAnnot[1]=succ2.node_ptr;
+					n2->ptrAnnot[1]=succ1.node_ptr;
+				} 
+			} else {
+				for (uint i=0;i<n->numEdges;i++) {
+					Edge succ=n->edges[i];
+					succ=constraintNegateIf(succ, polarity);
+					if(!edgeIsVarConst(succ)) {
+						pushVectorEdge(stack, succ);
+					}
+				}
 			}
 		}
-		
 	}
-	
 }

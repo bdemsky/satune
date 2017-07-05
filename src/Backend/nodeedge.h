@@ -46,7 +46,6 @@ struct Node {
 
 #define DEFAULT_CNF_ARRAY_SIZE 256
 #define LOAD_FACTOR 0.25
-#define enableMatching 1
 
 struct CNF {
 	uint varcount;
@@ -54,6 +53,7 @@ struct CNF {
 	uint size;
 	uint mask;
 	uint maxsize;
+	bool enableMatching;
 	Node ** node_array;
 	VectorEdge constraints;
 };
@@ -136,6 +136,12 @@ static inline bool edgeIsConst(Edge e) {
 static inline bool edgeIsVarConst(Edge e) {
 	return ((uintptr_t)e.node_ptr) & EDGE_IS_VAR_CONSTANT;
 }
+
+static inline Edge constraintNegateIf(Edge e, bool negate) {
+	Edge eret={(Node *)(((uintptr_t)e.node_ptr) ^ negate)};
+	return eret;
+}
+
 
 uint hashNode(NodeType type, uint numEdges, Edge * edges);
 Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashCode);
