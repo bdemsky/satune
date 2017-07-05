@@ -1,6 +1,6 @@
 #include "structs.h"
 #include "mymemory.h"
-#include "order.h"
+#include "orderpair.h"
 
 VectorImpl(Table, Table *, 4);
 VectorImpl(Set, Set *, 4);
@@ -22,12 +22,14 @@ inline bool Ptr_equals(void * key1, void * key2) {
 	return key1 == key2;
 }
 
-inline unsigned int BooleanOrder_hash_Function(BooleanOrder* This){
-	return This->first ^ This->second;
+inline unsigned int order_pair_hash_Function(OrderPair* This){
+	uint64_t x=This->first^This->second;
+	uint64_t a=This->first&This->second;
+	return (uint)((x<<4)^(a));
 }
 
-inline unsigned int BooleanOrder_equals(BooleanOrder* key1, BooleanOrder* key2){
+inline unsigned int order_pair_equals(OrderPair* key1, OrderPair* key2){
 	return key1->first== key2->first && key1->second == key2->second;
 }
 
-HashTableImpl(BoolConst, BooleanOrder *, Constraint *, BooleanOrder_hash_Function, BooleanOrder_equals);
+HashTableImpl(BoolConst, OrderPair *, Constraint *, order_pair_hash_Function, order_pair_equals);

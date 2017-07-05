@@ -9,7 +9,9 @@
 #include "tableentry.h"
 #include "table.h"
 #include "order.h"
-
+#include "predicate.h"
+#include "orderpair.h"
+#include "set.h"
 
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
@@ -70,7 +72,6 @@ Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value)
 				elemEnc->variables, i);
 		}
 	}
-	ASSERT(0);
 	return NULL;
 }
 
@@ -82,19 +83,20 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		encodeConstraintSATEncoder(This, constraint);
 	}
 	
-	size = getSizeVectorElement(csolver->allElements);
-	for(uint i=0; i<size; i++){
-		Element* element = getVectorElement(csolver->allElements, i);
-		switch(GETELEMENTTYPE(element)){
-			case ELEMFUNCRETURN: 
-				encodeFunctionElementSATEncoder(This, (ElementFunction*) element);
-				break;
-			default:	
-				continue;
-				//ElementSets that aren't used in any constraints/functions
-				//will be eliminated.
-		}
-	}
+//	FIXME: Following line for element!
+//	size = getSizeVectorElement(csolver->allElements);
+//	for(uint i=0; i<size; i++){
+//		Element* element = getVectorElement(csolver->allElements, i);
+//		switch(GETELEMENTTYPE(element)){
+//			case ELEMFUNCRETURN: 
+//				encodeFunctionElementSATEncoder(This, (ElementFunction*) element);
+//				break;
+//			default:	
+//				continue;
+//				//ElementSets that aren't used in any constraints/functions
+//				//will be eliminated.
+//		}
+//	}
 }
 
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
@@ -163,6 +165,7 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 	}
 }
 
+
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
 	switch( constraint->order->type){
 		case PARTIAL:
@@ -175,8 +178,76 @@ Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) 
 	return NULL;
 }
 
+
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
 	ASSERT(boolOrder->order->type == TOTAL);
+	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
+	OrderPair* pair = allocOrderPair(boolOrder->first, boolOrder->second);
+	if( !containsBoolConst(boolToConsts, pair) ){
+		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
+	}
+	Constraint* constraint = getOrderConstraint(boolToConsts, pair);
+	deleteOrderPair(pair);
+	return constraint;
+}
+
+void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
+	ASSERT(order->type == TOTAL);
+	VectorInt* mems = order->set->members;
+	HashTableBoolConst* table = order->boolsToConstraints;
+	uint size = getSizeVectorInt(mems);
+	for(uint i=0; i<size; i++){
+		uint64_t valueI = getVectorInt(mems, i);
+		for(uint j=i+1; j<size;j++){
+			uint64_t valueJ = getVectorInt(mems, j);
+			OrderPair* pairIJ = allocOrderPair(valueI, valueJ);
+			ASSERT(!containsBoolConst(table, pairIJ));
+			Constraint* constIJ = getNewVarSATEncoder(This);
+			putBoolConst(table, pairIJ, constIJ);
+			for(uint k=j+1; k<size; k++){
+				uint64_t valueK = getVectorInt(mems, k);
+				OrderPair* pairJK = allocOrderPair(valueJ, valueK);
+				OrderPair* pairIK = allocOrderPair(valueI, valueK);
+				Constraint* constJK, *constIK;
+				if(!containsBoolConst(table, pairJK)){
+					constJK = getNewVarSATEncoder(This);
+					putBoolConst(table, pairJK, constJK);
+				}
+				if(!containsBoolConst(table, pairIK)){
+					constIK = getNewVarSATEncoder(This);
+					putBoolConst(table, pairIK, constIK);
+				}
+				generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK); 
+			}
+		}
+	}
+}
+
+Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair){
+	ASSERT(pair->first!= pair->second);
+	Constraint* constraint= getBoolConst(table, pair);
+	ASSERT(constraint!= NULL);
+	if(pair->first > pair->second)
+		return constraint;
+	else
+		return negateConstraint(constraint);
+}
+
+Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *constIJ,Constraint *constJK,Constraint *constIK){
+	//FIXME: first we should add the the constraint to the satsolver!
+	Constraint *carray[] = {constIJ, constJK, negateConstraint(constIK)};
+	Constraint * loop1= allocArrayConstraint(OR, 3, carray);
+	Constraint * carray2[] = {negateConstraint(constIJ), negateConstraint(constJK), constIK};
+	Constraint * loop2= allocArrayConstraint(OR, 3,carray2 );
+	return allocConstraint(AND, loop1, loop2);
+}
+
+Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
+	// FIXME: we can have this implementation for partial order. Basically,
+	// we compute the transitivity between two order constraints specified by the client! (also can be used
+	// when client specify sparse constraints for the total order!)
+	ASSERT(boolOrder->order->type == PARTIAL);
+/*
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
 	if( containsBoolConst(boolToConsts, boolOrder) ){
 		return getBoolConst(boolToConsts, boolOrder);
@@ -206,23 +277,92 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 		}
 		return constraint;
 	}
-	
-	return NULL;
-}
-
-Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *first,Constraint *second,Constraint *third){
-	//FIXME: first we should add the the constraint to the satsolver!
-	return allocConstraint(IMPLIES, allocConstraint(AND, first, second), third);
-}
-
-Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
+*/	
 	return NULL;
 }
 
 Constraint * encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
-	//TO IMPLEMENT
-	
+	switch(GETPREDICATETYPE(constraint->predicate) ){
+		case TABLEPRED:
+			return encodeTablePredicateSATEncoder(This, constraint);
+		case OPERATORPRED:
+			return encodeOperatorPredicateSATEncoder(This, constraint);
+		default:
+			ASSERT(0);
+	}
 	return NULL;
+}
+
+Constraint * encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	switch(constraint->encoding.type){
+		case ENUMERATEIMPLICATIONS:
+		case ENUMERATEIMPLICATIONSNEGATE:
+			return encodeEnumTablePredicateSATEncoder(This, constraint);
+		case CIRCUIT:
+			ASSERT(0);
+			break;
+		default:
+			ASSERT(0);
+	}
+	return NULL;
+}
+
+Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
+	FunctionEncodingType encType = constraint->encoding.type;
+	uint size = getSizeVectorTableEntry(entries);
+	Constraint* constraints[size];
+	for(uint i=0; i<size; i++){
+		TableEntry* entry = getVectorTableEntry(entries, i);
+		if(encType==ENUMERATEIMPLICATIONS && entry->output!= true)
+			continue;
+		else if(encType==ENUMERATEIMPLICATIONSNEGATE && entry->output !=false)
+			continue;
+		ArrayElement* inputs = &constraint->inputs;
+		uint inputNum =getSizeArrayElement(inputs);
+		Constraint* carray[inputNum];
+		Element* el = getArrayElement(inputs, i);
+		for(uint j=0; j<inputNum; j++){
+			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
+		}
+		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
+	}
+	Constraint* result= allocArrayConstraint(OR, size, constraints);
+	//FIXME: if it didn't match with any entry
+	return encType==ENUMERATEIMPLICATIONS? result: negateConstraint(result);
+}
+
+Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	switch(constraint->encoding.type){
+		case ENUMERATEIMPLICATIONS:
+			return encodeEnumOperatorPredicateSATEncoder(This, constraint);
+		case CIRCUIT:
+			ASSERT(0);
+			break;
+		default:
+			ASSERT(0);
+	}
+	return NULL;
+}
+
+Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+	ASSERT(GETPREDICATETYPE(constraint)==OPERATORPRED);
+	PredicateOperator* predicate = (PredicateOperator*)constraint->predicate;
+	ASSERT(predicate->op == EQUALS); //For now, we just only support equals
+	//getting maximum size of in common elements between two sets!
+	uint size=getSizeVectorInt( getArraySet( &predicate->domains, 0)->members);
+	uint64_t commonElements [size];
+	getEqualitySetIntersection(predicate, &size, commonElements);
+	Constraint*  carray[size];
+	Element* elem1 = getArrayElement( &constraint->inputs, 0);
+	Element* elem2 = getArrayElement( &constraint->inputs, 1);
+	for(uint i=0; i<size; i++){
+		
+		carray[i] =  allocConstraint(AND, getElementValueConstraint(elem1, commonElements[i]),
+			getElementValueConstraint(elem2, commonElements[i]) );
+	}
+	//FIXME: the case when there is no intersection ....
+	return allocArrayConstraint(OR, size, carray);
 }
 
 Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This){

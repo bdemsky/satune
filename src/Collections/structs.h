@@ -26,7 +26,7 @@ VectorDef(Int, uint64_t, 4);
 
 
 HashTableDef(Void, void *, void *);
-HashTableDef(BoolConst, BooleanOrder *, Constraint *);
+HashTableDef(BoolConst, OrderPair *, Constraint *);
 
 HashSetDef(Void, void *);
 
