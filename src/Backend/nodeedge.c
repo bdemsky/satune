@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+VectorImpl(Edge, Edge, 16)
+
 CNF * createCNF() {
 	CNF * cnf=ourmalloc(sizeof(CNF));
 	cnf->varcount=1;
@@ -10,7 +12,8 @@ CNF * createCNF() {
 	cnf->node_array=ourcalloc(1, sizeof(Node *)*cnf->capacity);
 	cnf->size=0;
 	cnf->maxsize=(uint)(((double)cnf->capacity)*LOAD_FACTOR);
-	return cnf;
+	allocInlineDefVectorEdge(& cnf->constraints);
+ return cnf;
 }
 
 void deleteCNF(CNF * cnf) {
@@ -19,6 +22,7 @@ void deleteCNF(CNF * cnf) {
 		if (n!=NULL)
 			ourfree(n);
 	}
+	deleteVectorArrayEdge(& cnf->constraints);
 	ourfree(cnf->node_array);
 	ourfree(cnf);
 }
@@ -49,9 +53,12 @@ void resizeCNF(CNF *cnf, uint newCapacity) {
 Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashcode) {
 	Node *n=(Node *)ourmalloc(sizeof(Node)+sizeof(Edge)*numEdges);
 	memcpy(n->edges, edges, sizeof(Edge)*numEdges);
-	n->numEdges=numEdges;
 	n->flags.type=type;
+	n->flags.wasExpanded=0;
+	n->numEdges=numEdges;
 	n->hashCode=hashcode;
+	n->intAnnot[0]=0;n->intAnnot[1]=0;
+	n->ptrAnnot[0]=NULL;n->ptrAnnot[1]=NULL;
 	return n;
 }
 
@@ -249,8 +256,57 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge) {
 	return result;
 }
 
+void addConstraint(CNF *cnf, Edge constraint) {
+	pushVectorEdge(&cnf->constraints, constraint);
+}
+
 Edge constraintNewVar(CNF *cnf) {
 	uint varnum=cnf->varcount++;
 	Edge e={(Node *) ((((uintptr_t)varnum) << VAR_SHIFT) | EDGE_IS_VAR_CONSTANT) };
 	return e;
+}
+
+void countPass(CNF *cnf) {
+	uint numConstraints=getSizeVectorEdge(&cnf->constraints);
+	VectorEdge *ve=allocDefVectorEdge();
+	for(uint i=0; i<numConstraints;i++) {
+		countConstraint(cnf, ve, getVectorEdge(&cnf->constraints, i));
+	}
+	deleteVectorEdge(ve);
+}
+
+void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
+	//Skip constants and variables...
+	if (edgeIsVarConst(e))
+		return;
+
+	clearVectorEdge(stack);pushVectorEdge(stack, e);
+
+	while(getSizeVectorEdge(stack) != 0) {
+		Edge e=lastVectorEdge(stack); popVectorEdge(stack);
+		bool polarity=isNegEdge(e);
+		Node *n=getNodePtrFromEdge(e);
+		if (getExpanded(n,  polarity)) {
+			if (n->flags.type == NodeType_IFF ||
+					n->flags.type == NodeType_ITE) {
+				Edge pExp={n->ptrAnnot[polarity]};
+				getNodePtrFromEdge(pExp)->intAnnot[0]++;
+			} else {
+				n->intAnnot[polarity]++;
+			}
+		} else {
+			setExpanded(n, polarity); n->intAnnot[polarity]=1;
+			
+			if (n->flags.type == NodeType_ITE||
+					n->flags.type == NodeType_IFF) {
+				n->intAnnot[polarity]=0;
+				Edge tst=n->edges[0];
+				Edge thenedge=n->edges[1];
+				Edge elseedge=n->flags.type == NodeType_IFF? constraintNegate(thenedge): n->edges[2];
+				
+			}
+		}
+		
+	}
+	
 }

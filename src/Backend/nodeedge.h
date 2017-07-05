@@ -1,6 +1,7 @@
 #ifndef NODEEDGE_H
 #define NODEEDGE_H
 #include "classlist.h"
+#include "vector.h"
 
 #define NEGATE_EDGE 1
 #define EDGE_IS_VAR_CONSTANT 2
@@ -17,6 +18,8 @@ struct Edge {
 	Node * node_ptr;
 };
 
+VectorDef(Edge, Edge)
+
 enum NodeType {
 	NodeType_AND,
 	NodeType_ITE,
@@ -27,6 +30,7 @@ typedef enum NodeType NodeType;
 
 struct NodeFlags {
 	NodeType type:2;
+	int wasExpanded:2;
 };
 
 typedef struct NodeFlags NodeFlags;
@@ -35,6 +39,8 @@ struct Node {
 	NodeFlags flags;
 	uint numEdges;
 	uint hashCode;
+	uint intAnnot[2];
+	void * ptrAnnot[2];
 	Edge edges[];
 };
 
@@ -49,9 +55,18 @@ struct CNF {
 	uint mask;
 	uint maxsize;
 	Node ** node_array;
+	VectorEdge constraints;
 };
 
 typedef struct CNF CNF;
+
+static inline bool getExpanded(Node *n, int isNegated) {
+	return n->flags.wasExpanded & (1<<isNegated);
+}
+
+static inline void setExpanded(Node *n, int isNegated) {
+	n->flags.wasExpanded |= (1<<isNegated);
+}
 
 static inline Edge constraintNegate(Edge e) {
 	Edge enew = { (Node *) (((uintptr_t) e.node_ptr) ^ NEGATE_EDGE)};
@@ -118,6 +133,10 @@ static inline bool edgeIsConst(Edge e) {
 	return (((uintptr_t) e.node_ptr) & ~((uintptr_t)NEGATE_EDGE)) == EDGE_IS_VAR_CONSTANT;
 }
 
+static inline bool edgeIsVarConst(Edge e) {
+	return ((uintptr_t)e.node_ptr) & EDGE_IS_VAR_CONSTANT;
+}
+
 uint hashNode(NodeType type, uint numEdges, Edge * edges);
 Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashCode);
 bool compareNodes(Node * node, NodeType type, uint numEdges, Edge *edges);
@@ -130,6 +149,9 @@ Edge constraintIMPLIES(CNF * cnf, Edge left, Edge right);
 Edge constraintIFF(CNF * cnf, Edge left, Edge right);
 Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge);
 Edge constraintNewVar(CNF *cnf);
+void countPass(CNF *cnf);
+void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
+
 
 Edge E_True={(Node *)(uintptr_t) EDGE_IS_VAR_CONSTANT};
 Edge E_False={(Node *)(uintptr_t) (EDGE_IS_VAR_CONSTANT | NEGATE_EDGE)};

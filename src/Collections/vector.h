@@ -2,7 +2,7 @@
 #define VECTOR_H
 #include <string.h>
 
-#define VectorDef(name, type, defcap)                                   \
+#define VectorDef(name, type)																						\
 	struct Vector ## name {                                               \
 		uint size;                                                          \
 		uint capacity;                                                      \
@@ -13,7 +13,9 @@
 	Vector ## name * allocDefVector ## name();                            \
 	Vector ## name * allocVectorArray ## name(uint capacity, type * array); \
 	void pushVector ## name(Vector ## name *vector, type item);           \
-	type getVector ## name(Vector ## name *vector, uint index);           \
+	type lastVector ## name(Vector ## name *vector);											\
+	void popVector ## name(Vector ## name *vector);												\
+	type getVector ## name(Vector ## name *vector, uint index);						\
 	void setVector ## name(Vector ## name *vector, uint index, type item); \
 	uint getSizeVector ## name(Vector ## name *vector);                   \
 	void deleteVector ## name(Vector ## name *vector);                    \
@@ -41,7 +43,13 @@
 		memcpy(tmp->array, array, capacity * sizeof(type));									\
 		return tmp;                                                         \
 	}                                                                     \
-	void pushVector ## name(Vector ## name *vector, type item) {          \
+	void popVector ## name(Vector ## name *vector) {											\
+		vector->size--;																											\
+	}																																			\
+	type lastVector ## name(Vector ## name *vector) {											\
+		return vector->array[vector->size];																	\
+	}																																			\
+	void pushVector ## name(Vector ## name *vector, type item) {					\
 		if (vector->size >= vector->capacity) {                             \
 			uint newcap=vector->capacity * 2;                                 \
 			vector->array=(type *)ourrealloc(vector->array, newcap);          \
