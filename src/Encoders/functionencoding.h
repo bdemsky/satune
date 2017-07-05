@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum FunctionEncodingType {
-	FUNC_UNASSIGNED, ENUMERATEIMPLICATIONS, CIRCUIT
+	FUNC_UNASSIGNED, ENUMERATEIMPLICATIONS, ENUMERATEIMPLICATIONSNEGATE, CIRCUIT
 };
 
 typedef enum FunctionEncodingType FunctionEncodingType;

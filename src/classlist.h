@@ -70,6 +70,9 @@ typedef struct Table Table;
 struct Order;
 typedef struct Order Order;
 
+struct OrderPair;
+typedef struct OrderPair OrderPair;
+
 struct ElementEncoding;
 typedef struct ElementEncoding ElementEncoding;
 

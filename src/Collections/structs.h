@@ -23,7 +23,7 @@ VectorDef(ASTNode, ASTNode *);
 VectorDef(Int, uint64_t);
 
 HashTableDef(Void, void *, void *);
-HashTableDef(BoolConst, BooleanOrder *, Constraint *);
+HashTableDef(BoolConst, OrderPair *, Constraint *);
 
 HashSetDef(Void, void *);
 
