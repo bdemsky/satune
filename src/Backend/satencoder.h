@@ -10,7 +10,6 @@ struct SATEncoder {
 
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
-void initializeConstraintVars(CSolver* csolver, SATEncoder* This);
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This);
 Constraint * getNewVarSATEncoder(SATEncoder *This);
 void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Constraint **carray);

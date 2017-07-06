@@ -23,22 +23,6 @@ void deleteSATEncoder(SATEncoder *This) {
 	ourfree(This);
 }
 
-void initializeConstraintVars(CSolver* csolver, SATEncoder* This){
-	/** We really should not walk the free list to generate constraint
-			variables...walk the constraint tree instead.  Or even better
-			yet, just do this as you need to during the encodeAllSATEncoder
-			walk.  */
-
-//	FIXME!!!!(); // Make sure Hamed sees comment above
-
-	uint size = getSizeVectorElement(csolver->allElements);
-	for(uint i=0; i<size; i++){
-		Element* element = getVectorElement(csolver->allElements, i);
-		generateElementEncodingVariables(This,getElementEncoding(element));
-	}
-}
-
-
 Constraint * getElementValueConstraint(Element* This, uint64_t value) {
 	switch(getElementEncoding(This)->type){
 		case ONEHOT:
@@ -391,8 +375,74 @@ Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFun
 }
 
 Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
-	//FIXME: for now it just adds/substracts inputs exhustively
-	return NULL;
+	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
+	ASSERT(getSizeArrayElement(&This->inputs)=2 );
+	ElementEncoding* elem1 = getElementEncoding( getArrayElement(&This->inputs,0) );
+	ElementEncoding* elem2 = getElementEncoding( getArrayElement(&This->inputs,1) );
+	Constraint* carray[elem1->encArraySize*elem2->encArraySize];
+	uint size=0;
+	Constraint* overFlowConstraint = ((BooleanVar*) This->overflowstatus)->var;
+	for(uint i=0; i<elem1->encArraySize; i++){
+		if(isinUseElement(elem1, i)){
+			for(uint j=0; j<elem2->encArraySize; j++){
+				if(isinUseElement(elem2, j)){
+					bool isInRange = false, hasOverFlow=false;
+					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elem1->encodingArray[i],
+						elem2->encodingArray[j], &isInRange, &hasOverFlow);
+					if(!isInRange)
+						break; // Ignoring the cases that result of operation doesn't exist in the code.
+					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
+					// that doesn't iterate over encodingArray and treats more efficient ...
+					Constraint* constraint = allocConstraint(IMPLIES, 
+						allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
+							getElementValueConstraint(elem2->element, elem2->encodingArray[j])) ,
+						getElementValueConstraint((Element*) This, result) );
+					switch( ((FunctionOperator*)This->function)->overflowbehavior ){
+						case IGNORE:
+							if(!hasOverFlow){
+								carray[size++] = constraint;
+							}
+						case WRAPAROUND:
+							carray[size++] = constraint;
+						case FLAGFORCESOVERFLOW:
+							if(hasOverFlow){
+								Constraint* const1 = allocConstraint(IMPLIES, overFlowConstraint, 
+										allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(elem2->element, elem2->encodingArray[j])));
+								carray[size++] = allocConstraint(AND, const1, constraint);
+							}
+						case OVERFLOWSETSFLAG:
+							if(hasOverFlow){
+								Constraint* const1 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(elem2->element, elem2->encodingArray[j])), overFlowConstraint);
+								carray[size++] = allocConstraint(AND, const1, constraint);
+							} else
+								carray[size++] = constraint;
+						case FLAGIFFOVERFLOW:
+							if(!hasOverFlow){
+								carray[size++] = constraint;
+							}else{
+								Constraint* const1 = allocConstraint(IMPLIES, overFlowConstraint, 
+										allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(elem2->element, elem2->encodingArray[j])));
+								Constraint* const2 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(elem2->element, elem2->encodingArray[j])), overFlowConstraint);
+								Constraint* res [] = {const1, const2, constraint};
+								carray[size++] = allocArrayConstraint(AND, 3, res);
+							}
+						case NOOVERFLOW:
+							if(hasOverFlow)
+								ASSERT(0);
+								carray[size++] = constraint;
+						default:
+							ASSERT(0);
+					}
+					
+				}
+			}
+		}
+	}
+	return allocArrayConstraint(AND, size, carray);
 }
 
 Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){

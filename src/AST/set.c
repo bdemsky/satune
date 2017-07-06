@@ -21,6 +21,19 @@ Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
 	return tmp;
 }
 
+bool existsInSet(Set* set, uint64_t element){
+	if(set->isRange){
+		return element >= set->low && element <= set->high;
+	}else {
+		uint size = getSizeVectorInt(set->members);
+		for(uint i=0; i< size; i++){
+			if(element == getVectorInt(set->members, i))
+				return true;
+		}
+		return false;
+	}
+}
+
 uint getSetSize(Set* set){
 	if(set->isRange){
 		return set->high- set->low+1;
