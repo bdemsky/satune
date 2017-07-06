@@ -23,9 +23,7 @@ inline bool Ptr_equals(void * key1, void * key2) {
 }
 
 inline unsigned int order_pair_hash_Function(OrderPair* This){
-	uint64_t x=This->first^This->second;
-	uint64_t a=This->first&This->second;
-	return (uint)((x<<4)^(a));
+	return (uint) (This->first << 2) ^ This->second;
 }
 
 inline unsigned int order_pair_equals(OrderPair* key1, OrderPair* key2){
