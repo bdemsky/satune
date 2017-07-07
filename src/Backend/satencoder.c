@@ -64,7 +64,8 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 	uint size=getSizeVectorBoolean(constraints);
 	for(uint i=0;i<size;i++) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
-		encodeConstraintSATEncoder(This, constraint);
+		Constraint* c= encodeConstraintSATEncoder(This, constraint);
+		printConstraint(c);
 	}
 }
 
@@ -115,10 +116,10 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 	case L_OR:
 		return allocArrayConstraint(OR, getSizeArrayBoolean(&constraint->inputs), array);
 	case L_NOT:
-		ASSERT(constraint->numArray==1);
+		ASSERT( getSizeArrayBoolean(&constraint->inputs)==1);
 		return negateConstraint(array[0]);
 	case L_XOR: {
-		ASSERT(constraint->numArray==2);
+		ASSERT( getSizeArrayBoolean(&constraint->inputs)==2);
 		Constraint * nleft=negateConstraint(cloneConstraint(array[0]));
 		Constraint * nright=negateConstraint(cloneConstraint(array[1]));
 		return allocConstraint(OR,
@@ -126,7 +127,7 @@ Constraint * encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) 
 													 allocConstraint(AND, nleft, array[1]));
 	}
 	case L_IMPLIES:
-		ASSERT(constraint->numArray==2);
+		ASSERT( getSizeArrayBoolean( &constraint->inputs)==2);
 		return allocConstraint(IMPLIES, array[0], array[1]);
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
@@ -175,6 +176,7 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
 	OrderPair pair={boolOrder->first, boolOrder->second};
 	Constraint* constraint = getPairConstraint(This, boolToConsts, & pair);
+	ASSERT(constraint != NULL);
 	return constraint;
 }
 
@@ -213,6 +215,7 @@ Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair){
 
 Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *constIJ,Constraint *constJK,Constraint *constIK){
 	//FIXME: first we should add the the constraint to the satsolver!
+	ASSERT(constIJ!= NULL && constJK != NULL && constIK != NULL);
 	Constraint *carray[] = {constIJ, constJK, negateConstraint(constIK)};
 	Constraint * loop1= allocArrayConstraint(OR, 3, carray);
 	Constraint * carray2[] = {negateConstraint(constIJ), negateConstraint(constJK), constIK};
@@ -224,7 +227,7 @@ Constraint * encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * const
 	// FIXME: we can have this implementation for partial order. Basically,
 	// we compute the transitivity between two order constraints specified by the client! (also can be used
 	// when client specify sparse constraints for the total order!)
-	ASSERT(boolOrder->order->type == PARTIAL);
+	ASSERT(constraint->order->type == PARTIAL);
 /*
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
 	if( containsBoolConst(boolToConsts, boolOrder) ){
@@ -304,6 +307,7 @@ Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredic
 			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN)
 				encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
 			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
+			ASSERT(carray[j]!= NULL);
 		}
 		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
 	}
@@ -341,8 +345,11 @@ Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPre
 	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
 		encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
 	for(uint i=0; i<size; i++){
-		carray[i] =  allocConstraint(AND, getElementValueConstraint(elem1, commonElements[i]),
-			getElementValueConstraint(elem2, commonElements[i]) );
+		Constraint* arg1 = getElementValueConstraint(elem1, commonElements[i]);
+		ASSERT(arg1!=NULL);
+		Constraint* arg2 = getElementValueConstraint(elem2, commonElements[i]);
+		ASSERT(arg2 != NULL);
+		carray[i] =  allocConstraint(AND, arg1, arg2);
 	}
 	//FIXME: the case when there is no intersection ....
 	return allocArrayConstraint(OR, size, carray);
@@ -376,7 +383,7 @@ Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFun
 
 Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
 	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
-	ASSERT(getSizeArrayElement(&This->inputs)=2 );
+	ASSERT(getSizeArrayElement(&This->inputs)==2 );
 	ElementEncoding* elem1 = getElementEncoding( getArrayElement(&This->inputs,0) );
 	ElementEncoding* elem2 = getElementEncoding( getArrayElement(&This->inputs,1) );
 	Constraint* carray[elem1->encArraySize*elem2->encArraySize];
@@ -393,10 +400,14 @@ Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, Element
 						break; // Ignoring the cases that result of operation doesn't exist in the code.
 					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
 					// that doesn't iterate over encodingArray and treats more efficient ...
+					Constraint* and1 = getElementValueConstraint(elem1->element, elem1->encodingArray[i]);
+					ASSERT(and1 != NULL);
+					Constraint* and2 = getElementValueConstraint(elem2->element, elem2->encodingArray[j]);
+					ASSERT(and2 != NULL);
+					Constraint* imply2 = getElementValueConstraint((Element*) This, result);
+					ASSERT(imply2 != NULL);
 					Constraint* constraint = allocConstraint(IMPLIES, 
-						allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
-							getElementValueConstraint(elem2->element, elem2->encodingArray[j])) ,
-						getElementValueConstraint((Element*) This, result) );
+						allocConstraint(AND, and1, and2) , imply2);
 					switch( ((FunctionOperator*)This->function)->overflowbehavior ){
 						case IGNORE:
 							if(!hasOverFlow){
@@ -458,9 +469,11 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		for(uint j=0; j<inputNum; j++){
 			Element* el= getArrayElement(elements, j);
 			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
+			ASSERT(carray[j]!= NULL);
 		}
-		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray),
-			getElementValueBinaryIndexConstraint((Element*)This, entry->output));
+		Constraint* output = getElementValueConstraint((Element*)This, entry->output);
+		ASSERT(output!= NULL);
+		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray), output);
 		constraints[i]=row;
 	}
 	Constraint* result = allocArrayConstraint(OR, size, constraints);

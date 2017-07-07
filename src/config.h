@@ -20,7 +20,7 @@
 #endif
 
 #ifndef CONFIG_ASSERT
-//#define CONFIG_ASSERT
+#define CONFIG_ASSERT
 #endif
 
 #endif
