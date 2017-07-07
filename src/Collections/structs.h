@@ -23,8 +23,6 @@ VectorDef(TableEntry, TableEntry *, 4);
 VectorDef(ASTNode, ASTNode *, 4);
 VectorDef(Int, uint64_t, 4);
 
-
-
 HashTableDef(Void, void *, void *);
 HashTableDef(BoolConst, OrderPair *, Constraint *);
 
