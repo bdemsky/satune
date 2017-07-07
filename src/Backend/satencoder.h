@@ -29,7 +29,7 @@ Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredica
 Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
 
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value);
-Constraint * getElementValueConstraint(Element* This, uint64_t value);
+Constraint * getElementValueConstraint(SATEncoder* encoder, Element* This, uint64_t value);
 
 Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This);
 Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);

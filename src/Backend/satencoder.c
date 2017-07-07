@@ -23,7 +23,8 @@ void deleteSATEncoder(SATEncoder *This) {
 	ourfree(This);
 }
 
-Constraint * getElementValueConstraint(Element* This, uint64_t value) {
+Constraint * getElementValueConstraint(SATEncoder* encoder,Element* This, uint64_t value) {
+	generateElementEncodingVariables(encoder, getElementEncoding(This));
 	switch(getElementEncoding(This)->type){
 		case ONEHOT:
 			ASSERT(0);
@@ -32,10 +33,10 @@ Constraint * getElementValueConstraint(Element* This, uint64_t value) {
 			ASSERT(0);
 			break;
 		case BINARYINDEX:
-			ASSERT(0);
+			return getElementValueBinaryIndexConstraint(This, value);
 			break;
 		case ONEHOTBINARY:
-			return getElementValueBinaryIndexConstraint(This, value);
+			ASSERT(0);
 			break;
 		case BINARYVAL:
 			ASSERT(0);
@@ -66,6 +67,7 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		Constraint* c= encodeConstraintSATEncoder(This, constraint);
 		printConstraint(c);
+		model_print("\n");
 	}
 }
 
@@ -306,7 +308,7 @@ Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredic
 			Element* el = getArrayElement(inputs, j);
 			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN)
 				encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
-			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
+			carray[j] = getElementValueConstraint(This,el, entry->inputs[j]);
 			ASSERT(carray[j]!= NULL);
 		}
 		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
@@ -330,7 +332,7 @@ Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredica
 }
 
 Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
-	ASSERT(GETPREDICATETYPE(constraint)==OPERATORPRED);
+	ASSERT(GETPREDICATETYPE(constraint->predicate)==OPERATORPRED);
 	PredicateOperator* predicate = (PredicateOperator*)constraint->predicate;
 	ASSERT(predicate->op == EQUALS); //For now, we just only support equals
 	//getting maximum size of in common elements between two sets!
@@ -345,9 +347,9 @@ Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPre
 	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
 		encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
 	for(uint i=0; i<size; i++){
-		Constraint* arg1 = getElementValueConstraint(elem1, commonElements[i]);
+		Constraint* arg1 = getElementValueConstraint(This, elem1, commonElements[i]);
 		ASSERT(arg1!=NULL);
-		Constraint* arg2 = getElementValueConstraint(elem2, commonElements[i]);
+		Constraint* arg2 = getElementValueConstraint(This, elem2, commonElements[i]);
 		ASSERT(arg2 != NULL);
 		carray[i] =  allocConstraint(AND, arg1, arg2);
 	}
@@ -385,7 +387,9 @@ Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, Element
 	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
 	ASSERT(getSizeArrayElement(&This->inputs)==2 );
 	ElementEncoding* elem1 = getElementEncoding( getArrayElement(&This->inputs,0) );
+	generateElementEncodingVariables(encoder, elem1);
 	ElementEncoding* elem2 = getElementEncoding( getArrayElement(&This->inputs,1) );
+	generateElementEncodingVariables(encoder, elem2);
 	Constraint* carray[elem1->encArraySize*elem2->encArraySize];
 	uint size=0;
 	Constraint* overFlowConstraint = ((BooleanVar*) This->overflowstatus)->var;
@@ -400,11 +404,11 @@ Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, Element
 						break; // Ignoring the cases that result of operation doesn't exist in the code.
 					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
 					// that doesn't iterate over encodingArray and treats more efficient ...
-					Constraint* and1 = getElementValueConstraint(elem1->element, elem1->encodingArray[i]);
+					Constraint* and1 = getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]);
 					ASSERT(and1 != NULL);
-					Constraint* and2 = getElementValueConstraint(elem2->element, elem2->encodingArray[j]);
+					Constraint* and2 = getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j]);
 					ASSERT(and2 != NULL);
-					Constraint* imply2 = getElementValueConstraint((Element*) This, result);
+					Constraint* imply2 = getElementValueConstraint(encoder, (Element*) This, result);
 					ASSERT(imply2 != NULL);
 					Constraint* constraint = allocConstraint(IMPLIES, 
 						allocConstraint(AND, and1, and2) , imply2);
@@ -413,38 +417,45 @@ Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, Element
 							if(!hasOverFlow){
 								carray[size++] = constraint;
 							}
+							break;
 						case WRAPAROUND:
 							carray[size++] = constraint;
+							break;
 						case FLAGFORCESOVERFLOW:
 							if(hasOverFlow){
 								Constraint* const1 = allocConstraint(IMPLIES, overFlowConstraint, 
-										allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(elem2->element, elem2->encodingArray[j])));
+										allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])));
 								carray[size++] = allocConstraint(AND, const1, constraint);
 							}
+							break;
 						case OVERFLOWSETSFLAG:
 							if(hasOverFlow){
-								Constraint* const1 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(elem2->element, elem2->encodingArray[j])), overFlowConstraint);
+								Constraint* const1 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])), overFlowConstraint);
 								carray[size++] = allocConstraint(AND, const1, constraint);
 							} else
 								carray[size++] = constraint;
+							break;
 						case FLAGIFFOVERFLOW:
 							if(!hasOverFlow){
 								carray[size++] = constraint;
 							}else{
 								Constraint* const1 = allocConstraint(IMPLIES, overFlowConstraint, 
-										allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(elem2->element, elem2->encodingArray[j])));
-								Constraint* const2 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(elem2->element, elem2->encodingArray[j])), overFlowConstraint);
+										allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])));
+								Constraint* const2 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
+										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])), overFlowConstraint);
 								Constraint* res [] = {const1, const2, constraint};
 								carray[size++] = allocArrayConstraint(AND, 3, res);
 							}
+							break;
 						case NOOVERFLOW:
-							if(hasOverFlow)
+							if(hasOverFlow){
 								ASSERT(0);
-								carray[size++] = constraint;
+							}
+							carray[size++] = constraint;
+							break;
 						default:
 							ASSERT(0);
 					}
@@ -468,10 +479,10 @@ Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFu
 		Constraint* carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
 			Element* el= getArrayElement(elements, j);
-			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
+			carray[j] = getElementValueConstraint(encoder, el, entry->inputs[j]);
 			ASSERT(carray[j]!= NULL);
 		}
-		Constraint* output = getElementValueConstraint((Element*)This, entry->output);
+		Constraint* output = getElementValueConstraint(encoder, (Element*)This, entry->output);
 		ASSERT(output!= NULL);
 		Constraint* row= allocConstraint(IMPLIES, allocArrayConstraint(AND, inputNum, carray), output);
 		constraints[i]=row;

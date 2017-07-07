@@ -49,7 +49,8 @@ void generateBinaryIndexEncodingVars(SATEncoder* encoder, ElementEncoding* This)
 
 void generateElementEncodingVariables(SATEncoder* encoder, ElementEncoding* This){
 	ASSERT(This->type!=ELEM_UNASSIGNED);
-	ASSERT(This->variables==NULL);
+	if(This->variables!=NULL)
+		return;
 	switch(This->type){
 		case BINARYINDEX:
 			generateBinaryIndexEncodingVars(encoder, This);
