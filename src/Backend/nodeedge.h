@@ -62,6 +62,7 @@ struct CNF {
 	Node ** node_array;
 	IncrementalSolver * solver;
 	VectorEdge constraints;
+	VectorEdge args;
 };
 
 typedef struct CNF CNF;
@@ -190,7 +191,7 @@ CNFExpr * produceConjunction(CNF * cnf, Edge e);
 CNFExpr* produceDisjunction(CNF *cnf, Edge e);
 bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate);
 void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign);
-CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args);
+CNFExpr* fillArgs(CNF * cnf, Edge e, bool isNeg, Edge * largestEdge);
 
 
 

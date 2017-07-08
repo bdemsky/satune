@@ -18,6 +18,7 @@ CNF * createCNF() {
 	cnf->maxsize=(uint)(((double)cnf->capacity)*LOAD_FACTOR);
 	cnf->enableMatching=true;
 	allocInlineDefVectorEdge(& cnf->constraints);
+	allocInlineDefVectorEdge(& cnf->args);
  return cnf;
 }
 
@@ -28,6 +29,7 @@ void deleteCNF(CNF * cnf) {
 			ourfree(n);
 	}
 	deleteVectorArrayEdge(& cnf->constraints);
+	deleteVectorArrayEdge(& cnf->args);
 	ourfree(cnf->node_array);
 	ourfree(cnf);
 }
@@ -562,8 +564,8 @@ void outputCNF(CNF *cnf, CNFExpr *exp) {
 	
 }
 
-CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
-	args.clear();
+CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {
+	clearVectorEdge(&cnf->args);
 
 	*largestEdge = (void*) NULL;
 	CNFExpr* largest = NULL;
@@ -573,7 +575,7 @@ CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
 		Node * narg = getNodePtrFromEdge(arg);
 		
 		if (arg.isVar()) {
-			args.push(arg);
+			pushVectorEdge(&cnf->args, arg);
 			continue;
 		}
 		
@@ -589,14 +591,14 @@ CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
 					* largestEdge = arg;
 					continue;
 				} else if (argExp->litSize > largest->litSize) {
-					args.push(* largestEdge);
+					pushVectorEdge(&cnf->args, *largestEdge);
 					largest = argExp;
 					* largestEdge = arg;
 					continue;
 				}
 			}
 		}
-		args.push(arg);
+		pushVectorEdge(&cnf->args, arg);
 	}
 	
 	if (largest != NULL) {
@@ -609,12 +611,13 @@ CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
 
 CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 	Edge largestEdge;
-	CNFExpr* accum = fillArgs(e, false, largestEdge);
+	
+	CNFExpr* accum = fillArgs(cnf, e, false, &largestEdge);
 	if (accum == NULL) accum = allocCNFExprBool(true);
 	
-	int i = _args.size();
+	int i = getSizeVectorEdge(&cnf->args);
 	while (i != 0) {
-		Edge arg(_args[--i]);
+		Edge arg = getVectorEdge(&cnf->args, --i);
 		if (arg.isVar()) {
 			accum->conjoin(atomLit(arg));
 		} else {
@@ -637,7 +640,7 @@ CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 
 CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 	Edge largestEdge;
-	CNFExpr* accum = fillArgs(e, true, largestEdge);
+	CNFExpr* accum = fillArgs(cnf, e, true, &largestEdge);
 	if (accum == NULL)
 		accum = allocCNFExprBool(false);
 	
@@ -655,9 +658,9 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 	if (accum->clauseSize() > CLAUSE_MAX)
 		accum = allocCNFExprLiteral(introProxy(cnf, largestEdge, accum, isNegEdge(largestEdge)));
 	
-	int i = _args.size();
+	int i = getSizeVectorEdge(&cnf->args);
 	while (i != 0) {
-		Edge arg(_args[--i]);
+		Edge arg=getVectorEdge(&cnf->args, --i);
 		Node *narg=getNodePtrFromEdge(arg);
 		if (arg.isVar()) {
 			accum->disjoin(atomLit(arg));
