@@ -10,8 +10,12 @@ Order* allocOrder(OrderType type, Set * set){
 	allocInlineDefVectorBoolean(& order->constraints);
 	order->type=type;
 	allocOrderEncoding(& order->order, order);
-	order->boolsToConstraints = allocHashTableBoolConst(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	order->boolsToConstraints = NULL;
 	return order;
+}
+
+void initializeOrderHashTable(Order* order){
+	order->boolsToConstraints= allocHashTableBoolConst(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
 void addOrderConstraint(Order* order, BooleanOrder* constraint){

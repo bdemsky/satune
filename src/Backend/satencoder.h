@@ -15,7 +15,7 @@ Constraint * getNewVarSATEncoder(SATEncoder *This);
 void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Constraint **carray);
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);
-void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order);
+Constraint * createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order);
 Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair);
 Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *constIJ,Constraint *constJK,Constraint *constIK);
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);

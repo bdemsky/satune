@@ -20,18 +20,14 @@ Function* allocFunctionTable (Table* table){
 	return &This->base;
 }
 
-uint64_t applyFunctionOperator(FunctionOperator* func, uint64_t var1, uint64_t var2, bool* isInRange, bool* hasOverFlow){
+uint64_t applyFunctionOperator(FunctionOperator* func, uint64_t var1, uint64_t var2, bool* isInRange){
 	uint64_t result = 0;
 	switch( func->op){
 		case ADD:
 			result = var1+ var2;
-			if(result < var1){
-				*hasOverFlow=true;
-			}
 			break;
 		case SUB:
 			result = var1 - var2;
-			//FIXME: Should we consider underflow as well?
 			break;
 		default:
 			ASSERT(0);

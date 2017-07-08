@@ -67,7 +67,7 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		Constraint* c= encodeConstraintSATEncoder(This, constraint);
 		printConstraint(c);
-		model_print("\n");
+		model_print("\n\n");
 	}
 }
 
@@ -157,7 +157,7 @@ Constraint * getPairConstraint(SATEncoder *This, HashTableBoolConst * table, Ord
 		negate=true;
 		flipped.first=pair->second;
 		flipped.second=pair->first;
-		pair = &flipped;
+		pair = &flipped;	//FIXME: accessing a local variable from outside of the function?
 	}
 	Constraint * constraint;
 	if (!containsBoolConst(table, pair)) {
@@ -175,6 +175,10 @@ Constraint * getPairConstraint(SATEncoder *This, HashTableBoolConst * table, Ord
 
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
 	ASSERT(boolOrder->order->type == TOTAL);
+	if(boolOrder->order->boolsToConstraints == NULL){
+		initializeOrderHashTable(boolOrder->order);
+		return createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
+	}
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
 	OrderPair pair={boolOrder->first, boolOrder->second};
 	Constraint* constraint = getPairConstraint(This, boolToConsts, & pair);
@@ -182,11 +186,13 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 	return constraint;
 }
 
-void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
+Constraint* createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 	ASSERT(order->type == TOTAL);
 	VectorInt* mems = order->set->members;
 	HashTableBoolConst* table = order->boolsToConstraints;
 	uint size = getSizeVectorInt(mems);
+	Constraint* constraints [size*size];
+	uint csize =0;
 	for(uint i=0; i<size; i++){
 		uint64_t valueI = getVectorInt(mems, i);
 		for(uint j=i+1; j<size;j++){
@@ -199,10 +205,12 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 				OrderPair pairIK = {valueI, valueK};
 				Constraint* constIK = getPairConstraint(This, table, & pairIK);
 				Constraint* constJK = getPairConstraint(This, table, & pairJK);
-				generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK); 
+				constraints[csize++] = generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK); 
+				ASSERT(csize < size*size);
 			}
 		}
 	}
+	return allocArrayConstraint(AND, csize, constraints);
 }
 
 Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair){
@@ -306,9 +314,15 @@ Constraint * encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredic
 		Constraint* carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
 			Element* el = getArrayElement(inputs, j);
-			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN)
-				encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
-			carray[j] = getElementValueConstraint(This,el, entry->inputs[j]);
+			Constraint* tmpc = getElementValueConstraint(This,el, entry->inputs[j]);
+			ASSERT(tmpc!= NULL);
+			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN){
+				Constraint* func =encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
+				ASSERT(func!=NULL);
+				carray[j] = allocConstraint(AND, func, tmpc);
+			} else {
+				carray[j] = tmpc;
+			}
 			ASSERT(carray[j]!= NULL);
 		}
 		constraints[i]=allocArrayConstraint(AND, inputNum, carray);
@@ -341,11 +355,12 @@ Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPre
 	getEqualitySetIntersection(predicate, &size, commonElements);
 	Constraint*  carray[size];
 	Element* elem1 = getArrayElement( &constraint->inputs, 0);
+	Constraint *elemc1 = NULL, *elemc2 = NULL;
 	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN)
-		encodeFunctionElementSATEncoder(This, (ElementFunction*) elem1);
+		elemc1 = encodeFunctionElementSATEncoder(This, (ElementFunction*) elem1);
 	Element* elem2 = getArrayElement( &constraint->inputs, 1);
 	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
-		encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
+		elemc2 = encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
 	for(uint i=0; i<size; i++){
 		Constraint* arg1 = getElementValueConstraint(This, elem1, commonElements[i]);
 		ASSERT(arg1!=NULL);
@@ -354,7 +369,13 @@ Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPre
 		carray[i] =  allocConstraint(AND, arg1, arg2);
 	}
 	//FIXME: the case when there is no intersection ....
-	return allocArrayConstraint(OR, size, carray);
+	Constraint* result = allocArrayConstraint(OR, size, carray);
+	ASSERT(result!= NULL);
+	if(elemc1!= NULL)
+		result = allocConstraint(AND, result, elemc1);
+	if(elemc2 != NULL)
+		result = allocConstraint (AND, result, elemc2);
+	return result;
 }
 
 Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This){
@@ -387,74 +408,71 @@ Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, Element
 	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
 	ASSERT(getSizeArrayElement(&This->inputs)==2 );
 	ElementEncoding* elem1 = getElementEncoding( getArrayElement(&This->inputs,0) );
-	generateElementEncodingVariables(encoder, elem1);
 	ElementEncoding* elem2 = getElementEncoding( getArrayElement(&This->inputs,1) );
-	generateElementEncodingVariables(encoder, elem2);
 	Constraint* carray[elem1->encArraySize*elem2->encArraySize];
 	uint size=0;
 	Constraint* overFlowConstraint = ((BooleanVar*) This->overflowstatus)->var;
 	for(uint i=0; i<elem1->encArraySize; i++){
 		if(isinUseElement(elem1, i)){
-			for(uint j=0; j<elem2->encArraySize; j++){
+			for( uint j=0; j<elem2->encArraySize; j++){
 				if(isinUseElement(elem2, j)){
-					bool isInRange = false, hasOverFlow=false;
+					bool isInRange = false;
 					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elem1->encodingArray[i],
-						elem2->encodingArray[j], &isInRange, &hasOverFlow);
-					if(!isInRange)
-						break; // Ignoring the cases that result of operation doesn't exist in the code.
+						elem2->encodingArray[j], &isInRange);
 					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
 					// that doesn't iterate over encodingArray and treats more efficient ...
-					Constraint* and1 = getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]);
-					ASSERT(and1 != NULL);
-					Constraint* and2 = getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j]);
-					ASSERT(and2 != NULL);
-					Constraint* imply2 = getElementValueConstraint(encoder, (Element*) This, result);
-					ASSERT(imply2 != NULL);
-					Constraint* constraint = allocConstraint(IMPLIES, 
-						allocConstraint(AND, and1, and2) , imply2);
+					Constraint* valConstrIn1 = getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]);
+					ASSERT(valConstrIn1 != NULL);
+					Constraint* valConstrIn2 = getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j]);
+					ASSERT(valConstrIn2 != NULL);
+					Constraint* valConstrOut = getElementValueConstraint(encoder, (Element*) This, result);
+					if(valConstrOut == NULL)
+						continue; //FIXME:Should talk to brian about it!
+					Constraint* OpConstraint = allocConstraint(IMPLIES, 
+						allocConstraint(AND, valConstrIn1, valConstrIn2) , valConstrOut);
 					switch( ((FunctionOperator*)This->function)->overflowbehavior ){
 						case IGNORE:
-							if(!hasOverFlow){
-								carray[size++] = constraint;
+							if(isInRange){
+								carray[size++] = OpConstraint;
 							}
 							break;
 						case WRAPAROUND:
-							carray[size++] = constraint;
+							carray[size++] = OpConstraint;
 							break;
 						case FLAGFORCESOVERFLOW:
-							if(hasOverFlow){
-								Constraint* const1 = allocConstraint(IMPLIES, overFlowConstraint, 
-										allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])));
-								carray[size++] = allocConstraint(AND, const1, constraint);
+							if(isInRange){
+								Constraint* const1 = allocConstraint(IMPLIES,
+									allocConstraint(AND, valConstrIn1, valConstrIn2), 
+									negateConstraint(overFlowConstraint));
+								carray[size++] = allocConstraint(AND, const1, OpConstraint);
 							}
 							break;
 						case OVERFLOWSETSFLAG:
-							if(hasOverFlow){
-								Constraint* const1 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])), overFlowConstraint);
-								carray[size++] = allocConstraint(AND, const1, constraint);
-							} else
-								carray[size++] = constraint;
+							if(isInRange){
+								carray[size++] = OpConstraint;
+							} else{
+								carray[size++] = allocConstraint(IMPLIES,
+									allocConstraint(AND, valConstrIn1, valConstrIn2),
+									overFlowConstraint);
+							}
 							break;
 						case FLAGIFFOVERFLOW:
-							if(!hasOverFlow){
-								carray[size++] = constraint;
+							if(isInRange){
+								Constraint* const1 = allocConstraint(IMPLIES,
+									allocConstraint(AND, valConstrIn1, valConstrIn2), 
+									negateConstraint(overFlowConstraint));
+								carray[size++] = allocConstraint(AND, const1, OpConstraint);
 							}else{
-								Constraint* const1 = allocConstraint(IMPLIES, overFlowConstraint, 
-										allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])));
-								Constraint* const2 = allocConstraint(IMPLIES, allocConstraint(AND, getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]),
-										getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j])), overFlowConstraint);
-								Constraint* res [] = {const1, const2, constraint};
-								carray[size++] = allocArrayConstraint(AND, 3, res);
+								carray[size++] = allocConstraint(IMPLIES,
+									allocConstraint(AND, valConstrIn1, valConstrIn2),
+									overFlowConstraint);
 							}
 							break;
 						case NOOVERFLOW:
-							if(hasOverFlow){
+							if(!isInRange){
 								ASSERT(0);
 							}
-							carray[size++] = constraint;
+							carray[size++] = OpConstraint;
 							break;
 						default:
 							ASSERT(0);
