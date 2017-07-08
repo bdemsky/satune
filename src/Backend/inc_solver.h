@@ -31,6 +31,7 @@ struct IncrementalSolver {
 IncrementalSolver * allocIncrementalSolver();
 void deleteIncrementalSolver(IncrementalSolver * This);
 void addClauseLiteral(IncrementalSolver * This, int literal);
+void addArrayClauseLiteral(IncrementalSolver * This, uint numliterals, int * literals);
 void finishedClauses(IncrementalSolver * This);
 void freeze(IncrementalSolver * This, int variable);
 int solve(IncrementalSolver * This);

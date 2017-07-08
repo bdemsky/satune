@@ -31,6 +31,8 @@ typedef enum NodeType NodeType;
 struct NodeFlags {
 	NodeType type:2;
 	int wasExpanded:2;
+	int cnfVisitedDown:2;
+	int cnfVisitedUp:2;
 };
 
 typedef struct NodeFlags NodeFlags;
@@ -55,10 +57,14 @@ struct CNF {
 	uint maxsize;
 	bool enableMatching;
 	Node ** node_array;
+	IncrementalSolver * solver;
 	VectorEdge constraints;
 };
 
 typedef struct CNF CNF;
+
+struct CNFExpr;
+typedef struct CNFExpr CNFExpr;
 
 static inline bool getExpanded(Node *n, int isNegated) {
 	return n->flags.wasExpanded & (1<<isNegated);
@@ -87,6 +93,10 @@ static inline bool sameNodeOppSign(Edge e1, Edge e2) {
 
 static inline bool isNegEdge(Edge e) {
 	return ((uintptr_t)e.node_ptr) & NEGATE_EDGE;
+}
+
+static inline bool isPosEdge(Edge e) {
+	return !(((uintptr_t)e.node_ptr) & NEGATE_EDGE);
 }
 
 static inline bool isNodeEdge(Edge e) {
@@ -142,6 +152,18 @@ static inline Edge constraintNegateIf(Edge e, bool negate) {
 	return eret;
 }
 
+static inline Literal getEdgeVar(Edge e) {
+	int val = (int) (((uintptr_t) e.node_ptr) >> VAR_SHIFT);
+	return isNegEdge(e) ? -val : val;
+}
+
+static inline bool isProxy(CNFExpr *expr) {
+	return (bool) (((intptr_t) expr) & 1);
+}
+
+static inline Literal getProxy(CNFExpr *expr) {
+	return (Literal) (((intptr_t) expr) >> 1);
+}
 
 uint hashNode(NodeType type, uint numEdges, Edge * edges);
 Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashCode);
@@ -157,6 +179,10 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge);
 Edge constraintNewVar(CNF *cnf);
 void countPass(CNF *cnf);
 void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
+void convertPass(CNF *cnf, bool backtrackLit);
+void convertConstraint(CNF *cnf, VectorEdge *stack, Edge e, bool backtrackLit);
+void constrain(CNF * cnf, Literal l, CNFExpr *exp);
+void produceCNF(CNF * cnf, Edge e);
 
 
 Edge E_True={(Node *)(uintptr_t) EDGE_IS_VAR_CONSTANT};

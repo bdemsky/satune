@@ -1,6 +1,9 @@
 #include "nodeedge.h"
 #include <string.h>
 #include <stdlib.h>
+#include "inc_solver.h"
+
+/** Code ported from C++ BAT implementation of NICE-SAT */
 
 VectorImpl(Edge, Edge, 16)
 
@@ -56,6 +59,8 @@ Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashcode) {
 	memcpy(n->edges, edges, sizeof(Edge)*numEdges);
 	n->flags.type=type;
 	n->flags.wasExpanded=0;
+	n->flags.cnfVisitedDown=0;
+	n->flags.cnfVisitedUp=0;
 	n->numEdges=numEdges;
 	n->hashCode=hashcode;
 	n->intAnnot[0]=0;n->intAnnot[1]=0;
@@ -338,4 +343,345 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
 			}
 		}
 	}
+}
+
+void convertPass(CNF *cnf, bool backtrackLit) {
+	uint numConstraints=getSizeVectorEdge(&cnf->constraints);
+	VectorEdge *ve=allocDefVectorEdge();
+	for(uint i=0; i<numConstraints;i++) {
+		convertConstraint(cnf, ve, getVectorEdge(&cnf->constraints, i), backtrackLit);
+	}
+	deleteVectorEdge(ve);
+}
+
+void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit) {
+	Node *nroot=getNodePtrFromEdge(root);
+	
+	if (isNodeEdge(root) && (nroot->flags.type == NodeType_ITE || nroot->flags.type == NodeType_IFF)) {
+		root = (Edge) { (Node *) nroot->ptrAnnot[isNegEdge(root)]};
+	}
+	
+	if (edgeIsConst(root)) {
+		if (isNegEdge(root)) {
+			//trivally unsat
+			Edge newvar=constraintNewVar(cnf);
+			Literal var=getEdgeVar(newvar);
+			Literal clause[] = {var, -var, 0};
+			addArrayClauseLiteral(cnf->solver, 3, clause);
+			return;
+		} else {
+			//trivially true
+			return;
+		}
+	} else if (edgeIsVarConst(root)) {
+		Literal clause[] = { getEdgeVar(root), 0};
+		addArrayClauseLiteral(cnf->solver, 2, clause);
+		return;
+	}
+	
+	clearVectorEdge(stack);pushVectorEdge(stack, root);
+	while(getSizeVectorEdge(stack)!=0) {
+		Edge e=lastVectorEdge(stack);
+		Node *n=getNodePtrFromEdge(e);
+
+		if (edgeIsVarConst(e)) {
+			popVectorEdge(stack);
+			continue;
+		} else if (n->flags.type==NodeType_ITE ||
+							 n->flags.type==NodeType_IFF) {
+			popVectorEdge(stack);
+			pushVectorEdge(stack, (Edge) {(Node *)n->ptrAnnot[0]});
+			pushVectorEdge(stack, (Edge) {(Node *)n->ptrAnnot[1]});
+			continue;
+		}
+
+		bool needPos = (n->intAnnot[0] > 0);
+		bool needNeg = (n->intAnnot[1] > 0);
+		if ((!needPos || n->flags.cnfVisitedUp & 1) ||
+				(!needNeg || n->flags.cnfVisitedUp & 2)) {
+			popVectorEdge(stack);
+		} else if ((needPos && !n->flags.cnfVisitedDown & 1) ||
+							 (needNeg && !n->flags.cnfVisitedDown & 2)) {
+			if (needPos)
+				n->flags.cnfVisitedDown|=1;
+			if (needNeg)
+				n->flags.cnfVisitedDown|=2;
+			for(uint i=0; i<n->numEdges; i++) {
+				Edge arg=n->edges[i];
+				arg=constraintNegateIf(arg, isNegEdge(e));
+				pushVectorEdge(stack, arg); //WARNING, THIS LOOKS LIKE A BUG IN THE ORIGINAL CODE
+			}
+		} else {
+			popVectorEdge(stack);
+			produceCNF(cnf, e);
+		}
+	}
+	CNFExpr * cnfExp = (CNFExpr *) nroot->ptrAnnot[isNegEdge(root)];
+	if (isProxy(cnfExp)) {
+		//solver.add(getProxy(cnfExp))
+	} else if (backtrackLit) {
+		//solver.add(introProxy(solver, root, cnfExp, isNegEdge(root)));
+	} else {
+		//solver.add(*cnfExp);
+	}
+
+	if (!((intptr_t) cnfExp & 1)) {
+		//free rootExp
+		nroot->ptrAnnot[isNegEdge(root)] = NULL;
+	}
+}
+
+//DONE
+Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg) {
+	Literal l = 0;
+	Node * n = getNodePtrFromEdge(e);
+	
+	if (n->flags.cnfVisitedUp & (1<<!isNeg)) {
+		CNFExpr* otherExp = (CNFExpr*) n->ptrAnnot[!isNeg];
+		if (isProxy(otherExp))
+			l = -getProxy(otherExp);
+	} else {
+		Edge semNeg={(Node *) n->ptrAnnot[isNeg]};
+		Node * nsemNeg=getNodePtrFromEdge(semNeg);
+		if (nsemNeg != NULL) {
+			if (nsemNeg->flags.cnfVisitedUp & (1 << isNeg)) {
+				CNFExpr* otherExp = (CNFExpr*) nsemNeg->ptrAnnot[isNeg];
+				if (isProxy(otherExp))
+					l = -getProxy(otherExp);
+			} else if (nsemNeg->flags.cnfVisitedUp & (1<< !isNeg)) {
+				CNFExpr* otherExp = (CNFExpr*) nsemNeg->ptrAnnot[!isNeg];
+				if (isProxy(otherExp))
+					l = getProxy(otherExp);
+			}
+		}
+	}
+	
+	if (l == 0) {
+		Edge newvar = constraintNewVar(cnf);
+		l = getEdgeVar(newvar);
+	}
+	// Output the constraints on the auxiliary variable
+	constrainCNF(cnf, l, exp);
+	//delete exp; //FIXME
+  
+	n->ptrAnnot[isNeg] = (void*) ((intptr_t) (l << 1) | 1);
+	
+	return l;
+}
+
+//DONE
+void produceCNF(CNF * cnf, Edge e) {
+	CNFExpr* expPos = NULL;
+	CNFExpr* expNeg = NULL;
+	Node *n = getNodePtrFromEdge(e);
+	
+	if (n->intAnnot[0] > 0) {
+		expPos = produceConjunction(cnf, e);
+	}
+
+	if (n->intAnnot[1]  > 0) {
+		expNeg = produceDisjunction(cnf, e);
+	}
+
+	/// @todo Propagate constants across semantic negations (this can
+	/// be done similarly to the calls to propagate shown below).  The
+	/// trick here is that we need to figure out how to get the
+	/// semantic negation pointers, and ensure that they can have CNF
+	/// produced for them at the right point
+	///
+	/// propagate(solver, expPos, snPos, false) || propagate(solver, expNeg, snNeg, false)
+	
+	// propagate from positive to negative, negative to positive
+	propagate(cnf, expPos, expNeg, true) || propagate(cnf, expNeg, expPos, true);
+	
+	// The polarity heuristic entails visiting the discovery polarity first
+	if (isPosEdge(e)) {
+		saveCNF(cnf, expPos, e, false);
+		saveCNF(cnf, expNeg, e, true);
+	} else {
+		saveCNF(cnf, expNeg, e, true);
+		saveCNF(cnf, expPos, e, false);
+	}
+}
+
+
+//DONE
+bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
+	if (src != NULL && !isProxy(src) && getLitSizeCNF(src) == 0) {
+		if (dest == NULL) {
+			dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+		} else if (isProxy(dest)) {
+			bool alwaysTrue = (negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+			if (alwaysTrue) {
+				Literal clause[] = {getProxy(dest), 0};
+				addArrayClauseLiteral(cnf->solver, 2, clause);
+			} else {
+				Literal clause[] = {-getProxy(dest), 0};
+				addArrayClauseLiteral(cnf->solver, 2, clause);
+			}
+			
+			dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+		} else {
+			clearCNF(dest, negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+		}
+		return true;
+	}
+	return false;
+}
+
+void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign) {
+	Node *n=getNodePtrFromEdge(e);
+	n->flags.cnfVisitedUp & (1 << sign);
+	if (exp == NULL || isProxy(exp)) return;
+  
+	if (exp->litSize == 1) {
+		Literal l = exp->singletons()[0];
+		delete exp;
+		n->ptrAnnot[sign] = (void*) ((intptr_t) (l << 1) | 1);
+	} else if (exp->litSize != 0 && (n->intAnnot[sign] > 1 || e->isVarForced())) {
+		introProxy(solver, e, exp, sign);
+	} else {
+		n->ptrAnnot[sign] = exp;
+	}
+}
+
+void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp) {
+	if (alwaysTrueCNF(exp)) {
+		return;
+	} else if (alwaysFalseCNF(expr)) {
+		Literal clause[] = {-l, 0};
+		addArrayClauseLiteral(cnf->solver, 2, clause);
+		return;
+	}
+	//FIXME
+	
+}
+
+void outputCNF(CNF *cnf, CNFExpr *exp) {
+	
+}
+
+CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
+	args.clear();
+
+	*largestEdge = (void*) NULL;
+	CnfExp* largest = NULL;
+	int i = e->size();
+	while (i != 0) {
+		Edge arg = (*e)[--i]; arg.negateIf(isNeg);
+		
+		if (arg.isVar()) {
+			args.push(arg);
+			continue;
+		}
+		
+		if (arg->op() == NodeOp_Ite || arg->op() == NodeOp_Iff) {
+			arg = arg->ptrAnnot(arg.isNeg());
+		}
+    
+		if (arg->intAnnot(arg.isNeg()) == 1) {
+			CnfExp* argExp = (CnfExp*) arg->ptrAnnot(arg.isNeg());
+			if (!isProxy(argExp)) {
+				if (largest == NULL) {
+					largest = argExp;
+					largestEdge = arg;
+					continue;
+				} else if (argExp->litSize > largest->litSize) {
+					args.push(largestEdge);
+					largest = argExp;
+					largestEdge = arg;
+					continue;
+				}
+			}
+		}
+		args.push(arg);
+	}
+	
+	if (largest != NULL) {
+		largestEdge->ptrAnnot(largestEdge.isNeg()) = NULL;
+	}
+	
+	return largest;
+}
+
+
+CNFExpr * produceConjunction(CNF * cnf, Edge e) {
+	Edge largestEdge;
+	CnfExp* accum = fillArgs(e, false, largestEdge);
+	if (accum == NULL) accum = new CnfExp(true);
+	
+	int i = _args.size();
+	while (i != 0) {
+		Edge arg(_args[--i]);
+		if (arg.isVar()) {
+			accum->conjoin(atomLit(arg));
+		} else {
+			CnfExp* argExp = (CnfExp*) arg->ptrAnnot(arg.isNeg());
+      
+			bool destroy = (--arg->intAnnot(arg.isNeg()) == 0);
+			if (isProxy(argExp)) { // variable has been introduced
+				accum->conjoin(getProxy(argExp));
+			} else {
+				accum->conjoin(argExp, destroy);
+				if (destroy) arg->ptrAnnot(arg.isNeg()) = NULL;
+			}
+		}
+	}
+	
+	return accum;
+}
+
+#define CLAUSE_MAX 3
+
+CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
+	Edge largestEdge;
+	CNFExpr* accum = fillArgs(e, true, largestEdge);
+	if (accum == NULL)
+		accum = new CNFExpr(false);
+	
+	// This is necessary to check to make sure that we don't start out
+	// with an accumulator that is "too large".
+	
+	/// @todo Strictly speaking, introProxy doesn't *need* to free
+	/// memory, then this wouldn't have to reallocate CNFExpr
+	
+	/// @todo When this call to introProxy is made, the semantic
+	/// negation pointer will have been destroyed.  Thus, it will not
+	/// be possible to use the correct proxy.  That should be fixed.
+	
+	// at this point, we will either have NULL, or a destructible expression
+	if (accum->clauseSize() > CLAUSE_MAX)
+		accum = new CNFExpr(introProxy(solver, largestEdge, accum, largestEdge.isNeg()));
+	
+	int i = _args.size();
+	while (i != 0) {
+		Edge arg(_args[--i]);
+		if (arg.isVar()) {
+			accum->disjoin(atomLit(arg));
+		} else {
+			CNFExpr* argExp = (CNFExpr*) arg->ptrAnnot(arg.isNeg());
+			
+			bool destroy = (--arg->intAnnot(arg.isNeg()) == 0);
+			if (isProxy(argExp)) { // variable has been introduced
+				accum->disjoin(getProxy(argExp));
+			} else if (argExp->litSize == 0) {
+				accum->disjoin(argExp, destroy);
+			} else {
+				// check to see if we should introduce a proxy
+				int aL = accum->litSize;      // lits in accum
+				int eL = argExp->litSize;     // lits in argument
+				int aC = getClauseSizeCNF(accum);   // clauses in accum
+				int eC = getClauseSizeCNF(argExp);  // clauses in argument
+				
+				if (eC > CLAUSE_MAX || (eL * aC + aL * eC > eL + aC + aL + aC)) {
+					accum->disjoin(introProxy(solver, arg, argExp, arg.isNeg()));
+				} else {
+					accum->disjoin(argExp, destroy);
+					if (destroy) arg->ptrAnnot(arg.isNeg()) = NULL;
+				}
+			}
+		}
+	}
+  
+	return accum;
 }
