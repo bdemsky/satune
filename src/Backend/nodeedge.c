@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "inc_solver.h"
+#include "cnfexpr.h"
 
 /** Code ported from C++ BAT implementation of NICE-SAT */
 
@@ -462,7 +463,7 @@ Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg) {
 	}
 	// Output the constraints on the auxiliary variable
 	constrainCNF(cnf, l, exp);
-	//delete exp; //FIXME
+	deleteCNFExpr(exp);
   
 	n->ptrAnnot[isNeg] = (void*) ((intptr_t) (l << 1) | 1);
 	
@@ -531,15 +532,15 @@ bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
 
 void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign) {
 	Node *n=getNodePtrFromEdge(e);
-	n->flags.cnfVisitedUp & (1 << sign);
+	n->flags.cnfVisitedUp |= (1 << sign);
 	if (exp == NULL || isProxy(exp)) return;
   
 	if (exp->litSize == 1) {
 		Literal l = exp->singletons()[0];
-		delete exp;
+		deleteCNFExpr(exp);
 		n->ptrAnnot[sign] = (void*) ((intptr_t) (l << 1) | 1);
-	} else if (exp->litSize != 0 && (n->intAnnot[sign] > 1 || e->isVarForced())) {
-		introProxy(solver, e, exp, sign);
+	} else if (exp->litSize != 0 && (n->intAnnot[sign] > 1 || n->isVarForced())) {
+		introProxy(cnf, e, exp, sign);
 	} else {
 		n->ptrAnnot[sign] = exp;
 	}
@@ -548,7 +549,7 @@ void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign) {
 void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp) {
 	if (alwaysTrueCNF(exp)) {
 		return;
-	} else if (alwaysFalseCNF(expr)) {
+	} else if (alwaysFalseCNF(exp)) {
 		Literal clause[] = {-l, 0};
 		addArrayClauseLiteral(cnf->solver, 2, clause);
 		return;
@@ -561,35 +562,36 @@ void outputCNF(CNF *cnf, CNFExpr *exp) {
 	
 }
 
-CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
+CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args) {
 	args.clear();
 
 	*largestEdge = (void*) NULL;
-	CnfExp* largest = NULL;
+	CNFExpr* largest = NULL;
 	int i = e->size();
 	while (i != 0) {
 		Edge arg = (*e)[--i]; arg.negateIf(isNeg);
+		Node * narg = getNodePtrFromEdge(arg);
 		
 		if (arg.isVar()) {
 			args.push(arg);
 			continue;
 		}
 		
-		if (arg->op() == NodeOp_Ite || arg->op() == NodeOp_Iff) {
-			arg = arg->ptrAnnot(arg.isNeg());
+		if (narg->flags.type == NodeType_ITE || narg->flags.type == NodeType_IFF) {
+			arg = (Edge) {(Node *) narg->ptrAnnot[isNegEdge(arg)]};
 		}
     
-		if (arg->intAnnot(arg.isNeg()) == 1) {
-			CnfExp* argExp = (CnfExp*) arg->ptrAnnot(arg.isNeg());
+		if (narg->intAnnot[isNegEdge(arg)] == 1) {
+			CNFExpr* argExp = (CNFExpr*) narg->ptrAnnot[isNegEdge(arg)];
 			if (!isProxy(argExp)) {
 				if (largest == NULL) {
 					largest = argExp;
-					largestEdge = arg;
+					* largestEdge = arg;
 					continue;
 				} else if (argExp->litSize > largest->litSize) {
-					args.push(largestEdge);
+					args.push(* largestEdge);
 					largest = argExp;
-					largestEdge = arg;
+					* largestEdge = arg;
 					continue;
 				}
 			}
@@ -598,7 +600,7 @@ CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge, VectorEdge *
 	}
 	
 	if (largest != NULL) {
-		largestEdge->ptrAnnot(largestEdge.isNeg()) = NULL;
+		largestEdge->ptrAnnot(isNegEdge(*largestEdge)) = NULL;
 	}
 	
 	return largest;
@@ -607,8 +609,8 @@ CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge, VectorEdge *
 
 CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 	Edge largestEdge;
-	CnfExp* accum = fillArgs(e, false, largestEdge);
-	if (accum == NULL) accum = new CnfExp(true);
+	CNFExpr* accum = fillArgs(e, false, largestEdge);
+	if (accum == NULL) accum = allocCNFExprBool(true);
 	
 	int i = _args.size();
 	while (i != 0) {
@@ -616,14 +618,14 @@ CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 		if (arg.isVar()) {
 			accum->conjoin(atomLit(arg));
 		} else {
-			CnfExp* argExp = (CnfExp*) arg->ptrAnnot(arg.isNeg());
+			CNFExpr* argExp = (CNFExpr*) arg->ptrAnnot(isNegEdge(arg));
       
-			bool destroy = (--arg->intAnnot(arg.isNeg()) == 0);
+			bool destroy = (--arg->intAnnot(isNegEdge(arg)) == 0);
 			if (isProxy(argExp)) { // variable has been introduced
 				accum->conjoin(getProxy(argExp));
 			} else {
 				accum->conjoin(argExp, destroy);
-				if (destroy) arg->ptrAnnot(arg.isNeg()) = NULL;
+				if (destroy) arg->ptrAnnot(isNegEdge(arg)) = NULL;
 			}
 		}
 	}
@@ -637,7 +639,7 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 	Edge largestEdge;
 	CNFExpr* accum = fillArgs(e, true, largestEdge);
 	if (accum == NULL)
-		accum = new CNFExpr(false);
+		accum = allocCNFExprBool(false);
 	
 	// This is necessary to check to make sure that we don't start out
 	// with an accumulator that is "too large".
@@ -651,17 +653,18 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 	
 	// at this point, we will either have NULL, or a destructible expression
 	if (accum->clauseSize() > CLAUSE_MAX)
-		accum = new CNFExpr(introProxy(solver, largestEdge, accum, largestEdge.isNeg()));
+		accum = allocCNFExprLiteral(introProxy(cnf, largestEdge, accum, isNegEdge(largestEdge)));
 	
 	int i = _args.size();
 	while (i != 0) {
 		Edge arg(_args[--i]);
+		Node *narg=getNodePtrFromEdge(arg);
 		if (arg.isVar()) {
 			accum->disjoin(atomLit(arg));
 		} else {
-			CNFExpr* argExp = (CNFExpr*) arg->ptrAnnot(arg.isNeg());
+			CNFExpr* argExp = (CNFExpr*) narg->ptrAnnot[isNegEdge(arg)];
 			
-			bool destroy = (--arg->intAnnot(arg.isNeg()) == 0);
+			bool destroy = (--narg->intAnnot[isNegEdge(arg)] == 0);
 			if (isProxy(argExp)) { // variable has been introduced
 				accum->disjoin(getProxy(argExp));
 			} else if (argExp->litSize == 0) {
@@ -674,10 +677,10 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 				int eC = getClauseSizeCNF(argExp);  // clauses in argument
 				
 				if (eC > CLAUSE_MAX || (eL * aC + aL * eC > eL + aC + aL + aC)) {
-					accum->disjoin(introProxy(solver, arg, argExp, arg.isNeg()));
+					accum->disjoin(introProxy(cnf, arg, argExp, isNegEdge(arg)));
 				} else {
 					accum->disjoin(argExp, destroy);
-					if (destroy) arg->ptrAnnot(arg.isNeg()) = NULL;
+					if (destroy) narg->ptrAnnot[isNegEdge(arg)] = NULL;
 				}
 			}
 		}

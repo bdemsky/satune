@@ -11,7 +11,7 @@ struct LitVector {
 	uint capacity;
 	Literal *literals;
 };
-typedef CNFClause CNFClause;
+typedef struct LitVector LitVector;
 
 VectorDef(LitVector, LitVector *)
 
@@ -22,7 +22,19 @@ struct CNFExpr {
 	LitVector singletons;
 };
 
-typedef CNFExpr CNFExpr;
+typedef struct CNFExpr CNFExpr;
+
+LitVector * allocLitVector();
+void initLitVector(LitVector *This);
+void freeLitVector(LitVector *This);
+void deleteLitVector(LitVector *This);
+void addLiteralLitVector(LitVector *This, Literal l);
+
+CNFExpr * allocCNFExprBool(bool isTrue);
+CNFExpr * allocCNFExprLiteral(Literal l);
+void deleteCNFExpr(CNFExpr *This);
+
+
 
 bool alwaysTrueCNF(CNFExpr * This);
 bool alwaysFalseCNF(CNFExpr * This);

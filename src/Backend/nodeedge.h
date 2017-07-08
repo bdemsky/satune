@@ -8,6 +8,8 @@
 #define VAR_SHIFT 2
 #define EDGE_MASK (NEGATE_EDGE | EDGE_IS_VAR_CONSTANT)
 
+typedef int Literal;
+
 struct Edge;
 typedef struct Edge Edge;
 
@@ -30,6 +32,7 @@ typedef enum NodeType NodeType;
 
 struct NodeFlags {
 	NodeType type:2;
+	int varForced:1;
 	int wasExpanded:2;
 	int cnfVisitedDown:2;
 	int cnfVisitedUp:2;
@@ -181,8 +184,14 @@ void countPass(CNF *cnf);
 void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
 void convertPass(CNF *cnf, bool backtrackLit);
 void convertConstraint(CNF *cnf, VectorEdge *stack, Edge e, bool backtrackLit);
-void constrain(CNF * cnf, Literal l, CNFExpr *exp);
+void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp);
 void produceCNF(CNF * cnf, Edge e);
+CNFExpr * produceConjunction(CNF * cnf, Edge e);
+CNFExpr* produceDisjunction(CNF *cnf, Edge e);
+bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate);
+void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign);
+CNFExpr* fillArgs(Edge e, bool isNeg, Edge * largestEdge, VectorEdge * args);
+
 
 
 Edge E_True={(Node *)(uintptr_t) EDGE_IS_VAR_CONSTANT};
