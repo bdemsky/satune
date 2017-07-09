@@ -306,8 +306,8 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
 				n->intAnnot[polarity]++;
 			}
 		} else {
-			setExpanded(n, polarity); n->intAnnot[polarity]=1;
-			
+			setExpanded(n, polarity);
+
 			if (n->flags.type == NodeType_ITE||
 					n->flags.type == NodeType_IFF) {
 				n->intAnnot[polarity]=0;
@@ -336,6 +336,7 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
 					n2->ptrAnnot[1]=succ1.node_ptr;
 				} 
 			} else {
+				n->intAnnot[polarity]=1;
 				for (uint i=0;i<n->numEdges;i++) {
 					Edge succ=n->edges[i];
 					succ=constraintNegateIf(succ, polarity);
@@ -369,8 +370,10 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 			//trivally unsat
 			Edge newvar=constraintNewVar(cnf);
 			Literal var=getEdgeVar(newvar);
-			Literal clause[] = {var, -var};
-			addArrayClauseLiteral(cnf->solver, 2, clause);
+			Literal clause[] = {var};
+			addArrayClauseLiteral(cnf->solver, 1, clause);
+			clause[0]=-var;
+			addArrayClauseLiteral(cnf->solver, 1, clause);
 			return;
 		} else {
 			//trivially true
@@ -393,18 +396,20 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 		} else if (n->flags.type==NodeType_ITE ||
 							 n->flags.type==NodeType_IFF) {
 			popVectorEdge(stack);
-			pushVectorEdge(stack, (Edge) {(Node *)n->ptrAnnot[0]});
-			pushVectorEdge(stack, (Edge) {(Node *)n->ptrAnnot[1]});
+			if (n->ptrAnnot[0]!=NULL)
+				pushVectorEdge(stack, (Edge) {(Node *)n->ptrAnnot[0]});
+			if (n->ptrAnnot[1]!=NULL)
+				pushVectorEdge(stack, (Edge) {(Node *)n->ptrAnnot[1]});
 			continue;
 		}
 
 		bool needPos = (n->intAnnot[0] > 0);
 		bool needNeg = (n->intAnnot[1] > 0);
-		if ((!needPos || n->flags.cnfVisitedUp & 1) ||
+		if ((!needPos || n->flags.cnfVisitedUp & 1) &&
 				(!needNeg || n->flags.cnfVisitedUp & 2)) {
 			popVectorEdge(stack);
-		} else if ((needPos && !n->flags.cnfVisitedDown & 1) ||
-							 (needNeg && !n->flags.cnfVisitedDown & 2)) {
+		} else if ((needPos && !(n->flags.cnfVisitedDown & 1)) ||
+							 (needNeg && !(n->flags.cnfVisitedDown & 2))) {
 			if (needPos)
 				n->flags.cnfVisitedDown|=1;
 			if (needNeg)
@@ -421,15 +426,19 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 	}
 	CNFExpr * cnfExp = (CNFExpr *) nroot->ptrAnnot[isNegEdge(root)];
 	if (isProxy(cnfExp)) {
-		//solver.add(getProxy(cnfExp))
+		Literal l=getProxy(cnfExp);
+		Literal clause[] = {l};
+		addArrayClauseLiteral(cnf->solver, 1, clause);
 	} else if (backtrackLit) {
-		//solver.add(introProxy(solver, root, cnfExp, isNegEdge(root)));
+		Literal l=introProxy(cnf, root, cnfExp, isNegEdge(root));
+		Literal clause[] = {l};
+		addArrayClauseLiteral(cnf->solver, 1, clause);
 	} else {
-		//solver.add(*cnfExp);
+		outputCNF(cnf, cnfExp);
 	}
 
 	if (!((intptr_t) cnfExp & 1)) {
-		//free rootExp
+		deleteCNFExpr(cnfExp);
 		nroot->ptrAnnot[isNegEdge(root)] = NULL;
 	}
 }
@@ -472,7 +481,6 @@ Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg) {
 	return l;
 }
 
-//DONE
 void produceCNF(CNF * cnf, Edge e) {
 	CNFExpr* expPos = NULL;
 	CNFExpr* expNeg = NULL;

@@ -147,6 +147,10 @@ static inline bool edgeIsConst(Edge e) {
 	return (((uintptr_t) e.node_ptr) & ~((uintptr_t)NEGATE_EDGE)) == EDGE_IS_VAR_CONSTANT;
 }
 
+static inline bool edgeIsNull(Edge e) {
+	return e.node_ptr == NULL;
+}
+
 static inline bool edgeIsVarConst(Edge e) {
 	return ((uintptr_t)e.node_ptr) & EDGE_IS_VAR_CONSTANT;
 }
@@ -192,6 +196,8 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e);
 bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate);
 void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign);
 CNFExpr* fillArgs(CNF * cnf, Edge e, bool isNeg, Edge * largestEdge);
+Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg);
+void outputCNF(CNF *cnf, CNFExpr *expr);
 
 Edge E_True={(Node *)(uintptr_t) EDGE_IS_VAR_CONSTANT};
 Edge E_False={(Node *)(uintptr_t) (EDGE_IS_VAR_CONSTANT | NEGATE_EDGE)};
