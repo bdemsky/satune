@@ -17,6 +17,10 @@ void initLitVector(LitVector *This) {
 	This->literals=ourmalloc(This->capacity * sizeof(Literal));
 }
 
+void clearLitVector(LitVector *This) {
+	This->size=0;
+}
+
 void freeLitVector(LitVector *This) {
 	ourfree(This->literals);
 }
@@ -24,6 +28,10 @@ void freeLitVector(LitVector *This) {
 void deleteLitVector(LitVector *This) {
 	freeLitVector(This);
 	ourfree(This);
+}
+
+Literal getLiteralLitVector(LitVector *This, uint index) {
+	return This->literals[index];
 }
 
 void addLiteralLitVector(LitVector *This, Literal l) {
@@ -74,8 +82,79 @@ CNFExpr * allocCNFExprLiteral(Literal l) {
 	return This;
 }
 
+void clearCNFExpr(CNFExpr *This, bool isTrue) {
+	for(uint i=0;i<getSizeVectorLitVector(&This->clauses);i++) {
+		deleteLitVector(getVectorLitVector(&This->clauses, i));
+	}
+	clearVectorLitVector(&This->clauses);
+	clearLitVector(&This->singletons);
+	This->litSize=0;
+	This->isTrue=isTrue;
+}
+
 void deleteCNFExpr(CNFExpr *This) {
+	for(uint i=0;i<getSizeVectorLitVector(&This->clauses);i++) {
+		deleteLitVector(getVectorLitVector(&This->clauses, i));
+	}
 	deleteVectorArrayLitVector(&This->clauses);
 	freeLitVector(&This->singletons);
 	ourfree(This);
+}
+
+void conjoinCNFLit(CNFExpr *This, Literal l) {
+	if (This->litSize==0 && !This->isTrue) //Handle False
+		return;
+	
+	This->litSize-=getSizeLitVector(&This->singletons);
+	addLiteralLitVector(&This->singletons, l);
+	uint newsize=getSizeLitVector(&This->singletons);
+	if (newsize==0)
+		clearCNF(This, false); //We found a conflict
+	else
+		This->litSize+=getSizeLitVector(&This->singletons);
+}
+
+void disjoinCNFLit(CNFExpr *This, Literal l) {
+	if (This->litSize==0) {
+		if (!This->isTrue) {
+			This->litSize++;
+			addLiteralLitVector(&This->singletons, l);
+		}
+		return;
+	}
+	uint litSize=0;
+	uint newindex=0;
+	for(uint i=0;i<getSizeVectorLitVector(&This->clauses);i++) {
+		LitVector * lv=getVectorLitVector(&This->clauses, i);
+		addLiteralLitVector(lv, l);
+		uint newSize=getSizeLitVector(lv);
+		if (newSize!=0) {
+			setVectorLitVector(&This->clauses, newindex++, lv);
+		} else {
+			deleteLitVector(lv);
+		}
+		litSize+=newSize;
+	}
+	setSizeVectorLitVector(&This->clauses, newindex);
+
+	bool hasSameSingleton=false;
+	for(uint i=0;i<getSizeLitVector(&This->singletons);i++) {
+		Literal lsing=getLiteralLitVector(&This->singletons, i);
+		if (lsing == l) {
+			hasSameSingleton=true;
+		} else if (lsing != -l) {
+			//Create new LitVector with both l and lsing
+			LitVector *newlitvec=allocLitVector();
+			addLiteralLitVector(newlitvec, l);
+			addLiteralLitVector(newlitvec, lsing);
+			litSize+=2;
+			pushVectorLitVector(&This->clauses, newlitvec);
+		}
+	}
+	clearLitVector(&This->singletons);
+	if (hasSameSingleton) {
+		addLiteralLitVector(&This->singletons, l);
+		litSize++;
+	}
+	This->litSize=litSize;
 }

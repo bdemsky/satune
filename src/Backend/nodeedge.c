@@ -434,7 +434,7 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 	}
 }
 
-//DONE
+
 Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg) {
 	Literal l = 0;
 	Node * n = getNodePtrFromEdge(e);
@@ -507,8 +507,6 @@ void produceCNF(CNF * cnf, Edge e) {
 	}
 }
 
-
-//DONE
 bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
 	if (src != NULL && !isProxy(src) && getLitSizeCNF(src) == 0) {
 		if (dest == NULL) {
@@ -525,7 +523,7 @@ bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
 			
 			dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		} else {
-			clearCNF(dest, negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+			clearCNFExpr(dest, negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		}
 		return true;
 	}
@@ -538,10 +536,10 @@ void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign) {
 	if (exp == NULL || isProxy(exp)) return;
   
 	if (exp->litSize == 1) {
-		Literal l = exp->singletons()[0];
+		Literal l = getLiteralLitVector(&exp->singletons, 0);
 		deleteCNFExpr(exp);
 		n->ptrAnnot[sign] = (void*) ((intptr_t) (l << 1) | 1);
-	} else if (exp->litSize != 0 && (n->intAnnot[sign] > 1 || n->isVarForced())) {
+	} else if (exp->litSize != 0 && (n->intAnnot[sign] > 1 || n->flags.varForced)) {
 		introProxy(cnf, e, exp, sign);
 	} else {
 		n->ptrAnnot[sign] = exp;
@@ -567,14 +565,15 @@ void outputCNF(CNF *cnf, CNFExpr *exp) {
 CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {
 	clearVectorEdge(&cnf->args);
 
-	*largestEdge = (void*) NULL;
+	*largestEdge = (Edge) {(Node*) NULL};
 	CNFExpr* largest = NULL;
-	int i = e->size();
+	Node *n=getNodePtrFromEdge(e);
+	int i = n->numEdges;
 	while (i != 0) {
-		Edge arg = (*e)[--i]; arg.negateIf(isNeg);
+		Edge arg = n->edges[--i]; arg=constraintNegateIf(arg, isNeg);
 		Node * narg = getNodePtrFromEdge(arg);
 		
-		if (arg.isVar()) {
+		if (edgeIsVarConst(arg)) {
 			pushVectorEdge(&cnf->args, arg);
 			continue;
 		}
@@ -602,7 +601,8 @@ CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {
 	}
 	
 	if (largest != NULL) {
-		largestEdge->ptrAnnot(isNegEdge(*largestEdge)) = NULL;
+		Node *nlargestEdge=getNodePtrFromEdge(*largestEdge);
+		nlargestEdge->ptrAnnot[isNegEdge(*largestEdge)] = NULL;
 	}
 	
 	return largest;
@@ -618,17 +618,18 @@ CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 	int i = getSizeVectorEdge(&cnf->args);
 	while (i != 0) {
 		Edge arg = getVectorEdge(&cnf->args, --i);
-		if (arg.isVar()) {
-			accum->conjoin(atomLit(arg));
+		if (edgeIsVarConst(arg)) {
+			conjoinCNFLit(accum, getEdgeVar(arg));
 		} else {
-			CNFExpr* argExp = (CNFExpr*) arg->ptrAnnot(isNegEdge(arg));
+			Node *narg=getNodePtrFromEdge(arg);
+			CNFExpr* argExp = (CNFExpr*) narg->ptrAnnot[isNegEdge(arg)];
       
-			bool destroy = (--arg->intAnnot(isNegEdge(arg)) == 0);
+			bool destroy = (--narg->intAnnot[isNegEdge(arg)] == 0);
 			if (isProxy(argExp)) { // variable has been introduced
-				accum->conjoin(getProxy(argExp));
+				conjoinCNFLit(accum, getProxy(argExp));
 			} else {
-				accum->conjoin(argExp, destroy);
-				if (destroy) arg->ptrAnnot(isNegEdge(arg)) = NULL;
+				conjoinCNFExpr(accum, argExp, destroy);
+				if (destroy) narg->ptrAnnot[isNegEdge(arg)] = NULL;
 			}
 		}
 	}
@@ -655,23 +656,23 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 	/// be possible to use the correct proxy.  That should be fixed.
 	
 	// at this point, we will either have NULL, or a destructible expression
-	if (accum->clauseSize() > CLAUSE_MAX)
+	if (getClauseSizeCNF(accum) > CLAUSE_MAX)
 		accum = allocCNFExprLiteral(introProxy(cnf, largestEdge, accum, isNegEdge(largestEdge)));
 	
 	int i = getSizeVectorEdge(&cnf->args);
 	while (i != 0) {
 		Edge arg=getVectorEdge(&cnf->args, --i);
 		Node *narg=getNodePtrFromEdge(arg);
-		if (arg.isVar()) {
-			accum->disjoin(atomLit(arg));
+		if (edgeIsVarConst(arg)) {
+			disjoinCNFLit(accum, getEdgeVar(arg));
 		} else {
 			CNFExpr* argExp = (CNFExpr*) narg->ptrAnnot[isNegEdge(arg)];
 			
 			bool destroy = (--narg->intAnnot[isNegEdge(arg)] == 0);
 			if (isProxy(argExp)) { // variable has been introduced
-				accum->disjoin(getProxy(argExp));
+				disjoinCNFLit(accum, getProxy(argExp));
 			} else if (argExp->litSize == 0) {
-				accum->disjoin(argExp, destroy);
+				disjoinCNFExpr(accum, argExp, destroy);
 			} else {
 				// check to see if we should introduce a proxy
 				int aL = accum->litSize;      // lits in accum
@@ -680,9 +681,9 @@ CNFExpr* produceDisjunction(CNF *cnf, Edge e) {
 				int eC = getClauseSizeCNF(argExp);  // clauses in argument
 				
 				if (eC > CLAUSE_MAX || (eL * aC + aL * eC > eL + aC + aL + aC)) {
-					accum->disjoin(introProxy(cnf, arg, argExp, isNegEdge(arg)));
+					disjoinCNFLit(accum, introProxy(cnf, arg, argExp, isNegEdge(arg)));
 				} else {
-					accum->disjoin(argExp, destroy);
+					disjoinCNFExpr(accum, argExp, destroy);
 					if (destroy) narg->ptrAnnot[isNegEdge(arg)] = NULL;
 				}
 			}

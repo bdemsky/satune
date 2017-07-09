@@ -18,6 +18,7 @@
 	type getVector ## name(Vector ## name *vector, uint index);						\
 	void setVector ## name(Vector ## name *vector, uint index, type item); \
 	uint getSizeVector ## name(Vector ## name *vector);                   \
+	void setSizeVector ## name(Vector ## name *vector, uint size);				\
 	void deleteVector ## name(Vector ## name *vector);                    \
 	void clearVector ## name(Vector ## name *vector);                     \
 	void deleteVectorArray ## name(Vector ## name *vector);								\
@@ -48,6 +49,17 @@
 	}																																			\
 	type lastVector ## name(Vector ## name *vector) {											\
 		return vector->array[vector->size];																	\
+	}																																			\
+	void setSizeVector ## name(Vector ## name *vector, uint size) {				\
+		if (size <= vector->size) {																					\
+			vector->size=size;																								\
+			return;																														\
+		} else if (size > vector->capacity) {																\
+			vector->array=(type *)ourrealloc(vector->array, size);						\
+			vector->capacity=size;																						\
+		}																																		\
+		bzero(&vector->array[vector->size], (size-vector->size)*sizeof(type)); \
+		vector->size=size;																									\
 	}																																			\
 	void pushVector ## name(Vector ## name *vector, type item) {					\
 		if (vector->size >= vector->capacity) {                             \

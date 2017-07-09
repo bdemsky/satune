@@ -193,8 +193,6 @@ bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate);
 void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign);
 CNFExpr* fillArgs(CNF * cnf, Edge e, bool isNeg, Edge * largestEdge);
 
-
-
 Edge E_True={(Node *)(uintptr_t) EDGE_IS_VAR_CONSTANT};
 Edge E_False={(Node *)(uintptr_t) (EDGE_IS_VAR_CONSTANT | NEGATE_EDGE)};
 #endif
