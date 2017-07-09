@@ -17,6 +17,15 @@ void initLitVector(LitVector *This) {
 	This->literals=ourmalloc(This->capacity * sizeof(Literal));
 }
 
+LitVector *cloneLitVector(LitVector *orig) {
+	LitVector *This=ourmalloc(sizeof(LitVector));
+	This->size=orig->size;
+	This->capacity=orig->capacity;
+	This->literals=ourmalloc(This->capacity * sizeof(Literal));
+	memcpy(This->literals, orig->literals, sizeof(Literal) * This->size);
+	return This;
+}
+
 void clearLitVector(LitVector *This) {
 	This->size=0;
 }
@@ -114,6 +123,81 @@ void conjoinCNFLit(CNFExpr *This, Literal l) {
 		This->litSize+=getSizeLitVector(&This->singletons);
 }
 
+void copyCNF(CNFExpr *This, CNFExpr *expr, bool destroy) {
+	if (destroy) {
+		ourfree(This->singletons.literals);
+		ourfree(This->clauses.array);
+		This->litSize=expr->litSize;
+		This->singletons.literals=expr->singletons.literals;
+		This->singletons.capacity=expr->singletons.capacity;
+		This->clauses.size=expr->clauses.size;
+		This->clauses.array=expr->clauses.array;
+		This->clauses.capacity=expr->clauses.capacity;
+		ourfree(expr);
+	} else {
+		for(uint i=0;i<getSizeLitVector(&expr->singletons);i++) {
+			Literal l=getLiteralLitVector(&expr->singletons,i);
+			addLiteralLitVector(&This->singletons, l);
+		}
+		for(uint i=0;i<getSizeVectorLitVector(&expr->clauses);i++) {
+			LitVector *lv=getVectorLitVector(&expr->clauses,i);
+			pushVectorLitVector(&This->clauses, cloneLitVector(lv));
+		}
+		This->litSize=expr->litSize;
+	}
+}
+
+void conjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
+	if (expr->litSize==0) {
+		if (!This->isTrue) {
+			clearCNF(This, false);
+		}
+		if (destroy) {
+			deleteCNFExpr(expr);
+		}
+		return;
+	}
+	if (This->litSize==0) {
+		if (This->isTrue) {
+			copyCNF(This, expr, destroy);
+		} else if (destroy) {
+			deleteCNFExpr(expr);
+		}
+		return;
+	}
+	uint litSize=This->litSize;
+	litSize-=getSizeLitVector(&expr->singletons);
+	for(uint i=0;i<getSizeLitVector(&expr->singletons);i++) {
+		Literal l=getLiteralLitVector(&expr->singletons,i);
+		addLiteralLitVector(&This->singletons, l);
+		if (getSizeLitVector(&This->singletons)==0) {
+			//Found conflict...
+			clearCNF(This, false);
+			if (destroy) {
+				deleteCNFExpr(expr);
+			}
+			return;
+		}
+	}
+	litSize+=getSizeLitVector(&expr->singletons);
+	if (destroy) {
+		for(uint i=0;i<getSizeVectorLitVector(&expr->clauses);i++) {
+			LitVector *lv=getVectorLitVector(&expr->clauses,i);
+			litSize+=getSizeLitVector(lv);
+			pushVectorLitVector(&This->clauses, lv);
+		}
+		clearVectorLitVector(&expr->clauses);
+		deleteCNFExpr(expr);
+	} else {
+		for(uint i=0;i<getSizeVectorLitVector(&expr->clauses);i++) {
+			LitVector *lv=getVectorLitVector(&expr->clauses,i);
+			litSize+=getSizeLitVector(lv);
+			pushVectorLitVector(&This->clauses, cloneLitVector(lv));
+		}
+	}
+	This->litSize=litSize;
+}
+
 void disjoinCNFLit(CNFExpr *This, Literal l) {
 	if (This->litSize==0) {
 		if (!This->isTrue) {
@@ -122,6 +206,7 @@ void disjoinCNFLit(CNFExpr *This, Literal l) {
 		}
 		return;
 	}
+
 	uint litSize=0;
 	uint newindex=0;
 	for(uint i=0;i<getSizeVectorLitVector(&This->clauses);i++) {
@@ -155,6 +240,15 @@ void disjoinCNFLit(CNFExpr *This, Literal l) {
 	if (hasSameSingleton) {
 		addLiteralLitVector(&This->singletons, l);
 		litSize++;
+	} else if (litSize==0) {
+		This->isTrue=true;//we are true
 	}
 	This->litSize=litSize;
 }
+
+void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
+
+}
+
+
+
