@@ -369,16 +369,16 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 			//trivally unsat
 			Edge newvar=constraintNewVar(cnf);
 			Literal var=getEdgeVar(newvar);
-			Literal clause[] = {var, -var, 0};
-			addArrayClauseLiteral(cnf->solver, 3, clause);
+			Literal clause[] = {var, -var};
+			addArrayClauseLiteral(cnf->solver, 2, clause);
 			return;
 		} else {
 			//trivially true
 			return;
 		}
 	} else if (edgeIsVarConst(root)) {
-		Literal clause[] = { getEdgeVar(root), 0};
-		addArrayClauseLiteral(cnf->solver, 2, clause);
+		Literal clause[] = { getEdgeVar(root)};
+		addArrayClauseLiteral(cnf->solver, 1, clause);
 		return;
 	}
 	
@@ -514,11 +514,11 @@ bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
 		} else if (isProxy(dest)) {
 			bool alwaysTrue = (negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 			if (alwaysTrue) {
-				Literal clause[] = {getProxy(dest), 0};
-				addArrayClauseLiteral(cnf->solver, 2, clause);
+				Literal clause[] = {getProxy(dest)};
+				addArrayClauseLiteral(cnf->solver, 1, clause);
 			} else {
-				Literal clause[] = {-getProxy(dest), 0};
-				addArrayClauseLiteral(cnf->solver, 2, clause);
+				Literal clause[] = {-getProxy(dest)};
+				addArrayClauseLiteral(cnf->solver, 1, clause);
 			}
 			
 			dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
@@ -546,20 +546,37 @@ void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign) {
 	}
 }
 
-void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp) {
-	if (alwaysTrueCNF(exp)) {
+void constrainCNF(CNF * cnf, Literal lcond, CNFExpr *expr) {
+	if (alwaysTrueCNF(expr)) {
 		return;
-	} else if (alwaysFalseCNF(exp)) {
-		Literal clause[] = {-l, 0};
-		addArrayClauseLiteral(cnf->solver, 2, clause);
+	} else if (alwaysFalseCNF(expr)) {
+		Literal clause[] = {-lcond};
+		addArrayClauseLiteral(cnf->solver, 1, clause);
 		return;
 	}
-	//FIXME
 	
+	for(uint i=0;i<getSizeLitVector(&expr->singletons);i++) {
+		Literal l=getLiteralLitVector(&expr->singletons,i);
+		Literal clause[] = {-lcond, l};
+		addArrayClauseLiteral(cnf->solver, 1, clause);
+	}
+	for(uint i=0;i<getSizeVectorLitVector(&expr->clauses);i++) {
+		LitVector *lv=getVectorLitVector(&expr->clauses,i);
+		addClauseLiteral(cnf->solver, -lcond); //Add first literal
+		addArrayClauseLiteral(cnf->solver, getSizeLitVector(lv), lv->literals); //Add rest
+	}
 }
 
-void outputCNF(CNF *cnf, CNFExpr *exp) {
-	
+void outputCNF(CNF *cnf, CNFExpr *expr) {
+	for(uint i=0;i<getSizeLitVector(&expr->singletons);i++) {
+		Literal l=getLiteralLitVector(&expr->singletons,i);
+		Literal clause[] = {l};
+		addArrayClauseLiteral(cnf->solver, 1, clause);
+	}
+	for(uint i=0;i<getSizeVectorLitVector(&expr->clauses);i++) {
+		LitVector *lv=getVectorLitVector(&expr->clauses,i);
+		addArrayClauseLiteral(cnf->solver, getSizeLitVector(lv), lv->literals);
+	}
 }
 
 CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {

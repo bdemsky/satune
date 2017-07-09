@@ -49,6 +49,10 @@ void addArrayClauseLiteral(IncrementalSolver * This, uint numliterals, int * lit
 			flushBufferSolver(This);
 		}
 	}
+	This->buffer[This->offset++]=0;
+	if (This->offset==IS_BUFFERSIZE) {
+		flushBufferSolver(This);
+	}
 }
 
 void finishedClauses(IncrementalSolver * This) {
