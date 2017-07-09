@@ -32,8 +32,12 @@ LitVector *cloneLitVector(LitVector *orig);
 void deleteLitVector(LitVector *This);
 void addLiteralLitVector(LitVector *This, Literal l);
 Literal getLiteralLitVector(LitVector *This, uint index);
+void setLiteralLitVector(LitVector *This, uint index, Literal l);
+LitVector * mergeLitVectorLiteral(LitVector *This, Literal l);
+LitVector * mergeLitVectors(LitVector *This, LitVector *expr);
 
 static inline uint getSizeLitVector(LitVector *This) {return This->size;}
+static inline void setSizeLitVector(LitVector *This, uint size) {This->size=size;}
 
 CNFExpr * allocCNFExprBool(bool isTrue);
 CNFExpr * allocCNFExprLiteral(Literal l);

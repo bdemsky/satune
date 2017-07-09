@@ -43,6 +43,10 @@ Literal getLiteralLitVector(LitVector *This, uint index) {
 	return This->literals[index];
 }
 
+void setLiteralLitVector(LitVector *This, uint index, Literal l) {
+	This->literals[index]=l;
+}
+
 void addLiteralLitVector(LitVector *This, Literal l) {
 	Literal labs = abs(l);
 	uint vec_size=This->size;
@@ -246,27 +250,162 @@ void disjoinCNFLit(CNFExpr *This, Literal l) {
 	This->litSize=litSize;
 }
 
+#define MERGETHRESHOLD 2
+LitVector * mergeLitVectors(LitVector *This, LitVector *expr) {
+	uint maxsize=This->size+expr->size+MERGETHRESHOLD;
+	LitVector *merged=ourmalloc(sizeof(LitVector));
+	merged->literals=ourmalloc(sizeof(Literal)*maxsize);
+	merged->capacity=maxsize;
+	uint thisSize=boundedSize(This->size);
+	uint exprSize=boundedSize(expr->size);
+	uint iThis=0, iExpr=0, iMerge=0;
+	Literal lThis=This->literals[iThis];
+	Literal lExpr=expr->literals[iExpr];
+	Literal thisAbs=abs(lThis);
+	Literal exprAbs=abs(lExpr);
+
+	while(iThis<thisSize && iExpr<exprSize) {
+		if (thisAbs<exprAbs) {
+			merged->literals[iMerge++]=lThis;
+			lThis=This->literals[++iThis];
+			thisAbs=abs(lThis);
+		} else if(thisAbs>exprAbs) {
+			merged->literals[iMerge++]=lExpr;
+			lExpr=expr->literals[++iExpr];
+			exprAbs=abs(lExpr);
+		} else if(lThis==lExpr) {
+			merged->literals[iMerge++]=lExpr;
+			lExpr=expr->literals[++iExpr];
+			exprAbs=abs(lExpr);
+			lThis=This->literals[++iThis];
+			thisAbs=abs(lThis);
+		} else if(lThis==-lExpr) {
+			merged->size=0;
+			return merged;
+		}
+	}
+	if (iThis < thisSize) {
+		memcpy(&merged->literals[iMerge], &This->literals[iThis], (thisSize-iThis) * sizeof(Literal));
+		iMerge += (thisSize-iThis);
+	}
+	if (iExpr < exprSize) {
+		memcpy(&merged->literals[iMerge], &expr->literals[iExpr], (exprSize-iExpr) * sizeof(Literal));
+		iMerge += (exprSize-iExpr);
+	}
+	merged->size=iMerge;
+	return merged;
+}
+
+LitVector * mergeLitVectorLiteral(LitVector *This, Literal l) {
+	LitVector *copy=cloneLitVector(This);
+	addLiteralLitVector(copy, l);
+	return copy;
+}
+
 void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
+	/** Handle the special cases */
 	if (expr->litSize == 0) {
 		if (expr->isTrue) {
 			clearCNF(This, true);
 		}
-		if (destroy)
+		if (destroy) {
 			deleteCNFExpr(expr);
+		}
 		return;
-	}
-	if (This->litSize == 0) {
+	} else if (This->litSize == 0) {
 		if (!This->isTrue) {
 			copyCNF(This, expr, destroy);
 		} else if (destroy) {
 			deleteCNFExpr(expr);
 		}
 		return;
+	} else if (expr->litSize == 1) {
+		disjoinCNFLit(This, getLiteralLitVector(&expr->singletons,0));
+		if (destroy) {
+			deleteCNFExpr(expr);
+		}
+		return;
+	} else if (destroy && This->litSize == 1) {
+		Literal l=getLiteralLitVector(&This->singletons,0);
+		copyCNF(This, expr, true);
+		disjoinCNFLit(This, l);
+		return;
 	}
-	//Do big cross product computation
-	//FIXME
 	
+	/** Handle the full cross product */
+	uint mergeIndex=0;
+	uint newCapacity=getClauseSizeCNF(This)*getClauseSizeCNF(expr);
+	LitVector ** mergeArray=ourmalloc(newCapacity*sizeof(LitVector*));
+	uint singleIndex=0;
+	/** First do the singleton, clause pairs */
+	for(uint i=0;i<getSizeLitVector(&This->singletons);i++) {
+		Literal lThis=getLiteralLitVector(&This->singletons, i);
+		for(uint j=0;j<getSizeVectorLitVector(&expr->clauses);j++) {
+			LitVector * lExpr=getVectorLitVector(&expr->clauses, j);
+			LitVector * copy=cloneLitVector(lExpr);
+			addLiteralLitVector(copy, lThis);
+			if (getSizeLitVector(copy)==0) {
+				deleteLitVector(copy);
+			} else {
+				mergeArray[mergeIndex++]=copy;
+			}
+		}
+	}
+
+	/** Next do the clause, singleton pairs */
+	for(uint i=0;i<getSizeLitVector(&expr->singletons);i++) {
+		Literal lExpr=getLiteralLitVector(&expr->singletons, i);
+		for(uint j=0;j<getSizeVectorLitVector(&This->clauses);j++) {
+			LitVector * lThis=getVectorLitVector(&This->clauses, j);
+			LitVector * copy=cloneLitVector(lThis);
+			addLiteralLitVector(copy, lExpr);
+			if (getSizeLitVector(copy)==0) {
+				deleteLitVector(copy);
+			} else {
+				mergeArray[mergeIndex++]=copy;
+			}
+		}
+	}
+
+	/** Next do the clause, clause pairs */
+	for(uint i=0;i<getSizeVectorLitVector(&This->clauses);i++) {
+		LitVector * lThis=getVectorLitVector(&This->clauses, i);
+		for(uint j=0;j<getSizeVectorLitVector(&expr->clauses);j++) {
+			LitVector * lExpr=getVectorLitVector(&expr->clauses, j);
+			LitVector * merge=mergeLitVectors(lThis, lExpr);
+			if (getSizeLitVector(merge)==0) {
+				deleteLitVector(merge);
+			} else {
+				mergeArray[mergeIndex++]=merge;
+			}
+		}
+		deleteLitVector(lThis);//Done with this litVector
+	}
 	
+	/** Finally do the singleton, singleton pairs */
+	for(uint i=0;i<getSizeLitVector(&This->singletons);i++) {
+		Literal lThis=getLiteralLitVector(&This->singletons, i);
+			for(uint j=0;j<getSizeLitVector(&expr->singletons);j++) {
+				Literal lExpr=getLiteralLitVector(&expr->singletons, j);
+				if (lThis==lExpr) {
+					//We have a singleton still in the final result
+					setLiteralLitVector(&This->singletons, singleIndex++, lThis);
+				} else if (lThis!=-lExpr) {
+					LitVector *mergeLV=allocLitVector();
+					addLiteralLitVector(mergeLV, lThis);
+					addLiteralLitVector(mergeLV, lExpr);
+					mergeArray[mergeIndex++]=mergeLV;
+				}
+			}
+	}
+	
+	ourfree(This->clauses.array);
+	setSizeLitVector(&This->singletons, singleIndex);
+	This->clauses.capacity=newCapacity;
+	This->clauses.array=mergeArray;
+	This->clauses.size=mergeIndex;
+	if (destroy)
+		deleteCNFExpr(expr);
 }
 
 
