@@ -20,6 +20,22 @@ Function* allocFunctionTable (Table* table){
 	return &This->base;
 }
 
+uint64_t applyFunctionOperator(FunctionOperator* func, uint64_t var1, uint64_t var2, bool* isInRange){
+	uint64_t result = 0;
+	switch( func->op){
+		case ADD:
+			result = var1+ var2;
+			break;
+		case SUB:
+			result = var1 - var2;
+			break;
+		default:
+			ASSERT(0);
+	}
+	*isInRange = existsInSet(func->range, result);
+	return result;
+}
+
 void deleteFunction(Function* This){
 	switch(GETFUNCTIONTYPE(This)){
 	case TABLEFUNC:

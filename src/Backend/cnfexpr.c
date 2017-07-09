@@ -247,7 +247,26 @@ void disjoinCNFLit(CNFExpr *This, Literal l) {
 }
 
 void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
-
+	if (expr->litSize == 0) {
+		if (expr->isTrue) {
+			clearCNF(This, true);
+		}
+		if (destroy)
+			deleteCNFExpr(expr);
+		return;
+	}
+	if (This->litSize == 0) {
+		if (!This->isTrue) {
+			copyCNF(This, expr, destroy);
+		} else if (destroy) {
+			deleteCNFExpr(expr);
+		}
+		return;
+	}
+	//Do big cross product computation
+	//FIXME
+	
+	
 }
 
 

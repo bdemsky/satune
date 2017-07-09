@@ -26,6 +26,7 @@ struct FunctionTable {
 
 Function* allocFunctionOperator( ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior);
 Function* allocFunctionTable (Table* table);
+uint64_t applyFunctionOperator(FunctionOperator* func, uint64_t var1, uint64_t var2, bool* isInrange);
 void deleteFunction(Function* This);
 
 #endif

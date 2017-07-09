@@ -113,5 +113,5 @@ Order * createOrder(CSolver *, OrderType type, Set * set);
 Boolean * orderConstraint(CSolver *, Order * order, uint64_t first, uint64_t second);
 
 /** When everything is done, the client calls this function and then csolver starts to encode*/
-void encode(CSolver*);
+void startEncoding(CSolver*);
 #endif

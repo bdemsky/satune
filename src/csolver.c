@@ -171,10 +171,10 @@ Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64
 	return constraint;
 }
 
-void encode(CSolver* solver){
+void startEncoding(CSolver* solver){
 	naiveEncodingDecision(solver);
 	SATEncoder* satEncoder = allocSATEncoder();
-	initializeConstraintVars(solver, satEncoder);
+//	initializeConstraintVars(solver, satEncoder);
 	encodeAllSATEncoder(solver, satEncoder);
 	//For now, let's just delete it, and in future for doing queries 
 	//we may need it.

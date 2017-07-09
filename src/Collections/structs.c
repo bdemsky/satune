@@ -22,11 +22,11 @@ inline bool Ptr_equals(void * key1, void * key2) {
 	return key1 == key2;
 }
 
-inline unsigned int order_pair_hash_Function(OrderPair* This){
+static inline unsigned int order_pair_hash_Function(OrderPair* This){
 	return (uint) (This->first << 2) ^ This->second;
 }
 
-inline unsigned int order_pair_equals(OrderPair* key1, OrderPair* key2){
+static inline unsigned int order_pair_equals(OrderPair* key1, OrderPair* key2){
 	return key1->first== key2->first && key1->second == key2->second;
 }
 

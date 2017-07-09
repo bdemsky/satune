@@ -10,13 +10,12 @@ struct SATEncoder {
 
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
-void initializeConstraintVars(CSolver* csolver, SATEncoder* This);
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This);
 Constraint * getNewVarSATEncoder(SATEncoder *This);
 void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Constraint **carray);
 Constraint * encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);
 Constraint * encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);
-void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order);
+Constraint * createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order);
 Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair);
 Constraint * generateTransOrderConstraintSATEncoder(SATEncoder *This, Constraint *constIJ,Constraint *constJK,Constraint *constIK);
 Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);
@@ -30,7 +29,7 @@ Constraint * encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredica
 Constraint * encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
 
 Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value);
-Constraint * getElementValueConstraint(Element* This, uint64_t value);
+Constraint * getElementValueConstraint(SATEncoder* encoder, Element* This, uint64_t value);
 
 Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This);
 Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
