@@ -245,7 +245,7 @@ Edge constraintIMPLIES(CNF * cnf, Edge left, Edge right) {
 }
 
 Edge constraintIFF(CNF * cnf, Edge left, Edge right) {
-	bool negate=sameSignEdge(left, right);
+	bool negate=!sameSignEdge(left, right);
 	Edge lpos=getNonNeg(left);
 	Edge rpos=getNonNeg(right);
 
@@ -314,13 +314,19 @@ Edge constraintNewVar(CNF *cnf) {
 	return e;
 }
 
-void solveCNF(CNF *cnf) {
+int solveCNF(CNF *cnf) {
 	countPass(cnf);
 	convertPass(cnf, false);
 	finishedClauses(cnf->solver);
-	solve(cnf->solver);
+	return solve(cnf->solver);
 }
 
+bool getValueCNF(CNF *cnf, Edge var) {
+	Literal l=getEdgeVar(var);
+	bool isneg=(l<0);
+	l=abs(l);
+	return isneg ^ getValueSolver(cnf->solver, l);
+}
 
 void countPass(CNF *cnf) {
 	uint numConstraints=getSizeVectorEdge(&cnf->constraints);
@@ -681,6 +687,43 @@ CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {
 	return largest;
 }
 
+void printCNF(Edge e) {
+	if (edgeIsVarConst(e)) {
+		Literal l=getEdgeVar(e);
+		printf ("%d", l);
+		return;
+	}
+	bool isNeg=isNegEdge(e);
+	if (edgeIsConst(e)) {
+		if (isNeg)
+			printf("T");
+		else
+			printf("F");
+		return;
+	}
+	Node *n=getNodePtrFromEdge(e);
+	if (isNeg)
+		printf("!");
+	switch(getNodeType(e)) {
+	case NodeType_AND:
+		printf("and");
+		break;
+	case NodeType_ITE:
+		printf("ite");
+		break;
+	case NodeType_IFF:
+		printf("iff");
+		break;
+	}
+	printf("(");
+	for(uint i=0;i<n->numEdges;i++) {
+		Edge e=n->edges[i];
+		if (i!=0)
+			printf(" ");
+		printCNF(e);
+	}
+	printf(")");
+}
 
 CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 	Edge largestEdge;

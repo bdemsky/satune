@@ -35,7 +35,7 @@
 		Vector ## name * tmp = (Vector ## name *)ourmalloc(sizeof(Vector ## name));  \
 		tmp->size = 0;                                                      \
 		tmp->capacity = capacity;                                           \
-		tmp->array = (type *) ourcalloc(1, sizeof(type) * capacity);          \
+		tmp->array = (type *) ourmalloc(sizeof(type) * capacity);						\
 		return tmp;                                                         \
 	}                                                                     \
 	Vector ## name * allocVectorArray ## name(uint capacity, type * array)  { \
@@ -65,6 +65,7 @@
 		if (vector->size >= vector->capacity) {															\
 			uint newcap=vector->capacity << 1;																\
 			vector->array=(type *)ourrealloc(vector->array, newcap * sizeof(type)); \
+			vector->capacity=newcap;																					\
 		}                                                                   \
 		vector->array[vector->size++] = item;                               \
 	}                                                                     \
@@ -93,7 +94,7 @@
 	void allocInlineVector ## name(Vector ## name * vector, uint capacity) { \
 		vector->size = 0;                                                      \
 		vector->capacity = capacity;																							\
-		vector->array = (type *) ourcalloc(1, sizeof(type) * capacity);			\
+		vector->array = (type *) ourmalloc(sizeof(type) * capacity);				\
 	}																																			\
 	void allocInlineDefVector ## name(Vector ## name * vector) {					\
 		allocInlineVector ## name(vector, defcap);													\
