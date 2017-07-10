@@ -38,6 +38,6 @@ int main(int numargs, char ** argv) {
 	Element* inputs2 [] = {e4, e3};
 	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2);
 	addBoolean(solver, pred);
-	startEncoding(solver);
+//	startEncoding(solver);
 	deleteSolver(solver);
 }

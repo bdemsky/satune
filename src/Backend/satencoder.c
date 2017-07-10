@@ -16,10 +16,12 @@
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
 	This->varcount=1;
+	This->satSolver = allocIncrementalSolver();
 	return This;
 }
 
 void deleteSATEncoder(SATEncoder *This) {
+	deleteIncrementalSolver(This->satSolver);
 	ourfree(This);
 }
 
@@ -27,6 +29,7 @@ Constraint * getElementValueConstraint(SATEncoder* encoder,Element* This, uint64
 	generateElementEncodingVariables(encoder, getElementEncoding(This));
 	switch(getElementEncoding(This)->type){
 		case ONEHOT:
+			//FIXME
 			ASSERT(0);
 			break;
 		case UNARY:
@@ -60,14 +63,30 @@ Constraint * getElementValueBinaryIndexConstraint(Element* This, uint64_t value)
 	return NULL;
 }
 
+void addConstraintToSATSolver(Constraint *c, IncrementalSolver* satSolver) {
+	VectorConstraint* simplified = simplifyConstraint(c);
+	uint size = getSizeVectorConstraint(simplified);
+	for(uint i=0; i<size; i++) {
+		Constraint *simp=getVectorConstraint(simplified, i);
+		if (simp->type==TRUE)
+			continue;
+		ASSERT(simp->type!=FALSE);
+		dumpConstraint(simp, satSolver);
+	}
+	deleteVectorConstraint(simplified);
+}
+
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 	VectorBoolean *constraints=csolver->constraints;
 	uint size=getSizeVectorBoolean(constraints);
 	for(uint i=0;i<size;i++) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		Constraint* c= encodeConstraintSATEncoder(This, constraint);
+		addConstraintToSATSolver(c, This->satSolver);
 		printConstraint(c);
 		model_print("\n\n");
+		//FIXME: When do we want to delete constraints? Should we keep an array of them
+		// and delete them later, or it would be better to just delete them right away?
 	}
 }
 

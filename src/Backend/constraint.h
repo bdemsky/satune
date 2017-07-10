@@ -34,7 +34,7 @@ void deleteConstraint(Constraint *);
 void printConstraint(Constraint * c);
 void dumpConstraint(Constraint * c, IncrementalSolver *solver);
 static inline uint getVarConstraint(Constraint * c) {ASSERT(c->type==VAR); return c->numoperandsorvar;}
-VectorConstraint * simplify(Constraint * c);
+VectorConstraint * simplifyConstraint(Constraint * This);
 static inline CType getType(Constraint * c) {return c->type;}
 static inline bool isFalse(Constraint * c) {return c->type==FALSE;}
 static inline bool isTrue(Constraint * c) {return c->type==TRUE;}

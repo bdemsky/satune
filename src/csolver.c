@@ -174,8 +174,13 @@ Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64
 void startEncoding(CSolver* solver){
 	naiveEncodingDecision(solver);
 	SATEncoder* satEncoder = allocSATEncoder();
-//	initializeConstraintVars(solver, satEncoder);
+	createSolver(satEncoder->satSolver);
 	encodeAllSATEncoder(solver, satEncoder);
+	finishedClauses(satEncoder->satSolver);
+	solve(satEncoder->satSolver);
+	int result= getSolution(satEncoder->satSolver);
+	model_print("sat_solver's result:%d\n", result);
+	killSolver(satEncoder->satSolver);
 	//For now, let's just delete it, and in future for doing queries 
 	//we may need it.
 	deleteSATEncoder(satEncoder);
