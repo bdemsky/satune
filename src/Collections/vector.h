@@ -62,7 +62,7 @@
 		vector->size=size;																									\
 	}																																			\
 	void pushVector ## name(Vector ## name *vector, type item) {					\
-		if ((vector->size + 1) >= vector->capacity) {												\
+		if (vector->size >= vector->capacity) {															\
 			uint newcap=vector->capacity << 1;																\
 			vector->array=(type *)ourrealloc(vector->array, newcap * sizeof(type)); \
 		}                                                                   \
