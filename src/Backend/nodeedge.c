@@ -317,6 +317,7 @@ Edge constraintNewVar(CNF *cnf) {
 void solveCNF(CNF *cnf) {
 	countPass(cnf);
 	convertPass(cnf, false);
+	finishedClauses(cnf->solver);
 	solve(cnf->solver);
 }
 
