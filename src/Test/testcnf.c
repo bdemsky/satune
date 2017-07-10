@@ -12,5 +12,6 @@ int main(int numargs, char ** argv) {
 	Edge iff3=constraintIFF(cnf, v3, nv1);
 	Edge cand=constraintAND(cnf, 3, (Edge[]) {iff1, iff2, iff3});
 	addConstraint(cnf, cand);
+	solveCNF(cnf);
 	deleteCNF(cnf);
 }

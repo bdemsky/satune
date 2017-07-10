@@ -191,7 +191,7 @@ Edge constraintNewVar(CNF *cnf);
 void countPass(CNF *cnf);
 void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
 void addConstraint(CNF *cnf, Edge constraint);
-
+void solveCNF(CNF *cnf);
 
 
 void convertPass(CNF *cnf, bool backtrackLit);

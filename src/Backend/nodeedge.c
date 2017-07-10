@@ -19,7 +19,8 @@ CNF * createCNF() {
 	cnf->enableMatching=true;
 	allocInlineDefVectorEdge(& cnf->constraints);
 	allocInlineDefVectorEdge(& cnf->args);
- return cnf;
+	cnf->solver=allocIncrementalSolver();
+	return cnf;
 }
 
 void deleteCNF(CNF * cnf) {
@@ -30,6 +31,7 @@ void deleteCNF(CNF * cnf) {
 	}
 	deleteVectorArrayEdge(& cnf->constraints);
 	deleteVectorArrayEdge(& cnf->args);
+	deleteIncrementalSolver(cnf->solver);
 	ourfree(cnf->node_array);
 	ourfree(cnf);
 }
@@ -274,6 +276,13 @@ Edge constraintNewVar(CNF *cnf) {
 	Edge e={(Node *) ((((uintptr_t)varnum) << VAR_SHIFT) | EDGE_IS_VAR_CONSTANT) };
 	return e;
 }
+
+void solveCNF(CNF *cnf) {
+	countPass(cnf);
+	convertPass(cnf, false);
+	solve(cnf->solver);
+}
+
 
 void countPass(CNF *cnf) {
 	uint numConstraints=getSizeVectorEdge(&cnf->constraints);
