@@ -191,7 +191,7 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 
 	/** De-duplicate array */
 	uint lowindex=0;
-	edges[lowindex++]=edges[initindex++];
+	edges[lowindex]=edges[initindex++];
 
 	for(;initindex<numEdges;initindex++) {
 		Edge e1=edges[lowindex];
@@ -201,8 +201,10 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 				return E_False;
 			}
 		} else
-			edges[lowindex++]=edges[initindex];
+			edges[++lowindex]=edges[initindex];
 	}
+	lowindex++; //Make lowindex look like size
+	
 	if (lowindex==1)
 		return edges[0];
 
@@ -225,7 +227,7 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 		}
 	}
 	
-	return createNode(cnf, NodeType_AND, numEdges, edges);
+	return createNode(cnf, NodeType_AND, lowindex, edges);
 }
 
 Edge constraintAND2(CNF * cnf, Edge left, Edge right) {
@@ -327,12 +329,12 @@ void countPass(CNF *cnf) {
 	deleteVectorEdge(ve);
 }
 
-void countConstraint(CNF *cnf, VectorEdge *stack, Edge e) {
+void countConstraint(CNF *cnf, VectorEdge *stack, Edge eroot) {
 	//Skip constants and variables...
-	if (edgeIsVarConst(e))
+	if (edgeIsVarConst(eroot))
 		return;
 
-	clearVectorEdge(stack);pushVectorEdge(stack, e);
+	clearVectorEdge(stack);pushVectorEdge(stack, eroot);
 
 	bool isMatching=cnf->enableMatching;
 	
@@ -561,7 +563,7 @@ void produceCNF(CNF * cnf, Edge e) {
 
 bool propagate(CNF *cnf, CNFExpr ** dest, CNFExpr * src, bool negate) {
 	if (src != NULL && !isProxy(src) && getLitSizeCNF(src) == 0) {
-		if (dest == NULL) {
+		if (*dest == NULL) {
 			*dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		} else if (isProxy(*dest)) {
 			bool alwaysTrue = (negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
