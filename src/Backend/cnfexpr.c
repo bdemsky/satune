@@ -1,5 +1,40 @@
 #include "cnfexpr.h"
 
+/* 
+V2 Copyright (c) 2014 Ben Chambers, Eugene Goldberg, Pete Manolios,
+Vasilis Papavasileiou, Sudarshan Srinivasan, and Daron Vroon.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.  If
+you download or use the software, send email to Pete Manolios
+(pete@ccs.neu.edu) with your name, contact information, and a short
+note describing what you want to use BAT for.  For any reuse or
+distribution, you must make clear to others the license terms of this
+work.
+
+Contact Pete Manolios if you want any of these conditions waived.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/* 
+C port of CNF SAT Conversion Copyright Brian Demsky 2017. 
+*/
+
 #define LITCAPACITY 4
 #define MERGESIZE 5
 
