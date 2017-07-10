@@ -167,7 +167,7 @@ Edge constraintOR(CNF * cnf, uint numEdges, Edge *edges) {
 Edge constraintOR2(CNF * cnf, Edge left, Edge right) {
 	Edge lneg=constraintNegate(left);
 	Edge rneg=constraintNegate(right);
-	Edge eand=constraintAND2(cnf, left, right);
+	Edge eand=constraintAND2(cnf, lneg, rneg);
 	return constraintNegate(eand);
 }
 
