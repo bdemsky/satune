@@ -519,19 +519,19 @@ bool propagate(CNF *cnf, CNFExpr ** dest, CNFExpr * src, bool negate) {
 	if (src != NULL && !isProxy(src) && getLitSizeCNF(src) == 0) {
 		if (dest == NULL) {
 			*dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
-		} else if (isProxy(dest)) {
+		} else if (isProxy(*dest)) {
 			bool alwaysTrue = (negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 			if (alwaysTrue) {
-				Literal clause[] = {getProxy(dest)};
+				Literal clause[] = {getProxy(*dest)};
 				addArrayClauseLiteral(cnf->solver, 1, clause);
 			} else {
-				Literal clause[] = {-getProxy(dest)};
+				Literal clause[] = {-getProxy(*dest)};
 				addArrayClauseLiteral(cnf->solver, 1, clause);
 			}
 			
 			*dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		} else {
-			clearCNFExpr(dest, negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+			clearCNFExpr(*dest, negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		}
 		return true;
 	}

@@ -173,6 +173,9 @@ static inline Literal getProxy(CNFExpr *expr) {
 	return (Literal) (((intptr_t) expr) >> 1);
 }
 
+CNF * createCNF();
+void deleteCNF(CNF * cnf);
+
 uint hashNode(NodeType type, uint numEdges, Edge * edges);
 Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashCode);
 bool compareNodes(Node * node, NodeType type, uint numEdges, Edge *edges);
@@ -187,6 +190,10 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge);
 Edge constraintNewVar(CNF *cnf);
 void countPass(CNF *cnf);
 void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
+void addConstraint(CNF *cnf, Edge constraint);
+
+
+
 void convertPass(CNF *cnf, bool backtrackLit);
 void convertConstraint(CNF *cnf, VectorEdge *stack, Edge e, bool backtrackLit);
 void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp);

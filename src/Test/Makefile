@@ -6,7 +6,7 @@ include $(BASE)/common.mk
 
 DEPS := $(join $(addsuffix ., $(dir $(OBJECTS))), $(addsuffix .d, $(notdir $(OBJECTS))))
 
-CPPFLAGS += -I$(BASE) -I$(BASE)/AST -I$(BASE)/Collections
+CPPFLAGS += -I$(BASE) -I$(BASE)/AST -I$(BASE)/Collections -I$(BASE)/Backend
 
 all: $(OBJECTS) ../bin/run.sh
 
