@@ -29,6 +29,7 @@ void setOrderEncodingType(Order* order, OrderEncodingType type){
 void deleteOrder(Order* order){
 	deleteVectorArrayBoolean(& order->constraints);
 	deleteOrderEncoding(& order->order);
-	deleteHashTableBoolConst(order->boolsToConstraints);
+	if(order->boolsToConstraints!= NULL)
+		deleteHashTableBoolConst(order->boolsToConstraints);
 	ourfree(order);
 }

@@ -159,6 +159,7 @@ void printConstraint(Constraint * This) {
 		model_print("!t%u",This->numoperandsorvar);
 		break;
 	default:
+		model_print("In printingConstraint: %d", This->type);
 		ASSERT(0);
 	}
 }

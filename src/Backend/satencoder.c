@@ -82,9 +82,9 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 	for(uint i=0;i<size;i++) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		Constraint* c= encodeConstraintSATEncoder(This, constraint);
-		addConstraintToSATSolver(c, This->satSolver);
 		printConstraint(c);
 		model_print("\n\n");
+		addConstraintToSATSolver(c, This->satSolver);
 		//FIXME: When do we want to delete constraints? Should we keep an array of them
 		// and delete them later, or it would be better to just delete them right away?
 	}
