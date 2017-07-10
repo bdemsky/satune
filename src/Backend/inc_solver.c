@@ -42,6 +42,19 @@ void addClauseLiteral(IncrementalSolver * This, int literal) {
 	}
 }
 
+void addArrayClauseLiteral(IncrementalSolver * This, uint numliterals, int * literals) {
+	for(uint i=0;i<numliterals; i++) {
+		This->buffer[This->offset++]=literals[i];
+		if (This->offset==IS_BUFFERSIZE) {
+			flushBufferSolver(This);
+		}
+	}
+	This->buffer[This->offset++]=0;
+	if (This->offset==IS_BUFFERSIZE) {
+		flushBufferSolver(This);
+	}
+}
+
 void finishedClauses(IncrementalSolver * This) {
 	addClauseLiteral(This, 0);
 }
