@@ -45,11 +45,10 @@ void deleteCNFExpr(CNFExpr *This);
 void clearCNFExpr(CNFExpr *This, bool isTrue);
 
 void copyCNF(CNFExpr *This, CNFExpr *expr, bool destroy);
-bool alwaysTrueCNF(CNFExpr * This);
-bool alwaysFalseCNF(CNFExpr * This);
-uint getLitSizeCNF(CNFExpr * This);
-void clearCNF(CNFExpr *This, bool isTrue);
-uint getClauseSizeCNF(CNFExpr * This);
+static inline bool alwaysTrueCNF(CNFExpr * This) {return (This->litSize==0) && This->isTrue;}
+static inline bool alwaysFalseCNF(CNFExpr * This) {return (This->litSize==0) && !This->isTrue;}
+static inline uint getLitSizeCNF(CNFExpr * This) {return This->litSize;}
+static inline uint getClauseSizeCNF(CNFExpr * This) {return getSizeLitVector(&This->singletons) + getSizeVectorLitVector(&This->clauses);}
 void conjoinCNFLit(CNFExpr *This, Literal l);
 void disjoinCNFLit(CNFExpr *This, Literal l);
 void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy);

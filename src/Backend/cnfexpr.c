@@ -38,6 +38,8 @@ C port of CNF SAT Conversion Copyright Brian Demsky 2017.
 #define LITCAPACITY 4
 #define MERGESIZE 5
 
+VectorImpl(LitVector, LitVector *, 4)
+
 static inline uint boundedSize(uint x) { return (x > MERGESIZE)?MERGESIZE:x; }
 
 LitVector * allocLitVector() {
@@ -157,7 +159,7 @@ void conjoinCNFLit(CNFExpr *This, Literal l) {
 	addLiteralLitVector(&This->singletons, l);
 	uint newsize=getSizeLitVector(&This->singletons);
 	if (newsize==0)
-		clearCNF(This, false); //We found a conflict
+		clearCNFExpr(This, false); //We found a conflict
 	else
 		This->litSize+=getSizeLitVector(&This->singletons);
 }
@@ -189,7 +191,7 @@ void copyCNF(CNFExpr *This, CNFExpr *expr, bool destroy) {
 void conjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 	if (expr->litSize==0) {
 		if (!This->isTrue) {
-			clearCNF(This, false);
+			clearCNFExpr(This, false);
 		}
 		if (destroy) {
 			deleteCNFExpr(expr);
@@ -211,7 +213,7 @@ void conjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 		addLiteralLitVector(&This->singletons, l);
 		if (getSizeLitVector(&This->singletons)==0) {
 			//Found conflict...
-			clearCNF(This, false);
+			clearCNFExpr(This, false);
 			if (destroy) {
 				deleteCNFExpr(expr);
 			}
@@ -341,7 +343,7 @@ void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 	/** Handle the special cases */
 	if (expr->litSize == 0) {
 		if (expr->isTrue) {
-			clearCNF(This, true);
+			clearCNFExpr(This, true);
 		}
 		if (destroy) {
 			deleteCNFExpr(expr);

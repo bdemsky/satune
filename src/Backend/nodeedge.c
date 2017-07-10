@@ -136,7 +136,7 @@ Edge createNode(CNF *cnf, NodeType type, uint numEdges, Edge * edges) {
 uint hashNode(NodeType type, uint numEdges, Edge * edges) {
 	uint hashvalue=type ^ numEdges;
 	for(uint i=0;i<numEdges;i++) {
-		hashvalue ^= (uint) edges[i].node_ptr;
+		hashvalue ^= (uint) ((uintptr_t) edges[i].node_ptr);
 		hashvalue = (hashvalue << 3) | (hashvalue >> 29); //rotate left by 3 bits
 	}
 	return (uint) hashvalue;
@@ -546,7 +546,8 @@ void produceCNF(CNF * cnf, Edge e) {
 	/// propagate(solver, expPos, snPos, false) || propagate(solver, expNeg, snNeg, false)
 	
 	// propagate from positive to negative, negative to positive
-	propagate(cnf, & expPos, expNeg, true) || propagate(cnf, & expNeg, expPos, true);
+	if (!propagate(cnf, & expPos, expNeg, true))
+		propagate(cnf, & expNeg, expPos, true);
 	
 	// The polarity heuristic entails visiting the discovery polarity first
 	if (isPosEdge(e)) {

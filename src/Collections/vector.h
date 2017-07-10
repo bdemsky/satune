@@ -48,7 +48,7 @@
 		vector->size--;																											\
 	}																																			\
 	type lastVector ## name(Vector ## name *vector) {											\
-		return vector->array[vector->size];																	\
+		return vector->array[vector->size-1];																\
 	}																																			\
 	void setSizeVector ## name(Vector ## name *vector, uint size) {				\
 		if (size <= vector->size) {																					\
