@@ -100,6 +100,7 @@ Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashcode) {
 	n->flags.wasExpanded=0;
 	n->flags.cnfVisitedDown=0;
 	n->flags.cnfVisitedUp=0;
+	n->flags.varForced=0;
 	n->numEdges=numEdges;
 	n->hashCode=hashcode;
 	n->intAnnot[0]=0;n->intAnnot[1]=0;

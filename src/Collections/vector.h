@@ -55,16 +55,16 @@
 			vector->size=size;																								\
 			return;																														\
 		} else if (size > vector->capacity) {																\
-			vector->array=(type *)ourrealloc(vector->array, size);						\
+			vector->array=(type *)ourrealloc(vector->array, size * sizeof(type));	\
 			vector->capacity=size;																						\
 		}																																		\
 		bzero(&vector->array[vector->size], (size-vector->size)*sizeof(type)); \
 		vector->size=size;																									\
 	}																																			\
 	void pushVector ## name(Vector ## name *vector, type item) {					\
-		if (vector->size >= vector->capacity) {                             \
-			uint newcap=vector->capacity * 2;                                 \
-			vector->array=(type *)ourrealloc(vector->array, newcap);          \
+		if ((vector->size + 1) >= vector->capacity) {												\
+			uint newcap=vector->capacity << 1;																\
+			vector->array=(type *)ourrealloc(vector->array, newcap * sizeof(type)); \
 		}                                                                   \
 		vector->array[vector->size++] = item;                               \
 	}                                                                     \

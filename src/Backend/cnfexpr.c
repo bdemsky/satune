@@ -99,17 +99,17 @@ void addLiteralLitVector(LitVector *This, Literal l) {
 				This->size = 0; //either true or false now depending on whether this is a conj or disj
 			return;
 		}
-		if ((++This->size) >= This->capacity) {
-			This->capacity <<= 1;
-			This->literals=ourrealloc(This->literals, This->capacity * sizeof(Literal));
-		}
-		
-		if (vec_size < MERGESIZE) {
-			memmove(&This->literals[i+1], &This->literals[i], (vec_size-i) * sizeof(Literal));
-			This->literals[i]=l;
-		} else {
-			This->literals[vec_size]=l;
-		}
+	}
+	if ((++This->size) >= This->capacity) {
+		This->capacity <<= 1;
+		This->literals=ourrealloc(This->literals, This->capacity * sizeof(Literal));
+	}
+	
+	if (vec_size < MERGESIZE) {
+		memmove(&This->literals[i+1], &This->literals[i], (vec_size-i) * sizeof(Literal));
+		This->literals[i]=l;
+	} else {
+		This->literals[vec_size]=l;
 	}
 }
 
