@@ -503,7 +503,7 @@ void produceCNF(CNF * cnf, Edge e) {
 	/// propagate(solver, expPos, snPos, false) || propagate(solver, expNeg, snNeg, false)
 	
 	// propagate from positive to negative, negative to positive
-	propagate(cnf, expPos, expNeg, true) || propagate(cnf, expNeg, expPos, true);
+	propagate(cnf, & expPos, expNeg, true) || propagate(cnf, & expNeg, expPos, true);
 	
 	// The polarity heuristic entails visiting the discovery polarity first
 	if (isPosEdge(e)) {
@@ -515,10 +515,10 @@ void produceCNF(CNF * cnf, Edge e) {
 	}
 }
 
-bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
+bool propagate(CNF *cnf, CNFExpr ** dest, CNFExpr * src, bool negate) {
 	if (src != NULL && !isProxy(src) && getLitSizeCNF(src) == 0) {
 		if (dest == NULL) {
-			dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+			*dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		} else if (isProxy(dest)) {
 			bool alwaysTrue = (negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 			if (alwaysTrue) {
@@ -529,7 +529,7 @@ bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate) {
 				addArrayClauseLiteral(cnf->solver, 1, clause);
 			}
 			
-			dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
+			*dest = allocCNFExprBool(negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		} else {
 			clearCNFExpr(dest, negate ? alwaysFalseCNF(src) : alwaysTrueCNF(src));
 		}

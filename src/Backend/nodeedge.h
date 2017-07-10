@@ -193,7 +193,7 @@ void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp);
 void produceCNF(CNF * cnf, Edge e);
 CNFExpr * produceConjunction(CNF * cnf, Edge e);
 CNFExpr* produceDisjunction(CNF *cnf, Edge e);
-bool propagate(CNF *cnf, CNFExpr * dest, CNFExpr * src, bool negate);
+bool propagate(CNF *cnf, CNFExpr ** dest, CNFExpr * src, bool negate);
 void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign);
 CNFExpr* fillArgs(CNF * cnf, Edge e, bool isNeg, Edge * largestEdge);
 Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg);
