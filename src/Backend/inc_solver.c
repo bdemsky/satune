@@ -27,6 +27,7 @@ void deleteIncrementalSolver(IncrementalSolver * This) {
 	ourfree(This->buffer);
 	if (This->solution != NULL)
 		ourfree(This->solution);
+	ourfree(This);
 }
 
 void resetSolver(IncrementalSolver * This) {
