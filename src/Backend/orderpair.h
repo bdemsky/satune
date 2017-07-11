@@ -14,9 +14,10 @@
 struct OrderPair{
 	uint64_t first;
 	uint64_t second;
+	Constraint *constraint;
 }; 
 
-OrderPair* allocOrderPair(uint64_t first, uint64_t second);
+OrderPair* allocOrderPair(uint64_t first, uint64_t second, Constraint * constraint);
 void deleteOrderPair(OrderPair* pair);
 
 #endif /* ORDERPAIR_H */

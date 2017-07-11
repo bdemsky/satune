@@ -3,9 +3,11 @@
 
 #include "classlist.h"
 #include "structs.h"
+#include "inc_solver.h"
 
 struct SATEncoder {
 	uint varcount;
+	IncrementalSolver* satSolver;
 };
 
 SATEncoder * allocSATEncoder();
@@ -35,4 +37,5 @@ Constraint* encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction
 Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
 Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
 Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder,ElementFunction* This);
+void addConstraintToSATSolver(Constraint *c, IncrementalSolver* satSolver);
 #endif

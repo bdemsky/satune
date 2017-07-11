@@ -29,7 +29,8 @@ void allocEncodingArrayElement(ElementEncoding *This, uint size) {
 }
 
 void allocInUseArrayElement(ElementEncoding *This, uint size) {
-	This->inUseArray=ourcalloc(1, size >> 6);
+	uint bytes = ((size + ((1 << 9)-1)) >> 6)&~7;//Depends on size of inUseArray
+	This->inUseArray=ourcalloc(1, bytes);
 }
 
 void allocElementConstraintVariables(ElementEncoding* This, uint numVars){

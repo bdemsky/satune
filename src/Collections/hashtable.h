@@ -62,9 +62,10 @@
 	bool contains ## Name(const HashTable ## Name * tab, _Key key);       \
 	void resize ## Name(HashTable ## Name * tab, unsigned int newsize);   \
 	double getLoadFactor ## Name(HashTable ## Name * tab);                \
-	unsigned int getCapacity ## Name(HashTable ## Name * tab);
+	unsigned int getCapacity ## Name(HashTable ## Name * tab);						\
+	void resetAndDeleteHashTable ## Name(HashTable ## Name * tab);
 
-#define HashTableImpl(Name, _Key, _Val, hash_function, equals) \
+#define HashTableImpl(Name, _Key, _Val, hash_function, equals, freefunction) \
 	HashTable ## Name * allocHashTable ## Name(unsigned int initialcapacity, double factor) { \
 		HashTable ## Name * tab = (HashTable ## Name *)ourmalloc(sizeof(HashTable ## Name)); \
 		tab->table = (struct hashlistnode ## Name *)ourcalloc(initialcapacity, sizeof(struct hashlistnode ## Name)); \
@@ -77,14 +78,34 @@
 		tab->size = 0;                                                      \
 		return tab;                                                         \
 	}                                                                     \
-                                                                        \
-	void deleteHashTable ## Name(HashTable ## Name * tab) {                 \
+																																				\
+	void deleteHashTable ## Name(HashTable ## Name * tab) {								\
 		ourfree(tab->table);                                                \
 		if (tab->zero)                                                      \
 			ourfree(tab->zero);                                               \
 		ourfree(tab);                                                       \
 	}                                                                     \
-                                                                        \
+																																				\
+	void resetAndDeleteHashTable ## Name(HashTable ## Name * tab) {				\
+		for(uint i=0;i<tab->capacity;i++) {																	\
+			struct hashlistnode ## Name * bin=&tab->table[i];									\
+			if (bin->key!=NULL) {																							\
+				bin->key=NULL;																									\
+				if (bin->val!=NULL) {																						\
+					freefunction(bin->val);																				\
+					bin->val=NULL;																								\
+				}																																\
+			}																																	\
+		}																																		\
+		if (tab->zero)	{																										\
+			if (tab->zero->val != NULL)																				\
+				freefunction(tab->zero->val);																		\
+			ourfree(tab->zero);																								\
+			tab->zero=NULL;																										\
+		}																																		\
+		tab->size=0;																												\
+	}																																			\
+																																				\
 	void reset ## Name(HashTable ## Name * tab) {                         \
 		memset(tab->table, 0, tab->capacity * sizeof(struct hashlistnode ## Name)); \
 		if (tab->zero) {                                                    \
