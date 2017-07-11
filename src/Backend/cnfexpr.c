@@ -1,5 +1,5 @@
 #include "cnfexpr.h"
-
+#include <stdio.h>
 /* 
 V2 Copyright (c) 2014 Ben Chambers, Eugene Goldberg, Pete Manolios,
 Vasilis Papavasileiou, Sudarshan Srinivasan, and Daron Vroon.
@@ -445,5 +445,21 @@ void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 		deleteCNFExpr(expr);
 }
 
-
-
+void printCNFExpr(CNFExpr *This) {
+	for(uint i=0;i<getSizeLitVector(&This->singletons);i++) {
+		if (i!=0)
+			printf(" ^ ");
+		Literal l=getLiteralLitVector(&This->singletons,i);
+		printf ("%d",l);
+	}
+	for(uint i=0;i<getSizeVectorLitVector(&This->clauses);i++) {
+		LitVector *lv=getVectorLitVector(&This->clauses,i);
+		printf(" ^ (");
+		for(uint j=0;j<getSizeLitVector(lv);j++) {
+			if (j!=0)
+				printf(" v ");
+			printf("%d", getLiteralLitVector(lv, j));
+		}
+		printf(")");
+	}
+}

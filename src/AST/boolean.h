@@ -6,6 +6,7 @@
 #include "structs.h"
 #include "astnode.h"
 #include "functionencoding.h"
+#include "constraint.h"
 
 /**
     This is a little sketchy, but apparently legit.
@@ -29,7 +30,7 @@ struct BooleanOrder {
 struct BooleanVar {
 	Boolean base;
 	VarType vtype;
-	Constraint * var;
+	Edge var;
 };
 
 struct BooleanLogic {

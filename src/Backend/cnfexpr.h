@@ -43,6 +43,7 @@ CNFExpr * allocCNFExprBool(bool isTrue);
 CNFExpr * allocCNFExprLiteral(Literal l);
 void deleteCNFExpr(CNFExpr *This);
 void clearCNFExpr(CNFExpr *This, bool isTrue);
+void printCNFExpr(CNFExpr *This);
 
 void copyCNF(CNFExpr *This, CNFExpr *expr, bool destroy);
 static inline bool alwaysTrueCNF(CNFExpr * This) {return (This->litSize==0) && This->isTrue;}

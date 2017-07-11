@@ -14,7 +14,7 @@ int main(int numargs, char ** argv) {
 	Order * o=createOrder(solver, TOTAL, s);
 	Boolean * oc=orderConstraint(solver, o, 1, 2);
 	addBoolean(solver, oc);
-	
+		
 	uint64_t set2[] = {2, 3};
 	Set* rangef1 = createSet(solver, 1, set2, 2);
 	Function * f1 = createFunctionOperator(solver, ADD, domain, 2, rangef1, IGNORE);
@@ -38,6 +38,7 @@ int main(int numargs, char ** argv) {
 	Element* inputs2 [] = {e4, e3};
 	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2);
 	addBoolean(solver, pred);
+	
 	startEncoding(solver);
 	deleteSolver(solver);
 }

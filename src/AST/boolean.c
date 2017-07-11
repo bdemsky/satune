@@ -8,7 +8,7 @@ Boolean* allocBoolean(VarType t) {
 	BooleanVar* tmp=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
 	GETBOOLEANTYPE(tmp)=BOOLEANVAR;
 	tmp->vtype=t;
-	tmp->var=NULL;
+	tmp->var=E_NULL;
 	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
 	return & tmp->base;
 }

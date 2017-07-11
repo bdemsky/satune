@@ -21,10 +21,6 @@ typedef struct CSolver CSolver;
 struct SATEncoder;
 typedef struct SATEncoder SATEncoder;
 
-
-struct Constraint;
-typedef struct Constraint Constraint;
-
 typedef struct BooleanOrder BooleanOrder;
 typedef struct BooleanVar BooleanVar;
 typedef struct BooleanLogic BooleanLogic;
