@@ -23,7 +23,7 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	initDefVectorASTNode(GETELEMENTPARENTS(This));
 	for(uint i=0;i<numArrays;i++)
 		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) This);
-	initElementEncoding(&This->domainencoding, (Element *) This);
+	initElementEncoding(&This->rangeencoding, (Element *) This);
 	initFunctionEncoding(&This->functionencoding, (Element *) This);
 	return &This->base;
 }
@@ -55,7 +55,7 @@ void deleteElement(Element *This) {
 	case ELEMFUNCRETURN: {
 		ElementFunction *ef = (ElementFunction *) This;
 		deleteInlineArrayElement(&ef->inputs);
-		deleteElementEncoding(&ef->domainencoding);
+		deleteElementEncoding(&ef->rangeencoding);
 		deleteFunctionEncoding(&ef->functionencoding);
 		break;
 	}

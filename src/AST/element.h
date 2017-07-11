@@ -27,7 +27,7 @@ struct ElementFunction {
 	ArrayElement inputs;
 	Boolean * overflowstatus;
 	FunctionEncoding functionencoding;
-	ElementEncoding domainencoding;
+	ElementEncoding rangeencoding;
 };
 
 Element * allocElementSet(Set *s);
@@ -40,7 +40,7 @@ static inline ElementEncoding* getElementEncoding(Element* This){
 		case ELEMSET:
 			return &((ElementSet*)This)->encoding;
 		case ELEMFUNCRETURN:		
-			return &((ElementFunction*)This)->domainencoding;
+			return &((ElementFunction*)This)->rangeencoding;
 		default:
 			ASSERT(0);
 	}

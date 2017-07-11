@@ -20,19 +20,18 @@ Function* allocFunctionTable (Table* table){
 	return &This->base;
 }
 
-uint64_t applyFunctionOperator(FunctionOperator* This, uint64_t var1, uint64_t var2) {
-	uint64_t result = 0;
+uint64_t applyFunctionOperator(FunctionOperator* This, uint numVals, uint64_t * values) {
+	ASSERT(numVals == 2);
 	switch(This->op){
 		case ADD:
-			result = var1+ var2;
+			return values[0] + values[1];
 			break;
 		case SUB:
-			result = var1 - var2;
+			return values[0] - values[1];
 			break;
 		default:
 			ASSERT(0);
 	}
-	return result;
 }
 
 bool isInRangeFunction(FunctionOperator *This, uint64_t val) {

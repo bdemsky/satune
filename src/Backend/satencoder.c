@@ -132,7 +132,6 @@ Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint) {
 	}
 }
 
-
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
 	switch( constraint->order->type){
 		case PARTIAL:
@@ -161,16 +160,13 @@ Edge getPairConstraint(SATEncoder *This, HashTableOrderPair * table, OrderPair *
 		putOrderPair(table, paircopy, paircopy);
 	} else
 		constraint = getOrderPair(table, pair)->constraint;
-	if (negate)
-		return constraintNegate(constraint);
-	else
-		return constraint;
-	
+
+	return negate ? constraintNegate(constraint) : constraint;
 }
 
-Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
+Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
-	if(boolOrder->order->orderPairTable == NULL){
+	if(boolOrder->order->orderPairTable == NULL) {
 		initializeOrderHashTable(boolOrder->order);
 		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
 	}
@@ -222,41 +218,7 @@ Edge generateTransOrderConstraintSATEncoder(SATEncoder *This, Edge constIJ,Edge 
 }
 
 Edge encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
-	// FIXME: we can have this implementation for partial order. Basically,
-	// we compute the transitivity between two order constraints specified by the client! (also can be used
-	// when client specify sparse constraints for the total order!)
 	ASSERT(constraint->order->type == PARTIAL);
-/*
-	HashTableOrderPair* boolToConsts = boolOrder->order->boolsToConstraints;
-	if( containsOrderPair(boolToConsts, boolOrder) ){
-		return getOrderPair(boolToConsts, boolOrder);
-	} else {
-		Edge constraint = getNewVarSATEncoder(This); 
-		putOrderPair(boolToConsts,boolOrder, constraint);
-		VectorBoolean* orderConstrs = &boolOrder->order->constraints;
-		uint size= getSizeVectorBoolean(orderConstrs);
-		for(uint i=0; i<size; i++){
-			ASSERT(GETBOOLEANTYPE( getVectorBoolean(orderConstrs, i)) == ORDERCONST );
-			BooleanOrder* tmp = (BooleanOrder*)getVectorBoolean(orderConstrs, i);
-			BooleanOrder* newBool;
-			Edge first, second;
-			if(tmp->second==boolOrder->first){
-				newBool = (BooleanOrder*)allocBooleanOrder(tmp->order,tmp->first,boolOrder->second);
-				first = encodeTotalOrderSATEncoder(This, tmp);
-				second = constraint;
-				
-			}else if (boolOrder->second == tmp->first){
-				newBool = (BooleanOrder*)allocBooleanOrder(tmp->order,boolOrder->first,tmp->second);
-				first = constraint;
-				second = encodeTotalOrderSATEncoder(This, tmp);
-			}else
-				continue;
-			Edge transConstr= encodeTotalOrderSATEncoder(This, newBool);
-			generateTransOrderConstraintSATEncoder(This, first, second, transConstr );
-		}
-		return constraint;
-	}
-*/	
 	return E_BOGUS;
 }
 
@@ -296,6 +258,9 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 		encodeElementSATEncoder(This, getArrayElement(inputs, i));
 	}
 	
+	//WARNING: THIS ASSUMES PREDICATE TABLE IS COMPLETE...SEEMS UNLIKELY TO BE SAFE IN MANY CASES...
+	//WONDER WHAT BEST WAY TO HANDLE THIS IS...
+	
 	uint size = getSizeVectorTableEntry(entries);
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
@@ -330,7 +295,7 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 	return E_BOGUS;
 }
 
-Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
 	PredicateOperator* predicate = (PredicateOperator*)constraint->predicate;
 	uint numDomains=getSizeArraySet(&predicate->domains);
 
@@ -425,80 +390,107 @@ Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* 
 	return E_BOGUS;
 }
 
-Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
-	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
-	ASSERT(getSizeArrayElement(&This->inputs)==2 );
-	Element* elem1 = getArrayElement(&This->inputs,0);
-	Element* elem2 = getArrayElement(&This->inputs,1);
-	encodeElementSATEncoder(encoder, elem1);
-	encodeElementSATEncoder(encoder , elem2);
-	
-	ElementEncoding* elemEnc1 = getElementEncoding( getArrayElement(&This->inputs,0) );
-	ElementEncoding* elemEnc2 = getElementEncoding( getArrayElement(&This->inputs,1) );
-	Edge carray[elemEnc1->encArraySize*elemEnc2->encArraySize];
-	uint size=0;
-	Edge overFlowConstraint = ((BooleanVar*) This->overflowstatus)->var;
-	for(uint i=0; i<elemEnc1->encArraySize; i++){
-		if(isinUseElement(elemEnc1, i)){
-			for( uint j=0; j<elemEnc2->encArraySize; j++){
-				if(isinUseElement(elemEnc2, j)){
-					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elemEnc1->encodingArray[i],
-						elemEnc2->encodingArray[j]);
-					bool isInRange = isInRangeFunction((FunctionOperator*)This->function, result);
+Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* func) {
+	FunctionOperator * function = (FunctionOperator *) func->function;
+	uint numDomains=getSizeArrayElement(&func->inputs);
 
-					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
-					// that doesn't iterate over encodingArray and treats more efficient ...
-					Edge valConstrIn1 = getElementValueConstraint(encoder, elemEnc1->element, elemEnc1->encodingArray[i]);
-					Edge valConstrIn2 = getElementValueConstraint(encoder, elemEnc2->element, elemEnc2->encodingArray[j]);
-					Edge valConstrOut = getElementValueConstraint(encoder, (Element*) This, result);
-					if(edgeIsNull(valConstrOut))
-						continue; //FIXME:Should talk to brian about it!
-					Edge OpConstraint = constraintIMPLIES(encoder->cnf, constraintAND2(encoder->cnf, valConstrIn1, valConstrIn2), valConstrOut);
-					switch( ((FunctionOperator*)This->function)->overflowbehavior ){
-						case IGNORE:
-							if(isInRange){
-								carray[size++] = OpConstraint;
-							}
-							break;
-						case WRAPAROUND:
-							carray[size++] = OpConstraint;
-							break;
-						case FLAGFORCESOVERFLOW:
-							if(isInRange){
-								Edge const1 = constraintIMPLIES(encoder->cnf, constraintAND2(encoder->cnf, valConstrIn1, valConstrIn2), constraintNegate(overFlowConstraint));
-								carray[size++] = constraintAND2(encoder->cnf, const1, OpConstraint);
-							}
-							break;
-						case OVERFLOWSETSFLAG:
-							if(isInRange){
-								carray[size++] = OpConstraint;
-							} else{
-								carray[size++] = constraintIMPLIES(encoder->cnf, constraintAND2(encoder->cnf, valConstrIn1, valConstrIn2), overFlowConstraint);
-							}
-							break;
-						case FLAGIFFOVERFLOW:
-							if(isInRange){
-								Edge const1 = constraintIMPLIES(encoder->cnf, constraintAND2(encoder->cnf, valConstrIn1, valConstrIn2), constraintNegate(overFlowConstraint));
-								carray[size++] = constraintAND2(encoder->cnf, const1, OpConstraint);
-							} else {
-								carray[size++] = constraintIMPLIES(encoder->cnf, constraintAND2(encoder->cnf, valConstrIn1, valConstrIn2), overFlowConstraint);
-							}
-							break;
-						case NOOVERFLOW:
-							if(!isInRange){
-								ASSERT(0);
-							}
-							carray[size++] = OpConstraint;
-							break;
-						default:
-							ASSERT(0);
-					}
-					
+	/* Call base encoders for children */
+	for(uint i=0;i<numDomains;i++) {
+		Element *elem = getArrayElement( &func->inputs, i);
+		encodeElementSATEncoder(This, elem);
+	}
+
+	VectorEdge * clauses=allocDefVectorEdge(); // Setup array of clauses
+	
+	uint indices[numDomains]; //setup indices
+	bzero(indices, sizeof(uint)*numDomains);
+	
+	uint64_t vals[numDomains]; //setup value array
+	for(uint i=0;i<numDomains; i++) {
+		Set * set=getElementSet(getArrayElement(&func->inputs, i));
+		vals[i]=getSetElement(set, indices[i]);
+	}
+
+	Edge overFlowConstraint = ((BooleanVar*) func->overflowstatus)->var;
+	
+	bool notfinished=true;
+	while(notfinished) {
+		Edge carray[numDomains+2];
+
+		uint64_t result=applyFunctionOperator(function, numDomains, vals);
+		bool isInRange = isInRangeFunction((FunctionOperator*)func->function, result);
+		bool needClause = isInRange;
+		if (function->overflowbehavior == OVERFLOWSETSFLAG || function->overflowbehavior == FLAGIFFOVERFLOW) {
+			needClause=true;
+		}
+		
+		if (needClause) {
+			//Include this in the set of terms
+			for(uint i=0;i<numDomains;i++) {
+				Element * elem = getArrayElement(&func->inputs, i);
+				carray[i] = getElementValueConstraint(This, elem, vals[i]);
+			}
+			if (isInRange) {
+				carray[numDomains] = getElementValueConstraint(This, &func->base, result);
+			}
+
+			Edge clause;
+			switch(function->overflowbehavior) {
+			case IGNORE:
+			case NOOVERFLOW:
+			case WRAPAROUND: {
+				clause=constraintAND(This->cnf, numDomains+1, carray);
+				break;
+			}
+			case FLAGFORCESOVERFLOW: {
+				carray[numDomains+1]=constraintNegate(overFlowConstraint);
+				clause=constraintAND(This->cnf, numDomains+2, carray);
+				break;
+			}
+			case OVERFLOWSETSFLAG: {
+				if (isInRange) {
+					clause=constraintAND(This->cnf, numDomains+1, carray);
+				} else {
+					carray[numDomains+1]=overFlowConstraint;
+					clause=constraintAND(This->cnf, numDomains+1, carray);
 				}
+				break;
+			}
+			case FLAGIFFOVERFLOW: {
+				if (isInRange) {
+				carray[numDomains+1]=constraintNegate(overFlowConstraint);
+					clause=constraintAND(This->cnf, numDomains+2, carray);
+				} else {
+					carray[numDomains+1]=overFlowConstraint;
+					clause=constraintAND(This->cnf, numDomains+1, carray);
+				}
+				break;
+			}
+			default:
+				ASSERT(0);
+			}
+			pushVectorEdge(clauses, clause);
+		}
+		
+		notfinished=false;
+		for(uint i=0;i<numDomains; i++) {
+			uint index=++indices[i];
+			Set * set=getElementSet(getArrayElement(&func->inputs, i));
+
+			if (index < getSetSize(set)) {
+				vals[i]=getSetElement(set, index);
+				notfinished=true;
+				break;
+			} else {
+				indices[i]=0;
+				vals[i]=getSetElement(set, 0);
 			}
 		}
 	}
-	return constraintAND(encoder->cnf, size, carray); 
+
+	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	deleteVectorEdge(clauses);
+	return cor;
 }
 
 Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
