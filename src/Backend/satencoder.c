@@ -289,31 +289,26 @@ Edge encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constr
 Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
 	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
 	FunctionEncodingType encType = constraint->encoding.type;
+	ArrayElement* inputs = &constraint->inputs;
+	uint inputNum =getSizeArrayElement(inputs);
+	//Encode all the inputs first ...
+	for(uint i=0; i<inputNum; i++){
+		encodeElementSATEncoder(This, getArrayElement(inputs, i));
+	}
+	
 	uint size = getSizeVectorTableEntry(entries);
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
-
 	Edge constraints[size];
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(entries, i);
-
 		if(generateNegation == entry->output) {
 			//Skip the irrelevant entries
 			continue;
 		}
-
-		ArrayElement* inputs = &constraint->inputs;
-		uint inputNum =getSizeArrayElement(inputs);
 		Edge carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
 			Element* el = getArrayElement(inputs, j);
-			Edge tmpc = getElementValueConstraint(This, el, entry->inputs[j]);
-			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN){
-				// HAMED : THIS IS COMPLETELY BROKEN....
-				Edge func =encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
-				carray[j] = constraintAND2(This->cnf, func, tmpc);
-			} else {
-				carray[j] = tmpc;
-			}
+			carray[j] = getElementValueConstraint(This, el, entry->inputs[j]);
 		}
 		constraints[i]=constraintAND(This->cnf, inputNum, carray);
 	}
@@ -345,24 +340,30 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 	getEqualitySetIntersection(predicate, &size, commonElements);
 	Edge  carray[size];
 	Element* elem1 = getArrayElement( &constraint->inputs, 0);
-	Edge elemc1 = E_NULL, elemc2 = E_NULL;
-	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN) //HAMED:  THIS  IS PRETTY BROKEN...
-		elemc1 = encodeFunctionElementSATEncoder(This, (ElementFunction*) elem1);
 	Element* elem2 = getArrayElement( &constraint->inputs, 1);
-	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN) //HAMED: THIS IS PRETTY BROKEN
-		elemc2 = encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
+	encodeElementSATEncoder(This,elem1);
+	encodeElementSATEncoder(This, elem2);
+	
 	for(uint i=0; i<size; i++){
 		Edge arg1 = getElementValueConstraint(This, elem1, commonElements[i]);
 		Edge arg2 = getElementValueConstraint(This, elem2, commonElements[i]);
 		carray[i] =  constraintAND2(This->cnf, arg1, arg2);
 	}
 	//FIXME: the case when there is no intersection ....
-	Edge result = constraintOR(This->cnf, size, carray);
-	if (!edgeIsNull(elemc1))
-		result = constraintAND2(This->cnf, result, elemc1);
-	if (!edgeIsNull(elemc2))
-		result = constraintAND2(This->cnf, result, elemc2);
-	return result;
+	return constraintOR(This->cnf, size, carray);
+}
+
+void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
+	switch( GETELEMENTTYPE(This) ){
+		case ELEMFUNCRETURN:
+			Edge c = encodeFunctionElementSATEncoder(This, (ElementFunction*) This);
+			addConstraint(encoder->cnf, c);
+			break;
+		case ELEMSET:
+			return;
+		default:
+			ASSERT(0);
+	}
 }
 
 Edge encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This){
@@ -394,13 +395,10 @@ Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* 
 Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
 	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
 	ASSERT(getSizeArrayElement(&This->inputs)==2 );
-	Edge elemc1 = E_NULL, elemc2 = E_NULL;
 	Element* elem1 = getArrayElement(&This->inputs,0);
 	Element* elem2 = getArrayElement(&This->inputs,1);
-	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN)
-		elemc1 = encodeFunctionElementSATEncoder(encoder, (ElementFunction*) elem1);
-	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
-		elemc2 = encodeFunctionElementSATEncoder(encoder , (ElementFunction*) elem2);
+	encodeElementSATEncoder(encoder, elem1);
+	encodeElementSATEncoder(encoder , elem2);
 	
 	ElementEncoding* elemEnc1 = getElementEncoding( getArrayElement(&This->inputs,0) );
 	ElementEncoding* elemEnc2 = getElementEncoding( getArrayElement(&This->inputs,1) );
@@ -492,7 +490,5 @@ Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction*
 		Edge row= constraintIMPLIES(encoder->cnf, constraintAND(encoder->cnf, inputNum, carray), output);
 		constraints[i]=row;
 	}
-	Edge result = constraintOR(encoder->cnf, size, constraints);
-	return result;
+	return constraintOR(encoder->cnf, size, constraints);
 }
-
