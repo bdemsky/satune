@@ -70,6 +70,7 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		Edge c= encodeConstraintSATEncoder(This, constraint);
 		printCNF(c);
+		printf("\n");
 		addConstraint(This->cnf, c);
 	}
 }

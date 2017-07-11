@@ -172,10 +172,24 @@ void killSolver(IncrementalSolver * This) {
 		waitpid(This->solver_pid, &status, 0);
 	}
 }
+bool first=true;
 
 void flushBufferSolver(IncrementalSolver * This) {
 	ssize_t bytestowrite=sizeof(int)*This->offset;
 	ssize_t byteswritten=0;
+	for(uint i=0;i<This->offset;i++) {
+		if (first)
+			printf("(");
+		if (This->buffer[i]==0) {
+			printf(")\n");
+			first=true;
+		} else {
+			if (!first)
+				printf(" + ");
+			first=false;
+			printf("%d", This->buffer[i]);
+		}
+	}
 	do {
 		ssize_t n=write(This->to_solver_fd, &((char *)This->buffer)[byteswritten], bytestowrite);
 		if (n == -1) {
