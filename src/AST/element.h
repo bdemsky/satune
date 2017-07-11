@@ -34,6 +34,7 @@ Element * allocElementSet(Set *s);
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 void deleteElement(Element *This);
 Set* getElementSet(Element* This);
+
 static inline ElementEncoding* getElementEncoding(Element* This){
 	switch(GETELEMENTTYPE(This)){
 		case ELEMSET:
@@ -46,9 +47,7 @@ static inline ElementEncoding* getElementEncoding(Element* This){
 	return NULL;
 }
 
-
 static inline FunctionEncoding* getElementFunctionEncoding(ElementFunction* func){
 	return &func->functionencoding;
 }
-
 #endif

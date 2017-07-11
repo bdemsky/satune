@@ -106,7 +106,7 @@ Element * getElementVar(CSolver *This, Set * set) {
 }
 
 Boolean * getBooleanVar(CSolver *solver, VarType type) {
-	Boolean* boolean= allocBoolean(type);
+	Boolean* boolean= allocBooleanVar(type);
 	pushVectorBoolean(solver->allBooleans, boolean);
 	return boolean;
 }

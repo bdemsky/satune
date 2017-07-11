@@ -6,45 +6,45 @@
 #include "table.h"
 
 Element *allocElementSet(Set * s) {
-	ElementSet * tmp=(ElementSet *)ourmalloc(sizeof(ElementSet));
-	GETELEMENTTYPE(tmp)= ELEMSET;
-	tmp->set=s;
-	allocInlineDefVectorASTNode(GETELEMENTPARENTS(tmp));
-	initElementEncoding(&tmp->encoding, (Element *) tmp);
-	return &tmp->base;
+	ElementSet * This=(ElementSet *)ourmalloc(sizeof(ElementSet));
+	GETELEMENTTYPE(This)= ELEMSET;
+	This->set=s;
+	allocInlineDefVectorASTNode(GETELEMENTPARENTS(This));
+	initElementEncoding(&This->encoding, (Element *) This);
+	return &This->base;
 }
 
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus){
-	ElementFunction* tmp = (ElementFunction*) ourmalloc(sizeof(ElementFunction));
-	GETELEMENTTYPE(tmp)= ELEMFUNCRETURN;
-	tmp->function=function;
-	tmp->overflowstatus = overflowstatus;
-	allocInlineArrayInitElement(&tmp->inputs, array, numArrays);
-	allocInlineDefVectorASTNode(GETELEMENTPARENTS(tmp));
+	ElementFunction* This = (ElementFunction*) ourmalloc(sizeof(ElementFunction));
+	GETELEMENTTYPE(This)= ELEMFUNCRETURN;
+	This->function=function;
+	This->overflowstatus = overflowstatus;
+	allocInlineArrayInitElement(&This->inputs, array, numArrays);
+	allocInlineDefVectorASTNode(GETELEMENTPARENTS(This));
 	for(uint i=0;i<numArrays;i++)
-		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) tmp);
-	initElementEncoding(&tmp->domainencoding, (Element *) tmp);
-	initFunctionEncoding(&tmp->functionencoding, (Element *) tmp);
-	return &tmp->base;
+		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) This);
+	initElementEncoding(&This->domainencoding, (Element *) This);
+	initFunctionEncoding(&This->functionencoding, (Element *) This);
+	return &This->base;
 }
 
 Set* getElementSet(Element* This){
 	switch(GETELEMENTTYPE(This)){
-		case ELEMSET:
-			return ((ElementSet*)This)->set;
-		case ELEMFUNCRETURN:
-			;//Nope is needed for label assignment. i.e. next instruction isn't a statement 
-			Function* func = ((ElementFunction*)This)->function;
-			switch(GETFUNCTIONTYPE(func)){
-				case TABLEFUNC:
-					return ((FunctionTable*)func)->table->range;
-				case OPERATORFUNC:
-					return ((FunctionOperator*)func)->range;
-				default:
-					ASSERT(0);
-			}
+	case ELEMSET:
+		return ((ElementSet*)This)->set;
+	case ELEMFUNCRETURN: {
+		Function* func = ((ElementFunction*)This)->function;
+		switch(GETFUNCTIONTYPE(func)){
+		case TABLEFUNC:
+			return ((FunctionTable*)func)->table->range;
+		case OPERATORFUNC:
+			return ((FunctionOperator*)func)->range;
 		default:
 			ASSERT(0);
+		}
+	}
+	default:
+		ASSERT(0);
 	}
 	ASSERT(0);
 	return NULL;
@@ -65,9 +65,8 @@ void deleteElement(Element *This) {
 		break;
 	}
 	default:
-		;
+		ASSERT(0);
 	}
 	deleteVectorArrayASTNode(GETELEMENTPARENTS(This));
-
 	ourfree(This);
 }

@@ -2,48 +2,48 @@
 #include <stddef.h>
 
 Set * allocSet(VarType t, uint64_t* elements, uint num) {
-	Set * tmp=(Set *)ourmalloc(sizeof(Set));
-	tmp->type=t;
-	tmp->isRange=false;
-	tmp->low=0;
-	tmp->high=0;
-	tmp->members=allocVectorArrayInt(num, elements);
-	return tmp;
+	Set * This=(Set *)ourmalloc(sizeof(Set));
+	This->type=t;
+	This->isRange=false;
+	This->low=0;
+	This->high=0;
+	This->members=allocVectorArrayInt(num, elements);
+	return This;
 }
 
 Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
-	Set * tmp=(Set *)ourmalloc(sizeof(Set));
-	tmp->type=t;
-	tmp->isRange=true;
-	tmp->low=lowrange;
-	tmp->high=highrange;
-	tmp->members=NULL;
-	return tmp;
+	Set * This=(Set *)ourmalloc(sizeof(Set));
+	This->type=t;
+	This->isRange=true;
+	This->low=lowrange;
+	This->high=highrange;
+	This->members=NULL;
+	return This;
 }
 
-bool existsInSet(Set* set, uint64_t element){
-	if(set->isRange){
-		return element >= set->low && element <= set->high;
+bool existsInSet(Set* This, uint64_t element){
+	if(This->isRange){
+		return element >= This->low && element <= This->high;
 	}else {
-		uint size = getSizeVectorInt(set->members);
+		uint size = getSizeVectorInt(This->members);
 		for(uint i=0; i< size; i++){
-			if(element == getVectorInt(set->members, i))
+			if(element == getVectorInt(This->members, i))
 				return true;
 		}
 		return false;
 	}
 }
 
-uint getSetSize(Set* set){
-	if(set->isRange){
-		return set->high- set->low+1;
+uint getSetSize(Set* This){
+	if(This->isRange){
+		return This->high- This->low+1;
 	}else{
-		return getSizeVectorInt(set->members);
+		return getSizeVectorInt(This->members);
 	}
 }
 
-void deleteSet(Set * set) {
-	if (!set->isRange)
-		deleteVectorInt(set->members);
-	ourfree(set);
+void deleteSet(Set * This) {
+	if (!This->isRange)
+		deleteVectorInt(This->members);
+	ourfree(This);
 }

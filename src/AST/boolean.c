@@ -4,27 +4,24 @@
 #include "element.h"
 #include "order.h"
 
-Boolean* allocBoolean(VarType t) {
-	BooleanVar* tmp=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
-	GETBOOLEANTYPE(tmp)=BOOLEANVAR;
-	tmp->vtype=t;
-	tmp->var=E_NULL;
-	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
-	return & tmp->base;
+Boolean* allocBooleanVar(VarType t) {
+	BooleanVar* This=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
+	GETBOOLEANTYPE(This)=BOOLEANVAR;
+	This->vtype=t;
+	This->var=E_NULL;
+	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+	return & This->base;
 }
 
 Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
-	BooleanOrder* tmp=(BooleanOrder *) ourmalloc(sizeof (BooleanOrder));
-	GETBOOLEANTYPE(tmp)=ORDERCONST;
-	tmp->order=order;
-	tmp->first=first;
-	tmp->second=second;
-	//FIXME: what if client calls this function with the same arguments?
-	//Instead of vector we should keep a hashtable from PAIR->BOOLEANOrder with
-	//asymmetric hash function.  
-	pushVectorBoolean(&order->constraints, &tmp->base);
-	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(tmp));
-	return & tmp -> base;
+	BooleanOrder* This=(BooleanOrder *) ourmalloc(sizeof (BooleanOrder));
+	GETBOOLEANTYPE(This)=ORDERCONST;
+	This->order=order;
+	This->first=first;
+	This->second=second;
+	pushVectorBoolean(&order->constraints, &This->base);
+	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+	return & This -> base;
 }
 
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs){

@@ -411,9 +411,10 @@ Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunctio
 		if(isinUseElement(elemEnc1, i)){
 			for( uint j=0; j<elemEnc2->encArraySize; j++){
 				if(isinUseElement(elemEnc2, j)){
-					bool isInRange = false;
 					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elemEnc1->encodingArray[i],
-						elemEnc2->encodingArray[j], &isInRange);
+						elemEnc2->encodingArray[j]);
+					bool isInRange = isInRangeFunction((FunctionOperator*)This->function, result);
+
 					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
 					// that doesn't iterate over encodingArray and treats more efficient ...
 					Edge valConstrIn1 = getElementValueConstraint(encoder, elemEnc1->element, elemEnc1->encodingArray[i]);

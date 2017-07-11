@@ -16,8 +16,8 @@ struct Order {
 };
 
 Order* allocOrder(OrderType type, Set * set);
-void initializeOrderHashTable(Order * order);
-void addOrderConstraint(Order* order, BooleanOrder* constraint);
-void setOrderEncodingType(Order* order, OrderEncodingType type);
-void deleteOrder(Order* order);
+void initializeOrderHashTable(Order * This);
+void addOrderConstraint(Order * This, BooleanOrder * constraint);
+void setOrderEncodingType(Order * This, OrderEncodingType type);
+void deleteOrder(Order * This);
 #endif

@@ -46,7 +46,7 @@ struct BooleanPredicate {
 	ArrayElement inputs;
 };
 
-Boolean * allocBoolean(VarType t);
+Boolean * allocBooleanVar(VarType t);
 Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs);
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize);
