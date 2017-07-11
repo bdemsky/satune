@@ -86,8 +86,6 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		printConstraint(c);
 		model_print("\n\n");
 		addConstraintToSATSolver(c, This->satSolver);
-		//FIXME: When do we want to delete constraints? Should we keep an array of them
-		// and delete them later, or it would be better to just delete them right away?
 	}
 }
 
@@ -425,23 +423,31 @@ Constraint* encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFun
 Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
 	ASSERT(GETFUNCTIONTYPE(This->function) == OPERATORFUNC);
 	ASSERT(getSizeArrayElement(&This->inputs)==2 );
-	ElementEncoding* elem1 = getElementEncoding( getArrayElement(&This->inputs,0) );
-	ElementEncoding* elem2 = getElementEncoding( getArrayElement(&This->inputs,1) );
-	Constraint* carray[elem1->encArraySize*elem2->encArraySize];
+	Constraint *elemc1=NULL, *elemc2 = NULL;
+	Element* elem1 = getArrayElement(&This->inputs,0);
+	Element* elem2 = getArrayElement(&This->inputs,1);
+	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN)
+		elemc1 = encodeFunctionElementSATEncoder(encoder, (ElementFunction*) elem1);
+	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
+		elemc2 = encodeFunctionElementSATEncoder(encoder , (ElementFunction*) elem2);
+	
+	ElementEncoding* elemEnc1 = getElementEncoding( elem1 );
+	ElementEncoding* elemEnc2 = getElementEncoding( elem2 );
+	Constraint* carray[elemEnc1->encArraySize*elemEnc2->encArraySize];
 	uint size=0;
 	Constraint* overFlowConstraint = ((BooleanVar*) This->overflowstatus)->var;
-	for(uint i=0; i<elem1->encArraySize; i++){
-		if(isinUseElement(elem1, i)){
-			for( uint j=0; j<elem2->encArraySize; j++){
-				if(isinUseElement(elem2, j)){
+	for(uint i=0; i<elemEnc1->encArraySize; i++){
+		if(isinUseElement(elemEnc1, i)){
+			for( uint j=0; j<elemEnc2->encArraySize; j++){
+				if(isinUseElement(elemEnc2, j)){
 					bool isInRange = false;
-					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elem1->encodingArray[i],
-						elem2->encodingArray[j], &isInRange);
+					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elemEnc1->encodingArray[i],
+						elemEnc2->encodingArray[j], &isInRange);
 					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
 					// that doesn't iterate over encodingArray and treats more efficient ...
-					Constraint* valConstrIn1 = getElementValueConstraint(encoder, elem1->element, elem1->encodingArray[i]);
+					Constraint* valConstrIn1 = getElementValueConstraint(encoder, elemEnc1->element, elemEnc1->encodingArray[i]);
 					ASSERT(valConstrIn1 != NULL);
-					Constraint* valConstrIn2 = getElementValueConstraint(encoder, elem2->element, elem2->encodingArray[j]);
+					Constraint* valConstrIn2 = getElementValueConstraint(encoder, elemEnc2->element, elemEnc2->encodingArray[j]);
 					ASSERT(valConstrIn2 != NULL);
 					Constraint* valConstrOut = getElementValueConstraint(encoder, (Element*) This, result);
 					if(valConstrOut == NULL)
@@ -500,7 +506,12 @@ Constraint* encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, Element
 			}
 		}
 	}
-	return allocArrayConstraint(AND, size, carray);
+	Constraint* result = allocArrayConstraint(OR, size, carray);
+	if(elemc1 != NULL)
+		result = allocConstraint(AND, result, elemc1);
+	if(elemc2 != NULL)
+		result = allocConstraint(AND, result, elemc2);
+	return result;
 }
 
 Constraint* encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){

@@ -177,7 +177,11 @@ void startEncoding(CSolver* solver){
 	encodeAllSATEncoder(solver, satEncoder);
 	finishedClauses(satEncoder->satSolver);
 	int result= solve(satEncoder->satSolver);
-	model_print("sat_solver's result:%d\n", result);
+	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->satSolver->solutionsize);
+	for(uint i=1; i<=satEncoder->satSolver->solutionsize; i++){
+		model_print("%d, ", satEncoder->satSolver->solution[i]);
+	}
+	model_print("\n");
 	//For now, let's just delete it, and in future for doing queries 
 	//we may need it.
 	deleteSATEncoder(satEncoder);

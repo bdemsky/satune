@@ -88,6 +88,7 @@ int getSolution(IncrementalSolver * This) {
 			This->solution[0] = 0;
 		}
 		readSolver(This, &This->solution[1], numVars * sizeof(int));
+		This->solutionsize = numVars;
 	}
 	return result;
 }
