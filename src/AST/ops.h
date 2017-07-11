@@ -6,7 +6,7 @@ typedef enum LogicOp LogicOp;
 enum ArithOp {ADD, SUB};
 typedef enum ArithOp ArithOp;
 
-enum CompOp {EQUALS};
+enum CompOp {EQUALS, LT, GT, LTE, GTE};
 typedef enum CompOp CompOp;
 
 enum OrderType {PARTIAL, TOTAL};

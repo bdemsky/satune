@@ -18,29 +18,6 @@ Predicate* allocPredicateTable(Table* table, UndefinedBehavior undefBehavior){
 	return &This->base;
 }
 
-// BRIAN: REVISIT
-void getEqualitySetIntersection(PredicateOperator* This, uint* size, uint64_t* result){
-	ASSERT( This->op == EQUALS);
-	//make sure equality has 2 operands
-	ASSERT(getSizeArraySet( &This->domains) == 2);
-	*size=0;
-	VectorInt* mems1 = getArraySet(&This->domains, 0)->members; 
-	uint size1 = getSizeVectorInt(mems1);
-	VectorInt* mems2 = getArraySet(&This->domains, 1)->members;
-	uint size2 = getSizeVectorInt(mems2);
-	//FIXME:This isn't efficient, if we a hashset datastructure for Set, we
-	// can reduce it to O(n), but for now .... HG
-	for(uint i=0; i<size1; i++){
-		uint64_t tmp= getVectorInt(mems1, i);
-		for(uint j=0; j<size2; j++){
-			if(tmp == getVectorInt(mems2, j)){
-				result[(*size)++]=tmp;
-				break;
-			}
-		}
-	}
-}
-
 void deletePredicate(Predicate* This){
 	switch(GETPREDICATETYPE(This)) {
 	case OPERATORPRED: {
@@ -56,3 +33,19 @@ void deletePredicate(Predicate* This){
 	ourfree(This);
 }
 
+bool evalPredicateOperator(PredicateOperator * This, uint64_t * inputs) {
+	switch(This->op) {
+	case EQUALS:
+		return inputs[0]==inputs[1];
+	case LT:
+		return inputs[0]<inputs[1];
+	case GT:
+		return inputs[0]>inputs[1];
+	case LTE:
+		return inputs[0]<=inputs[1];
+	case GTE:
+		return inputs[0]>=inputs[1];
+	}
+	ASSERT(0);
+	return false;
+}

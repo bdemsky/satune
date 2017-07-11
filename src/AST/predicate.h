@@ -25,7 +25,6 @@ struct PredicateTable {
 
 Predicate* allocPredicateOperator(CompOp op, Set ** domain, uint numDomain);
 Predicate* allocPredicateTable(Table* table, UndefinedBehavior undefBehavior);
-// size and result will be modified by this function!
-void getEqualitySetIntersection(PredicateOperator* This, uint* size, uint64_t* result);
+bool evalPredicateOperator(PredicateOperator * This, uint64_t * inputs);
 void deletePredicate(Predicate* This);
 #endif

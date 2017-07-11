@@ -317,7 +317,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 	return generateNegation ? result: constraintNegate(result);
 }
 
-Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
+Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
 	switch(constraint->encoding.type){
 		case ENUMERATEIMPLICATIONS:
 			return encodeEnumOperatorPredicateSATEncoder(This, constraint);
@@ -331,26 +331,60 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 }
 
 Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
-	ASSERT(GETPREDICATETYPE(constraint->predicate)==OPERATORPRED);
 	PredicateOperator* predicate = (PredicateOperator*)constraint->predicate;
-	ASSERT(predicate->op == EQUALS); //For now, we just only support equals
-	//getting maximum size of in common elements between two sets!
-	uint size=getSizeVectorInt( getArraySet( &predicate->domains, 0)->members);
-	uint64_t commonElements [size];
-	getEqualitySetIntersection(predicate, &size, commonElements);
-	Edge  carray[size];
-	Element* elem1 = getArrayElement( &constraint->inputs, 0);
-	Element* elem2 = getArrayElement( &constraint->inputs, 1);
-	encodeElementSATEncoder(This,elem1);
-	encodeElementSATEncoder(This, elem2);
-	
-	for(uint i=0; i<size; i++){
-		Edge arg1 = getElementValueConstraint(This, elem1, commonElements[i]);
-		Edge arg2 = getElementValueConstraint(This, elem2, commonElements[i]);
-		carray[i] =  constraintAND2(This->cnf, arg1, arg2);
+	uint numDomains=getSizeArraySet(&predicate->domains);
+
+	FunctionEncodingType encType = constraint->encoding.type;
+	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
+
+	/* Call base encoders for children */
+	for(uint i=0;i<numDomains;i++) {
+		Element *elem = getArrayElement( &constraint->inputs, i);
+		encodeElementSATEncoder(This, elem);
 	}
-	//FIXME: the case when there is no intersection ....
-	return constraintOR(This->cnf, size, carray);
+	VectorEdge * clauses=allocDefVectorEdge(); // Setup array of clauses
+	
+	uint indices[numDomains]; //setup indices
+	bzero(indices, sizeof(uint)*numDomains);
+	
+	uint64_t vals[numDomains]; //setup value array
+	for(uint i=0;i<numDomains; i++) {
+		Set * set=getArraySet(&predicate->domains, i);
+		vals[i]=getSetElement(set, indices[i]);
+	}
+	
+	bool notfinished=true;
+	while(notfinished) {
+		Edge carray[numDomains];
+
+		if (evalPredicateOperator(predicate, vals) ^ generateNegation) {
+			//Include this in the set of terms
+			for(uint i=0;i<numDomains;i++) {
+				Element * elem = getArrayElement(&constraint->inputs, i);
+				carray[i] = getElementValueConstraint(This, elem, vals[i]);
+			}
+			pushVectorEdge(clauses, constraintAND(This->cnf, numDomains, carray));
+		}
+		
+		notfinished=false;
+		for(uint i=0;i<numDomains; i++) {
+			uint index=++indices[i];
+			Set * set=getArraySet(&predicate->domains, i);
+
+			if (index < getSetSize(set)) {
+				vals[i]=getSetElement(set, index);
+				notfinished=true;
+				break;
+			} else {
+				indices[i]=0;
+				vals[i]=getSetElement(set, 0);
+			}
+		}
+	}
+
+	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	deleteVectorEdge(clauses);
+	return generateNegation ? cor : constraintNegate(cor);
 }
 
 void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
