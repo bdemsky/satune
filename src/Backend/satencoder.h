@@ -34,8 +34,8 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 Edge getElementValueBinaryIndexConstraint(SATEncoder * This, Element* element, uint64_t value);
 Edge getElementValueConstraint(SATEncoder* encoder, Element* This, uint64_t value);
 
-Edge encodeElementSATEncoder(SATEncoder* encoder, Element *This);
-Edge encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This);
+void encodeElementSATEncoder(SATEncoder* encoder, Element *This);
+Edge encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This);
 Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
 Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
 Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder,ElementFunction* This);

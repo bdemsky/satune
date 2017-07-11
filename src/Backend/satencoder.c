@@ -356,8 +356,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 	switch( GETELEMENTTYPE(This) ){
 		case ELEMFUNCRETURN:
-			Edge c = encodeFunctionElementSATEncoder(This, (ElementFunction*) This);
-			addConstraint(encoder->cnf, c);
+			addConstraintCNF(encoder->cnf, encodeElementFunctionSATEncoder(encoder, (ElementFunction*) This));
 			break;
 		case ELEMSET:
 			return;
@@ -366,7 +365,7 @@ void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 	}
 }
 
-Edge encodeFunctionElementSATEncoder(SATEncoder* encoder, ElementFunction *This){
+Edge encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This){
 	switch(GETFUNCTIONTYPE(This->function)){
 		case TABLEFUNC:
 			return encodeTableElementFunctionSATEncoder(encoder, This);
@@ -465,12 +464,7 @@ Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunctio
 			}
 		}
 	}
-	Edge result = constraintAND(encoder->cnf, size, carray); 
-	if (!edgeIsNull(elemc1))
-		result = constraintAND2(encoder->cnf, result, elemc1);
-	if (!edgeIsNull(elemc2))
-		result = constraintAND2(encoder->cnf, result, elemc2);
-	return result;
+	return constraintAND(encoder->cnf, size, carray); 
 }
 
 Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
