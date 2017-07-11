@@ -21,7 +21,7 @@ int main(int numargs, char ** argv) {
 	Edge cor=constraintOR2(cnf, constraintAND2(cnf, c1, c2), v5);
 	printCNF(cor);
 	printf("\n");
-	addConstraint(cnf, cor);
+	addConstraintCNF(cnf, cor);
 	int value=solveCNF(cnf);
 	if (value==1) {
 		bool v1v=getValueCNF(cnf, v1);

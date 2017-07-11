@@ -71,7 +71,7 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		Edge c= encodeConstraintSATEncoder(This, constraint);
 		printCNF(c);
 		printf("\n\n");
-		addConstraint(This->cnf, c);
+		addConstraintCNF(This->cnf, c);
 	}
 }
 
@@ -198,7 +198,7 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 				OrderPair pairIK = {valueI, valueK};
 				Edge constIK = getPairConstraint(This, table, & pairIK);
 				Edge constJK = getPairConstraint(This, table, & pairJK);
-				addConstraint(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK)); 
+				addConstraintCNF(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK)); 
 			}
 		}
 	}
