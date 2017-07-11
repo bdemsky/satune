@@ -290,13 +290,17 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
 	FunctionEncodingType encType = constraint->encoding.type;
 	uint size = getSizeVectorTableEntry(entries);
+	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
+
 	Edge constraints[size];
 	for(uint i=0; i<size; i++){
 		TableEntry* entry = getVectorTableEntry(entries, i);
-		if(encType==ENUMERATEIMPLICATIONS && entry->output!= true)
+
+		if(generateNegation == entry->output) {
+			//Skip the irrelevant entries
 			continue;
-		else if(encType==ENUMERATEIMPLICATIONSNEGATE && entry->output !=false)
-			continue;
+		}
+
 		ArrayElement* inputs = &constraint->inputs;
 		uint inputNum =getSizeArrayElement(inputs);
 		Edge carray[inputNum];
@@ -304,6 +308,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 			Element* el = getArrayElement(inputs, j);
 			Edge tmpc = getElementValueConstraint(This, el, entry->inputs[j]);
 			if( GETELEMENTTYPE(el) == ELEMFUNCRETURN){
+				// HAMED : THIS IS COMPLETELY BROKEN....
 				Edge func =encodeFunctionElementSATEncoder(This, (ElementFunction*) el);
 				carray[j] = constraintAND2(This->cnf, func, tmpc);
 			} else {
@@ -313,8 +318,8 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 		constraints[i]=constraintAND(This->cnf, inputNum, carray);
 	}
 	Edge result=constraintOR(This->cnf, size, constraints);
-	//FIXME: if it didn't match with any entry
-	return encType==ENUMERATEIMPLICATIONS? result: constraintNegate(result);
+
+	return generationNegation ? result: constraintNegate(result);
 }
 
 Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
@@ -341,10 +346,10 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 	Edge  carray[size];
 	Element* elem1 = getArrayElement( &constraint->inputs, 0);
 	Edge elemc1 = E_NULL, elemc2 = E_NULL;
-	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN)
+	if( GETELEMENTTYPE(elem1) == ELEMFUNCRETURN) //HAMED:  THIS  IS PRETTY BROKEN...
 		elemc1 = encodeFunctionElementSATEncoder(This, (ElementFunction*) elem1);
 	Element* elem2 = getArrayElement( &constraint->inputs, 1);
-	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN)
+	if( GETELEMENTTYPE(elem2) == ELEMFUNCRETURN) //HAMED: THIS IS PRETTY BROKEN
 		elemc2 = encodeFunctionElementSATEncoder(This, (ElementFunction*) elem2);
 	for(uint i=0; i<size; i++){
 		Edge arg1 = getElementValueConstraint(This, elem1, commonElements[i]);
