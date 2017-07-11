@@ -232,7 +232,7 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 			return constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[0]));
 		}
 	}
-	
+
 	return createNode(cnf, NodeType_AND, lowindex, edges);
 }
 
@@ -397,8 +397,8 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge eroot) {
 				n->intAnnot[polarity]=1;
 				for (uint i=0;i<n->numEdges;i++) {
 					Edge succ=n->edges[i];
-					succ=constraintNegateIf(succ, polarity);
 					if(!edgeIsVarConst(succ)) {
+						succ=constraintNegateIf(succ, polarity);
 						pushVectorEdge(stack, succ);
 					}
 				}
@@ -605,7 +605,7 @@ void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign) {
 	if (exp->litSize == 1) {
 		Literal l = getLiteralLitVector(&exp->singletons, 0);
 		deleteCNFExpr(exp);
-		n->ptrAnnot[sign] = (void*) ((intptr_t) (l << 1) | 1);
+		n->ptrAnnot[sign] = (void*) ((((intptr_t) l) << 1) | 1);
 	} else if (exp->litSize != 0 && (n->intAnnot[sign] > 1 || n->flags.varForced)) {
 		introProxy(cnf, e, exp, sign);
 	} else {
@@ -625,7 +625,7 @@ void constrainCNF(CNF * cnf, Literal lcond, CNFExpr *expr) {
 	for(uint i=0;i<getSizeLitVector(&expr->singletons);i++) {
 		Literal l=getLiteralLitVector(&expr->singletons,i);
 		Literal clause[] = {-lcond, l};
-		addArrayClauseLiteral(cnf->solver, 1, clause);
+		addArrayClauseLiteral(cnf->solver, 2, clause);
 	}
 	for(uint i=0;i<getSizeVectorLitVector(&expr->clauses);i++) {
 		LitVector *lv=getVectorLitVector(&expr->clauses,i);
@@ -654,7 +654,8 @@ CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {
 	Node *n=getNodePtrFromEdge(e);
 	int i = n->numEdges;
 	while (i != 0) {
-		Edge arg = n->edges[--i]; arg=constraintNegateIf(arg, isNeg);
+		Edge arg = n->edges[--i];
+		arg=constraintNegateIf(arg, isNeg);
 		Node * narg = getNodePtrFromEdge(arg);
 		
 		if (edgeIsVarConst(arg)) {
@@ -734,7 +735,8 @@ CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 	Edge largestEdge;
 	
 	CNFExpr* accum = fillArgs(cnf, e, false, &largestEdge);
-	if (accum == NULL) accum = allocCNFExprBool(true);
+	if (accum == NULL)
+		accum = allocCNFExprBool(true);
 	
 	int i = getSizeVectorEdge(&cnf->args);
 	while (i != 0) {
@@ -750,7 +752,8 @@ CNFExpr * produceConjunction(CNF * cnf, Edge e) {
 				conjoinCNFLit(accum, getProxy(argExp));
 			} else {
 				conjoinCNFExpr(accum, argExp, destroy);
-				if (destroy) narg->ptrAnnot[isNegEdge(arg)] = NULL;
+				if (destroy)
+					narg->ptrAnnot[isNegEdge(arg)] = NULL;
 			}
 		}
 	}
