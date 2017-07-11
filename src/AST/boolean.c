@@ -9,7 +9,7 @@ Boolean* allocBooleanVar(VarType t) {
 	GETBOOLEANTYPE(This)=BOOLEANVAR;
 	This->vtype=t;
 	This->var=E_NULL;
-	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+	initDefVectorBoolean(GETBOOLEANPARENTS(This));
 	return & This->base;
 }
 
@@ -20,7 +20,7 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	This->first=first;
 	This->second=second;
 	pushVectorBoolean(&order->constraints, &This->base);
-	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+	initDefVectorBoolean(GETBOOLEANPARENTS(This));
 	return & This -> base;
 }
 
@@ -28,8 +28,8 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 	BooleanPredicate* This = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
 	GETBOOLEANTYPE(This)= PREDICATEOP;
 	This->predicate=predicate;
-	allocInlineArrayInitElement(&This->inputs, inputs, numInputs);
-	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
+	initArrayInitElement(&This->inputs, inputs, numInputs);
+	initDefVectorBoolean(GETBOOLEANPARENTS(This));
 
 	for(uint i=0;i<numInputs;i++) {
 		pushVectorASTNode(GETELEMENTPARENTS(inputs[i]), (ASTNode *)This);
@@ -41,8 +41,8 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize){
 	BooleanLogic * This = ourmalloc(sizeof(BooleanLogic));
-	allocInlineDefVectorBoolean(GETBOOLEANPARENTS(This));
-	allocInlineArrayInitBoolean(&This->inputs, array, asize);
+	initDefVectorBoolean(GETBOOLEANPARENTS(This));
+	initArrayInitBoolean(&This->inputs, array, asize);
 	pushVectorBoolean(solver->allBooleans, (Boolean *) This);
 	return & This->base;
 }

@@ -10,16 +10,16 @@
 #include "satencoder.h"
 
 CSolver * allocCSolver() {
-	CSolver * tmp=(CSolver *) ourmalloc(sizeof(CSolver));
-	tmp->constraints=allocDefVectorBoolean();
-	tmp->allBooleans=allocDefVectorBoolean();
-	tmp->allSets=allocDefVectorSet();
-	tmp->allElements=allocDefVectorElement();
-	tmp->allPredicates = allocDefVectorPredicate();
-	tmp->allTables = allocDefVectorTable();
-	tmp->allOrders = allocDefVectorOrder();
-	tmp->allFunctions = allocDefVectorFunction();
-	return tmp;
+	CSolver * This=(CSolver *) ourmalloc(sizeof(CSolver));
+	This->constraints=allocDefVectorBoolean();
+	This->allBooleans=allocDefVectorBoolean();
+	This->allSets=allocDefVectorSet();
+	This->allElements=allocDefVectorElement();
+	This->allPredicates = allocDefVectorPredicate();
+	This->allTables = allocDefVectorTable();
+	This->allOrders = allocDefVectorOrder();
+	This->allFunctions = allocDefVectorFunction();
+	return This;
 }
 
 /** This function tears down the solver and the entire AST */
@@ -89,11 +89,11 @@ MutableSet * createMutableSet(CSolver * This, VarType type) {
 	return set;
 }
 
-void addItem(CSolver *solver, MutableSet * set, uint64_t element) {
+void addItem(CSolver *This, MutableSet * set, uint64_t element) {
 	addElementMSet(set, element);
 }
 
-uint64_t createUniqueItem(CSolver *solver, MutableSet * set) {
+uint64_t createUniqueItem(CSolver *This, MutableSet * set) {
 	uint64_t element=set->low++;
 	addElementMSet(set, element);
 	return element;
@@ -105,76 +105,76 @@ Element * getElementVar(CSolver *This, Set * set) {
 	return element;
 }
 
-Boolean * getBooleanVar(CSolver *solver, VarType type) {
+Boolean * getBooleanVar(CSolver *This, VarType type) {
 	Boolean* boolean= allocBooleanVar(type);
-	pushVectorBoolean(solver->allBooleans, boolean);
+	pushVectorBoolean(This->allBooleans, boolean);
 	return boolean;
 }
 
-Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior) {
+Function * createFunctionOperator(CSolver *This, ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior) {
 	Function* function = allocFunctionOperator(op, domain, numDomain, range, overflowbehavior);
-	pushVectorFunction(solver->allFunctions, function);
+	pushVectorFunction(This->allFunctions, function);
 	return function;
 }
 
-Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain) {
+Predicate * createPredicateOperator(CSolver *This, CompOp op, Set ** domain, uint numDomain) {
 	Predicate* predicate= allocPredicateOperator(op, domain,numDomain);
-	pushVectorPredicate(solver->allPredicates, predicate);
+	pushVectorPredicate(This->allPredicates, predicate);
 	return predicate;
 }
 
-Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range) {
+Table * createTable(CSolver *This, Set **domains, uint numDomain, Set * range) {
 	Table* table= allocTable(domains,numDomain,range);
-	pushVectorTable(solver->allTables, table);
+	pushVectorTable(This->allTables, table);
 	return table;
 }
 
-void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSize, uint64_t result) {
+void addTableEntry(CSolver *This, Table* table, uint64_t* inputs, uint inputSize, uint64_t result) {
 	addNewTableEntry(table,inputs, inputSize,result);
 }
 
-Function * completeTable(CSolver *solver, Table * table) {
+Function * completeTable(CSolver *This, Table * table) {
 	Function* function = allocFunctionTable(table);
-	pushVectorFunction(solver->allFunctions,function);
+	pushVectorFunction(This->allFunctions,function);
 	return function;
 }
 
-Element * applyFunction(CSolver *solver, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus) {
+Element * applyFunction(CSolver *This, Function * function, Element ** array, uint numArrays, Boolean * overflowstatus) {
 	Element* element= allocElementFunction(function,array,numArrays,overflowstatus);
-	pushVectorElement(solver->allElements, element);
+	pushVectorElement(This->allElements, element);
 	return element;
 }
 
-Boolean * applyPredicate(CSolver *solver, Predicate * predicate, Element ** inputs, uint numInputs) {
+Boolean * applyPredicate(CSolver *This, Predicate * predicate, Element ** inputs, uint numInputs) {
 	Boolean* boolean= allocBooleanPredicate(predicate, inputs, numInputs);
-	pushVectorBoolean(solver->allBooleans, boolean);
+	pushVectorBoolean(This->allBooleans, boolean);
 	return boolean;
 }
 
-Boolean * applyLogicalOperation(CSolver *solver, LogicOp op, Boolean ** array, uint asize) {
-	return allocBooleanLogicArray(solver, op, array, asize);
+Boolean * applyLogicalOperation(CSolver *This, LogicOp op, Boolean ** array, uint asize) {
+	return allocBooleanLogicArray(This, op, array, asize);
 }
 
-void addBoolean(CSolver *This, Boolean * constraint) {
+void addConstraint(CSolver *This, Boolean * constraint) {
 	pushVectorBoolean(This->constraints, constraint);
 }
 
-Order * createOrder(CSolver *solver, OrderType type, Set * set) {
+Order * createOrder(CSolver *This, OrderType type, Set * set) {
 	Order* order = allocOrder(type, set);
-	pushVectorOrder(solver->allOrders, order);
+	pushVectorOrder(This->allOrders, order);
 	return order;
 }
 
-Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64_t second) {
+Boolean * orderConstraint(CSolver *This, Order * order, uint64_t first, uint64_t second) {
 	Boolean* constraint = allocBooleanOrder(order, first, second);
-	pushVectorBoolean(solver->allBooleans,constraint);
+	pushVectorBoolean(This->allBooleans,constraint);
 	return constraint;
 }
 
-void startEncoding(CSolver* solver){
-	naiveEncodingDecision(solver);
+void startEncoding(CSolver* This){
+	naiveEncodingDecision(This);
 	SATEncoder* satEncoder = allocSATEncoder();
-	encodeAllSATEncoder(solver, satEncoder);
+	encodeAllSATEncoder(This, satEncoder);
 	int result= solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
 	for(uint i=1; i<=satEncoder->cnf->solver->solutionsize; i++){

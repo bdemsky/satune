@@ -9,7 +9,7 @@ Element *allocElementSet(Set * s) {
 	ElementSet * This=(ElementSet *)ourmalloc(sizeof(ElementSet));
 	GETELEMENTTYPE(This)= ELEMSET;
 	This->set=s;
-	allocInlineDefVectorASTNode(GETELEMENTPARENTS(This));
+	initDefVectorASTNode(GETELEMENTPARENTS(This));
 	initElementEncoding(&This->encoding, (Element *) This);
 	return &This->base;
 }
@@ -19,8 +19,8 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	GETELEMENTTYPE(This)= ELEMFUNCRETURN;
 	This->function=function;
 	This->overflowstatus = overflowstatus;
-	allocInlineArrayInitElement(&This->inputs, array, numArrays);
-	allocInlineDefVectorASTNode(GETELEMENTPARENTS(This));
+	initArrayInitElement(&This->inputs, array, numArrays);
+	initDefVectorASTNode(GETELEMENTPARENTS(This));
 	for(uint i=0;i<numArrays;i++)
 		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) This);
 	initElementEncoding(&This->domainencoding, (Element *) This);

@@ -6,9 +6,9 @@
 Order* allocOrder(OrderType type, Set * set){
 	Order* This = (Order*)ourmalloc(sizeof(Order));
 	This->set=set;
-	allocInlineDefVectorBoolean(& This->constraints);
+	initDefVectorBoolean(& This->constraints);
 	This->type=type;
-	allocOrderEncoding(& This->order, This);
+	initOrderEncoding(& This->order, This);
 	This->boolsToConstraints = NULL;
 	return This;
 }

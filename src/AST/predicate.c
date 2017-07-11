@@ -5,7 +5,7 @@
 Predicate* allocPredicateOperator(CompOp op, Set ** domain, uint numDomain){
 	PredicateOperator* This = ourmalloc(sizeof(PredicateOperator));
 	GETPREDICATETYPE(This)=OPERATORPRED;
-	allocInlineArrayInitSet(&This->domains, domain, numDomain);
+	initArrayInitSet(&This->domains, domain, numDomain);
 	This->op=op;
 	return &This->base;
 }

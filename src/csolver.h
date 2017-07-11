@@ -104,7 +104,7 @@ Boolean * applyLogicalOperation(CSolver *, LogicOp op, Boolean ** array, uint as
 /** This function adds a boolean constraint to the set of constraints
     to be satisfied */
 
-void addBoolean(CSolver *, Boolean * constraint);
+void addConstraint(CSolver *, Boolean * constraint);
 
 /** This function instantiates an order of type type over the set set. */
 Order * createOrder(CSolver *, OrderType type, Set * set);

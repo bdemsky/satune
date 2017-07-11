@@ -7,8 +7,8 @@
 
 Table * allocTable(Set **domains, uint numDomain, Set * range){
 	Table* This = (Table*) ourmalloc(sizeof(Table));
-	allocInlineArrayInitSet(&This->domains, domains, numDomain);
-	allocInlineDefVectorTableEntry(&This->entries);
+	initArrayInitSet(&This->domains, domains, numDomain);
+	initDefVectorTableEntry(&This->entries);
 	This->range =range;
 	return This;
 }

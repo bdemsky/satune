@@ -23,9 +23,9 @@
 	void clearVector ## name(Vector ## name *vector);                     \
 	void deleteVectorArray ## name(Vector ## name *vector);								\
 	type * exposeArray ## name(Vector ## name * vector);									\
-	void allocInlineVector ## name(Vector ## name * vector, uint capacity); \
-	void allocInlineDefVector ## name(Vector ## name * vector);						\
-	void allocInlineVectorArray ## name(Vector ## name * vector, uint capacity, type * array);
+	void initVector ## name(Vector ## name * vector, uint capacity); \
+	void initDefVector ## name(Vector ## name * vector);						\
+	void initVectorArray ## name(Vector ## name * vector, uint capacity, type * array);
 
 #define VectorImpl(name, type, defcap)                                  \
 	Vector ## name * allocDefVector ## name() {                           \
@@ -91,16 +91,16 @@
 	void deleteVectorArray ## name(Vector ## name *vector) {							\
 		ourfree(vector->array);                                             \
 	}																																			\
-	void allocInlineVector ## name(Vector ## name * vector, uint capacity) { \
+	void initVector ## name(Vector ## name * vector, uint capacity) { \
 		vector->size = 0;                                                      \
 		vector->capacity = capacity;																							\
 		vector->array = (type *) ourmalloc(sizeof(type) * capacity);				\
 	}																																			\
-	void allocInlineDefVector ## name(Vector ## name * vector) {					\
-		allocInlineVector ## name(vector, defcap);													\
+	void initDefVector ## name(Vector ## name * vector) {					\
+		initVector ## name(vector, defcap);													\
 	}																																			\
-	void allocInlineVectorArray ## name(Vector ## name * vector, uint capacity, type * array) {	\
-		allocInlineVector ##name(vector, capacity);													\
+	void initVectorArray ## name(Vector ## name * vector, uint capacity, type * array) {	\
+		initVector ##name(vector, capacity);													\
 		vector->size=capacity;																							\
 		memcpy(vector->array, array, capacity * sizeof(type));	\
 	}

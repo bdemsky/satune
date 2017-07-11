@@ -13,7 +13,7 @@ struct OrderEncoding {
 	Order *order;
 };
 
-void allocOrderEncoding(OrderEncoding * This, Order *order);
+void initOrderEncoding(OrderEncoding * This, Order *order);
 void deleteOrderEncoding(OrderEncoding *This);
 
 #endif

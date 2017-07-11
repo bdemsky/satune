@@ -6,7 +6,7 @@
 Function* allocFunctionOperator(ArithOp op, Set ** domain, uint numDomain, Set * range, OverFlowBehavior overflowbehavior) {
 	FunctionOperator* This = (FunctionOperator*) ourmalloc(sizeof(FunctionOperator));
 	GETFUNCTIONTYPE(This)=OPERATORFUNC;
-	allocInlineArrayInitSet(&This->domains, domain, numDomain);
+	initArrayInitSet(&This->domains, domain, numDomain);
 	This->op=op;
 	This->overflowbehavior = overflowbehavior;
 	This->range=range;

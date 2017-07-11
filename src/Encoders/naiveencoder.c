@@ -13,7 +13,7 @@
 #include "order.h"
 #include <strings.h>
 
-
+//BRIAN: MAKE FOLLOW TREE STRUCTURE
 void naiveEncodingDecision(CSolver* csolver){
 	uint size = getSizeVectorElement(csolver->allElements);
 	for(uint i=0; i<size; i++){
@@ -57,5 +57,3 @@ void baseBinaryIndexElementAssign(ElementEncoding *This) {
 		setInUseElement(This, i);
 	}
 }
-
-

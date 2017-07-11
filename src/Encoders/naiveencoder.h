@@ -3,11 +3,8 @@
 #include "classlist.h"
 #include "structs.h"
 
-
-
 /**
- *For now, This function just simply goes through elements/functions and 
- *assigns a predefined Encoding to each of them 
+ * The NaiveEncoder assigns a predefined Encoding to each Element and Function.
  * @param csolver
  * @param encoder
  */
