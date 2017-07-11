@@ -9,12 +9,12 @@ Order* allocOrder(OrderType type, Set * set){
 	initDefVectorBoolean(& This->constraints);
 	This->type=type;
 	initOrderEncoding(& This->order, This);
-	This->boolsToConstraints = NULL;
+	This->orderPairTable = NULL;
 	return This;
 }
 
 void initializeOrderHashTable(Order* This){
-	This->boolsToConstraints= allocHashTableBoolConst(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	This->orderPairTable=allocHashTableOrderPair(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
 void addOrderConstraint(Order* This, BooleanOrder* constraint){
@@ -28,9 +28,9 @@ void setOrderEncodingType(Order* This, OrderEncodingType type){
 void deleteOrder(Order* This){
 	deleteVectorArrayBoolean(& This->constraints);
 	deleteOrderEncoding(& This->order);
-	if(This->boolsToConstraints!= NULL) {
-		resetAndDeleteHashTableBoolConst(This->boolsToConstraints);
-		deleteHashTableBoolConst(This->boolsToConstraints);
+	if(This->orderPairTable != NULL) {
+		resetAndDeleteHashTableOrderPair(This->orderPairTable);
+		deleteHashTableOrderPair(This->orderPairTable);
 	}
 	ourfree(This);
 }

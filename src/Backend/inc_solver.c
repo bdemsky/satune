@@ -81,7 +81,6 @@ int solve(IncrementalSolver * This) {
 	return getSolution(This);
 }
 
-
 void startSolve(IncrementalSolver *This) {
 	addClauseLiteral(This, IS_RUNSOLVER);
 	flushBufferSolver(This);
@@ -173,11 +172,15 @@ void killSolver(IncrementalSolver * This) {
 		waitpid(This->solver_pid, &status, 0);
 	}
 }
+
+//DEBUGGING CODE STARTS
 bool first=true;
+//DEBUGGING CODE ENDS
 
 void flushBufferSolver(IncrementalSolver * This) {
 	ssize_t bytestowrite=sizeof(int)*This->offset;
 	ssize_t byteswritten=0;
+	//DEBUGGING CODE STARTS
 	for(uint i=0;i<This->offset;i++) {
 		if (first)
 			printf("(");
@@ -191,6 +194,7 @@ void flushBufferSolver(IncrementalSolver * This) {
 			printf("%d", This->buffer[i]);
 		}
 	}
+	//DEBUGGING CODE ENDS
 	do {
 		ssize_t n=write(This->to_solver_fd, &((char *)This->buffer)[byteswritten], bytestowrite);
 		if (n == -1) {

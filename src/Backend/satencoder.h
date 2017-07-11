@@ -19,7 +19,7 @@ void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Edge*carray);
 Edge encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);
 void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order);
-Edge getOrderConstraint(HashTableBoolConst *table, OrderPair *pair);
+Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair);
 Edge generateTransOrderConstraintSATEncoder(SATEncoder *This, Edge constIJ, Edge constJK, Edge constIK);
 Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);
 Edge encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint);

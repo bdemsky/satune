@@ -29,4 +29,4 @@ static inline unsigned int order_pair_equals(OrderPair* key1, OrderPair* key2){
 	return key1->first== key2->first && key1->second == key2->second;
 }
 
-HashTableImpl(BoolConst, OrderPair *, OrderPair *, order_pair_hash_Function, order_pair_equals, ourfree);
+HashTableImpl(OrderPair, OrderPair *, OrderPair *, order_pair_hash_Function, order_pair_equals, ourfree);
