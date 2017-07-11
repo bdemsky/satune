@@ -72,6 +72,7 @@ void addConstraintToSATSolver(Constraint *c, IncrementalSolver* satSolver) {
 			continue;
 		ASSERT(simp->type!=FALSE);
 		dumpConstraint(simp, satSolver);
+		freerecConstraint(simp);
 	}
 	deleteVectorConstraint(simplified);
 }
@@ -181,10 +182,10 @@ Constraint * getPairConstraint(SATEncoder *This, HashTableBoolConst * table, Ord
 	Constraint * constraint;
 	if (!containsBoolConst(table, pair)) {
 		constraint = getNewVarSATEncoder(This);
-		OrderPair * paircopy = allocOrderPair(pair->first, pair->second);
-		putBoolConst(table, paircopy, constraint);
+		OrderPair * paircopy = allocOrderPair(pair->first, pair->second, constraint);
+		putBoolConst(table, paircopy, paircopy);
 	} else
-		constraint = getBoolConst(table, pair);
+		constraint = getBoolConst(table, pair)->constraint;
 	if (negate)
 		return negateConstraint(constraint);
 	else
@@ -199,9 +200,8 @@ Constraint * encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrd
 		return createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
 	}
 	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
-	OrderPair pair={boolOrder->first, boolOrder->second};
-	Constraint* constraint = getPairConstraint(This, boolToConsts, & pair);
-	ASSERT(constraint != NULL);
+	OrderPair pair={boolOrder->first, boolOrder->second, NULL};
+	Constraint *constraint = getPairConstraint(This, boolToConsts, & pair);
 	return constraint;
 }
 
@@ -234,8 +234,7 @@ Constraint* createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* or
 
 Constraint* getOrderConstraint(HashTableBoolConst *table, OrderPair *pair){
 	ASSERT(pair->first!= pair->second);
-	Constraint* constraint= getBoolConst(table, pair);
-	ASSERT(constraint!= NULL);
+	Constraint* constraint= getBoolConst(table, pair)->constraint;
 	if(pair->first > pair->second)
 		return constraint;
 	else

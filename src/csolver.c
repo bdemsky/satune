@@ -174,7 +174,6 @@ Boolean * orderConstraint(CSolver *solver, Order * order, uint64_t first, uint64
 void startEncoding(CSolver* solver){
 	naiveEncodingDecision(solver);
 	SATEncoder* satEncoder = allocSATEncoder();
-	satEncoder->satSolver =allocIncrementalSolver();
 	encodeAllSATEncoder(solver, satEncoder);
 	finishedClauses(satEncoder->satSolver);
 	int result= solve(satEncoder->satSolver);

@@ -63,6 +63,7 @@ Constraint * allocVarConstraint(CType t, uint v) {
 void deleteConstraint(Constraint *This) {
 	if (This->operands!=NULL)
 		ourfree(This->operands);
+	ourfree(This);
 }
 
 void dumpConstraint(Constraint * This, IncrementalSolver *solver) {
@@ -97,7 +98,7 @@ void internalfreeConstraint(Constraint * This) {
 		ASSERT(0);
 	default:
 		This->type=BOGUS;
-		ourfree(This);
+		deleteConstraint(This);
 	}
 }
 
