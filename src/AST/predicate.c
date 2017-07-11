@@ -3,29 +3,30 @@
 #include "set.h"
 
 Predicate* allocPredicateOperator(CompOp op, Set ** domain, uint numDomain){
-	PredicateOperator* predicate = ourmalloc(sizeof(PredicateOperator));
-	GETPREDICATETYPE(predicate)=OPERATORPRED;
-	allocInlineArrayInitSet(&predicate->domains, domain, numDomain);
-	predicate->op=op;
-	return &predicate->base;
+	PredicateOperator* This = ourmalloc(sizeof(PredicateOperator));
+	GETPREDICATETYPE(This)=OPERATORPRED;
+	initArrayInitSet(&This->domains, domain, numDomain);
+	This->op=op;
+	return &This->base;
 }
 
 Predicate* allocPredicateTable(Table* table, UndefinedBehavior undefBehavior){
-	PredicateTable* predicate = ourmalloc(sizeof(PredicateTable));
-	GETPREDICATETYPE(predicate) = TABLEPRED;
-	predicate->table=table;
-	predicate->undefinedbehavior=undefBehavior;
-	return &predicate->base;
+	PredicateTable* This = ourmalloc(sizeof(PredicateTable));
+	GETPREDICATETYPE(This) = TABLEPRED;
+	This->table=table;
+	This->undefinedbehavior=undefBehavior;
+	return &This->base;
 }
 
-void getEqualitySetIntersection(PredicateOperator* predicate, uint* size, uint64_t* result){
-	ASSERT( predicate->op == EQUALS);
+// BRIAN: REVISIT
+void getEqualitySetIntersection(PredicateOperator* This, uint* size, uint64_t* result){
+	ASSERT( This->op == EQUALS);
 	//make sure equality has 2 operands
-	ASSERT(getSizeArraySet( &predicate->domains) == 2);
+	ASSERT(getSizeArraySet( &This->domains) == 2);
 	*size=0;
-	VectorInt* mems1 = getArraySet(&predicate->domains, 0)->members; 
+	VectorInt* mems1 = getArraySet(&This->domains, 0)->members; 
 	uint size1 = getSizeVectorInt(mems1);
-	VectorInt* mems2 = getArraySet(&predicate->domains, 1)->members;
+	VectorInt* mems2 = getArraySet(&This->domains, 1)->members;
 	uint size2 = getSizeVectorInt(mems2);
 	//FIXME:This isn't efficient, if we a hashset datastructure for Set, we
 	// can reduce it to O(n), but for now .... HG
@@ -38,13 +39,12 @@ void getEqualitySetIntersection(PredicateOperator* predicate, uint* size, uint64
 			}
 		}
 	}
-	
 }
 
-void deletePredicate(Predicate* predicate){
-	switch(GETPREDICATETYPE(predicate)) {
+void deletePredicate(Predicate* This){
+	switch(GETPREDICATETYPE(This)) {
 	case OPERATORPRED: {
-		PredicateOperator * operpred=(PredicateOperator *) predicate;
+		PredicateOperator * operpred=(PredicateOperator *) This;
 		deleteInlineArraySet(&operpred->domains);
 		break;
 	}
@@ -53,6 +53,6 @@ void deletePredicate(Predicate* predicate){
 	}
 	}
 	//need to handle freeing array...
-	ourfree(predicate);
+	ourfree(This);
 }
 

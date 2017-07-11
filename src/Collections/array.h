@@ -37,12 +37,12 @@
 	static inline void deleteInlineArray ## name(Array ## name *This) {					\
 		ourfree(This->array);																								\
 	}																																			\
-	static inline void allocInlineArray ## name(Array ## name * This, uint size) {			\
+	static inline void initArray ## name(Array ## name * This, uint size) {			\
 		This->size = size;																									\
 		This->array = (type *) ourcalloc(1, sizeof(type) * size);						\
 	}																																			\
-	static inline void allocInlineArrayInit ## name(Array ## name * This, type *array, uint size) { \
-		allocInlineArray ##name(This, size);																\
+	static inline void initArrayInit ## name(Array ## name * This, type *array, uint size) { \
+		initArray ##name(This, size);																				\
 		memcpy(This->array, array, size * sizeof(type));										\
 	}
 

@@ -3,10 +3,10 @@
 #include "set.h"
 
 
-Function* allocFunctionOperator( ArithOp op, Set ** domain, uint numDomain, Set * range,OverFlowBehavior overflowbehavior){
+Function* allocFunctionOperator(ArithOp op, Set ** domain, uint numDomain, Set * range, OverFlowBehavior overflowbehavior) {
 	FunctionOperator* This = (FunctionOperator*) ourmalloc(sizeof(FunctionOperator));
 	GETFUNCTIONTYPE(This)=OPERATORFUNC;
-	allocInlineArrayInitSet(&This->domains, domain, numDomain);
+	initArrayInitSet(&This->domains, domain, numDomain);
 	This->op=op;
 	This->overflowbehavior = overflowbehavior;
 	This->range=range;
@@ -20,9 +20,9 @@ Function* allocFunctionTable (Table* table){
 	return &This->base;
 }
 
-uint64_t applyFunctionOperator(FunctionOperator* func, uint64_t var1, uint64_t var2, bool* isInRange){
+uint64_t applyFunctionOperator(FunctionOperator* This, uint64_t var1, uint64_t var2) {
 	uint64_t result = 0;
-	switch( func->op){
+	switch(This->op){
 		case ADD:
 			result = var1+ var2;
 			break;
@@ -32,8 +32,11 @@ uint64_t applyFunctionOperator(FunctionOperator* func, uint64_t var1, uint64_t v
 		default:
 			ASSERT(0);
 	}
-	*isInRange = existsInSet(func->range, result);
 	return result;
+}
+
+bool isInRangeFunction(FunctionOperator *This, uint64_t val) {
+	return existsInSet(This->range, val);
 }
 
 void deleteFunction(Function* This){

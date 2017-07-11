@@ -1,13 +1,13 @@
 #include "mutableset.h"
 
 MutableSet * allocMutableSet(VarType t) {
-	MutableSet * tmp=(MutableSet *)ourmalloc(sizeof(MutableSet));
-	tmp->type=t;
-	tmp->isRange=false;
-	tmp->low=0;
-	tmp->high=0;
-	tmp->members=allocDefVectorInt();
-	return tmp;
+	MutableSet * This=(MutableSet *)ourmalloc(sizeof(MutableSet));
+	This->type=t;
+	This->isRange=false;
+	This->low=0;
+	This->high=0;
+	This->members=allocDefVectorInt();
+	return This;
 }
 
 void addElementMSet(MutableSet * set, uint64_t element) {

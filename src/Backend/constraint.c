@@ -56,8 +56,8 @@ CNF * createCNF() {
 	cnf->size=0;
 	cnf->maxsize=(uint)(((double)cnf->capacity)*LOAD_FACTOR);
 	cnf->enableMatching=true;
-	allocInlineDefVectorEdge(& cnf->constraints);
-	allocInlineDefVectorEdge(& cnf->args);
+	initDefVectorEdge(& cnf->constraints);
+	initDefVectorEdge(& cnf->args);
 	cnf->solver=allocIncrementalSolver();
 	return cnf;
 }
@@ -309,7 +309,7 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge) {
 	return result;
 }
 
-void addConstraint(CNF *cnf, Edge constraint) {
+void addConstraintCNF(CNF *cnf, Edge constraint) {
 	pushVectorEdge(&cnf->constraints, constraint);
 }
 

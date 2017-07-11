@@ -191,7 +191,7 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge);
 Edge constraintNewVar(CNF *cnf);
 void countPass(CNF *cnf);
 void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
-void addConstraint(CNF *cnf, Edge constraint);
+void addConstraintCNF(CNF *cnf, Edge constraint);
 int solveCNF(CNF *cnf);
 bool getValueCNF(CNF *cnf, Edge var);
 void printCNF(Edge e);

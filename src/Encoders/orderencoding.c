@@ -1,6 +1,6 @@
 #include "orderencoding.h"
 
-void allocOrderEncoding(OrderEncoding * This, Order *order) {
+void initOrderEncoding(OrderEncoding * This, Order *order) {
 	This->type=ORDER_UNASSIGNED;
 	This->order=order;
 }

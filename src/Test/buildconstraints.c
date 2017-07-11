@@ -10,10 +10,10 @@ int main(int numargs, char ** argv) {
 	Predicate *equals=createPredicateOperator(solver, EQUALS, domain, 2);
 	Element * inputs[]={e1, e2};
 	Boolean * b=applyPredicate(solver, equals, inputs, 2);
-	addBoolean(solver, b);
+	addConstraint(solver, b);
 	Order * o=createOrder(solver, TOTAL, s);
 	Boolean * oc=orderConstraint(solver, o, 1, 2);
-	addBoolean(solver, oc);
+	addConstraint(solver, oc);
 		
 	uint64_t set2[] = {2, 3};
 	Set* rangef1 = createSet(solver, 1, set2, 2);
@@ -37,7 +37,7 @@ int main(int numargs, char ** argv) {
 	Predicate* equal2 = createPredicateOperator(solver, EQUALS, domain2, 2);
 	Element* inputs2 [] = {e4, e3};
 	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2);
-	addBoolean(solver, pred);
+	addConstraint(solver, pred);
 	
 	startEncoding(solver);
 	deleteSolver(solver);

@@ -5,27 +5,26 @@
 #include "set.h"
 #include "mutableset.h"
 
-
 Table * allocTable(Set **domains, uint numDomain, Set * range){
-	Table* table = (Table*) ourmalloc(sizeof(Table));
-	allocInlineArrayInitSet(&table->domains, domains, numDomain);
-	allocInlineDefVectorTableEntry(&table->entries);
-	table->range =range;
-	return table;
+	Table* This = (Table*) ourmalloc(sizeof(Table));
+	initArrayInitSet(&This->domains, domains, numDomain);
+	initDefVectorTableEntry(&This->entries);
+	This->range =range;
+	return This;
 }
 
-void addNewTableEntry(Table* table, uint64_t* inputs, uint inputSize, uint64_t result){
-	ASSERT(getSizeArraySet( &table->domains) == inputSize);
-	pushVectorTableEntry(&table->entries, allocTableEntry(inputs, inputSize, result));
+void addNewTableEntry(Table* This, uint64_t* inputs, uint inputSize, uint64_t result){
+	ASSERT(getSizeArraySet( &This->domains) == inputSize);
+	pushVectorTableEntry(&This->entries, allocTableEntry(inputs, inputSize, result));
 }
 
-void deleteTable(Table* table){
-  deleteInlineArraySet(&table->domains);
-  uint size = getSizeVectorTableEntry(&table->entries);
+void deleteTable(Table* This){
+  deleteInlineArraySet(&This->domains);
+  uint size = getSizeVectorTableEntry(&This->entries);
   for(uint i=0; i<size; i++){
-    deleteTableEntry(getVectorTableEntry(&table->entries, i));
+    deleteTableEntry(getVectorTableEntry(&This->entries, i));
   }
-  deleteVectorArrayTableEntry(&table->entries);
-  ourfree(table);
+  deleteVectorArrayTableEntry(&This->entries);
+  ourfree(This);
 }
 

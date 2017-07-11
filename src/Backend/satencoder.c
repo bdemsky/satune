@@ -71,7 +71,7 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 		Edge c= encodeConstraintSATEncoder(This, constraint);
 		printCNF(c);
 		printf("\n\n");
-		addConstraint(This->cnf, c);
+		addConstraintCNF(This->cnf, c);
 	}
 }
 
@@ -145,22 +145,22 @@ Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
 	return E_BOGUS;
 }
 
-Edge getPairConstraint(SATEncoder *This, HashTableBoolConst * table, OrderPair * pair) {
+Edge getPairConstraint(SATEncoder *This, HashTableOrderPair * table, OrderPair * pair) {
 	bool negate = false;
 	OrderPair flipped;
 	if (pair->first > pair->second) {
 		negate=true;
 		flipped.first=pair->second;
 		flipped.second=pair->first;
-		pair = &flipped;	//FIXME: accessing a local variable from outside of the function?
+		pair = &flipped;
 	}
 	Edge constraint;
-	if (!containsBoolConst(table, pair)) {
+	if (!containsOrderPair(table, pair)) {
 		constraint = getNewVarSATEncoder(This);
 		OrderPair * paircopy = allocOrderPair(pair->first, pair->second, constraint);
-		putBoolConst(table, paircopy, paircopy);
+		putOrderPair(table, paircopy, paircopy);
 	} else
-		constraint = getBoolConst(table, pair)->constraint;
+		constraint = getOrderPair(table, pair)->constraint;
 	if (negate)
 		return constraintNegate(constraint);
 	else
@@ -170,20 +170,20 @@ Edge getPairConstraint(SATEncoder *This, HashTableBoolConst * table, OrderPair *
 
 Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder){
 	ASSERT(boolOrder->order->type == TOTAL);
-	if(boolOrder->order->boolsToConstraints == NULL){
+	if(boolOrder->order->orderPairTable == NULL){
 		initializeOrderHashTable(boolOrder->order);
 		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
 	}
-	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
+	HashTableOrderPair* orderPairTable = boolOrder->order->orderPairTable;
 	OrderPair pair={boolOrder->first, boolOrder->second, E_NULL};
-	Edge constraint = getPairConstraint(This, boolToConsts, & pair);
+	Edge constraint = getPairConstraint(This, orderPairTable, & pair);
 	return constraint;
 }
 
 void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 	ASSERT(order->type == TOTAL);
 	VectorInt* mems = order->set->members;
-	HashTableBoolConst* table = order->boolsToConstraints;
+	HashTableOrderPair* table = order->orderPairTable;
 	uint size = getSizeVectorInt(mems);
 	uint csize =0;
 	for(uint i=0; i<size; i++){
@@ -198,15 +198,15 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 				OrderPair pairIK = {valueI, valueK};
 				Edge constIK = getPairConstraint(This, table, & pairIK);
 				Edge constJK = getPairConstraint(This, table, & pairJK);
-				addConstraint(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK)); 
+				addConstraintCNF(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK)); 
 			}
 		}
 	}
 }
 
-Edge getOrderConstraint(HashTableBoolConst *table, OrderPair *pair){
+Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair){
 	ASSERT(pair->first!= pair->second);
-	Edge constraint = getBoolConst(table, pair)->constraint;
+	Edge constraint = getOrderPair(table, pair)->constraint;
 	if(pair->first > pair->second)
 		return constraint;
 	else
@@ -227,12 +227,12 @@ Edge encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint){
 	// when client specify sparse constraints for the total order!)
 	ASSERT(constraint->order->type == PARTIAL);
 /*
-	HashTableBoolConst* boolToConsts = boolOrder->order->boolsToConstraints;
-	if( containsBoolConst(boolToConsts, boolOrder) ){
-		return getBoolConst(boolToConsts, boolOrder);
+	HashTableOrderPair* boolToConsts = boolOrder->order->boolsToConstraints;
+	if( containsOrderPair(boolToConsts, boolOrder) ){
+		return getOrderPair(boolToConsts, boolOrder);
 	} else {
 		Edge constraint = getNewVarSATEncoder(This); 
-		putBoolConst(boolToConsts,boolOrder, constraint);
+		putOrderPair(boolToConsts,boolOrder, constraint);
 		VectorBoolean* orderConstrs = &boolOrder->order->constraints;
 		uint size= getSizeVectorBoolean(orderConstrs);
 		for(uint i=0; i<size; i++){
@@ -409,9 +409,10 @@ Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder, ElementFunctio
 		if(isinUseElement(elemEnc1, i)){
 			for( uint j=0; j<elemEnc2->encArraySize; j++){
 				if(isinUseElement(elemEnc2, j)){
-					bool isInRange = false;
 					uint64_t result= applyFunctionOperator((FunctionOperator*)This->function,elemEnc1->encodingArray[i],
-						elemEnc2->encodingArray[j], &isInRange);
+						elemEnc2->encodingArray[j]);
+					bool isInRange = isInRangeFunction((FunctionOperator*)This->function, result);
+
 					//FIXME: instead of getElementValueConstraint, it might be useful to have another function
 					// that doesn't iterate over encodingArray and treats more efficient ...
 					Edge valConstrIn1 = getElementValueConstraint(encoder, elemEnc1->element, elemEnc1->encodingArray[i]);

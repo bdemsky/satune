@@ -117,7 +117,7 @@ CNFExpr * allocCNFExprBool(bool isTrue) {
 	CNFExpr *This=ourmalloc(sizeof(CNFExpr));
 	This->litSize=0;
 	This->isTrue=isTrue;
-	allocInlineVectorLitVector(&This->clauses, 2);
+	initVectorLitVector(&This->clauses, 2);
 	initLitVector(&This->singletons);
 	return This;
 }
@@ -126,7 +126,7 @@ CNFExpr * allocCNFExprLiteral(Literal l) {
 	CNFExpr *This=ourmalloc(sizeof(CNFExpr));
 	This->litSize=1;
 	This->isTrue=false;
-	allocInlineVectorLitVector(&This->clauses, 2);
+	initVectorLitVector(&This->clauses, 2);
 	initLitVector(&This->singletons);
 	addLiteralLitVector(&This->singletons, l);
 	return This;

@@ -3,35 +3,34 @@
 #include "set.h"
 #include "boolean.h"
 
-
 Order* allocOrder(OrderType type, Set * set){
-	Order* order = (Order*)ourmalloc(sizeof(Order));
-	order->set=set;
-	allocInlineDefVectorBoolean(& order->constraints);
-	order->type=type;
-	allocOrderEncoding(& order->order, order);
-	order->boolsToConstraints = NULL;
-	return order;
+	Order* This = (Order*)ourmalloc(sizeof(Order));
+	This->set=set;
+	initDefVectorBoolean(& This->constraints);
+	This->type=type;
+	initOrderEncoding(& This->order, This);
+	This->orderPairTable = NULL;
+	return This;
 }
 
-void initializeOrderHashTable(Order* order){
-	order->boolsToConstraints= allocHashTableBoolConst(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+void initializeOrderHashTable(Order* This){
+	This->orderPairTable=allocHashTableOrderPair(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
-void addOrderConstraint(Order* order, BooleanOrder* constraint){
-	pushVectorBoolean( &order->constraints, (Boolean*) constraint);
+void addOrderConstraint(Order* This, BooleanOrder* constraint){
+	pushVectorBoolean( &This->constraints, (Boolean*) constraint);
 }
 
-void setOrderEncodingType(Order* order, OrderEncodingType type){
-	order->order.type = type;
+void setOrderEncodingType(Order* This, OrderEncodingType type){
+	This->order.type = type;
 }
 
-void deleteOrder(Order* order){
-	deleteVectorArrayBoolean(& order->constraints);
-	deleteOrderEncoding(& order->order);
-	if(order->boolsToConstraints!= NULL) {
-		resetAndDeleteHashTableBoolConst(order->boolsToConstraints);
-		deleteHashTableBoolConst(order->boolsToConstraints);
+void deleteOrder(Order* This){
+	deleteVectorArrayBoolean(& This->constraints);
+	deleteOrderEncoding(& This->order);
+	if(This->orderPairTable != NULL) {
+		resetAndDeleteHashTableOrderPair(This->orderPairTable);
+		deleteHashTableOrderPair(This->orderPairTable);
 	}
-	ourfree(order);
+	ourfree(This);
 }
