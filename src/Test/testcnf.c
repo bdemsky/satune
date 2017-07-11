@@ -1,4 +1,4 @@
-#include "nodeedge.h"
+#include "constraint.h"
 #include <stdio.h>
 
 int main(int numargs, char ** argv) {

@@ -1,7 +1,7 @@
 #include "orderpair.h"
 
 
-OrderPair* allocOrderPair(uint64_t first, uint64_t second, Constraint * constraint){
+OrderPair* allocOrderPair(uint64_t first, uint64_t second, Edge constraint){
 	OrderPair* pair = (OrderPair*) ourmalloc(sizeof(OrderPair));
 	pair->first = first;
 	pair->second = second;

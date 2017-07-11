@@ -10,14 +10,15 @@
 
 #include "classlist.h"
 #include "mymemory.h"
+#include "constraint.h"
 
 struct OrderPair{
 	uint64_t first;
 	uint64_t second;
-	Constraint *constraint;
+	Edge constraint;
 }; 
 
-OrderPair* allocOrderPair(uint64_t first, uint64_t second, Constraint * constraint);
+OrderPair* allocOrderPair(uint64_t first, uint64_t second, Edge constraint);
 void deleteOrderPair(OrderPair* pair);
 
 #endif /* ORDERPAIR_H */

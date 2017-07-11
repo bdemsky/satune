@@ -175,8 +175,7 @@ void startEncoding(CSolver* solver){
 	naiveEncodingDecision(solver);
 	SATEncoder* satEncoder = allocSATEncoder();
 	encodeAllSATEncoder(solver, satEncoder);
-	finishedClauses(satEncoder->satSolver);
-	int result= solve(satEncoder->satSolver);
+	int result= solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\n", result);
 	//For now, let's just delete it, and in future for doing queries 
 	//we may need it.

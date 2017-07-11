@@ -35,7 +35,7 @@ void allocInUseArrayElement(ElementEncoding *This, uint size) {
 
 void allocElementConstraintVariables(ElementEncoding* This, uint numVars){
 	This->numVars = numVars;
-	This->variables = ourmalloc(sizeof(Constraint*) * numVars);
+	This->variables = ourmalloc(sizeof(Edge) * numVars);
 }
 
 void setElementEncodingType(ElementEncoding* This, ElementEncodingType type){

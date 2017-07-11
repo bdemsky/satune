@@ -13,7 +13,6 @@ ArrayDef(Set, Set *);
 VectorDef(Table, Table *);
 VectorDef(Set, Set *);
 VectorDef(Boolean, Boolean *);
-VectorDef(Constraint, Constraint *);
 VectorDef(Function, Function *);
 VectorDef(Predicate, Predicate *);
 VectorDef(Element, Element *);

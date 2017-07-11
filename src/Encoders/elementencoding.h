@@ -2,6 +2,7 @@
 #define ELEMENTENCODING_H
 #include "classlist.h"
 #include "naiveencoder.h"
+#include "constraint.h"
 
 enum ElementEncodingType {
 	ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
@@ -12,7 +13,7 @@ typedef enum ElementEncodingType ElementEncodingType;
 struct ElementEncoding {
 	ElementEncodingType type;
 	Element * element;
-	Constraint ** variables;/* List Variables Used To Encode Element */
+	Edge * variables;/* List Variables Used To Encode Element */
 	uint64_t * encodingArray;	/* List the Variables in the appropriate order */
 	uint64_t * inUseArray;/* Bitmap to track variables in use */
 	uint encArraySize;
