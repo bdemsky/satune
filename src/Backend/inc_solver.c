@@ -11,6 +11,7 @@
 #define SATSOLVER "sat_solver"
 #include <fcntl.h>
 #include "common.h"
+#include <string.h>
 
 IncrementalSolver * allocIncrementalSolver() {
 	IncrementalSolver *This=(IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
@@ -44,15 +45,24 @@ void addClauseLiteral(IncrementalSolver * This, int literal) {
 }
 
 void addArrayClauseLiteral(IncrementalSolver * This, uint numliterals, int * literals) {
-	for(uint i=0;i<numliterals; i++) {
-		This->buffer[This->offset++]=literals[i];
-		if (This->offset==IS_BUFFERSIZE) {
+	uint index=0;
+	while(true) {
+		uint bufferspace=IS_BUFFERSIZE-This->offset;
+		uint numtowrite=numliterals-index;
+		if (bufferspace > numtowrite) {
+			memcpy(&This->buffer[This->offset], &literals[index], numtowrite*sizeof(int));
+			This->offset+=numtowrite;
+			This->buffer[This->offset++]=0; //have one extra spot always
+			if (This->offset==IS_BUFFERSIZE) {//Check if full
+				flushBufferSolver(This);
+			}
+			return;
+		} else {
+			memcpy(&This->buffer[This->offset], &literals[index], bufferspace*sizeof(int));
+			This->offset+=bufferspace;
+			index+=bufferspace;
 			flushBufferSolver(This);
 		}
-	}
-	This->buffer[This->offset++]=0;
-	if (This->offset==IS_BUFFERSIZE) {
-		flushBufferSolver(This);
 	}
 }
 
