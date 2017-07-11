@@ -494,6 +494,7 @@ Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 }
 
 Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
+	//FIXME: HANDLE UNDEFINED BEHAVIORS
 	ASSERT(GETFUNCTIONTYPE(This->function)==TABLEFUNC);
 	ArrayElement* elements= &This->inputs;
 	Table* table = ((FunctionTable*) (This->function))->table;
