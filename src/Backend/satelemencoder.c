@@ -9,8 +9,7 @@ Edge getElementValueConstraint(SATEncoder* This, Element* elem, uint64_t value) 
 		case ONEHOT:
 			return getElementValueOneHotConstraint(This, elem, value);
 		case UNARY:
-			ASSERT(0);
-			break;
+			return getElementValueUnaryConstraint(This, elem, value);
 		case BINARYINDEX:
 			return getElementValueBinaryIndexConstraint(This, elem, value);
 		case ONEHOTBINARY:
@@ -50,6 +49,21 @@ Edge getElementValueOneHotConstraint(SATEncoder * This, Element* elem, uint64_t 
 	return E_BOGUS;
 }
 
+Edge getElementValueUnaryConstraint(SATEncoder * This, Element* elem, uint64_t value) {
+	ASTNodeType type = GETELEMENTTYPE(elem);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ElementEncoding* elemEnc = getElementEncoding(elem);
+	for(uint i=0; i<elemEnc->encArraySize; i++){
+		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {
+			if ((i+1)==elemEnc->encArraySize)
+				return elemEnc->variables[i];
+			else
+				return constraintAND2(This->cnf, elemEnc->variables[i], constraintNegate(elemEnc->variables[i+1]));
+		}
+	}
+	return E_BOGUS;
+}
+
 void allocElementConstraintVariables(ElementEncoding* This, uint numVars) {
 	This->numVars = numVars;
 	This->variables = ourmalloc(sizeof(Edge) * numVars);
@@ -69,6 +83,16 @@ void generateOneHotEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
 			addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf, encoding->variables[i], constraintNegate(encoding->variables[j])));
 		}
 	}
+	addConstraintCNF(This->cnf, constraintOR(This->cnf, encoding->numVars, encoding->variables));
+}
+
+void generateUnaryEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
+	allocElementConstraintVariables(encoding, encoding->encArraySize);
+	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);	
+	//Add unary constraint
+	for(uint i=1;i<encoding->numVars;i++) {
+		addConstraintCNF(This->cnf, constraintOR2(This->cnf, encoding->variables[i-1], constraintNegate(encoding->variables[i])));
+	}
 }
 
 void generateElementEncoding(SATEncoder* This, Element * element) {
@@ -82,6 +106,9 @@ void generateElementEncoding(SATEncoder* This, Element * element) {
 		return;
 	case BINARYINDEX:
 		generateBinaryIndexEncodingVars(This, encoding);
+		return;
+	case UNARY:
+		generateUnaryEncodingVars(This, encoding);
 		return;
 	default:
 		ASSERT(0);
