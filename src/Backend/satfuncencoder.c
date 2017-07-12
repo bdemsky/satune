@@ -48,8 +48,7 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 		case ENUMERATEIMPLICATIONS:
 			return encodeEnumOperatorPredicateSATEncoder(This, constraint);
 		case CIRCUIT:
-			ASSERT(0);
-			break;
+			return encodeCircuitOperatorPredicateEncoder(This, constraint);
 		default:
 			ASSERT(0);
 	}
