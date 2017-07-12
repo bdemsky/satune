@@ -122,7 +122,7 @@ Edge encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constr
 void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 	switch( GETELEMENTTYPE(This) ){
 		case ELEMFUNCRETURN:
-			addConstraintCNF(encoder->cnf, encodeElementFunctionSATEncoder(encoder, (ElementFunction*) This));
+			encodeElementFunctionSATEncoder(encoder, (ElementFunction*) This);
 			break;
 		case ELEMSET:
 			return;
@@ -131,22 +131,23 @@ void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 	}
 }
 
-Edge encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This){
+void encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This){
 	switch(GETFUNCTIONTYPE(This->function)){
 		case TABLEFUNC:
-			return encodeTableElementFunctionSATEncoder(encoder, This);
+			encodeTableElementFunctionSATEncoder(encoder, This);
+			break;
 		case OPERATORFUNC:
-			return encodeOperatorElementFunctionSATEncoder(encoder, This);
+			encodeOperatorElementFunctionSATEncoder(encoder, This);
+			break;
 		default:
 			ASSERT(0);
 	}
-	return E_BOGUS;
 }
 
-Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
+void encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
 	switch(getElementFunctionEncoding(This)->type){
 		case ENUMERATEIMPLICATIONS:
-			return encodeEnumTableElemFunctionSATEncoder(encoder, This);
+			encodeEnumTableElemFunctionSATEncoder(encoder, This);
 			break;
 		case CIRCUIT:
 			ASSERT(0);
@@ -154,5 +155,4 @@ Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* 
 		default:
 			ASSERT(0);
 	}
-	return E_BOGUS;
 }

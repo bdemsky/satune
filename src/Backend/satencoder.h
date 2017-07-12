@@ -29,7 +29,7 @@ Edge encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constr
 
 
 void encodeElementSATEncoder(SATEncoder* encoder, Element *This);
-Edge encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This);
-Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
+void encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This);
+void encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
 
 #endif

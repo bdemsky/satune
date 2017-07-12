@@ -114,7 +114,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 }
 
 
-Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* func) {
+void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* func) {
 	FunctionOperator * function = (FunctionOperator *) func->function;
 	uint numDomains=getSizeArrayElement(&func->inputs);
 
@@ -213,15 +213,15 @@ Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 	}
 
 	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	addConstraintCNF(This->cnf, cor);
 	deleteVectorEdge(clauses);
-	return cor;
 }
 
-Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This){
+void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* func){
 	//FIXME: HANDLE UNDEFINED BEHAVIORS
-	ASSERT(GETFUNCTIONTYPE(This->function)==TABLEFUNC);
-	ArrayElement* elements= &This->inputs;
-	Table* table = ((FunctionTable*) (This->function))->table;
+	ASSERT(GETFUNCTIONTYPE(func->function)==TABLEFUNC);
+	ArrayElement* elements= &func->inputs;
+	Table* table = ((FunctionTable*) (func->function))->table;
 	uint size = getSizeVectorTableEntry(&table->entries);
 	Edge constraints[size]; //FIXME: should add a space for the case that didn't match any entries
 	for(uint i=0; i<size; i++) {
@@ -230,11 +230,11 @@ Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction*
 		Edge carray[inputNum];
 		for(uint j=0; j<inputNum; j++){
 			Element* el= getArrayElement(elements, j);
-			carray[j] = getElementValueConstraint(encoder, el, entry->inputs[j]);
+			carray[j] = getElementValueConstraint(This, el, entry->inputs[j]);
 		}
-		Edge output = getElementValueConstraint(encoder, (Element*)This, entry->output);
-		Edge row= constraintIMPLIES(encoder->cnf, constraintAND(encoder->cnf, inputNum, carray), output);
+		Edge output = getElementValueConstraint(This, (Element*)func, entry->output);
+		Edge row= constraintIMPLIES(This->cnf, constraintAND(This->cnf, inputNum, carray), output);
 		constraints[i]=row;
 	}
-	return constraintOR(encoder->cnf, size, constraints);
+	addConstraintCNF(This->cnf, constraintOR(This->cnf, size, constraints));
 }
