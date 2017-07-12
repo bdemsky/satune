@@ -13,6 +13,7 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding*
 	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
 	return elemEnc->encodingArray[index];
 }
+
 uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint index=0;
 	for(int i=elemEnc->numVars-1;i>=0;i--) {
@@ -22,16 +23,28 @@ uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elem
 	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
 	return elemEnc->encodingArray[index];
 }
+
+uint64_t getElementValueUnarySATTranslator(CSolver* This, ElementEncoding* elemEnc){
+	uint index=0;
+	for(int i=elemEnc->numVars-1;i>=0;i--) {
+		if (This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ])
+			index = i;
+	}
+	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
+	return elemEnc->encodingArray[index];
+}
+
 uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
-	switch(getElementEncoding(element)->type){
+	ElementEncoding* elemEnc = getElementEncoding(element);
+	switch(elemEnc->type){
 		case ONEHOT:
-			ASSERT(0);
+			getElementValueOneHotSATTranslator(This, elemEnc);
 			break;
 		case UNARY:
-			ASSERT(0);
+			getElementValueUnarySATTranslator(This, elemEnc);
 			break;
 		case BINARYINDEX:
-			return getElementValueBinaryIndexSATTranslator(This, getElementEncoding(element));
+			return getElementValueBinaryIndexSATTranslator(This, elemEnc);
 		case ONEHOTBINARY:
 			ASSERT(0);
 			break;
@@ -42,6 +55,7 @@ uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
 			ASSERT(0);
 			break;
 	}
+	return -1;
 }
 
 bool getBooleanVariableValueSATTranslator( CSolver* This , Boolean* boolean){

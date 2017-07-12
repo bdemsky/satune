@@ -12,6 +12,7 @@
 
 bool getBooleanVariableValueSATTranslator( CSolver* This , Boolean* boolean);
 uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elemEnc);
+uint64_t getElementValueUnarySATTranslator(CSolver* This, ElementEncoding* elemEnc);
 uint64_t getElementValueSATTranslator(CSolver* This, Element* element);
 
 #endif /* SATTRANSLATOR_H */
