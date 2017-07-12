@@ -12,6 +12,8 @@
 #include "predicate.h"
 #include "set.h"
 
+//TODO: Should handle sharing of AST Nodes without recoding them a second time
+
 SATEncoder * allocSATEncoder() {
 	SATEncoder *This=ourmalloc(sizeof (SATEncoder));
 	This->varcount=1;

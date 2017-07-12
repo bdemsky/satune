@@ -190,11 +190,10 @@ uint64_t getElementValue(CSolver* This, Element* element){
 	switch(GETELEMENTTYPE(element)){
 		case ELEMSET:
 			return getElementValueSATTranslator(This, element);
-			break;
 		default:
 			ASSERT(0);
 	}
-	return -1;
+	exit(-1);
 }
 
 bool getBooleanValue( CSolver* This , Boolean* boolean){
@@ -204,5 +203,5 @@ bool getBooleanValue( CSolver* This , Boolean* boolean){
 		default:
 			ASSERT(0);
 	}
-	return -1;
+	exit(-1);
 }
