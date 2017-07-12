@@ -47,24 +47,22 @@ void naiveEncodingLogicOp(BooleanLogic * This) {
 }
 
 void naiveEncodingPredicate(BooleanPredicate * This) {
-	FunctionEncoding * encoding = getPredicateFunctionEncoding(This);
-	if (getFunctionEncodingType(encoding) != FUNC_UNASSIGNED)
-		return;
+	FunctionEncoding *encoding = getPredicateFunctionEncoding(This);
+	if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
+		setFunctionEncodingType(getPredicateFunctionEncoding(This), ENUMERATEIMPLICATIONS);
 
-	setFunctionEncodingType(getPredicateFunctionEncoding(This), ENUMERATEIMPLICATIONS);
 	for(uint i=0; i < getSizeArrayElement(&This->inputs); i++) {
-		Element * element=getArrayElement(&This->inputs, i);
+		Element *element=getArrayElement(&This->inputs, i);
 		naiveEncodingElement(element);
 	}
 }
 
 void naiveEncodingElement(Element * This) {
 	ElementEncoding * encoding = getElementEncoding(This);
-	if (getElementEncodingType(encoding) != ELEM_UNASSIGNED)
-		return;
-	
-	setElementEncodingType(encoding, BINARYINDEX);
-	baseBinaryIndexElementAssign(encoding);
+	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
+		setElementEncodingType(encoding, BINARYINDEX);
+		baseBinaryIndexElementAssign(encoding);
+	}
 	
 	if(GETELEMENTTYPE(This) == ELEMFUNCRETURN) {
 		ElementFunction *function=(ElementFunction *) This;
@@ -72,7 +70,9 @@ void naiveEncodingElement(Element * This) {
 			Element * element=getArrayElement(&function->inputs, i);
 			naiveEncodingElement(element);
 		}
-		setFunctionEncodingType(getElementFunctionEncoding(function), ENUMERATEIMPLICATIONS);
+		FunctionEncoding *encoding = getElementFunctionEncoding(function);
+		if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
+			setFunctionEncodingType(getElementFunctionEncoding(function), ENUMERATEIMPLICATIONS);
 	}
 }
 
