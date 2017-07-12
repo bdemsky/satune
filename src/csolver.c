@@ -8,6 +8,7 @@
 #include "table.h"
 #include "function.h"
 #include "satencoder.h"
+#include "sattranslator.h"
 
 CSolver * allocCSolver() {
 	CSolver * This=(CSolver *) ourmalloc(sizeof(CSolver));
@@ -19,6 +20,7 @@ CSolver * allocCSolver() {
 	This->allTables = allocDefVectorTable();
 	This->allOrders = allocDefVectorOrder();
 	This->allFunctions = allocDefVectorFunction();
+	This->satEncoder = allocSATEncoder();
 	return This;
 }
 
@@ -68,6 +70,7 @@ void deleteSolver(CSolver *This) {
 		deleteFunction(getVectorFunction(This->allFunctions, i));
 	}
 	deleteVectorFunction(This->allFunctions);
+	deleteSATEncoder(This->satEncoder);
 	ourfree(This);
 }
 
@@ -173,7 +176,7 @@ Boolean * orderConstraint(CSolver *This, Order * order, uint64_t first, uint64_t
 
 void startEncoding(CSolver* This){
 	naiveEncodingDecision(This);
-	SATEncoder* satEncoder = allocSATEncoder();
+	SATEncoder* satEncoder = This->satEncoder;
 	encodeAllSATEncoder(This, satEncoder);
 	int result= solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
@@ -181,7 +184,25 @@ void startEncoding(CSolver* This){
 		model_print("%d, ", satEncoder->cnf->solver->solution[i]);
 	}
 	model_print("\n");
-	//For now, let's just delete it, and in future for doing queries 
-	//we may need it.
-	deleteSATEncoder(satEncoder);
+}
+
+uint64_t getElementValue(CSolver* This, Element* element){
+	switch(GETELEMENTTYPE(element)){
+		case ELEMSET:
+			return getElementValueSATTranslator(This, element);
+			break;
+		default:
+			ASSERT(0);
+	}
+	return -1;
+}
+
+bool getBooleanValue( CSolver* This , Boolean* boolean){
+	switch(GETBOOLEANTYPE(boolean)){
+		case BOOLEANVAR:
+			return getBooleanVariableValueSATTranslator(This, boolean);
+		default:
+			ASSERT(0);
+	}
+	return -1;
 }

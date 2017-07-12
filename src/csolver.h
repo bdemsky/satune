@@ -5,6 +5,7 @@
 #include "structs.h"
 
 struct CSolver {
+	SATEncoder* satEncoder;
 	/** This is a vector of constraints that must be satisfied. */
 	VectorBoolean * constraints;
 
@@ -114,4 +115,11 @@ Boolean * orderConstraint(CSolver *, Order * order, uint64_t first, uint64_t sec
 
 /** When everything is done, the client calls this function and then csolver starts to encode*/
 void startEncoding(CSolver*);
+
+/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
+uint64_t getElementValue(CSolver*, Element* element);
+
+/** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
+bool getBooleanValue( CSolver* , Boolean* boolean);
+
 #endif
