@@ -13,6 +13,15 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding*
 	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
 	return elemEnc->encodingArray[index];
 }
+uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elemEnc){
+	uint index=0;
+	for(int i=elemEnc->numVars-1;i>=0;i--) {
+		if (This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ])
+			index = i;
+	}
+	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
+	return elemEnc->encodingArray[index];
+}
 uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
 	switch(getElementEncoding(element)->type){
 		case ONEHOT:
