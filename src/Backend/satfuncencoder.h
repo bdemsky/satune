@@ -6,5 +6,7 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
 void encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder,ElementFunction* This);
 void encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
+Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate * constraint);
+Edge encodeCircuitEquals(SATEncoder * This, BooleanPredicate * constraint);
 
 #endif

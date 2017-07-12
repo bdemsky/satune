@@ -56,6 +56,35 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 	return E_BOGUS;
 }
 
+Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate * constraint) {
+	PredicateOperator * predicate = (PredicateOperator*) constraint->predicate;
+	
+	switch(predicate->op) {
+	case EQUALS: {
+		return encodeCircuitEquals(This, constraint);
+	}
+	default:
+		ASSERT(0);
+	}
+	exit(-1);
+}
+
+Edge encodeCircuitEquals(SATEncoder * This, BooleanPredicate * constraint) {
+	PredicateOperator * predicate = (PredicateOperator*) constraint->predicate;
+	ASSERT(getSizeArraySet(&predicate->domains) == 2);
+	Element *elem0 = getArrayElement( &constraint->inputs, 0);
+	Element *elem1 = getArrayElement( &constraint->inputs, 1);
+	ElementEncoding *ee0=getElementEncoding(elem0);
+	ElementEncoding *ee1=getElementEncoding(elem1);
+	ASSERT(ee0->numVars==ee1->numVars);
+	uint numVars=ee0->numVars;
+	Edge carray[numVars];
+	for (uint i=0; i<numVars; i++) {
+		carray[i]=constraintIFF(This->cnf, ee0->variables[i], ee1->variables[i]);
+	}
+	return constraintAND(This->cnf, numVars, carray);
+}
+
 Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
 	PredicateOperator* predicate = (PredicateOperator*)constraint->predicate;
 	uint numDomains=getSizeArraySet(&predicate->domains);

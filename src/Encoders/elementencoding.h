@@ -28,6 +28,7 @@ void allocEncodingArrayElement(ElementEncoding *This, uint size);
 void allocInUseArrayElement(ElementEncoding *This, uint size);
 void generateBinaryIndexEncodingVars(SATEncoder* encode, ElementEncoding* This);
 void generateElementEncodingVariables(SATEncoder* encoder, ElementEncoding* This);
+static inline uint numEncodingVars(ElementEncoding *This) {return This->numVars;}
 
 static inline bool isinUseElement(ElementEncoding *This, uint offset) {
 	return (This->inUseArray[(offset>>6)] >> (offset & 63)) &0x1;
