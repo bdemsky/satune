@@ -15,6 +15,7 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding*
 }
 
 uint64_t getElementValueBinaryValueSATTranslator(CSolver* This, ElementEncoding* elemEnc){
+	//THIS WILL PROBABLY BE WRONG SINCE THE VALUES CAN BE OFFSET
 	uint64_t value=0;
 	for(int i=elemEnc->numVars-1;i>=0;i--) {
 		value=value<<1;
@@ -35,13 +36,14 @@ uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elem
 }
 
 uint64_t getElementValueUnarySATTranslator(CSolver* This, ElementEncoding* elemEnc){
-	uint index=0;
-	for(int i=elemEnc->numVars-1;i>=0;i--) {
-		if (This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ])
-			index = i;
+	uint i;
+	for(i=0;i<elemEnc->numVars;i++) {
+		if (!This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ]) {
+			break;
+		}
 	}
-	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
-	return elemEnc->encodingArray[index];
+
+	return elemEnc->encodingArray[i];
 }
 
 uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
