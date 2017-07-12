@@ -33,30 +33,7 @@ void allocInUseArrayElement(ElementEncoding *This, uint size) {
 	This->inUseArray=ourcalloc(1, bytes);
 }
 
-void allocElementConstraintVariables(ElementEncoding* This, uint numVars){
-	This->numVars = numVars;
-	This->variables = ourmalloc(sizeof(Edge) * numVars);
-}
-
 void setElementEncodingType(ElementEncoding* This, ElementEncodingType type){
 	This->type = type;
 }
 
-void generateBinaryIndexEncodingVars(SATEncoder* encoder, ElementEncoding* This){
-	ASSERT(This->type==BINARYINDEX);
-	allocElementConstraintVariables(This, NUMBITS(This->encArraySize-1));
-	getArrayNewVarsSATEncoder(encoder, This->numVars, This->variables);
-}
-
-void generateElementEncodingVariables(SATEncoder* encoder, ElementEncoding* This){
-	ASSERT(This->type!=ELEM_UNASSIGNED);
-	if(This->variables!=NULL)
-		return;
-	switch(This->type){
-		case BINARYINDEX:
-			generateBinaryIndexEncodingVars(encoder, This);
-			break;
-		default:
-			ASSERT(0);
-	}
-}

@@ -127,6 +127,7 @@ void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 			encodeElementFunctionSATEncoder(encoder, (ElementFunction*) This);
 			break;
 		case ELEMSET:
+			generateElementEncoding(encoder, This);
 			return;
 		default:
 			ASSERT(0);

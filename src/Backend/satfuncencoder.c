@@ -52,7 +52,7 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * con
 		default:
 			ASSERT(0);
 	}
-	return E_BOGUS;
+	exit(-1);
 }
 
 Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate * constraint) {
