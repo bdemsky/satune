@@ -13,6 +13,7 @@ struct SATEncoder {
 
 #include "satelemencoder.h"
 #include "satorderencoder.h"
+#include "satfuncencoder.h"
 
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
@@ -24,12 +25,11 @@ Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint);
 Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint);
 Edge encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
 Edge encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
-Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
-Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
-Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
+
+
+
 void encodeElementSATEncoder(SATEncoder* encoder, Element *This);
-Edge encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This);
-Edge encodeEnumTableElemFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
-Edge encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
-Edge encodeOperatorElementFunctionSATEncoder(SATEncoder* encoder,ElementFunction* This);
+void encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This);
+void encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
+
 #endif

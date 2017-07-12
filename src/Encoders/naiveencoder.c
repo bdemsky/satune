@@ -13,34 +13,66 @@
 #include "order.h"
 #include <strings.h>
 
-//BRIAN: MAKE FOLLOW TREE STRUCTURE
-void naiveEncodingDecision(CSolver* csolver){
-	uint size = getSizeVectorElement(csolver->allElements);
-	for(uint i=0; i<size; i++){
-		Element* element = getVectorElement(csolver->allElements, i);
-		//Whether it's a ElementFunction or ElementSet we should do the followings:
-		setElementEncodingType(getElementEncoding(element), BINARYINDEX);
-		baseBinaryIndexElementAssign(getElementEncoding(element));
-		if(GETELEMENTTYPE(element) == ELEMFUNCRETURN){
-			setFunctionEncodingType(getElementFunctionEncoding((ElementFunction*)element),
-				ENUMERATEIMPLICATIONS);
-		}
+void naiveEncodingDecision(CSolver* This) {
+	for (uint i=0; i < getSizeVectorBoolean(This->constraints); i++) {
+		naiveEncodingConstraint(getVectorBoolean(This->constraints, i));
+	}
+}
+
+void naiveEncodingConstraint(Boolean * This) {
+	switch(GETBOOLEANTYPE(This)) {
+	case BOOLEANVAR: {
+		return;
+	}
+	case ORDERCONST: {
+		setOrderEncodingType( ((BooleanOrder*)This)->order, PAIRWISE );
+		return;
+	}
+	case LOGICOP: {
+		naiveEncodingLogicOp((BooleanLogic *) This);
+	}
+	case PREDICATEOP: {
+		naiveEncodingPredicate((BooleanPredicate *) This);
+		return;
+	}
+	default:
+		ASSERT(0);
+	}
+}
+
+void naiveEncodingLogicOp(BooleanLogic * This) {
+	for(uint i=0; i < getSizeArrayBoolean(&This->inputs); i++) {
+		naiveEncodingConstraint(getArrayBoolean(&This->inputs, i));
+	}
+}
+
+void naiveEncodingPredicate(BooleanPredicate * This) {
+	FunctionEncoding *encoding = getPredicateFunctionEncoding(This);
+	if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
+		setFunctionEncodingType(getPredicateFunctionEncoding(This), ENUMERATEIMPLICATIONS);
+
+	for(uint i=0; i < getSizeArrayElement(&This->inputs); i++) {
+		Element *element=getArrayElement(&This->inputs, i);
+		naiveEncodingElement(element);
+	}
+}
+
+void naiveEncodingElement(Element * This) {
+	ElementEncoding * encoding = getElementEncoding(This);
+	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
+		setElementEncodingType(encoding, BINARYINDEX);
+		baseBinaryIndexElementAssign(encoding);
 	}
 	
-	size = getSizeVectorBoolean(csolver->allBooleans);
-	for(uint i=0; i<size; i++){
-		Boolean* boolean = getVectorBoolean(csolver->allBooleans, i);
-		switch(GETBOOLEANTYPE(boolean)){
-			case PREDICATEOP:
-				setFunctionEncodingType(getPredicateFunctionEncoding((BooleanPredicate*)boolean),
-					ENUMERATEIMPLICATIONS);
-				break;
-			case ORDERCONST:
-				setOrderEncodingType( ((BooleanOrder*)boolean)->order, PAIRWISE );
-				break;
-			default:
-				continue;
-		} 
+	if(GETELEMENTTYPE(This) == ELEMFUNCRETURN) {
+		ElementFunction *function=(ElementFunction *) This;
+		for(uint i=0; i < getSizeArrayElement(&function->inputs); i++) {
+			Element * element=getArrayElement(&function->inputs, i);
+			naiveEncodingElement(element);
+		}
+		FunctionEncoding *encoding = getElementFunctionEncoding(function);
+		if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
+			setFunctionEncodingType(getElementFunctionEncoding(function), ENUMERATEIMPLICATIONS);
 	}
 }
 

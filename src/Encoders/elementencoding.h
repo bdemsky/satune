@@ -21,6 +21,7 @@ struct ElementEncoding {
 };
 
 void initElementEncoding(ElementEncoding *This, Element *element);
+static inline ElementEncodingType getElementEncodingType(ElementEncoding * This) {return This->type;}
 void setElementEncodingType(ElementEncoding* This, ElementEncodingType type);
 void deleteElementEncoding(ElementEncoding *This);
 void allocEncodingArrayElement(ElementEncoding *This, uint size);

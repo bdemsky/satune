@@ -24,6 +24,7 @@ struct FunctionEncoding {
 void initFunctionEncoding(FunctionEncoding *encoding, Element *function);
 void initPredicateEncoding(FunctionEncoding *encoding, Boolean *predicate);
 void setFunctionEncodingType(FunctionEncoding* encoding, FunctionEncodingType type);
+static inline FunctionEncodingType getFunctionEncodingType(FunctionEncoding* This) {return This->type;}
 void deleteFunctionEncoding(FunctionEncoding *This);
 
 #endif
