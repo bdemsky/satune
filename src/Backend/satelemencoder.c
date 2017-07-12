@@ -99,8 +99,8 @@ void generateOneHotEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
 	allocElementConstraintVariables(encoding, encoding->encArraySize);
 	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);	
 	for(uint i=0;i<encoding->numVars;i++) {
-		for(uint j=0;j<encoding->numVars;j++) {
-			addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf, encoding->variables[i], constraintNegate(encoding->variables[j])));
+		for(uint j=i+1;j<encoding->numVars;j++) {
+			addConstraintCNF(This->cnf, constraintNegate(constraintAND2(This->cnf, encoding->variables[i], encoding->variables[j])));
 		}
 	}
 	addConstraintCNF(This->cnf, constraintOR(This->cnf, encoding->numVars, encoding->variables));
