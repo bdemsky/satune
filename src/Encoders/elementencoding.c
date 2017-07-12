@@ -37,3 +37,12 @@ void setElementEncodingType(ElementEncoding* This, ElementEncodingType type){
 	This->type = type;
 }
 
+uint getMaximumBitsBinaryValueEncodingVars(ElementEncoding *encoding) {
+	uint64_t max = 0;
+	for(uint i=0; i< encoding->encArraySize; i++){
+		if(encoding->encodingArray[i]>max)
+			max = encoding->encodingArray[i];
+	}
+	return NUMBITS(max-1);
+}
+

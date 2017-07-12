@@ -36,4 +36,6 @@ static inline void setInUseElement(ElementEncoding *This, uint offset) {
 	This->inUseArray[(offset>>6)] |= 1 << (offset & 63);
 }
 
+uint getMaximumBitsBinaryValueEncodingVars(ElementEncoding *encoding);
+
 #endif
