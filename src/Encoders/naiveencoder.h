@@ -8,7 +8,12 @@
  * @param csolver
  * @param encoder
  */
+
 void naiveEncodingDecision(CSolver* csolver);
+void naiveEncodingConstraint(Boolean * This);
+void naiveEncodingLogicOp(BooleanLogic * This);
+void naiveEncodingPredicate(BooleanPredicate * This);
+void naiveEncodingElement(Element * This);
 void baseBinaryIndexElementAssign(ElementEncoding *This);
 
 #endif
