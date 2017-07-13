@@ -40,7 +40,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 	}
 	Edge result=constraintOR(This->cnf, size, constraints);
 
-	return generateNegation ? result: constraintNegate(result);
+	return generateNegation ? constraintNegate(result) : result;
 }
 
 Edge encodeOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint) {
@@ -117,7 +117,8 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 				Element * elem = getArrayElement(&constraint->inputs, i);
 				carray[i] = getElementValueConstraint(This, elem, vals[i]);
 			}
-			pushVectorEdge(clauses, constraintAND(This->cnf, numDomains, carray));
+			Edge term=constraintAND(This->cnf, numDomains, carray);
+			pushVectorEdge(clauses, term);
 		}
 		
 		notfinished=false;
@@ -138,7 +139,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 
 	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	deleteVectorEdge(clauses);
-	return generateNegation ? cor : constraintNegate(cor);
+	return generateNegation ? constraintNegate(cor) : cor;
 }
 
 

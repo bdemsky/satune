@@ -174,7 +174,7 @@ Boolean * orderConstraint(CSolver *This, Order * order, uint64_t first, uint64_t
 	return constraint;
 }
 
-void startEncoding(CSolver* This){
+int startEncoding(CSolver* This){
 	naiveEncodingDecision(This);
 	SATEncoder* satEncoder = This->satEncoder;
 	encodeAllSATEncoder(This, satEncoder);
@@ -184,6 +184,7 @@ void startEncoding(CSolver* This){
 		model_print("%d, ", satEncoder->cnf->solver->solution[i]);
 	}
 	model_print("\n");
+	return result;
 }
 
 uint64_t getElementValue(CSolver* This, Element* element){

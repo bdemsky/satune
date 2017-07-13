@@ -114,7 +114,7 @@ Order * createOrder(CSolver *, OrderType type, Set * set);
 Boolean * orderConstraint(CSolver *, Order * order, uint64_t first, uint64_t second);
 
 /** When everything is done, the client calls this function and then csolver starts to encode*/
-void startEncoding(CSolver*);
+int startEncoding(CSolver*);
 
 /** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 uint64_t getElementValue(CSolver*, Element* element);

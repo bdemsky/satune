@@ -11,10 +11,7 @@ int main(int numargs, char ** argv) {
 	Element * inputs[]={e1, e2};
 	Boolean * b=applyPredicate(solver, equals, inputs, 2);
 	addConstraint(solver, b);
-	Order * o=createOrder(solver, TOTAL, s);
-	Boolean * oc=orderConstraint(solver, o, 1, 2);
-	addConstraint(solver, oc);
-		
+
 	uint64_t set2[] = {2, 3};
 	Set* rangef1 = createSet(solver, 1, set2, 2);
 	Function * f1 = createFunctionOperator(solver, ADD, domain, 2, rangef1, IGNORE);
@@ -25,7 +22,7 @@ int main(int numargs, char ** argv) {
 	uint64_t row3[] = {2, 1};
 	uint64_t row4[] = {1, 2};
 	addTableEntry(solver, table, row1, 2, 0);
-	addTableEntry(solver, table, row2, 2, 1);
+	addTableEntry(solver, table, row2, 2, 0);
 	addTableEntry(solver, table, row3, 2, 2);
 	addTableEntry(solver, table, row4, 2, 2);
 	Function * f2 = completeTable(solver, table); //its range would be as same as s
@@ -39,6 +36,7 @@ int main(int numargs, char ** argv) {
 	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2);
 	addConstraint(solver, pred);
 	
-	startEncoding(solver);
+	if (startEncoding(solver)==1)
+		printf("e1=%llu e2=%llu\n", getElementValue(solver,e1), getElementValue(solver, e2));
 	deleteSolver(solver);
 }
