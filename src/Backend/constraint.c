@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "inc_solver.h"
 #include "cnfexpr.h"
-
+#include "common.h"
 /* 
 V2 Copyright (c) 2014 Ben Chambers, Eugene Goldberg, Pete Manolios,
 Vasilis Papavasileiou, Sudarshan Srinivasan, and Daron Vroon.
@@ -181,6 +181,7 @@ int comparefunction(const Edge * e1, const Edge * e2) {
 }
 
 Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
+	ASSERT(numEdges!=0);
 	qsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *)) comparefunction);
 	int initindex=0;
 	while(initindex<numEdges && equalsEdge(edges[initindex], E_True))
@@ -311,9 +312,9 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge) {
 
 void addConstraintCNF(CNF *cnf, Edge constraint) {
 	pushVectorEdge(&cnf->constraints, constraint);
-	printf("****ADDING NEW Constraint*****\n");
+	model_print("****ADDING NEW Constraint*****\n");
 	printCNF(constraint);
-	printf("\n******************************\n");
+	model_print("\n******************************\n");
 }
 
 Edge constraintNewVar(CNF *cnf) {
@@ -699,39 +700,39 @@ CNFExpr* fillArgs(CNF *cnf, Edge e, bool isNeg, Edge * largestEdge) {
 void printCNF(Edge e) {
 	if (edgeIsVarConst(e)) {
 		Literal l=getEdgeVar(e);
-		printf ("%d", l);
+		model_print ("%d", l);
 		return;
 	}
 	bool isNeg=isNegEdge(e);
 	if (edgeIsConst(e)) {
 		if (isNeg)
-			printf("T");
+			model_print("T");
 		else
-			printf("F");
+			model_print("F");
 		return;
 	}
 	Node *n=getNodePtrFromEdge(e);
 	if (isNeg)
-		printf("!");
+		model_print("!");
 	switch(getNodeType(e)) {
 	case NodeType_AND:
-		printf("and");
+		model_print("and");
 		break;
 	case NodeType_ITE:
-		printf("ite");
+		model_print("ite");
 		break;
 	case NodeType_IFF:
-		printf("iff");
+		model_print("iff");
 		break;
 	}
-	printf("(");
+	model_print("(");
 	for(uint i=0;i<n->numEdges;i++) {
 		Edge e=n->edges[i];
 		if (i!=0)
-			printf(" ");
+			model_print(" ");
 		printCNF(e);
 	}
-	printf(")");
+	model_print(")");
 }
 
 CNFExpr * produceConjunction(CNF * cnf, Edge e) {
