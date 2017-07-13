@@ -171,7 +171,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 	
 	bool notfinished=true;
 	while(notfinished) {
-		Edge carray[numDomains+2];
+		Edge carray[numDomains+1];
 
 		uint64_t result=applyFunctionOperator(function, numDomains, vals);
 		bool isInRange = isInRangeFunction((FunctionOperator*)func->function, result);
@@ -195,30 +195,26 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 			case IGNORE:
 			case NOOVERFLOW:
 			case WRAPAROUND: {
-				clause=constraintAND(This->cnf, numDomains+1, carray);
+				clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), carray[numDomains]);
 				break;
 			}
 			case FLAGFORCESOVERFLOW: {
-				carray[numDomains+1]=constraintNegate(overFlowConstraint);
-				clause=constraintAND(This->cnf, numDomains+2, carray);
+				clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintAND2(This->cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				break;
 			}
 			case OVERFLOWSETSFLAG: {
 				if (isInRange) {
-					clause=constraintAND(This->cnf, numDomains+1, carray);
+					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), carray[numDomains]);
 				} else {
-					carray[numDomains+1]=overFlowConstraint;
-					clause=constraintAND(This->cnf, numDomains+1, carray);
+					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), overFlowConstraint);
 				}
 				break;
 			}
 			case FLAGIFFOVERFLOW: {
 				if (isInRange) {
-				carray[numDomains+1]=constraintNegate(overFlowConstraint);
-					clause=constraintAND(This->cnf, numDomains+2, carray);
+					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintAND2(This->cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				} else {
-					carray[numDomains+1]=overFlowConstraint;
-					clause=constraintAND(This->cnf, numDomains+1, carray);
+					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), overFlowConstraint);
 				}
 				break;
 			}
@@ -244,7 +240,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 		}
 	}
 
-	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	Edge cor=constraintAND(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	addConstraintCNF(This->cnf, cor);
 	deleteVectorEdge(clauses);
 }
@@ -271,5 +267,5 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* fu
 		Edge row= constraintIMPLIES(This->cnf, constraintAND(This->cnf, inputNum, carray), output);
 		constraints[i]=row;
 	}
-	addConstraintCNF(This->cnf, constraintOR(This->cnf, size, constraints));
+	addConstraintCNF(This->cnf, constraintAND(This->cnf, size, constraints));
 }

@@ -712,8 +712,22 @@ void printCNF(Edge e) {
 		return;
 	}
 	Node *n=getNodePtrFromEdge(e);
-	if (isNeg)
+	if (isNeg) {
+		//Pretty print things that are equivalent to OR's
+		if (getNodeType(e)==NodeType_AND) {
+			model_print("or(");
+			for(uint i=0;i<n->numEdges;i++) {
+				Edge e=n->edges[i];
+				if (i!=0)
+					model_print(" ");
+				printCNF(constraintNegate(e));
+			}
+			model_print(")");
+			return;
+		}
+
 		model_print("!");
+	}
 	switch(getNodeType(e)) {
 	case NodeType_AND:
 		model_print("and");
