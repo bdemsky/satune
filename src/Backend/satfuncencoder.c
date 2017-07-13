@@ -8,7 +8,7 @@
 #include "tableentry.h"
 #include "set.h"
 #include "element.h"
-
+#include "common.h"
 Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
 	VectorTableEntry* entries = &(((PredicateTable*)constraint->predicate)->table->entries);
 	FunctionEncodingType encType = constraint->encoding.type;
@@ -144,6 +144,9 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 
 
 void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* func) {
+#ifdef TRACE_DEBUG
+	model_print("Operator Function ...\n");
+#endif
 	FunctionOperator * function = (FunctionOperator *) func->function;
 	uint numDomains=getSizeArrayElement(&func->inputs);
 
@@ -247,6 +250,9 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 }
 
 void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* func){
+#ifdef TRACE_DEBUG
+	model_print("Enumeration Table functions ...\n");
+#endif
 	//FIXME: HANDLE UNDEFINED BEHAVIORS
 	ASSERT(GETFUNCTIONTYPE(func->function)==TABLEFUNC);
 	ArrayElement* elements= &func->inputs;

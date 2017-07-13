@@ -17,6 +17,7 @@
 /** Turn on debugging. */
 #ifndef CONFIG_DEBUG
 //#define CONFIG_DEBUG
+#define TRACE_DEBUG
 #endif
 
 #ifndef CONFIG_ASSERT

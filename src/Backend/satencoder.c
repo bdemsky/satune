@@ -30,10 +30,10 @@ void encodeAllSATEncoder(CSolver *csolver, SATEncoder * This) {
 	VectorBoolean *constraints=csolver->constraints;
 	uint size=getSizeVectorBoolean(constraints);
 	for(uint i=0;i<size;i++) {
+		model_print("Encoding All ...\n\n");
 		Boolean *constraint=getVectorBoolean(constraints, i);
 		Edge c= encodeConstraintSATEncoder(This, constraint);
-		printCNF(c);
-		printf("\n\n");
+		model_print("Returned Constraint in EncodingAll:\n");
 		addConstraintCNF(This->cnf, c);
 	}
 }
@@ -124,6 +124,7 @@ Edge encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constr
 void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 	switch( GETELEMENTTYPE(This) ){
 		case ELEMFUNCRETURN:
+			generateElementEncoding(encoder, This);
 			encodeElementFunctionSATEncoder(encoder, (ElementFunction*) This);
 			break;
 		case ELEMSET:

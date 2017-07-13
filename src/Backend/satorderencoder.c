@@ -51,6 +51,9 @@ Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder * boolOrder) {
 
 
 void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
+#ifdef TRACE_DEBUG
+	model_print("in total order ...\n");
+#endif	
 	ASSERT(order->type == TOTAL);
 	VectorInt* mems = order->set->members;
 	HashTableOrderPair* table = order->orderPairTable;

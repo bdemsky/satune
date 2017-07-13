@@ -210,7 +210,7 @@ Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges) {
 			edges[++lowindex]=edges[initindex];
 	}
 	lowindex++; //Make lowindex look like size
-	
+
 	if (lowindex==1)
 		return edges[0];
 
@@ -311,6 +311,9 @@ Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge) {
 
 void addConstraintCNF(CNF *cnf, Edge constraint) {
 	pushVectorEdge(&cnf->constraints, constraint);
+	printf("****ADDING NEW Constraint*****\n");
+	printCNF(constraint);
+	printf("\n******************************\n");
 }
 
 Edge constraintNewVar(CNF *cnf) {
