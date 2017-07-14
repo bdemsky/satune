@@ -33,7 +33,7 @@ int main(int numargs, char ** argv) {
 	Element *in2[]={e1};
 	Table* t2 = createTable(solver, d2, 1, s1);
 	uint64_t row3[] = {6};
-	addTableEntry(solver, t1, row3, 1, 6);
+	addTableEntry(solver, t2, row3, 1, 6);
 	Function * f3 = completeTable(solver, t2);	
 	Element * e5 = applyFunction(solver, f3, in2, 1, overflow);
 	
