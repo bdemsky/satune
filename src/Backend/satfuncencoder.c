@@ -253,12 +253,13 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* fu
 	//FIXME: HANDLE UNDEFINED BEHAVIORS
 	ASSERT(GETFUNCTIONTYPE(func->function)==TABLEFUNC);
 	ArrayElement* elements= &func->inputs;
-	Table* table = ((FunctionTable*) (func->function))->table;
-	uint size = getSizeVectorTableEntry(&table->entries);
 	for(uint i=0; i<getSizeArrayElement(elements); i++){
 		Element *elem = getArrayElement( elements, i);
 		encodeElementSATEncoder(This, elem);
 	}
+
+	Table* table = ((FunctionTable*) (func->function))->table;
+	uint size = getSizeVectorTableEntry(&table->entries);
 	Edge constraints[size]; //FIXME: should add a space for the case that didn't match any entries
 	for(uint i=0; i<size; i++) {
 		TableEntry* entry = getVectorTableEntry(&table->entries, i);
