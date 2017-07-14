@@ -424,9 +424,9 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 	Node *nroot=getNodePtrFromEdge(root);
 	
 	if (isNodeEdge(root) && (nroot->flags.type == NodeType_ITE || nroot->flags.type == NodeType_IFF)) {
-		root = (Edge) { (Node *) nroot->ptrAnnot[isNegEdge(root)]};
+		nroot = (Node *) nroot->ptrAnnot[isNegEdge(root)];
+		root = (Edge) { nroot };
 	}
-	
 	if (edgeIsConst(root)) {
 		if (isNegEdge(root)) {
 			//trivally unsat
