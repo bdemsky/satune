@@ -41,5 +41,7 @@ int main(int numargs, char ** argv) {
 	
 	if (startEncoding(solver)==1)
 		printf("e1=%llu e2=%llu\n", getElementValue(solver,e1), getElementValue(solver, e2));
+	else
+		printf("UNSAT\n");
 	deleteSolver(solver);
 }

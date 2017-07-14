@@ -136,7 +136,8 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 			}
 		}
 	}
-
+	if(getSizeVectorEdge(clauses) == 0)
+		return E_False;
 	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	deleteVectorEdge(clauses);
 	return generateNegation ? constraintNegate(cor) : cor;
