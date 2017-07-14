@@ -65,6 +65,9 @@ uint64_t createUniqueItem(CSolver *, MutableSet * set);
 
 Element * getElementVar(CSolver *, Set * set);
 
+/** This function creates an element constrant. */
+Element * getElementConst(CSolver *, VarType type, uint64_t value);
+
 /** This function creates a boolean variable. */
 
 Boolean * getBooleanVar(CSolver *, VarType type);

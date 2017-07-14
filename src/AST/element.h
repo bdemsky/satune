@@ -15,6 +15,13 @@ struct Element {
 	VectorASTNode parents;
 };
 
+struct ElementConst {
+	Element base;
+	Set * set;
+	uint64_t value;
+	ElementEncoding encoding;
+};
+
 struct ElementSet {
 	Element base;
 	Set * set;
@@ -30,6 +37,7 @@ struct ElementFunction {
 	ElementEncoding rangeencoding;
 };
 
+Element * allocElementConst(uint64_t value, VarType type);
 Element * allocElementSet(Set *s);
 Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
 void deleteElement(Element *This);

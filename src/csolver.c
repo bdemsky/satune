@@ -108,6 +108,12 @@ Element * getElementVar(CSolver *This, Set * set) {
 	return element;
 }
 
+Element * getElementConst(CSolver *This, VarType type, uint64_t value) {
+	Element * element=allocElementConst(value, type);
+	pushVectorElement(This->allElements, element);
+	return element;
+}
+
 Boolean * getBooleanVar(CSolver *This, VarType type) {
 	Boolean* boolean= allocBooleanVar(type);
 	pushVectorBoolean(This->allBooleans, boolean);

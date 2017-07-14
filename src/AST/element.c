@@ -28,10 +28,22 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	return &This->base;
 }
 
+Element * allocElementConst(uint64_t value, VarType type) {
+	ElementConst * This=(ElementConst *)ourmalloc(sizeof(ElementConst));
+	GETELEMENTTYPE(This)= ELEMCONST;
+	This->value=value;
+	This->set=allocSet(type, (uint64_t[]){value}, 1);
+	initDefVectorASTNode(GETELEMENTPARENTS(This));
+	initElementEncoding(&This->encoding, (Element *) This);
+	return &This->base;
+}
+
 Set* getElementSet(Element* This){
 	switch(GETELEMENTTYPE(This)){
 	case ELEMSET:
 		return ((ElementSet*)This)->set;
+	case ELEMCONST:
+		return ((ElementConst*)This)->set;
 	case ELEMFUNCRETURN: {
 		Function* func = ((ElementFunction*)This)->function;
 		switch(GETFUNCTIONTYPE(func)){
@@ -62,6 +74,12 @@ void deleteElement(Element *This) {
 	case ELEMSET: {
 		ElementSet *es = (ElementSet *) This;
 		deleteElementEncoding(&es->encoding);
+		break;
+	}
+	case ELEMCONST: {
+		ElementConst *ec = (ElementConst *) This;
+		deleteSet(ec->set);//Client did not create, so we free it
+		deleteElementEncoding(&ec->encoding);
 		break;
 	}
 	default:

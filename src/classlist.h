@@ -41,6 +41,7 @@ typedef struct Set MutableSet;
 
 typedef struct ElementFunction ElementFunction;
 typedef struct ElementSet ElementSet;
+typedef struct ElementConst ElementConst;
 
 struct Element;
 typedef struct Element Element;
