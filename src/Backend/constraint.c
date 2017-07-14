@@ -487,6 +487,7 @@ void convertConstraint(CNF *cnf, VectorEdge *stack, Edge root, bool backtrackLit
 		}
 	}
 	CNFExpr * cnfExp = (CNFExpr *) nroot->ptrAnnot[isNegEdge(root)];
+	ASSERT(cnfExp!=NULL);
 	if (isProxy(cnfExp)) {
 		Literal l=getProxy(cnfExp);
 		Literal clause[] = {l};
