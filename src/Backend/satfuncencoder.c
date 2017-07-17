@@ -222,6 +222,11 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 			default:
 				ASSERT(0);
 			}
+#ifdef TRACE_DEBUG
+			model_print("added clause in operator function\n");
+			printCNF(clause);
+			model_print("\n");
+#endif
 			pushVectorEdge(clauses, clause);
 		}
 		

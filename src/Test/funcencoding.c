@@ -58,7 +58,8 @@ int main(int numargs, char ** argv) {
 	addConstraint(solver, pred);
 	
 	if (startEncoding(solver)==1)
-		printf("e1=%llu e2=%llu\n", getElementValue(solver,e1), getElementValue(solver, e2));
+		printf("e1=%llu e2=%llu e7=%llu\n", 
+			 getElementValue(solver,e1), getElementValue(solver, e2), getElementValue(solver, e7));
 	else
 		printf("UNSAT\n");
 	deleteSolver(solver);
