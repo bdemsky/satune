@@ -2,6 +2,7 @@
 #include "element.h"
 #include "csolver.h"
 #include "satencoder.h"
+#include "set.h"
 
 uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint index=0;
@@ -47,6 +48,9 @@ uint64_t getElementValueUnarySATTranslator(CSolver* This, ElementEncoding* elemE
 }
 
 uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
+	Set* set = getElementSet(element);
+	if(getSetSize( set ) ==1)	//case when the set has only one item
+		return getSetElement(set, 0);
 	ElementEncoding* elemEnc = getElementEncoding(element);
 	switch(elemEnc->type){
 		case ONEHOT:

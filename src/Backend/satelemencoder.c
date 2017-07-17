@@ -4,7 +4,7 @@
 #include "ops.h"
 #include "element.h"
 
-Edge getElementValueConstraint(SATEncoder* This, Element* elem, uint64_t value) {
+Edge getElementValueConstraint(SATEncoder* This, Element* elem, uint64_t value) { 
 	switch(getElementEncoding(elem)->type){
 		case ONEHOT:
 			return getElementValueOneHotConstraint(This, elem, value);
