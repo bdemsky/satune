@@ -31,10 +31,10 @@ Edge getElementValueBinaryIndexConstraint(SATEncoder * This, Element* elem, uint
 	ElementEncoding* elemEnc = getElementEncoding(elem);
 	for(uint i=0; i<elemEnc->encArraySize; i++){
 		if(isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {
-			return generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, i);
+			return (elemEnc->numVars == 0) ? E_True: generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, i);
 		}
 	}
-	return E_BOGUS;
+	return E_False;
 }
 
 Edge getElementValueOneHotConstraint(SATEncoder * This, Element* elem, uint64_t value) {

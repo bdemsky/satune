@@ -32,7 +32,7 @@ extern int switch_alloc;
 
 #define model_print printf
 
-#define NEXTPOW2(x) (1<<(sizeof(uint)*8-__builtin_clz(x-1)))
+#define NEXTPOW2(x) ((x==1) ? 1 : (1<<(sizeof(uint)*8-__builtin_clz(x-1))))
 #define NUMBITS(x) ((x==0) ? 0 : 8*sizeof(x)-__builtin_clz(x))
 
 #ifdef CONFIG_DEBUG
