@@ -10,7 +10,7 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding*
 	uint index=0;
 	for(int i=elemEnc->numVars-1;i>=0;i--) {
 		index=index<<1;
-		if (This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ])
+		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
 			index |= 1;
 	}
 	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
@@ -22,7 +22,7 @@ uint64_t getElementValueBinaryValueSATTranslator(CSolver* This, ElementEncoding*
 	uint64_t value=0;
 	for(int i=elemEnc->numVars-1;i>=0;i--) {
 		value=value<<1;
-		if (This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ])
+		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )) )
 			value |= 1;
 	}
 	return value;
@@ -31,7 +31,7 @@ uint64_t getElementValueBinaryValueSATTranslator(CSolver* This, ElementEncoding*
 uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint index=0;
 	for(int i=elemEnc->numVars-1;i>=0;i--) {
-		if (This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ])
+		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
 			index = i;
 	}
 	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
@@ -41,7 +41,7 @@ uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elem
 uint64_t getElementValueUnarySATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint i;
 	for(i=0;i<elemEnc->numVars;i++) {
-		if (!This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[i] ) ]) {
+		if (! getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )) ) {
 			break;
 		}
 	}
@@ -77,16 +77,16 @@ uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
 
 bool getBooleanVariableValueSATTranslator( CSolver* This , Boolean* boolean){
 	int index = getEdgeVar( ((BooleanVar*) boolean)->var );
-	return This->satEncoder->cnf->solver->solution[index] == true;
+	return getValueSolver(This->satEncoder->cnf->solver, index);
 }
 
 HappenedBefore getOrderConstraintValueSATTranslator(CSolver* This, Order * order, uint64_t first, uint64_t second){
 	ASSERT(order->orderPairTable!= NULL);
+	model_print("Frist:%llu\tSecond:%llu\n", first, second);
 	OrderPair pair={first, second, E_NULL};
 	Edge var = getOrderConstraint(order->orderPairTable, & pair);
 	if(edgeIsNull(var))
 		return UNORDERED;
-	int index = getEdgeVar( var );
-	return This->satEncoder->cnf->solver->solution[index] ? FIRST: SECOND;
+	return getValueCNF(This->satEncoder->cnf, var)? FIRST: SECOND;
 }
 

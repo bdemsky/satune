@@ -83,6 +83,9 @@ Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair){
 	if(value == NULL)
 		return E_NULL;
 	Edge constraint = value->constraint;
+	model_print("Constraint:\n");
+	printCNF(constraint);
+	model_print("\n***********\n");
 	if(pair->first > pair->second || edgeIsNull(constraint))
 		return constraint;
 	else
