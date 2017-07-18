@@ -27,7 +27,7 @@ Edge getElementValueConstraint(SATEncoder* This, Element* elem, uint64_t value) 
 
 Edge getElementValueBinaryIndexConstraint(SATEncoder * This, Element* elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
-	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding* elemEnc = getElementEncoding(elem);
 	for(uint i=0; i<elemEnc->encArraySize; i++){
 		if(isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {

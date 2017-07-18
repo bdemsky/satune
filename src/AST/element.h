@@ -49,6 +49,8 @@ static inline ElementEncoding* getElementEncoding(Element* This){
 			return &((ElementSet*)This)->encoding;
 		case ELEMFUNCRETURN:		
 			return &((ElementFunction*)This)->rangeencoding;
+		case ELEMCONST:
+			return &((ElementConst*)This)->encoding;
 		default:
 			ASSERT(0);
 	}

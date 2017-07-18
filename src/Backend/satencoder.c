@@ -130,6 +130,8 @@ void encodeElementSATEncoder(SATEncoder* encoder, Element *This){
 		case ELEMSET:
 			generateElementEncoding(encoder, This);
 			return;
+		case ELEMCONST:
+			return;
 		default:
 			ASSERT(0);
 	}

@@ -196,6 +196,7 @@ int startEncoding(CSolver* This){
 uint64_t getElementValue(CSolver* This, Element* element){
 	switch(GETELEMENTTYPE(element)){
 		case ELEMSET:
+		case ELEMCONST:
 			return getElementValueSATTranslator(This, element);
 		default:
 			ASSERT(0);
