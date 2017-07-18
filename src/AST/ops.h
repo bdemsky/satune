@@ -12,7 +12,7 @@ typedef enum CompOp CompOp;
 enum OrderType {PARTIAL, TOTAL};
 typedef enum OrderType OrderType;
 
-enum HappenedBefore {UNORDERED, FIRST, SECOND};
+enum HappenedBefore {FIRST, SECOND, UNORDERED};
 typedef enum HappenedBefore HappenedBefore;
 
 /**

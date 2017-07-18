@@ -79,7 +79,10 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 
 Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair){
 	ASSERT(pair->first!= pair->second);
-	Edge constraint = getOrderPair(table, pair)->constraint;
+	OrderPair* value = getOrderPair(table, pair);
+	if(value == NULL)
+		return E_NULL;
+	Edge constraint = value->constraint;
 	if(pair->first > pair->second || edgeIsNull(constraint))
 		return constraint;
 	else

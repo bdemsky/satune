@@ -125,6 +125,6 @@ uint64_t getElementValue(CSolver*, Element* element);
 /** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
 bool getBooleanValue( CSolver* , Boolean* boolean);
 
-HappenedBefore getOrderConstraintValue(CSolver*, Boolean* orderConstr);
+HappenedBefore getOrderConstraintValue(CSolver*, Order * order, uint64_t first, uint64_t second);
 
 #endif

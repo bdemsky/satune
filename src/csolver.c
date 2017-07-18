@@ -213,13 +213,7 @@ bool getBooleanValue( CSolver* This , Boolean* boolean){
 	exit(-1);
 }
 
-HappenedBefore getOrderConstraintValue(CSolver* This, Boolean* orderConstr){
-	switch(GETBOOLEANTYPE(orderConstr)){
-		case ORDERCONST:
-			return getOrderConstraintValueSATTranslator(This, (BooleanOrder*)orderConstr);
-		default:
-			ASSERT(0);
-	}
-	exit(-1);
+HappenedBefore getOrderConstraintValue(CSolver* This, Order * order, uint64_t first, uint64_t second){
+	return getOrderConstraintValueSATTranslator(This, order, first, second);
 }
 

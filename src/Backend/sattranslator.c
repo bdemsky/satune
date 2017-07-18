@@ -80,10 +80,10 @@ bool getBooleanVariableValueSATTranslator( CSolver* This , Boolean* boolean){
 	return This->satEncoder->cnf->solver->solution[index] == true;
 }
 
-HappenedBefore getOrderConstraintValueSATTranslator(CSolver* This, BooleanOrder* boolOrder){
-	ASSERT(boolOrder->order->orderPairTable!= NULL);
-	OrderPair pair={boolOrder->first, boolOrder->second, E_NULL};
-	Edge var = getOrderConstraint(boolOrder->order->orderPairTable, & pair);
+HappenedBefore getOrderConstraintValueSATTranslator(CSolver* This, Order * order, uint64_t first, uint64_t second){
+	ASSERT(order->orderPairTable!= NULL);
+	OrderPair pair={first, second, E_NULL};
+	Edge var = getOrderConstraint(order->orderPairTable, & pair);
 	if(edgeIsNull(var))
 		return UNORDERED;
 	int index = getEdgeVar( var );
