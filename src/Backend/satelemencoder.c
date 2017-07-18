@@ -70,14 +70,17 @@ Edge getElementValueBinaryValueConstraint(SATEncoder * This, Element* element, u
 	ASTNodeType type = GETELEMENTTYPE(element);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
 	ElementEncoding* elemEnc = getElementEncoding(element);
-	for(uint i=0; i<elemEnc->encArraySize; i++){
-		if(isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {
-			return generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, value);
-			// This constraint can be generated right away without iterating over encodingArray
-			// but we need to make sure that element with that value is in use ...
-		}
+	if (elemEnc->low <= elemEnc->high) {
+		if (value < elemEnc->low || value > elemEnc->high)
+			return E_False;
+	} else {
+		//Range wraps around 0
+		if (value < elemEnc->low && value > elemEnc->high)
+			return E_False;
 	}
-	return E_BOGUS;
+	
+	uint64_t valueminusoffset=value-elemEnc->offset;
+	return generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, valueminusoffset);
 }
 
 void allocElementConstraintVariables(ElementEncoding* This, uint numVars) {
@@ -87,7 +90,7 @@ void allocElementConstraintVariables(ElementEncoding* This, uint numVars) {
 
 void generateBinaryValueEncodingVars(SATEncoder* This, ElementEncoding* encoding){
 	ASSERT(encoding->type==BINARYVAL);
-	allocElementConstraintVariables(encoding, getMaximumBitsBinaryValueEncodingVars(encoding));
+	allocElementConstraintVariables(encoding, encoding->numBits);
 	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
 }
 
