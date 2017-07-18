@@ -20,7 +20,7 @@ Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder * constraint) {
 Edge getPairConstraint(SATEncoder *This, HashTableOrderPair * table, OrderPair * pair) {
 	bool negate = false;
 	OrderPair flipped;
-	if (pair->first > pair->second) {
+	if (pair->first < pair->second) {
 		negate=true;
 		flipped.first=pair->second;
 		flipped.second=pair->first;
@@ -79,17 +79,20 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 
 Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair){
 	ASSERT(pair->first!= pair->second);
-	OrderPair* value = getOrderPair(table, pair);
-	if(value == NULL)
+	bool negate = false;
+	OrderPair flipped;
+	if (pair->first < pair->second) {
+		negate=true;
+		flipped.first=pair->second;
+		flipped.second=pair->first;
+		pair = &flipped;
+	}
+	if (!containsOrderPair(table, pair)) {
 		return E_NULL;
-	Edge constraint = value->constraint;
-	model_print("Constraint:\n");
-	printCNF(constraint);
-	model_print("\n***********\n");
-	if(pair->first > pair->second || edgeIsNull(constraint))
-		return constraint;
-	else
-		return constraintNegate(constraint);
+	}
+	Edge constraint= getOrderPair(table, pair)->constraint;
+	ASSERT(!edgeIsNull(constraint));
+	return negate ? constraintNegate(constraint) : constraint;
 }
 
 Edge generateTransOrderConstraintSATEncoder(SATEncoder *This, Edge constIJ,Edge constJK,Edge constIK){
