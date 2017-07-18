@@ -79,8 +79,6 @@ static inline void setExpanded(Node *n, int isNegated) {
 }
 
 static inline Edge constraintNegate(Edge e) {
-	if(edgeIsNull(e))
-		return e;
 	Edge enew = { (Node *) (((uintptr_t) e.node_ptr) ^ NEGATE_EDGE)};
 	return enew;
 }
