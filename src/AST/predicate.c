@@ -1,6 +1,7 @@
 #include "predicate.h"
 #include "boolean.h"
 #include "set.h"
+#include "table.h"
 
 Predicate* allocPredicateOperator(CompOp op, Set ** domain, uint numDomain){
 	PredicateOperator* This = ourmalloc(sizeof(PredicateOperator));
@@ -11,6 +12,7 @@ Predicate* allocPredicateOperator(CompOp op, Set ** domain, uint numDomain){
 }
 
 Predicate* allocPredicateTable(Table* table, UndefinedBehavior undefBehavior){
+	ASSERT(table->range == NULL);
 	PredicateTable* This = ourmalloc(sizeof(PredicateTable));
 	GETPREDICATETYPE(This) = TABLEPRED;
 	This->table=table;

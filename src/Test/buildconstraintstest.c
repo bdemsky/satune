@@ -28,7 +28,7 @@ int main(int numargs, char ** argv) {
 	addTableEntry(solver, table, row2, 2, 0);
 	addTableEntry(solver, table, row3, 2, 2);
 	addTableEntry(solver, table, row4, 2, 2);
-	Function * f2 = completeTable(solver, table); //its range would be as same as s
+	Function * f2 = completeTable(solver, table, IGNOREBEHAVIOR); //its range would be as same as s
 	
 	Boolean* overflow = getBooleanVar(solver , 2);
 	Element * e3 = applyFunction(solver, f1, inputs, 2, overflow);

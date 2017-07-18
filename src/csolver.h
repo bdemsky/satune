@@ -81,9 +81,13 @@ Function * createFunctionOperator(CSolver *solver, ArithOp op, Set ** domain, ui
 
 Predicate * createPredicateOperator(CSolver *solver, CompOp op, Set ** domain, uint numDomain);
 
+Predicate * createPredicateTable(CSolver *solver, Table* table, UndefinedBehavior behavior);
+
 /** This function creates an empty instance table.*/
 
 Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range);
+
+Table * createTablePredicate(CSolver *solver, Set **domains, uint numDomain);
 
 /** This function adds an input output relation to a table. */
 
@@ -91,7 +95,7 @@ void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSi
 
 /** This function converts a completed table into a function. */
 
-Function * completeTable(CSolver *, Table *);
+Function * completeTable(CSolver *, Table *, UndefinedBehavior behavior);
 
 /** This function applies a function to the Elements in its input. */
 

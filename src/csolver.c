@@ -132,18 +132,28 @@ Predicate * createPredicateOperator(CSolver *This, CompOp op, Set ** domain, uin
 	return predicate;
 }
 
+Predicate * createPredicateTable(CSolver *This, Table* table, UndefinedBehavior behavior){
+	Predicate* predicate = allocPredicateTable(table, behavior);
+	pushVectorPredicate(This->allPredicates, predicate);
+	return predicate;
+}
+
 Table * createTable(CSolver *This, Set **domains, uint numDomain, Set * range) {
 	Table* table= allocTable(domains,numDomain,range);
 	pushVectorTable(This->allTables, table);
 	return table;
 }
 
+Table * createTableForPredicate(CSolver *solver, Set **domains, uint numDomain){
+	return createTable(solver, domains, numDomain, NULL);
+}
+
 void addTableEntry(CSolver *This, Table* table, uint64_t* inputs, uint inputSize, uint64_t result) {
 	addNewTableEntry(table,inputs, inputSize,result);
 }
 
-Function * completeTable(CSolver *This, Table * table) {
-	Function* function = allocFunctionTable(table);
+Function * completeTable(CSolver *This, Table * table, UndefinedBehavior behavior) {
+	Function* function = allocFunctionTable(table, behavior);
 	pushVectorFunction(This->allFunctions,function);
 	return function;
 }

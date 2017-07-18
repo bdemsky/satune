@@ -26,7 +26,7 @@ int main(int numargs, char ** argv) {
 	uint64_t row2[] = {6, 4};
 	addTableEntry(solver, t1, row1, 2, 3);
 	addTableEntry(solver, t1, row2, 2, 1);
-	Function * f2 = completeTable(solver, t1);	
+	Function * f2 = completeTable(solver, t1, IGNOREBEHAVIOR);	
 	Element * e4 = applyFunction(solver, f2, in1, 2, overflow);
 	
 	Set *d2[] = {s1};
@@ -34,7 +34,7 @@ int main(int numargs, char ** argv) {
 	Table* t2 = createTable(solver, d2, 1, s1);
 	uint64_t row3[] = {6};
 	addTableEntry(solver, t2, row3, 1, 6);
-	Function * f3 = completeTable(solver, t2);	
+	Function * f3 = completeTable(solver, t2, IGNOREBEHAVIOR);	
 	Element * e5 = applyFunction(solver, f3, in2, 1, overflow);
 	
 	Set *d3[] = {s2, s3, s1};
@@ -48,7 +48,7 @@ int main(int numargs, char ** argv) {
 	addTableEntry(solver, t3, row5, 3, 1);
 	addTableEntry(solver, t3, row6, 3, 2);
 	addTableEntry(solver, t3, row7, 3, 1);
-	Function * f4 = completeTable(solver, t3);	
+	Function * f4 = completeTable(solver, t3, IGNOREBEHAVIOR);	
 	Element * e6 = applyFunction(solver, f4, in3, 3, overflow);
 	
 	Set* deq[] = {s5,s4};

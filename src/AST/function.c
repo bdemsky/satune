@@ -13,10 +13,11 @@ Function* allocFunctionOperator(ArithOp op, Set ** domain, uint numDomain, Set *
 	return &This->base;
 }
 
-Function* allocFunctionTable (Table* table){
+Function* allocFunctionTable (Table* table, UndefinedBehavior undefBehavior){
 	FunctionTable* This = (FunctionTable*) ourmalloc(sizeof(FunctionTable));
 	GETFUNCTIONTYPE(This)=TABLEFUNC;
 	This->table = table;
+	This->undefBehavior = undefBehavior;
 	return &This->base;
 }
 

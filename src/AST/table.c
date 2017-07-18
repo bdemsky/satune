@@ -15,6 +15,8 @@ Table * allocTable(Set **domains, uint numDomain, Set * range){
 
 void addNewTableEntry(Table* This, uint64_t* inputs, uint inputSize, uint64_t result){
 	ASSERT(getSizeArraySet( &This->domains) == inputSize);
+	if(This->range==NULL)
+		ASSERT(result == true || result == false);
 	pushVectorTableEntry(&This->entries, allocTableEntry(inputs, inputSize, result));
 }
 

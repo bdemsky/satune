@@ -22,10 +22,11 @@ struct FunctionOperator {
 struct FunctionTable {
 	Function base;
 	Table* table;
+	UndefinedBehavior undefBehavior;
 };
 
 Function* allocFunctionOperator(ArithOp op, Set ** domain, uint numDomain, Set * range, OverFlowBehavior overflowbehavior);
-Function* allocFunctionTable (Table* table);
+Function* allocFunctionTable (Table* table, UndefinedBehavior behavior);
 uint64_t applyFunctionOperator(FunctionOperator* This, uint numVals, uint64_t * values);
 bool isInRangeFunction(FunctionOperator *This, uint64_t val);
 void deleteFunction(Function* This);
