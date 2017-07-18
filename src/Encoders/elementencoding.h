@@ -14,9 +14,20 @@ struct ElementEncoding {
 	ElementEncodingType type;
 	Element * element;
 	Edge * variables;/* List Variables Used To Encode Element */
-	uint64_t * encodingArray;	/* List the Variables in the appropriate order */
-	uint64_t * inUseArray;/* Bitmap to track variables in use */
-	uint encArraySize;
+	union {
+		struct {
+			uint64_t * encodingArray;	/* List the Variables in the appropriate order */
+			uint64_t * inUseArray;/* Bitmap to track variables in use */
+			uint encArraySize;
+		};
+		struct {
+			uint64_t offset;/* Value = offset + encoded number (interpretted according to isBinaryValSigned) */
+			uint64_t low;/* Lowest value to encode */
+			uint64_t high;/* High value to encode.   If low > high, we assume wrap around to include 0. */
+			uint numBits;
+			bool isBinaryValSigned;
+		};
+	};
 	uint numVars;	/* Number of variables */
 };
 
@@ -35,7 +46,5 @@ static inline bool isinUseElement(ElementEncoding *This, uint offset) {
 static inline void setInUseElement(ElementEncoding *This, uint offset) {
 	This->inUseArray[(offset>>6)] |= 1 << (offset & 63);
 }
-
-uint getMaximumBitsBinaryValueEncodingVars(ElementEncoding *encoding);
 
 #endif

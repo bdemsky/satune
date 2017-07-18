@@ -18,13 +18,19 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding*
 }
 
 uint64_t getElementValueBinaryValueSATTranslator(CSolver* This, ElementEncoding* elemEnc){
-	//THIS WILL PROBABLY BE WRONG SINCE THE VALUES CAN BE OFFSET
 	uint64_t value=0;
 	for(int i=elemEnc->numVars-1;i>=0;i--) {
 		value=value<<1;
 		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )) )
 			value |= 1;
 	}
+	if (elemEnc->isBinaryValSigned &&
+			This->satEncoder->cnf->solver->solution[ getEdgeVar( elemEnc->variables[elemEnc->numVars-1])]) {
+		//Do sign extension of negative number
+		uint64_t highbits=0xffffffffffffffff - ((1 << (elemEnc->numVars)) - 1);
+		value+=highbits;
+	}
+	value+=elemEnc->offset;
 	return value;
 }
 
