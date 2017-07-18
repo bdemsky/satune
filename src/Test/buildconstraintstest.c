@@ -12,7 +12,8 @@ int main(int numargs, char ** argv) {
 	Set * domain[]={s, s};
 	Predicate *equals=createPredicateOperator(solver, EQUALS, domain, 2);
 	Element * inputs[]={e1, e2};
-	Boolean * b=applyPredicate(solver, equals, inputs, 2);
+	Boolean* overflow = getBooleanVar(solver , 2);
+	Boolean * b=applyPredicate(solver, equals, inputs, 2, overflow);
 	addConstraint(solver, b);
 
 	uint64_t set2[] = {2, 3};
@@ -30,13 +31,12 @@ int main(int numargs, char ** argv) {
 	addTableEntry(solver, table, row4, 2, 2);
 	Function * f2 = completeTable(solver, table, IGNOREBEHAVIOR); //its range would be as same as s
 	
-	Boolean* overflow = getBooleanVar(solver , 2);
 	Element * e3 = applyFunction(solver, f1, inputs, 2, overflow);
 	Element * e4 = applyFunction(solver, f2, inputs, 2, overflow);
 	Set* domain2[] = {s,rangef1};
 	Predicate* equal2 = createPredicateOperator(solver, EQUALS, domain2, 2);
 	Element* inputs2 [] = {e4, e3};
-	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2);
+	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2, overflow);
 	addConstraint(solver, pred);
 	
 	if (startEncoding(solver)==1)

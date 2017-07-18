@@ -24,7 +24,7 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	return & This -> base;
 }
 
-Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs){
+Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus){
 	BooleanPredicate* This = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
 	GETBOOLEANTYPE(This)= PREDICATEOP;
 	This->predicate=predicate;
@@ -35,7 +35,7 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 		pushVectorASTNode(GETELEMENTPARENTS(inputs[i]), (ASTNode *)This);
 	}
 	initPredicateEncoding(&This->encoding, (Boolean *) This);
-
+	This->undefStatus = undefinedStatus;
 	return & This->base;
 }
 

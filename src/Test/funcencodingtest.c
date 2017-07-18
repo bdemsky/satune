@@ -54,7 +54,7 @@ int main(int numargs, char ** argv) {
 	Set* deq[] = {s5,s4};
 	Predicate* gt = createPredicateOperator(solver, GT, deq, 2);
 	Element* inputs2 [] = {e7, e6};
-	Boolean* pred = applyPredicate(solver, gt, inputs2, 2);
+	Boolean* pred = applyPredicate(solver, gt, inputs2, 2, overflow);
 	addConstraint(solver, pred);
 	
 	if (startEncoding(solver)==1)

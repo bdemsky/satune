@@ -103,7 +103,7 @@ Element * applyFunction(CSolver *, Function * function, Element ** array, uint n
 
 /** This function applies a predicate to the Elements in its input. */
 
-Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs, uint numInputs);
+Boolean * applyPredicate(CSolver *, Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus);
 
 /** This function applies a logical operation to the Booleans in its input. */
 
