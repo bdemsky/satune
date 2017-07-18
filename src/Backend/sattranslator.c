@@ -3,6 +3,8 @@
 #include "csolver.h"
 #include "satencoder.h"
 #include "set.h"
+#include "order.h"
+#include "orderpair.h"
 
 uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint index=0;
@@ -54,10 +56,9 @@ uint64_t getElementValueUnarySATTranslator(CSolver* This, ElementEncoding* elemE
 }
 
 uint64_t getElementValueSATTranslator(CSolver* This, Element* element){
-	Set* set = getElementSet(element);
-	if(getSetSize( set ) ==1)	//case when the set has only one item
-		return getSetElement(set, 0);
 	ElementEncoding* elemEnc = getElementEncoding(element);
+	if(elemEnc->numVars == 0)	//case when the set has only one item
+		return getSetElement(getElementSet(element), 0);
 	switch(elemEnc->type){
 		case ONEHOT:
 			getElementValueOneHotSATTranslator(This, elemEnc);
@@ -84,3 +85,14 @@ bool getBooleanVariableValueSATTranslator( CSolver* This , Boolean* boolean){
 	int index = getEdgeVar( ((BooleanVar*) boolean)->var );
 	return This->satEncoder->cnf->solver->solution[index] == true;
 }
+
+HappenedBefore getOrderConstraintValueSATTranslator(CSolver* This, BooleanOrder* boolOrder){
+	ASSERT(boolOrder->order->orderPairTable!= NULL);
+	OrderPair pair={boolOrder->first, boolOrder->second, E_NULL};
+	Edge var = getOrderConstraint(boolOrder->order->orderPairTable, & pair);
+	if(edgeIsNull(var))
+		return UNORDERED;
+	int index = getEdgeVar( var );
+	return This->satEncoder->cnf->solver->solution[index] ? FIRST: SECOND;
+}
+

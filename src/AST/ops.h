@@ -12,6 +12,9 @@ typedef enum CompOp CompOp;
 enum OrderType {PARTIAL, TOTAL};
 typedef enum OrderType OrderType;
 
+enum HappenedBefore {UNORDERED, FIRST, SECOND};
+typedef enum HappenedBefore HappenedBefore;
+
 /**
  *    FLAGFORCESOVERFLOW forces the operation to overflow if the boolean flag is true
  *  OVERFLOWSETSFLAG -- sets the flag if the operation overflows

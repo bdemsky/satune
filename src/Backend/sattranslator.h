@@ -9,8 +9,11 @@
 #define SATTRANSLATOR_H
 
 #include "classlist.h"
+#include "ops.h"
+
 
 bool getBooleanVariableValueSATTranslator( CSolver* This , Boolean* boolean);
+HappenedBefore getOrderConstraintValueSATTranslator(CSolver* This, BooleanOrder* boolOrder);
 uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding* elemEnc);
 uint64_t getElementValueBinaryValueSATTranslator(CSolver* This, ElementEncoding* elemEnc);
 uint64_t getElementValueOneHotSATTranslator(CSolver* This, ElementEncoding* elemEnc);
