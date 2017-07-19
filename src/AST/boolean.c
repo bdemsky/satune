@@ -51,14 +51,19 @@ Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, 
 
 void deleteBoolean(Boolean * This) {
 	switch(GETBOOLEANTYPE(This)){
-	case PREDICATEOP: {
-		BooleanPredicate *bp=(BooleanPredicate *)This;
-		deleteInlineArrayElement(& bp->inputs );
-		deleteFunctionEncoding(& bp->encoding);
-		break;
-	}
-	default:
-		break;
+		case PREDICATEOP:{
+			BooleanPredicate *bp=(BooleanPredicate *)This;
+			deleteInlineArrayElement(& bp->inputs );
+			deleteFunctionEncoding(& bp->encoding);
+			break;
+		}
+		case LOGICOP:{
+			BooleanLogic* bl = (BooleanLogic*) This;
+			deleteInlineArrayBoolean(&bl->inputs);
+			break;
+		}
+		default:
+			break;
 	}
 	deleteVectorArrayBoolean(GETBOOLEANPARENTS(This));
 	ourfree(This);
