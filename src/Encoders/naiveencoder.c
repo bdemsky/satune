@@ -30,6 +30,7 @@ void naiveEncodingConstraint(Boolean * This) {
 	}
 	case LOGICOP: {
 		naiveEncodingLogicOp((BooleanLogic *) This);
+		return;
 	}
 	case PREDICATEOP: {
 		naiveEncodingPredicate((BooleanPredicate *) This);

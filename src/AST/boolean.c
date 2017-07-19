@@ -41,6 +41,8 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize){
 	BooleanLogic * This = ourmalloc(sizeof(BooleanLogic));
+	GETBOOLEANTYPE(This) = LOGICOP;
+	This->op = op;
 	initDefVectorBoolean(GETBOOLEANPARENTS(This));
 	initArrayInitBoolean(&This->inputs, array, asize);
 	pushVectorBoolean(solver->allBooleans, (Boolean *) This);
