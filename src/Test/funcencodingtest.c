@@ -1,5 +1,21 @@
 #include "csolver.h"
-
+/**
+ * e1 = {6}
+ * e2={4, 2}
+ * e3=Fsub(e1,e2) {4, 2}
+ * e4= f(e1, e2) 
+ *	6 2 => 3
+ *	6 4 => 1
+ * e5 = f(e1)=>e1 {6}
+ * e6 = (e3, e4, e5) {2, 3, 1}
+ *	4 3 6 => 3
+ *	2 1 6 => 1
+ *	2 3 6 => 2
+ *	4 1 6 => 1
+ * e7 = {2, 1, 0}
+ * e7 > e6
+ * Result: e1=6, e2=4, e7=2
+ */
 int main(int numargs, char ** argv) {
 	CSolver * solver=allocCSolver();
 	uint64_t set1[]={6};

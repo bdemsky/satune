@@ -1,5 +1,11 @@
 #include "csolver.h"
-
+/**
+ * e1 = {0, 1, 2}
+ * e2 = {3, 4}
+ * e1 == e2
+ * 
+ * Result: UNSAT
+ */
 int main(int numargs, char ** argv) {
 	CSolver * solver=allocCSolver();
 	uint64_t set1[]={0, 1, 2};

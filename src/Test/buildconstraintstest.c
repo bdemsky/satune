@@ -1,5 +1,18 @@
 #include "csolver.h"
 
+/**
+ * e1={0, 1, 2}
+ * e2={0, 1, 2}
+ * e1 == e2
+ * e3= e1+e2 {0, 1, 2, 3, 4}
+ * e4 = f(e1, e2)
+ *	0 1 => 0
+ *	1 1 => 0
+ *	2 1 => 2
+ *	2 2 => 2
+ * e3 == e4
+ * Result: UNSAT!
+ */
 int main(int numargs, char ** argv) {
 	CSolver * solver=allocCSolver();
 	uint64_t set1[]={0, 1, 2};
@@ -12,8 +25,7 @@ int main(int numargs, char ** argv) {
 	Set * domain[]={s, s};
 	Predicate *equals=createPredicateOperator(solver, EQUALS, domain, 2);
 	Element * inputs[]={e1, e2};
-	Boolean* overflow = getBooleanVar(solver , 2);
-	Boolean * b=applyPredicate(solver, equals, inputs, 2, overflow);
+	Boolean * b=applyPredicate(solver, equals, inputs, 2, NULL);
 	addConstraint(solver, b);
 
 	uint64_t set2[] = {2, 3};
@@ -30,7 +42,7 @@ int main(int numargs, char ** argv) {
 	addTableEntry(solver, table, row3, 2, 2);
 	addTableEntry(solver, table, row4, 2, 2);
 	Function * f2 = completeTable(solver, table, IGNOREBEHAVIOR); //its range would be as same as s
-	
+	Boolean* overflow = getBooleanVar(solver , 2);	
 	Element * e3 = applyFunction(solver, f1, inputs, 2, overflow);
 	Element * e4 = applyFunction(solver, f2, inputs, 2, overflow);
 	Set* domain2[] = {s,rangef1};

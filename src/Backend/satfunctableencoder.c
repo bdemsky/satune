@@ -205,7 +205,8 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 		encodeElementSATEncoder(This, elem);
 	}
 
-	FunctionTable* function =(FunctionTable*)elemFunc;
+	FunctionTable* function =(FunctionTable*)elemFunc->function;
+	model_print("undefBehavior: %d\n", function->undefBehavior);
 	switch(function->undefBehavior){
 		case IGNOREBEHAVIOR:
 		case FLAGFORCEUNDEFINED:

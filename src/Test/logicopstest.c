@@ -4,9 +4,7 @@
  * b1 AND b2=>b3
  * !b3 OR b4
  * b1 XOR b4
- * @param numargs
- * @param argv
- * @return 
+ * Result: b1=1 b2=0 b3=0 b4=0 
  */
 int main(int numargs, char** argv){
 	CSolver * solver=allocCSolver();

@@ -1,5 +1,10 @@
 #include "csolver.h"
-
+/**
+ * e1 = 5
+ * e2 = {1, 3, 4, 6}
+ * e1 < e2
+ * Result: e1=5 e2=6
+ */
 int main(int numargs, char ** argv){
 	CSolver *solver=allocCSolver();
 	uint64_t set1[]={5};
