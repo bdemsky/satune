@@ -19,10 +19,10 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 	for(uint i=0; i<inputNum; i++){
 		encodeElementSATEncoder(This, getArrayElement(inputs, i));
 	}
-	uint size = getSizeHashSetTableEntry(table->entrie);
+	uint size = getSizeHashSetTableEntry(table->entries);
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
-	HSIteratorTableEntry* iterator = iteratorTableEntry(table->entrie);
+	HSIteratorTableEntry* iterator = iteratorTableEntry(table->entries);
 	uint i=0;
 	while(hasNextTableEntry(iterator)){
 		TableEntry* entry = nextTableEntry(iterator);
@@ -51,9 +51,9 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder* This, ElementFunction*
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	ArrayElement* elements= &func->inputs;
 	Table* table = ((FunctionTable*) (func->function))->table;
-	uint size = getSizeHashSetTableEntry(table->entrie);
+	uint size = getSizeHashSetTableEntry(table->entries);
 	Edge constraints[size];
-	HSIteratorTableEntry* iterator = iteratorTableEntry(table->entrie);
+	HSIteratorTableEntry* iterator = iteratorTableEntry(table->entries);
 	uint i=0;
 	while(hasNextTableEntry(iterator)) {
 		TableEntry* entry = nextTableEntry(iterator);
