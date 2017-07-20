@@ -18,6 +18,7 @@ Element* allocElementFunction(Function * function, Element ** array, uint numArr
 	ElementFunction* This = (ElementFunction*) ourmalloc(sizeof(ElementFunction));
 	GETELEMENTTYPE(This)= ELEMFUNCRETURN;
 	This->function=function;
+	ASSERT(GETBOOLEANTYPE(overflowstatus) == BOOLEANVAR);
 	This->overflowstatus = overflowstatus;
 	initArrayInitElement(&This->inputs, array, numArrays);
 	initDefVectorASTNode(GETELEMENTPARENTS(This));

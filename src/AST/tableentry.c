@@ -4,6 +4,7 @@
 TableEntry* allocTableEntry(uint64_t* inputs, uint inputSize, uint64_t result){
 	TableEntry* te = (TableEntry*) ourmalloc(sizeof(TableEntry)+inputSize*sizeof(uint64_t));
 	te->output=result;
+	te->inputSize=inputSize;
 	memcpy(te->inputs, inputs, inputSize * sizeof(uint64_t));
 	return te;
 }

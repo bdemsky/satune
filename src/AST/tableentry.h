@@ -18,6 +18,7 @@
 #include "mymemory.h"
 struct TableEntry {
 	uint64_t output;
+	uint inputSize;
 	uint64_t inputs[];
 };
 

@@ -25,5 +25,5 @@ HashTableDef(Void, void *, void *);
 HashTableDef(OrderPair, OrderPair *, OrderPair *);
 
 HashSetDef(Void, void *);
-
+HashSetDef(TableEntry, TableEntry*);
 #endif

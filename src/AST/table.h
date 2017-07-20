@@ -7,10 +7,11 @@
 struct Table {
 	ArraySet domains;
 	Set * range;
-	VectorTableEntry entries;
+	HashSetTableEntry* entrie;
 };
 
 Table * allocTable(Set ** domains, uint numDomain, Set * range);
 void addNewTableEntry(Table * This, uint64_t * inputs, uint inputSize, uint64_t result);
+TableEntry* getTableEntryFromTable(Table* table, uint64_t* inputs, uint inputSize);
 void deleteTable(Table * This);
 #endif
