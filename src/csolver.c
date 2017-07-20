@@ -164,7 +164,10 @@ Element * applyFunction(CSolver *This, Function * function, Element ** array, ui
 	return element;
 }
 
-Boolean * applyPredicate(CSolver *This, Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus) {
+Boolean * applyPredicate(CSolver *This, Predicate * predicate, Element ** inputs, uint numInputs) {
+	return applyPredicateTable(This, predicate, inputs, numInputs, NULL);
+}
+Boolean * applyPredicateTable(CSolver *This, Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus) {
 	Boolean* boolean= allocBooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
 	pushVectorBoolean(This->allBooleans, boolean);
 	return boolean;
