@@ -147,7 +147,10 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 			}
 		}
 	}
-
+	if(getSizeVectorEdge(clauses) == 0){
+		deleteVectorEdge(clauses);
+		return E_False;
+	}
 	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	deleteVectorEdge(clauses);
 	return generateNegation ? constraintNegate(cor) : cor;
@@ -287,7 +290,10 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 			}
 		}
 	}
-
+	if(getSizeVectorEdge(clauses) == 0){
+		deleteVectorEdge(clauses);
+		return;
+	}
 	Edge cor=constraintAND(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	addConstraintCNF(This->cnf, cor);
 	deleteVectorEdge(clauses);
