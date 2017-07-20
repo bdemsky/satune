@@ -11,6 +11,7 @@
 #include "order.h"
 #include "predicate.h"
 #include "set.h"
+#include "satfuncopencoder.h"
 
 //TODO: Should handle sharing of AST Nodes without recoding them a second time
 

@@ -13,7 +13,7 @@ struct SATEncoder {
 
 #include "satelemencoder.h"
 #include "satorderencoder.h"
-#include "satfuncencoder.h"
+#include "satfunctableencoder.h"
 
 SATEncoder * allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
