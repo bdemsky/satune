@@ -87,8 +87,7 @@ Predicate * createPredicateTable(CSolver *solver, Table* table, UndefinedBehavio
 
 Table * createTable(CSolver *solver, Set **domains, uint numDomain, Set * range);
 
-Table * createTablePredicate(CSolver *solver, Set **domains, uint numDomain);
-
+Table * createTableForPredicate(CSolver *solver, Set **domains, uint numDomain);
 /** This function adds an input output relation to a table. */
 
 void addTableEntry(CSolver *solver, Table* table, uint64_t* inputs, uint inputSize, uint64_t result);

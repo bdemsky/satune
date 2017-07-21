@@ -89,49 +89,46 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 	}
 
 	Edge undefConstraint = encodeConstraintSATEncoder (This, constraint->undefStatus);
-	
+	printCNF(undefConstraint);
 	bool notfinished=true;
 	while(notfinished) {
 		Edge carray[numDomains];
 		TableEntry* tableEntry = getTableEntryFromTable(predicate->table, vals, numDomains);
 		bool isInRange = tableEntry!=NULL;
-		bool ignoreEntry = generateNegation == tableEntry->output;
-		ASSERT(predicate->undefinedbehavior == UNDEFINEDSETSFLAG || predicate->undefinedbehavior == FLAGIFFUNDEFINED);
-		//Include this in the set of terms
-		for(uint i=0;i<numDomains;i++) {
-			Element * elem = getArrayElement(&constraint->inputs, i);
-			carray[i] = getElementValueConstraint(This, elem, vals[i]);
-		}
-
+		if(isInRange && generateNegation == tableEntry->output)
+			goto NEXT;
 		Edge clause;
+		for(uint i=0;i<numDomains;i++) {
+				Element * elem = getArrayElement(&constraint->inputs, i);
+				carray[i] = getElementValueConstraint(This, elem, vals[i]);
+		}
+	
 		switch(predicate->undefinedbehavior) {
-			case UNDEFINEDSETSFLAG: {
-				if (isInRange && !ignoreEntry) {
+			case UNDEFINEDSETSFLAG:
+				if(isInRange){
 					clause=constraintAND(This->cnf, numDomains, carray);
-				} else if(!isInRange) {
+				}else{
 					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint);
 				}
 				break;
-			}
-			case FLAGIFFUNDEFINED: {
-				if (isInRange && !ignoreEntry) {
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintAND2(This->cnf, carray[numDomains], constraintNegate(undefConstraint)));
-				} else if(!isInRange) {
+			case FLAGIFFUNDEFINED:
+				if(isInRange){
+					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintNegate(undefConstraint));
+				}else{
 					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint);
 				}
 				break;
-			}
+
 			default:
 				ASSERT(0);
-		}
+		}	
 #ifdef TRACE_DEBUG
 		model_print("added clause in predicate table enumeration ...\n");
 		printCNF(clause);
 		model_print("\n");
 #endif
 		pushVectorEdge(clauses, clause);
-		
-		
+NEXT:	
 		notfinished=false;
 		for(uint i=0;i<numDomains; i++) {
 			uint index=++indices[i];
@@ -237,7 +234,6 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 		TableEntry* tableEntry = getTableEntryFromTable(function->table, vals, numDomains);
 		bool isInRange = tableEntry!=NULL;
 		ASSERT(function->undefBehavior == UNDEFINEDSETSFLAG || function->undefBehavior == FLAGIFFUNDEFINED);
-		//Include this in the set of terms
 		for(uint i=0;i<numDomains;i++) {
 			Element * elem = getArrayElement(&elemFunc->inputs, i);
 			carray[i] = getElementValueConstraint(This, elem, vals[i]);
