@@ -186,7 +186,10 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder* This, ElementFunction* 
 			}
 		}
 	}
-
+	if(getSizeVectorEdge(clauses) == 0){
+		deleteVectorEdge(clauses);
+		return;
+	}
 	Edge cor=constraintAND(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	addConstraintCNF(This->cnf, cor);
 	deleteVectorEdge(clauses);

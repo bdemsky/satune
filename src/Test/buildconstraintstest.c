@@ -25,7 +25,7 @@ int main(int numargs, char ** argv) {
 	Set * domain[]={s, s};
 	Predicate *equals=createPredicateOperator(solver, EQUALS, domain, 2);
 	Element * inputs[]={e1, e2};
-	Boolean * b=applyPredicate(solver, equals, inputs, 2, NULL);
+	Boolean * b=applyPredicate(solver, equals, inputs, 2);
 	addConstraint(solver, b);
 
 	uint64_t set2[] = {2, 3};
@@ -48,7 +48,7 @@ int main(int numargs, char ** argv) {
 	Set* domain2[] = {s,rangef1};
 	Predicate* equal2 = createPredicateOperator(solver, EQUALS, domain2, 2);
 	Element* inputs2 [] = {e4, e3};
-	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2, overflow);
+	Boolean* pred = applyPredicate(solver, equal2, inputs2, 2);
 	addConstraint(solver, pred);
 	
 	if (startEncoding(solver)==1)

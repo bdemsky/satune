@@ -40,7 +40,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 				row=constraintAND(This->cnf, inputNum, carray);
 				break;
 			case FLAGFORCEUNDEFINED:{
-				Edge undefConst = ((BooleanVar*)constraint->undefStatus)->var;
+				Edge undefConst = encodeConstraintSATEncoder(This, constraint->undefStatus);
 				row=constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray),  constraintNegate(undefConst));
 				break;
 			}
@@ -88,7 +88,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 		vals[i]=getSetElement(set, indices[i]);
 	}
 
-	Edge undefConstraint = ((BooleanVar*) constraint->undefStatus)->var;
+	Edge undefConstraint = encodeConstraintSATEncoder (This, constraint->undefStatus);
 	
 	bool notfinished=true;
 	while(notfinished) {
@@ -147,7 +147,10 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 			}
 		}
 	}
-
+	if(getSizeVectorEdge(clauses) == 0){
+		deleteVectorEdge(clauses);
+		return E_False;
+	}
 	Edge cor=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	deleteVectorEdge(clauses);
 	return generateNegation ? constraintNegate(cor) : cor;
@@ -179,7 +182,7 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder* This, ElementFunction*
 				break;
 			}
 			case FLAGFORCEUNDEFINED: {
-				Edge undefConst = ((BooleanVar*)func->overflowstatus)->var;
+				Edge undefConst = encodeConstraintSATEncoder(This, func->overflowstatus);
 				row=constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray), constraintAND2(This->cnf, output, constraintNegate(undefConst)));
 				break;
 			}
@@ -206,7 +209,6 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 	}
 
 	FunctionTable* function =(FunctionTable*)elemFunc->function;
-	model_print("undefBehavior: %d\n", function->undefBehavior);
 	switch(function->undefBehavior){
 		case IGNOREBEHAVIOR:
 		case FLAGFORCEUNDEFINED:
@@ -228,8 +230,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 		vals[i]=getSetElement(set, indices[i]);
 	}
 
-	Edge undefConstraint = ((BooleanVar*) elemFunc->overflowstatus)->var;
-	
+	Edge undefConstraint = encodeConstraintSATEncoder(This, elemFunc->overflowstatus);
 	bool notfinished=true;
 	while(notfinished) {
 		Edge carray[numDomains+1];
@@ -289,7 +290,10 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 			}
 		}
 	}
-
+	if(getSizeVectorEdge(clauses) == 0){
+		deleteVectorEdge(clauses);
+		return;
+	}
 	Edge cor=constraintAND(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	addConstraintCNF(This->cnf, cor);
 	deleteVectorEdge(clauses);
