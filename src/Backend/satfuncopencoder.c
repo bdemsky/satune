@@ -75,7 +75,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder * This, BooleanPredicate *
 			}
 		}
 	}
-	if(getSizeVectorEdge(clauses) == 0){
+	if(getSizeVectorEdge(clauses) == 0) {
 		deleteVectorEdge(clauses);
 		return E_False;
 	}
