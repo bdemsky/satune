@@ -61,8 +61,8 @@ void naiveEncodingPredicate(BooleanPredicate * This) {
 void naiveEncodingElement(Element * This) {
 	ElementEncoding * encoding = getElementEncoding(This);
 	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
-		setElementEncodingType(encoding, BINARYINDEX);
-		baseBinaryIndexElementAssign(encoding);
+		setElementEncodingType(encoding, ONEHOT);
+		encodingArrayInitialization(encoding);
 	}
 	
 	if(GETELEMENTTYPE(This) == ELEMFUNCRETURN) {
@@ -77,7 +77,7 @@ void naiveEncodingElement(Element * This) {
 	}
 }
 
-void baseBinaryIndexElementAssign(ElementEncoding *This) {
+void encodingArrayInitialization(ElementEncoding *This) {
 	Element * element=This->element;
 	Set * set= getElementSet(element);
 	ASSERT(set->isRange==false);

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "ops.h"
 #include "element.h"
+#include "set.h"
 
 Edge getElementValueConstraint(SATEncoder* This, Element* elem, uint64_t value) { 
 	switch(getElementEncoding(elem)->type){
@@ -39,14 +40,14 @@ Edge getElementValueBinaryIndexConstraint(SATEncoder * This, Element* elem, uint
 
 Edge getElementValueOneHotConstraint(SATEncoder * This, Element* elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
-	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding* elemEnc = getElementEncoding(elem);
 	for(uint i=0; i<elemEnc->encArraySize; i++){
 		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {
-			return elemEnc->variables[i];
+			return (elemEnc->numVars == 0) ? E_True: elemEnc->variables[i];
 		}
 	}
-	return E_BOGUS;
+	return E_False;
 }
 
 Edge getElementValueUnaryConstraint(SATEncoder * This, Element* elem, uint64_t value) {
@@ -100,8 +101,8 @@ void generateBinaryIndexEncodingVars(SATEncoder *This, ElementEncoding *encoding
 	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
 }
 
-void generateOneHotEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
-	allocElementConstraintVariables(encoding, encoding->encArraySize);
+void generateOneHotEncodingVars(SATEncoder *This, ElementEncoding *encoding) { 
+	allocElementConstraintVariables(encoding, getSetSize( getElementSet(encoding->element)));
 	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);	
 	for(uint i=0;i<encoding->numVars;i++) {
 		for(uint j=i+1;j<encoding->numVars;j++) {
