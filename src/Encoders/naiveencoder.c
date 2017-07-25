@@ -61,7 +61,7 @@ void naiveEncodingPredicate(BooleanPredicate * This) {
 void naiveEncodingElement(Element * This) {
 	ElementEncoding * encoding = getElementEncoding(This);
 	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
-		setElementEncodingType(encoding, ONEHOT);
+		setElementEncodingType(encoding, UNARY);
 		encodingArrayInitialization(encoding);
 	}
 	
@@ -77,12 +77,25 @@ void naiveEncodingElement(Element * This) {
 	}
 }
 
+uint getSizeEncodingArray(ElementEncoding *This, uint setSize){
+	switch(This->type){
+		case BINARYINDEX:
+			return NEXTPOW2(setSize);
+		case ONEHOT:
+		case UNARY:
+			return setSize;
+		default:
+			ASSERT(0);
+	}
+	return -1;
+}
+
 void encodingArrayInitialization(ElementEncoding *This) {
 	Element * element=This->element;
 	Set * set= getElementSet(element);
 	ASSERT(set->isRange==false);
 	uint size=getSizeVectorInt(set->members);
-	uint encSize=NEXTPOW2(size);
+	uint encSize=getSizeEncodingArray(This, size);
 	allocEncodingArrayElement(This, encSize);
 	allocInUseArrayElement(This, encSize);
 	for(uint i=0;i<size;i++) {
