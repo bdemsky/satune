@@ -61,7 +61,7 @@ void naiveEncodingPredicate(BooleanPredicate * This) {
 void naiveEncodingElement(Element * This) {
 	ElementEncoding * encoding = getElementEncoding(This);
 	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
-		setElementEncodingType(encoding, UNARY);
+		setElementEncodingType(encoding, BINARYINDEX);
 		encodingArrayInitialization(encoding);
 	}
 	
