@@ -21,7 +21,6 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 	uint size = getSizeHashSetTableEntry(table->entries);
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
-	VectorEdge * undefClauses=allocDefVectorEdge();
 	Edge undefConst = encodeConstraintSATEncoder(This, constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
@@ -29,7 +28,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 	uint i=0;
 	while(hasNextTableEntry(iterator)){
 		TableEntry* entry = nextTableEntry(iterator);
-		if(generateNegation == entry->output) {
+		if(generateNegation == entry->output && undefStatus == IGNOREBEHAVIOR) {
 			//Skip the irrelevant entries
 			continue;
 		}
@@ -46,8 +45,11 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 				row=constraintAND(This->cnf, inputNum, carray);
 				break;
 			case FLAGFORCEUNDEFINED:{
+				addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray),  constraintNegate(undefConst)));
+				if(generateNegation == entry->output){
+					continue;
+				}
 				row=constraintAND(This->cnf, inputNum, carray);
-				pushVectorEdge(undefClauses, constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray),  constraintNegate(undefConst)));
 				break;
 			}
 			default:
@@ -58,14 +60,11 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 		
 		model_print("\n\n");
 	}
+	ASSERT(i!=0);
 	Edge result= generateNegation?constraintNegate(constraintOR(This->cnf, i, constraints))
 		:constraintOR(This->cnf, i, constraints);
-	Edge tmp = E_NULL;
-	if(getSizeVectorEdge(undefClauses) != 0)
-		tmp= constraintAND(This->cnf, getSizeVectorEdge(undefClauses), exposeArrayEdge(undefClauses));
-	deleteVectorEdge(undefClauses);
 	printCNF(result);
-	return edgeIsNull(tmp)? result: constraintAND2(This->cnf, tmp, result);
+	return result;
 }
 Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint){
 #ifdef TRACE_DEBUG
@@ -91,7 +90,6 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 	uint numDomains=getSizeArraySet(&predicate->table->domains);
 
 	VectorEdge * clauses=allocDefVectorEdge();
-	VectorEdge * undefClauses=allocDefVectorEdge();
 	
 	uint indices[numDomains]; //setup indices
 	bzero(indices, sizeof(uint)*numDomains);
@@ -101,7 +99,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 		Set * set=getArraySet(&predicate->table->domains, i);
 		vals[i]=getSetElement(set, indices[i]);
 	}
-
+	bool hasOverflow = false;
 	Edge undefConstraint = encodeConstraintSATEncoder (This, constraint->undefStatus);
 	printCNF(undefConstraint);
 	bool notfinished=true;
@@ -109,8 +107,9 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 		Edge carray[numDomains];
 		TableEntry* tableEntry = getTableEntryFromTable(predicate->table, vals, numDomains);
 		bool isInRange = tableEntry!=NULL;
-		if(isInRange && generateNegation == tableEntry->output)
-			goto NEXT;
+		if(!isInRange && !hasOverflow){
+			hasOverflow=true;
+		}
 		Edge clause;
 		for(uint i=0;i<numDomains;i++) {
 				Element * elem = getArrayElement(&constraint->inputs, i);
@@ -122,30 +121,31 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * co
 				if(isInRange){
 					clause=constraintAND(This->cnf, numDomains, carray);
 				}else{
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint);
+					addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint) );
 				}
 				break;
 			case FLAGIFFUNDEFINED:
 				if(isInRange){
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintNegate(undefConstraint));
+					clause=constraintAND(This->cnf, numDomains, carray);
+					addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintNegate(undefConstraint)));
 				}else{
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint);
+					addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint) );
 				}
 				break;
 
 			default:
 				ASSERT(0);
-		}	
+		}
+		
+		if(isInRange){
 #ifdef TRACE_DEBUG
-		model_print("added clause in predicate table enumeration ...\n");
-		printCNF(clause);
-		model_print("\n");
+			model_print("added clause in predicate table enumeration ...\n");
+			printCNF(clause);
+			model_print("\n");
 #endif
-		if(isInRange)
 			pushVectorEdge(clauses, clause);
-		else
-			pushVectorEdge(undefClauses, clause);
-NEXT:	
+		}
+		
 		notfinished=false;
 		for(uint i=0;i<numDomains; i++) {
 			uint index=++indices[i];
@@ -162,20 +162,16 @@ NEXT:
 		}
 	}
 	Edge result = E_NULL;
-	if(getSizeVectorEdge(clauses) != 0){
-		result=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
-		if(generateNegation){
-			ASSERT(getSizeVectorEdge(undefClauses) == 0);
-			result = constraintNegate(result);
-		}
+	ASSERT(getSizeVectorEdge(clauses) != 0);
+	result=constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	if(hasOverflow){
+		result = constraintOR2(This->cnf, result, undefConstraint);
 	}
-	if(getSizeVectorEdge(undefClauses)!= 0){
-		ASSERT(!generateNegation);
-		Edge tmp = constraintAND(This->cnf, getSizeVectorEdge(undefClauses), exposeArrayEdge(undefClauses));
-		result= edgeIsNull(result)? tmp : constraintAND2(This->cnf, tmp, result);
+	if(generateNegation){
+		ASSERT(!hasOverflow);
+		result = constraintNegate(result);
 	}
 	deleteVectorEdge(clauses);
-	deleteVectorEdge(undefClauses);
 	return result;
 }
 

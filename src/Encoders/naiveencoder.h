@@ -14,6 +14,7 @@ void naiveEncodingConstraint(Boolean * This);
 void naiveEncodingLogicOp(BooleanLogic * This);
 void naiveEncodingPredicate(BooleanPredicate * This);
 void naiveEncodingElement(Element * This);
-void baseBinaryIndexElementAssign(ElementEncoding *This);
+void encodingArrayInitialization(ElementEncoding *This);
+uint getSizeEncodingArray(ElementEncoding *, uint setSize);
 
 #endif

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "ops.h"
 #include "element.h"
+#include "set.h"
 
 Edge getElementValueConstraint(SATEncoder* This, Element* elem, uint64_t value) { 
 	switch(getElementEncoding(elem)->type){
@@ -39,22 +40,24 @@ Edge getElementValueBinaryIndexConstraint(SATEncoder * This, Element* elem, uint
 
 Edge getElementValueOneHotConstraint(SATEncoder * This, Element* elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
-	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding* elemEnc = getElementEncoding(elem);
 	for(uint i=0; i<elemEnc->encArraySize; i++){
 		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {
-			return elemEnc->variables[i];
+			return (elemEnc->numVars == 0) ? E_True: elemEnc->variables[i];
 		}
 	}
-	return E_BOGUS;
+	return E_False;
 }
 
 Edge getElementValueUnaryConstraint(SATEncoder * This, Element* elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
-	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
+	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding* elemEnc = getElementEncoding(elem);
 	for(uint i=0; i<elemEnc->encArraySize; i++){
 		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i]==value) {
+			if(elemEnc->numVars == 0)
+				return E_True;
 			if (i==0)
 				return constraintNegate(elemEnc->variables[0]);
 			else if ((i+1)==elemEnc->encArraySize)
@@ -63,7 +66,7 @@ Edge getElementValueUnaryConstraint(SATEncoder * This, Element* elem, uint64_t v
 				return constraintAND2(This->cnf, elemEnc->variables[i-1], constraintNegate(elemEnc->variables[i]));
 		}
 	}
-	return E_BOGUS;
+	return E_False;
 }
 
 Edge getElementValueBinaryValueConstraint(SATEncoder * This, Element* element, uint64_t value){

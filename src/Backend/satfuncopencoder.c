@@ -212,11 +212,14 @@ Edge encodeCircuitEquals(SATEncoder * This, BooleanPredicate * constraint) {
 	PredicateOperator * predicate = (PredicateOperator*) constraint->predicate;
 	ASSERT(getSizeArraySet(&predicate->domains) == 2);
 	Element *elem0 = getArrayElement( &constraint->inputs, 0);
+	encodeElementSATEncoder(This, elem0);
 	Element *elem1 = getArrayElement( &constraint->inputs, 1);
+	encodeElementSATEncoder(This, elem1);
 	ElementEncoding *ee0=getElementEncoding(elem0);
 	ElementEncoding *ee1=getElementEncoding(elem1);
 	ASSERT(ee0->numVars==ee1->numVars);
 	uint numVars=ee0->numVars;
+	ASSERT(numVars != 0);
 	Edge carray[numVars];
 	for (uint i=0; i<numVars; i++) {
 		carray[i]=constraintIFF(This->cnf, ee0->variables[i], ee1->variables[i]);

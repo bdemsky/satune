@@ -210,6 +210,7 @@ uint64_t getElementValue(CSolver* This, Element* element){
 	switch(GETELEMENTTYPE(element)){
 		case ELEMSET:
 		case ELEMCONST:
+		case ELEMFUNCRETURN:
 			return getElementValueSATTranslator(This, element);
 		default:
 			ASSERT(0);
