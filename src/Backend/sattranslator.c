@@ -8,18 +8,19 @@
 
 uint64_t getElementValueBinaryIndexSATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint index=0;
-	for(uint i=elemEnc->numVars-1;i>=0;i--) {
+	for(int i=elemEnc->numVars-1;i>=0;i--) {
 		index=index<<1;
 		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
 			index |= 1;
 	}
+	model_print("index:%u\tencArraySize:%u\tisInUseElement:%u\n", index, elemEnc->encArraySize, isinUseElement(elemEnc, index));
 	ASSERT(elemEnc->encArraySize >index && isinUseElement(elemEnc, index));
 	return elemEnc->encodingArray[index];
 }
 
 uint64_t getElementValueBinaryValueSATTranslator(CSolver* This, ElementEncoding* elemEnc){
 	uint64_t value=0;
-	for(uint i=elemEnc->numVars-1;i>=0;i--) {
+	for(int i=elemEnc->numVars-1;i>=0;i--) {
 		value=value<<1;
 		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )) )
 			value |= 1;

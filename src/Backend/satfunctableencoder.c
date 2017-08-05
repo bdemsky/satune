@@ -268,30 +268,33 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder* This, ElementFunction* el
 		switch(function->undefBehavior) {
 			case UNDEFINEDSETSFLAG: {
 				if (isInRange) {
+					//FIXME: Talk to Brian, It should be IFF not only IMPLY. --HG
 					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), carray[numDomains]);
 				} else {
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint);
+					addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint));
 				}
 				break;
 			}
 			case FLAGIFFUNDEFINED: {
 				if (isInRange) {
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintAND2(This->cnf, carray[numDomains], constraintNegate(undefConstraint)));
+					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), carray[numDomains]);
+					addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf, constraintAND(This->cnf, numDomains, carray), constraintNegate(undefConstraint) ));
 				} else {
-					clause=constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint);
+					addConstraintCNF(This->cnf,constraintIMPLIES(This->cnf, constraintAND(This->cnf, numDomains, carray), undefConstraint));
 				}
 				break;
 			}
 			default:
 				ASSERT(0);
 		}
+		if(isInRange){
 #ifdef TRACE_DEBUG
-		model_print("added clause in function table enumeration ...\n");
-		printCNF(clause);
-		model_print("\n");
+			model_print("added clause in function table enumeration ...\n");
+			printCNF(clause);
+			model_print("\n");
 #endif
-		pushVectorEdge(clauses, clause);
-
+			pushVectorEdge(clauses, clause);
+		}
 		
 		notfinished=false;
 		for(uint i=0;i<numDomains; i++) {
