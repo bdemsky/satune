@@ -38,4 +38,10 @@ typedef enum PredicateType PredicateType;
 enum ASTNodeType {ORDERCONST, BOOLEANVAR, LOGICOP, PREDICATEOP, ELEMSET, ELEMFUNCRETURN, ELEMCONST};
 typedef enum ASTNodeType ASTNodeType;
 
+enum Polarity {P_UNDEFINED, P_TRUE, P_FALSE, P_BOTHTRUEFALSE};
+typedef enum Polarity Polarity;
+
+enum BooleanValue {BV_UNDEFINED, BV_MUSTBETRUE, BV_MUSTBEFALSE, BV_UNKNOWN};
+typedef enum BooleanValue BooleanValue;
+
 #endif

@@ -7,6 +7,8 @@
 Boolean* allocBooleanVar(VarType t) {
 	BooleanVar* This=(BooleanVar *) ourmalloc(sizeof (BooleanVar));
 	GETBOOLEANTYPE(This)=BOOLEANVAR;
+	GETBOOLEANVALUE(This) = BV_UNDEFINED;
+	GETBOOLEANPOLARITY(This) = P_UNDEFINED;
 	This->vtype=t;
 	This->var=E_NULL;
 	initDefVectorBoolean(GETBOOLEANPARENTS(This));
@@ -16,6 +18,8 @@ Boolean* allocBooleanVar(VarType t) {
 Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	BooleanOrder* This=(BooleanOrder *) ourmalloc(sizeof (BooleanOrder));
 	GETBOOLEANTYPE(This)=ORDERCONST;
+	GETBOOLEANVALUE(This) = BV_UNDEFINED;
+	GETBOOLEANPOLARITY(This) = P_UNDEFINED;
 	This->order=order;
 	This->first=first;
 	This->second=second;
@@ -27,6 +31,8 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus){
 	BooleanPredicate* This = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
 	GETBOOLEANTYPE(This)= PREDICATEOP;
+	GETBOOLEANVALUE(This) = BV_UNDEFINED;
+	GETBOOLEANPOLARITY(This) = P_UNDEFINED;
 	This->predicate=predicate;
 	initArrayInitElement(&This->inputs, inputs, numInputs);
 	initDefVectorBoolean(GETBOOLEANPARENTS(This));
@@ -42,6 +48,8 @@ Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint n
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize){
 	BooleanLogic * This = ourmalloc(sizeof(BooleanLogic));
 	GETBOOLEANTYPE(This) = LOGICOP;
+	GETBOOLEANVALUE(This) = BV_UNDEFINED;
+	GETBOOLEANPOLARITY(This) = P_UNDEFINED;
 	This->op = op;
 	initDefVectorBoolean(GETBOOLEANPARENTS(This));
 	initArrayInitBoolean(&This->inputs, array, asize);
@@ -68,3 +76,33 @@ void deleteBoolean(Boolean * This) {
 	deleteVectorArrayBoolean(GETBOOLEANPARENTS(This));
 	ourfree(This);
 }
+
+
+Polarity negatePolarity(Polarity This){
+	switch(This){
+		case P_UNDEFINED:
+		case P_BOTHTRUEFALSE:
+			return This;
+		case P_TRUE:
+			return P_FALSE;
+		case P_FALSE:
+			return P_TRUE;
+		default:
+			ASSERT(0);
+	}
+}
+
+BooleanValue negateBooleanValue(BooleanValue This){
+	switch(This){
+		case BV_UNDEFINED:
+		case BV_UNKNOWN:
+			return This;
+		case BV_MUSTBETRUE:
+			return BV_MUSTBEFALSE;
+		case BV_MUSTBEFALSE:
+			return BV_MUSTBETRUE;
+		default:
+			ASSERT(0);
+	}
+}
+

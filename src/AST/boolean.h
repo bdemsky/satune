@@ -14,9 +14,13 @@
 
 #define GETBOOLEANTYPE(o) GETASTNODETYPE(o)
 #define GETBOOLEANPARENTS(o) (&((Boolean *)(o))->parents)
+#define GETBOOLEANPOLARITY(b) (((Boolean*)b)->polarity)
+#define GETBOOLEANVALUE(b) (((Boolean*)b)->boolVal)
 
 struct Boolean {
 	ASTNode base;
+	Polarity polarity;
+	BooleanValue boolVal;
 	VectorBoolean parents;
 };
 
@@ -52,7 +56,8 @@ Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus);
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize);
 void deleteBoolean(Boolean * This);
-
+Polarity negatePolarity(Polarity This);
+BooleanValue negateBooleanValue(BooleanValue This);
 static inline FunctionEncoding* getPredicateFunctionEncoding(BooleanPredicate* func){
 	return &func->encoding;
 }
