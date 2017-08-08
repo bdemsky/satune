@@ -26,4 +26,6 @@ HashTableDef(OrderPair, OrderPair *, OrderPair *);
 
 HashSetDef(Void, void *);
 HashSetDef(TableEntry, TableEntry*);
+HashSetDef(OrderNode, OrderNode*);
+HashSetDef(OrderEdge, OrderEdge*);
 #endif

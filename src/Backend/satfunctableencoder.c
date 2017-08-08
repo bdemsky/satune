@@ -60,6 +60,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder * This, BooleanPredica
 		
 		model_print("\n\n");
 	}
+	deleteIterTableEntry(iterator);
 	ASSERT(i!=0);
 	Edge result= generateNegation?constraintNegate(constraintOR(This->cnf, i, constraints))
 		:constraintOR(This->cnf, i, constraints);

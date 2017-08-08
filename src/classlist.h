@@ -82,6 +82,15 @@ typedef struct OrderEncoding OrderEncoding;
 struct TableEntry;
 typedef struct TableEntry TableEntry;
 
+struct OrderGraph;
+typedef struct OrderGraph OrderGraph;
+
+struct OrderNode;
+typedef struct OrderNode OrderNode;
+
+struct OrderEdge;
+typedef struct OrderEdge OrderEdge;
+
 typedef unsigned int uint;
 typedef uint64_t VarType;
 #endif
