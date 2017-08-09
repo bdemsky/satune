@@ -58,7 +58,6 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder* This, Order* order){
 	VectorInt* mems = order->set->members;
 	HashTableOrderPair* table = order->orderPairTable;
 	uint size = getSizeVectorInt(mems);
-	uint csize =0;
 	for(uint i=0; i<size; i++){
 		uint64_t valueI = getVectorInt(mems, i);
 		for(uint j=i+1; j<size;j++){
