@@ -11,14 +11,12 @@
 #include "table.h"
 #include "tableentry.h"
 #include "order.h"
-#include "polarityassignment.h"
 #include <strings.h>
 
 void naiveEncodingDecision(CSolver* This) {
 	for (uint i=0; i < getSizeVectorBoolean(This->constraints); i++) {
 		Boolean* boolean = getVectorBoolean(This->constraints, i);
 		naiveEncodingConstraint(boolean);
-		assignPolarityAndBooleanValue(boolean);
 	}
 }
 

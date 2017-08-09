@@ -13,18 +13,15 @@
 #include "ops.h"
 #include "boolean.h"
 
-void assignPolarityAndBooleanValue(Boolean* boolean);
-void assignPolarityAndBooleanValue(Boolean* boolean);
-void assignPredicatePolarityAndBooleanValue(Boolean* boolean);
-void assignLogicOpPolarityAndBooleanValue(Boolean* boolean);
-void computeLogicOpPolarity(Boolean* boolean);
-void computeLogicOpBooleanValue(Boolean* boolean);
-void computeImplicationBooleanValue(Boolean* first, Boolean* second, BooleanValue parent);
+void computePolarities(CSolver* This);
+void updatePolarity(Boolean *This, Polarity polarity);
+void updateMustValue(Boolean *This, BooleanValue value);
 void computePolarityAndBooleanValue(Boolean* boolean);
-void computePredicatePolarityAndBooleanValue(Boolean* boolean);
-void computeLogicOpPolarityAndBooleanValue(Boolean* boolean);
-BooleanValue computeBooleanValue(LogicOp op, BooleanValue childVal, BooleanValue parentVal );
-Polarity computePolarity(Polarity childPol, Polarity parentPol);
-
+void computePredicatePolarityAndBooleanValue(BooleanPredicate* This);
+void computeLogicOpPolarityAndBooleanValue(BooleanLogic* boolean);
+Polarity negatePolarity(Polarity This);
+BooleanValue negateBooleanValue(BooleanValue This);
+void computeLogicOpPolarity(BooleanLogic* boolean);
+void computeLogicOpBooleanValue(BooleanLogic* boolean);
 
 #endif /* POLARITYASSIGNMENT_H */

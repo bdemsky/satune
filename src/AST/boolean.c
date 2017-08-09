@@ -76,33 +76,3 @@ void deleteBoolean(Boolean * This) {
 	deleteVectorArrayBoolean(GETBOOLEANPARENTS(This));
 	ourfree(This);
 }
-
-
-Polarity negatePolarity(Polarity This){
-	switch(This){
-		case P_UNDEFINED:
-		case P_BOTHTRUEFALSE:
-			return This;
-		case P_TRUE:
-			return P_FALSE;
-		case P_FALSE:
-			return P_TRUE;
-		default:
-			ASSERT(0);
-	}
-}
-
-BooleanValue negateBooleanValue(BooleanValue This){
-	switch(This){
-		case BV_UNDEFINED:
-		case BV_UNKNOWN:
-			return This;
-		case BV_MUSTBETRUE:
-			return BV_MUSTBEFALSE;
-		case BV_MUSTBEFALSE:
-			return BV_MUSTBETRUE;
-		default:
-			ASSERT(0);
-	}
-}
-
