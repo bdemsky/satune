@@ -92,5 +92,6 @@ struct OrderEdge;
 typedef struct OrderEdge OrderEdge;
 
 typedef unsigned int uint;
+typedef long int int64;
 typedef uint64_t VarType;
 #endif

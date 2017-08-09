@@ -2,6 +2,8 @@
 #include "mymemory.h"
 #include "orderpair.h"
 #include "tableentry.h"
+#include "ordernode.h"
+#include "orderedge.h"
 
 VectorImpl(Table, Table *, 4);
 VectorImpl(Set, Set *, 4);
@@ -15,7 +17,7 @@ VectorImpl(ASTNode, ASTNode *, 4);
 VectorImpl(Int, uint64_t, 4);
 
 inline unsigned int Ptr_hash_function(void * hash) {
-	return (unsigned int)((uint64_t)hash >> 4);
+	return (unsigned int)((int64)hash >> 4);
 }
 
 inline bool Ptr_equals(void * key1, void * key2) {
@@ -50,7 +52,27 @@ static inline bool table_entry_equals(TableEntry* key1, TableEntry* key2){
 	return true;
 }
 
+static inline unsigned int order_node_hash_Function(OrderNode* This){
+	return (uint) ((int64)This->order << 2) ^ This->id;
+	
+}
+
+static inline bool order_node_equals(OrderNode* key1, OrderNode* key2){
+	return key1->id == key2->id && key1->order == key2->order;
+}
+
+static inline unsigned int order_edge_hash_Function(OrderEdge* This){
+	return (uint) (( (int64)This->sink << 2)^((int64)This->source << 6) ) ^ (int64)This->order;
+	
+}
+
+static inline bool order_edge_equals(OrderEdge* key1, OrderEdge* key2){
+	return key1->sink == key2->sink && key1->source == key2->source && key1->order == key2->order;
+}
+
 HashTableImpl(OrderPair, OrderPair *, OrderPair *, order_pair_hash_Function, order_pair_equals, ourfree);
 HashSetImpl(TableEntry, TableEntry*, table_entry_hash_Function, table_entry_equals);
+HashSetImpl(OrderNode, OrderNode*, order_node_hash_Function, order_node_equals);
+HashSetImpl(OrderEdge, OrderEdge*, order_edge_hash_Function, order_edge_equals);
 
 
