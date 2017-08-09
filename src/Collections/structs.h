@@ -20,9 +20,12 @@ VectorDef(Order, Order *);
 VectorDef(TableEntry, TableEntry *);
 VectorDef(ASTNode, ASTNode *);
 VectorDef(Int, uint64_t);
+VectorDef(OrderNode, OrderNode*);
+VectorDef(OrderGraph, OrderGraph*);
 
 HashTableDef(Void, void *, void *);
 HashTableDef(OrderPair, OrderPair *, OrderPair *);
+HashTableDef(Node, OrderNode*, NodeInfo*);
 
 HashSetDef(Void, void *);
 HashSetDef(TableEntry, TableEntry*);

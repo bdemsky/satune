@@ -60,9 +60,7 @@ void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr){
 	OrderNode* from = getOrderNodeFromOrderGraph(graph, bOrder->first, bOrder->order);
 	OrderNode* to = getOrderNodeFromOrderGraph(graph, bOrder->second, bOrder->order);
 	addOrderEdge(graph, from, to, constr);
-	
 }
-
 
 void deleteOrderGraph(OrderGraph* graph){
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);

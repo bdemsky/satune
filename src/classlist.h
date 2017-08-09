@@ -91,6 +91,12 @@ typedef struct OrderNode OrderNode;
 struct OrderEdge;
 typedef struct OrderEdge OrderEdge;
 
+struct OrderEncoder;
+typedef struct OrderEncoder OrderEncoder;
+
+struct NodeInfo;
+typedef struct NodeInfo NodeInfo;
+
 typedef unsigned int uint;
 typedef long int int64;
 typedef uint64_t VarType;
