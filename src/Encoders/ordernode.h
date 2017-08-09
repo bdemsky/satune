@@ -12,6 +12,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "structs.h"
+#include "orderedge.h"
 struct OrderNode{
 	uint64_t id;
 	Order* order;
@@ -20,7 +21,8 @@ struct OrderNode{
 };
 
 OrderNode* allocOrderNode(uint64_t id, Order* order);
-
+void addNewIncomingEdge(OrderNode* node, OrderEdge* edge);
+void addNewOutgoingEdge(OrderNode* node, OrderEdge* edge);
 void deleteOrderNode(OrderNode* node);
 
 #endif /* ORDERNODE_H */

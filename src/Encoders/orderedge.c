@@ -1,10 +1,10 @@
 
 #include "orderedge.h"
 
-OrderEdge* allocOrderEdge(Boolean* order, OrderNode* begin, OrderNode* end){
+OrderEdge* allocOrderEdge(Boolean* order, OrderNode* source, OrderNode* sink){
 	OrderEdge* This = (OrderEdge*) ourmalloc(sizeof(OrderEdge));
-	This->source = begin;
-	This->sink = end;
+	This->source = source;
+	This->sink = sink;
 	This->order = order;
 	return This;
 }

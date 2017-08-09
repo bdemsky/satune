@@ -13,10 +13,14 @@
 
 struct OrderGraph{
 	HashSetOrderNode* nodes;
+	HashSetOrderEdge* edges;
 };
 
 OrderGraph* allocOrderGraph();
-
+void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr);
+OrderNode* getOrderNodeFromOrderGraph(OrderGraph* graph, uint64_t id, Order* order);
+OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, Boolean* order, OrderNode* begin, OrderNode* end);
+void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean* constr);
 void deleteOrderGraph(OrderGraph* graph);
 
 #endif /* ORDERGRAPH_H */

@@ -10,17 +10,18 @@ OrderNode* allocOrderNode(uint64_t id, Order* order){
 	return This;
 }
 
+void addNewIncomingEdge(OrderNode* node, OrderEdge* edge){
+	ASSERT(!containsHashSetOrderEdge(node->inEdges, edge)); // Only for testing ... Should be removed after testing
+	addHashSetOrderEdge(node->inEdges, edge);
+}
+
+void addNewOutgoingEdge(OrderNode* node, OrderEdge* edge){
+	ASSERT(!containsHashSetOrderEdge(node->outEdges, edge));
+	addHashSetOrderEdge(node->outEdges, edge);
+}
+
 void deleteOrderNode(OrderNode* node){
-	//NOTE: each node only responsible to delete its outgoing edges and 
-	// only delete the set for incoming edges (incoming edges are going
-	// to be deleted by other OrderNodes that they go out from them ...
 	deleteHashSetOrderEdge(node->inEdges);
-	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->outEdges);
-	while(hasNextOrderEdge(iterator)){
-		OrderEdge* edge = nextOrderEdge(iterator);
-		deleteOrderEdge(edge);
-	}
-	deleteIterOrderEdge(iterator);
 	deleteHashSetOrderEdge(node->outEdges);
 	ourfree(node);
 }
