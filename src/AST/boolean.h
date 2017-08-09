@@ -31,6 +31,15 @@ struct BooleanOrder {
 	uint64_t second;
 };
 
+//I don't like the name, we may want to change it later --HG
+struct BooleanInterOrder{
+	Boolean base;
+	Order* order1;
+	uint64_t first;
+	Order* order2;
+	uint64_t second;
+};
+
 struct BooleanVar {
 	Boolean base;
 	VarType vtype;
@@ -53,6 +62,7 @@ struct BooleanPredicate {
 
 Boolean * allocBooleanVar(VarType t);
 Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);
+Boolean * allocBooleanInterOrder(Order * order1, uint64_t first,Order* order2, uint64_t second);
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus);
 Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize);
 void deleteBoolean(Boolean * This);

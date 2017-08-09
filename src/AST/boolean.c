@@ -28,6 +28,20 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	return & This -> base;
 }
 
+Boolean * allocBooleanInterOrder(Order * order1, uint64_t first,Order* order2, uint64_t second){
+	BooleanInterOrder* This=(BooleanInterOrder *) ourmalloc(sizeof (BooleanInterOrder));
+	GETBOOLEANTYPE(This)=INTERORDERCONST;
+	GETBOOLEANVALUE(This) = BV_UNDEFINED;
+	GETBOOLEANPOLARITY(This) = P_UNDEFINED;
+	This->order1=order1;
+	This->order2 = order2;
+	This->first=first;
+	This->second=second;
+	pushVectorBoolean(&order1->constraints, &This->base);
+	initDefVectorBoolean(GETBOOLEANPARENTS(This));
+	return & This -> base;
+}
+
 Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus){
 	BooleanPredicate* This = (BooleanPredicate*) ourmalloc(sizeof(BooleanPredicate));
 	GETBOOLEANTYPE(This)= PREDICATEOP;

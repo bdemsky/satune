@@ -193,6 +193,12 @@ Boolean * orderConstraint(CSolver *This, Order * order, uint64_t first, uint64_t
 	return constraint;
 }
 
+Boolean * interOrderConstraint(CSolver * This, Order * order1, uint64_t first, Order* order2, uint64_t second){
+	Boolean* constraint = allocBooleanInterOrder(order1, first, order2, second);
+	pushVectorBoolean(This->allBooleans, constraint);
+	return constraint;
+}
+
 int startEncoding(CSolver* This){
 	naiveEncodingDecision(This);
 	SATEncoder* satEncoder = This->satEncoder;

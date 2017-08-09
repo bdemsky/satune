@@ -22,6 +22,7 @@ struct SATEncoder;
 typedef struct SATEncoder SATEncoder;
 
 typedef struct BooleanOrder BooleanOrder;
+typedef struct BooleanInterOrder BooleanInterOrder;
 typedef struct BooleanVar BooleanVar;
 typedef struct BooleanLogic BooleanLogic;
 typedef struct BooleanPredicate BooleanPredicate;
