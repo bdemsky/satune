@@ -82,7 +82,7 @@ static inline bool node_info_equals(OrderNode * key1, OrderNode * key2) {
 }
 
 HashTableImpl(OrderPair, OrderPair *, OrderPair *, order_pair_hash_Function, order_pair_equals, ourfree);
-HashTableImpl(Node, OrderNode *, NodeInfo *, node_info_hash_function, node_info_equals, ourfree);
+HashTableImpl(NodeInfo, OrderNode *, NodeInfo *, node_info_hash_function, node_info_equals, ourfree);
 
 HashSetImpl(TableEntry, TableEntry*, table_entry_hash_Function, table_entry_equals);
 HashSetImpl(OrderNode, OrderNode*, order_node_hash_Function, order_node_equals);

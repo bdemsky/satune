@@ -6,6 +6,7 @@
 OrderGraph* allocOrderGraph(){
 	OrderGraph* This = (OrderGraph*) ourmalloc(sizeof(OrderGraph));
 	This->nodes = allocHashSetOrderNode(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	initDefVectorOrderNode(&This->scc);
 	return This;
 }
 

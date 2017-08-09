@@ -31,9 +31,10 @@ void deleteOrderEncoder(OrderEncoder* This);
 OrderEncoder* buildOrderGraphs(CSolver* This);
 void computeStronglyConnectedComponentGraph(OrderGraph* graph);
 void orderAnalysis(CSolver* solver);
-void initializeNodeInfoSCC(OrderGraph* graph, HashTableNode* nodeToInfo);
-void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNode* nodeToInfo, uint* timer, bool isReverse);
-void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNode* nodeToInfo, bool isReverse);
+void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo);
+void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo, uint* timer, bool isReverse);
+void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo);
+void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo);
 
 #endif /* ORDERGRAPHBUILDER_H */
 

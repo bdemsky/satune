@@ -14,6 +14,7 @@
 struct OrderGraph{
 	HashSetOrderNode* nodes;
 	HashSetOrderEdge* edges;
+	VectorOrderNode scc;
 };
 
 OrderGraph* allocOrderGraph();
