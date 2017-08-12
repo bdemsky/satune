@@ -36,12 +36,10 @@ static inline unsigned int order_pair_equals(OrderPair* key1, OrderPair* key2){
 }
 
 static inline unsigned int table_entry_hash_Function(TableEntry* This){
-	//http://isthe.com/chongo/tech/comp/fnv/
-	unsigned int h = 2166136261;
-	const unsigned int FNV_PRIME = 16777619;
+	unsigned int h = 0;
 	for(uint i=0; i<This->inputSize; i++){
-		h ^= This->inputs[i];
-		h *= FNV_PRIME;
+		h += This->inputs[i];
+		h *= 31;
 	}
 	return h;
 }
@@ -66,7 +64,6 @@ static inline bool order_node_equals(OrderNode* key1, OrderNode* key2){
 
 static inline unsigned int order_edge_hash_Function(OrderEdge* This){
 	return (uint) (( (int64)This->sink << 2)^((int64)This->source << 6) ) ^ (int64)This->order;
-	
 }
 
 static inline bool order_edge_equals(OrderEdge* key1, OrderEdge* key2){
