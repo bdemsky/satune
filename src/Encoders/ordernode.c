@@ -1,10 +1,9 @@
 #include "ordernode.h"
 #include "orderedge.h"
 
-OrderNode* allocOrderNode(uint64_t id, Order* order){
+OrderNode* allocOrderNode(uint64_t id) {
 	OrderNode* This = (OrderNode*) ourmalloc(sizeof(OrderNode));
 	This->id = id;
-	This->order = order;
 	This->inEdges = allocHashSetOrderEdge(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	This->outEdges = allocHashSetOrderEdge(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	return This;

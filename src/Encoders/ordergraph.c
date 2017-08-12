@@ -3,14 +3,14 @@
 #include "boolean.h"
 #include "orderedge.h"
 
-OrderGraph* allocOrderGraph(){
+OrderGraph* allocOrderGraph() {
 	OrderGraph* This = (OrderGraph*) ourmalloc(sizeof(OrderGraph));
 	This->nodes = allocHashSetOrderNode(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	initDefVectorOrderNode(&This->scc);
 	return This;
 }
 
-void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean* constr){
+void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean* constr) {
 	switch(constr->polarity){
 		case P_BOTHTRUEFALSE:
 		case P_TRUE:{
@@ -32,8 +32,8 @@ void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean
 	}
 }
 
-OrderNode* getOrderNodeFromOrderGraph(OrderGraph* graph, uint64_t id, Order* order){
-	OrderNode* node = allocOrderNode(id, order);
+OrderNode* getOrderNodeFromOrderGraph(OrderGraph* graph, uint64_t id) {
+	OrderNode* node = allocOrderNode(id);
 	OrderNode* tmp = getHashSetOrderNode(graph->nodes, node);
 	if( tmp!= NULL){
 		deleteOrderNode(node);
@@ -45,9 +45,9 @@ OrderNode* getOrderNodeFromOrderGraph(OrderGraph* graph, uint64_t id, Order* ord
 }
 
 OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, Boolean* order, OrderNode* begin, OrderNode* end){
-	OrderEdge* edge = allocOrderEdge(order, begin, end);
+	OrderEdge* edge = allocOrderEdge(begin, end);
 	OrderEdge* tmp = getHashSetOrderEdge(graph->edges, edge);
-	if(tmp!= NULL){
+	if ( tmp!= NULL ) {
 		deleteOrderEdge(edge);
 		edge = tmp;
 	} else {
@@ -56,10 +56,10 @@ OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, Boolean* order, OrderNo
 	return edge;
 }
 
-void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr){
+void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr) {
 	BooleanOrder* bOrder = (BooleanOrder*) constr;
-	OrderNode* from = getOrderNodeFromOrderGraph(graph, bOrder->first, bOrder->order);
-	OrderNode* to = getOrderNodeFromOrderGraph(graph, bOrder->second, bOrder->order);
+	OrderNode* from = getOrderNodeFromOrderGraph(graph, bOrder->first);
+	OrderNode* to = getOrderNodeFromOrderGraph(graph, bOrder->second);
 	addOrderEdge(graph, from, to, constr);
 }
 

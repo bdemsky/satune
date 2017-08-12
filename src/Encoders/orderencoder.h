@@ -14,7 +14,7 @@
 enum NodeStatus {NOTVISITED, VISITED, FINISHED};
 typedef enum NodeStatus NodeStatus;
 
-struct NodeInfo{
+struct NodeInfo {
 	NodeStatus status;
 	uint finishTime;
 };
@@ -29,6 +29,7 @@ OrderEncoder* allocOrderEncoder();
 void deleteOrderEncoder(OrderEncoder* This);
 
 OrderEncoder* buildOrderGraphs(CSolver* This);
+OrderGraph* buildOrderGraph(Order *order);
 void computeStronglyConnectedComponentGraph(OrderGraph* graph);
 void orderAnalysis(CSolver* solver);
 void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo);

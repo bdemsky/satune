@@ -15,12 +15,11 @@
 #include "orderedge.h"
 struct OrderNode{
 	uint64_t id;
-	Order* order;
 	HashSetOrderEdge* inEdges;
 	HashSetOrderEdge* outEdges;
 };
 
-OrderNode* allocOrderNode(uint64_t id, Order* order);
+OrderNode* allocOrderNode(uint64_t id);
 void addNewIncomingEdge(OrderNode* node, OrderEdge* edge);
 void addNewOutgoingEdge(OrderNode* node, OrderEdge* edge);
 void deleteOrderNode(OrderNode* node);

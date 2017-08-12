@@ -1,4 +1,3 @@
-
 #include "orderencoder.h"
 #include "structs.h"
 #include "csolver.h"
@@ -8,7 +7,7 @@
 #include "ordernode.h"
 
 
-NodeInfo* allocNodeInfo(){
+NodeInfo* allocNodeInfo() {
 	NodeInfo* This = (NodeInfo*) ourmalloc(sizeof(NodeInfo));
 	This->finishTime = 0;
 	This->status = NOTVISITED;
@@ -33,19 +32,24 @@ void deleteOrderEncoder(OrderEncoder* This){
 	ourfree(This);
 }
 
-OrderEncoder* buildOrderGraphs(CSolver* This){
+OrderEncoder* buildOrderGraphs(CSolver* This) {
 	uint size = getSizeVectorOrder(This->allOrders);
 	OrderEncoder* oEncoder = allocOrderEncoder();
 	for(uint i=0; i<size; i++){
-		OrderGraph* orderGraph = allocOrderGraph();
 		Order* order = getVectorOrder(This->allOrders, i);
-		uint constrSize = getSizeVectorBoolean(&order->constraints);
-		for(uint j=0; j<constrSize; j++){
-			addOrderConstraintToOrderGraph(orderGraph, getVectorBoolean(&order->constraints, j));
-		}
+		OrderGraph *orderGraph=buildOrderGraph(order);
 		pushVectorOrderGraph(&oEncoder->graphs, orderGraph);
 	}
 	return oEncoder;
+}
+
+OrderGraph* buildOrderGraph(Order *order) {
+	OrderGraph* orderGraph = allocOrderGraph();
+	uint constrSize = getSizeVectorBoolean(&order->constraints);
+	for(uint j=0; j<constrSize; j++){
+		addOrderConstraintToOrderGraph(orderGraph, getVectorBoolean(&order->constraints, j));
+	}
+	return orderGraph;
 }
 
 void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo){

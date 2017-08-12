@@ -54,24 +54,24 @@ static inline bool table_entry_equals(TableEntry* key1, TableEntry* key2){
 }
 
 static inline unsigned int order_node_hash_Function(OrderNode* This){
-	return (uint) ((int64)This->order << 2) ^ This->id;
+	return (uint) This->id;
 	
 }
 
 static inline bool order_node_equals(OrderNode* key1, OrderNode* key2){
-	return key1->id == key2->id && key1->order == key2->order;
+	return key1->id == key2->id;
 }
 
 static inline unsigned int order_edge_hash_Function(OrderEdge* This){
-	return (uint) (( (int64)This->sink << 2)^((int64)This->source << 6) ) ^ (int64)This->order;
+	return (uint) (( (uintptr_t)This->sink)^((uintptr_t)This->source << 4) );
 }
 
 static inline bool order_edge_equals(OrderEdge* key1, OrderEdge* key2){
-	return key1->sink == key2->sink && key1->source == key2->source && key1->order == key2->order;
+	return key1->sink == key2->sink && key1->source == key2->source;
 }
 
 static inline unsigned int node_info_hash_function(OrderNode * hash) {
-	return (uint)((int64)hash >> 4);
+	return (uint)((intptr_t)hash >> 4);
 }
 
 static inline bool node_info_equals(OrderNode * key1, OrderNode * key2) {

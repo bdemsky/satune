@@ -11,13 +11,13 @@
 #include "mymemory.h"
 #include "ordernode.h"
 
-struct OrderEdge{
-	Boolean* order;
+struct OrderEdge {
 	OrderNode* source;
 	OrderNode* sink;
 };
 
-OrderEdge* allocOrderEdge(Boolean* order, OrderNode* begin, OrderNode* end);
+OrderEdge* allocOrderEdge(OrderNode* begin, OrderNode* end);
 void deleteOrderEdge(OrderEdge* This);
+
 #endif /* ORDEREDGE_H */
 
