@@ -13,7 +13,8 @@
 #include "mymemory.h"
 #include "structs.h"
 #include "orderedge.h"
-struct OrderNode{
+
+struct OrderNode {
 	uint64_t id;
 	HashSetOrderEdge* inEdges;
 	HashSetOrderEdge* outEdges;

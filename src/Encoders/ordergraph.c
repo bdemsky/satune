@@ -14,14 +14,14 @@ void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean
 	switch(constr->polarity){
 		case P_BOTHTRUEFALSE:
 		case P_TRUE:{
-			OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, constr, node1, node2);
+			OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
 			addNewOutgoingEdge(node1, _1to2);
 			addNewIncomingEdge(node2, _1to2);
 			if(constr->polarity == P_TRUE)
 				break;
 		}
 		case P_FALSE:{
-			OrderEdge* _2to1 = getOrderEdgeFromOrderGraph(graph, constr, node2, node1);
+			OrderEdge* _2to1 = getOrderEdgeFromOrderGraph(graph, node2, node1);
 			addNewOutgoingEdge(node2, _2to1);
 			addNewIncomingEdge(node1, _2to1);
 			break;
@@ -35,16 +35,16 @@ void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean
 OrderNode* getOrderNodeFromOrderGraph(OrderGraph* graph, uint64_t id) {
 	OrderNode* node = allocOrderNode(id);
 	OrderNode* tmp = getHashSetOrderNode(graph->nodes, node);
-	if( tmp!= NULL){
+	if( tmp != NULL){
 		deleteOrderNode(node);
-		node= tmp;
+		node = tmp;
 	} else {
 		addHashSetOrderNode(graph->nodes, node);
 	}
 	return node;
 }
 
-OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, Boolean* order, OrderNode* begin, OrderNode* end){
+OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, OrderNode* begin, OrderNode* end) {
 	OrderEdge* edge = allocOrderEdge(begin, end);
 	OrderEdge* tmp = getHashSetOrderEdge(graph->edges, edge);
 	if ( tmp!= NULL ) {

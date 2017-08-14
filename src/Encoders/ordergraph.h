@@ -11,7 +11,7 @@
 #include "structs.h"
 #include "mymemory.h"
 
-struct OrderGraph{
+struct OrderGraph {
 	HashSetOrderNode* nodes;
 	HashSetOrderEdge* edges;
 	VectorOrderNode scc;
@@ -20,7 +20,7 @@ struct OrderGraph{
 OrderGraph* allocOrderGraph();
 void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr);
 OrderNode* getOrderNodeFromOrderGraph(OrderGraph* graph, uint64_t id);
-OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, Boolean* order, OrderNode* begin, OrderNode* end);
+OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, OrderNode* begin, OrderNode* end);
 void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean* constr);
 void deleteOrderGraph(OrderGraph* graph);
 
