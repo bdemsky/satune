@@ -19,16 +19,9 @@ struct NodeInfo {
 	uint finishTime;
 };
 
-struct OrderEncoder{
-	VectorOrderGraph graphs;
-};
-
 NodeInfo* allocNodeInfo();
 void deleteNodeInfo(NodeInfo* info);
-OrderEncoder* allocOrderEncoder();
-void deleteOrderEncoder(OrderEncoder* This);
 
-OrderEncoder* buildOrderGraphs(CSolver* This);
 OrderGraph* buildOrderGraph(Order *order);
 void computeStronglyConnectedComponentGraph(OrderGraph* graph);
 void orderAnalysis(CSolver* solver);

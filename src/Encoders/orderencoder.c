@@ -18,31 +18,6 @@ void deleteNodeInfo(NodeInfo* info){
 	ourfree(info);
 }
 
-OrderEncoder* allocOrderEncoder(){
-	OrderEncoder* This = (OrderEncoder*) ourmalloc(sizeof(OrderEncoder));
-	initDefVectorOrderGraph( &This->graphs );
-	return This;
-}
-
-void deleteOrderEncoder(OrderEncoder* This){
-	uint size = getSizeVectorOrderGraph(&This->graphs);
-	for(uint i=0; i<size; i++){
-		deleteOrderGraph(getVectorOrderGraph(&This->graphs, i));
-	}
-	ourfree(This);
-}
-
-OrderEncoder* buildOrderGraphs(CSolver* This) {
-	uint size = getSizeVectorOrder(This->allOrders);
-	OrderEncoder* oEncoder = allocOrderEncoder();
-	for(uint i=0; i<size; i++){
-		Order* order = getVectorOrder(This->allOrders, i);
-		OrderGraph *orderGraph=buildOrderGraph(order);
-		pushVectorOrderGraph(&oEncoder->graphs, orderGraph);
-	}
-	return oEncoder;
-}
-
 OrderGraph* buildOrderGraph(Order *order) {
 	OrderGraph* orderGraph = allocOrderGraph(order);
 	uint constrSize = getSizeVectorBoolean(&order->constraints);
@@ -138,13 +113,14 @@ void removeMustBeTrueNodes(OrderGraph* graph){
 	//TODO: Nodes that all the incoming/outgoing edges are MUST_BE_TRUE
 }
 
-void orderAnalysis(CSolver* solver){
-	OrderEncoder* oEncoder = buildOrderGraphs(solver);
-	uint size = getSizeVectorOrderGraph(&oEncoder->graphs);
+void orderAnalysis(CSolver* This){
+	uint size = getSizeVectorOrder(This->allOrders);
 	for(uint i=0; i<size; i++){
-		OrderGraph* graph = getVectorOrderGraph(&oEncoder->graphs, i);
+		Order* order = getVectorOrder(This->allOrders, i);
+		OrderGraph* graph = buildOrderGraph(order);
 		removeMustBeTrueNodes(graph);
 		computeStronglyConnectedComponentGraph(graph);
+		deleteOrderGraph(graph);
 	}
 }
 
