@@ -21,9 +21,9 @@ void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean
 	case P_BOTHTRUEFALSE:
 	case P_TRUE:{
 		OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
-		_1to2->polPos=true;
 		if (mustval==BV_MUSTBETRUE || mustval == BV_UNSAT)
-			_1to2->mustPos=true;
+			_1to2->mustPos = true;
+		_1to2->polPos = true;
 		addNewOutgoingEdge(node1, _1to2);
 		addNewIncomingEdge(node2, _1to2);
 		if(constr->polarity == P_TRUE)
@@ -32,16 +32,16 @@ void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean
 	case P_FALSE:{
 		if (order->type==TOTAL) {
 			OrderEdge* _2to1 = getOrderEdgeFromOrderGraph(graph, node2, node1);
-			_2to1->polPos=true;
 			if (mustval==BV_MUSTBEFALSE || mustval == BV_UNSAT)
-				_2to1->mustPos=true;
+				_2to1->mustPos = true;
+			_2to1->polPos = true;
 			addNewOutgoingEdge(node2, _2to1);
 			addNewIncomingEdge(node1, _2to1);
 		} else {
 			OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
-			_1to2->polNeg=true;
 			if (mustval==BV_MUSTBEFALSE || mustval == BV_UNSAT)
-				_1to2->mustNeg=true;
+				_1to2->mustNeg = true;
+			_1to2->polNeg = true;
 			addNewOutgoingEdge(node1, _1to2);
 			addNewIncomingEdge(node2, _1to2);
 		}
@@ -75,6 +75,12 @@ OrderEdge* getOrderEdgeFromOrderGraph(OrderGraph* graph, OrderNode* begin, Order
 		addHashSetOrderEdge(graph->edges, edge);
 	}
 	return edge;
+}
+
+OrderEdge* getInverseOrderEdge(OrderGraph* graph, OrderEdge *edge) {
+	OrderEdge inverseedge={edge->sink, edge->source, false, false, false, false, false};
+	OrderEdge * tmp=getHashSetOrderEdge(graph->edges, &inverseedge);
+	return tmp;
 }
 
 void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr) {

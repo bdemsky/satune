@@ -14,7 +14,7 @@ NodeInfo* allocNodeInfo() {
 	return This;
 }
 
-void deleteNodeInfo(NodeInfo* info){
+void deleteNodeInfo(NodeInfo* info) {
 	ourfree(info);
 }
 
@@ -27,7 +27,7 @@ OrderGraph* buildOrderGraph(Order *order) {
 	return orderGraph;
 }
 
-void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo){
+void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo) {
 	uint timer=0;
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
 	while(hasNextOrderNode(iterator)){
@@ -44,7 +44,7 @@ void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nod
 	deleteIterOrderNode(iterator);
 }
 
-void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo){
+void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo) {
 	uint timer=0;
 	uint size = getSizeVectorOrderNode(finishNodes);
 	for(int i=size-1; i>=0; i--){
@@ -61,7 +61,7 @@ void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeIn
 }
 
 void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes,
-	HashTableNodeInfo* nodeToInfo, uint* timer, bool isReverse){
+	HashTableNodeInfo* nodeToInfo, uint* timer, bool isReverse) {
 	(*timer)++;
 	model_print("Timer in DFSNodeVisit:%u\n", *timer);
 	HSIteratorOrderEdge* iterator = isReverse?iteratorOrderEdge(node->inEdges):iteratorOrderEdge(node->outEdges);
@@ -81,7 +81,7 @@ void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes,
 	deleteIterOrderEdge(iterator);
 }
 
-void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo){
+void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo) {
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
 	while(hasNextOrderNode(iterator)){
 		putNodeInfo(nodeToInfo, nextOrderNode(iterator), allocNodeInfo());
@@ -89,7 +89,7 @@ void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo){
 	deleteIterOrderNode(iterator);
 }
 
-void resetNodeInfoStatusSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo){
+void resetNodeInfoStatusSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo) {
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
 	while(hasNextOrderNode(iterator)){
 		NodeInfo* info= getNodeInfo(nodeToInfo, nextOrderNode(iterator));
@@ -98,7 +98,7 @@ void resetNodeInfoStatusSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo){
 	deleteIterOrderNode(iterator);
 }
 
-void computeStronglyConnectedComponentGraph(OrderGraph* graph){
+void computeStronglyConnectedComponentGraph(OrderGraph* graph) {
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(& finishNodes);
 	HashTableNodeInfo* nodeToInfo = allocHashTableNodeInfo(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
@@ -107,10 +107,58 @@ void computeStronglyConnectedComponentGraph(OrderGraph* graph){
 	resetNodeInfoStatusSCC(graph, nodeToInfo);
 	DFSReverse(graph, &finishNodes, nodeToInfo);
 	deleteHashTableNodeInfo(nodeToInfo);
+	deleteVectorArrayOrderNode(&finishNodes);
 }
 
-void removeMustBeTrueNodes(OrderGraph* graph){
+void removeMustBeTrueNodes(OrderGraph* graph) {
 	//TODO: Nodes that all the incoming/outgoing edges are MUST_BE_TRUE
+}
+
+bool searchForNode(OrderNode *src, OrderNode *dst) {
+	bool found=false;
+	VectorOrderNode stack;
+	initDefVectorOrderNode(&stack);
+	pushVectorOrderNode(&stack, src);
+	HashSetOrderNode* discovered = allocHashSetOrderNode(16, 0.3);
+	while(getSizeVectorOrderNode(&stack) != 0) {
+		OrderNode* node = lastVectorOrderNode(&stack); popVectorOrderNode(&stack);
+		HSIteratorOrderEdge *edgeit = iteratorOrderEdge(node->outEdges);
+		while(hasNextOrderEdge(edgeit)) {
+			OrderEdge* edge = nextOrderEdge(edgeit);
+			if (edge->polPos) {
+				OrderNode *edge_dst = edge->sink;
+				if (edge_dst == dst)
+					goto exitloop;
+				if (addHashSetOrderNode(discovered, edge_dst)) {
+					pushVectorOrderNode(&stack, edge_dst);
+				}
+			}
+		}
+		deleteIterOrderEdge(edgeit);
+	}
+ exitloop:
+	deleteHashSetOrderNode(discovered);
+	deleteVectorArrayOrderNode(&stack);
+	return found;
+}
+
+void completePartialOrderGraph(OrderGraph* graph) {
+	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
+	while(hasNextOrderNode(iterator)) {
+		OrderNode* node = nextOrderNode(iterator);
+		HSIteratorOrderEdge *edgeit = iteratorOrderEdge(node->outEdges);
+		while(hasNextOrderEdge(edgeit)) {
+			OrderEdge* edge = nextOrderEdge(edgeit);
+			if(edge->polNeg) {
+				if (edge->polPos || searchForNode(node, edge->sink)) {
+					OrderEdge * newedge = getOrderEdgeFromOrderGraph(graph, edge->sink, edge->source);
+					newedge->pseudoPos = true;
+				}
+			}
+		}
+		deleteIterOrderEdge(edgeit);
+	}
+	deleteIterOrderNode(iterator);
 }
 
 void orderAnalysis(CSolver* This){
@@ -118,6 +166,9 @@ void orderAnalysis(CSolver* This){
 	for(uint i=0; i<size; i++){
 		Order* order = getVectorOrder(This->allOrders, i);
 		OrderGraph* graph = buildOrderGraph(order);
+		if (order->type==PARTIAL) {
+			completePartialOrderGraph(graph);
+		}
 		removeMustBeTrueNodes(graph);
 		computeStronglyConnectedComponentGraph(graph);
 		deleteOrderGraph(graph);

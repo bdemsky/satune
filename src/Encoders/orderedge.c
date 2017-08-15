@@ -1,4 +1,5 @@
 #include "orderedge.h"
+#include "ordergraph.h"
 
 OrderEdge* allocOrderEdge(OrderNode* source, OrderNode* sink) {
 	OrderEdge* This = (OrderEdge*) ourmalloc(sizeof(OrderEdge));
@@ -8,9 +9,11 @@ OrderEdge* allocOrderEdge(OrderNode* source, OrderNode* sink) {
 	This->polNeg = false;
 	This->mustPos = false;
 	This->mustNeg = false;
+	This->pseudoPos = false;
 	return This;
 }
 
 void deleteOrderEdge(OrderEdge* This) {
 	ourfree(This);
 }
+
