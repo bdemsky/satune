@@ -9,11 +9,14 @@
 #define ORDEREDGE_H
 #include "classlist.h"
 #include "mymemory.h"
-#include "ordernode.h"
 
 struct OrderEdge {
 	OrderNode* source;
 	OrderNode* sink;
+	unsigned int polPos:1;
+	unsigned int polNeg:1;
+	unsigned int mustPos:1;
+	unsigned int mustNeg:1;
 };
 
 OrderEdge* allocOrderEdge(OrderNode* begin, OrderNode* end);

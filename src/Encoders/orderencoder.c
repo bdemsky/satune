@@ -44,7 +44,7 @@ OrderEncoder* buildOrderGraphs(CSolver* This) {
 }
 
 OrderGraph* buildOrderGraph(Order *order) {
-	OrderGraph* orderGraph = allocOrderGraph();
+	OrderGraph* orderGraph = allocOrderGraph(order);
 	uint constrSize = getSizeVectorBoolean(&order->constraints);
 	for(uint j=0; j<constrSize; j++){
 		addOrderConstraintToOrderGraph(orderGraph, getVectorBoolean(&order->constraints, j));

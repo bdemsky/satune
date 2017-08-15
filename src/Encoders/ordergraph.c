@@ -2,33 +2,54 @@
 #include "ordernode.h"
 #include "boolean.h"
 #include "orderedge.h"
+#include "ordergraph.h"
+#include "order.h"
 
-OrderGraph* allocOrderGraph() {
+OrderGraph* allocOrderGraph(Order *order) {
 	OrderGraph* This = (OrderGraph*) ourmalloc(sizeof(OrderGraph));
 	This->nodes = allocHashSetOrderNode(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	This->order = order;
 	initDefVectorOrderNode(&This->scc);
 	return This;
 }
 
 void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean* constr) {
-	switch(constr->polarity){
-		case P_BOTHTRUEFALSE:
-		case P_TRUE:{
-			OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
-			addNewOutgoingEdge(node1, _1to2);
-			addNewIncomingEdge(node2, _1to2);
-			if(constr->polarity == P_TRUE)
-				break;
-		}
-		case P_FALSE:{
+	Polarity polarity=constr->polarity;
+	BooleanValue mustval=constr->boolVal;
+	Order* order=graph->order;
+	switch(polarity) {
+	case P_BOTHTRUEFALSE:
+	case P_TRUE:{
+		OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+		_1to2->polPos=true;
+		if (mustval==BV_MUSTBETRUE || mustval == BV_UNSAT)
+			_1to2->mustPos=true;
+		addNewOutgoingEdge(node1, _1to2);
+		addNewIncomingEdge(node2, _1to2);
+		if(constr->polarity == P_TRUE)
+			break;
+	}
+	case P_FALSE:{
+		if (order->type==TOTAL) {
 			OrderEdge* _2to1 = getOrderEdgeFromOrderGraph(graph, node2, node1);
+			_2to1->polPos=true;
+			if (mustval==BV_MUSTBEFALSE || mustval == BV_UNSAT)
+				_2to1->mustPos=true;
 			addNewOutgoingEdge(node2, _2to1);
 			addNewIncomingEdge(node1, _2to1);
-			break;
+		} else {
+			OrderEdge* _1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+			_1to2->polNeg=true;
+			if (mustval==BV_MUSTBEFALSE || mustval == BV_UNSAT)
+				_1to2->mustNeg=true;
+			addNewOutgoingEdge(node1, _1to2);
+			addNewIncomingEdge(node2, _1to2);
 		}
-		default:
-			ASSERT(0);
-				
+		break;
+	}
+	case P_UNDEFINED:
+		//There is an unreachable order constraint if this assert fires
+		ASSERT(0);
 	}
 }
 
