@@ -23,7 +23,7 @@ Boolean* allocBooleanOrder(Order* order, uint64_t first, uint64_t second) {
 	This->order=order;
 	This->first=first;
 	This->second=second;
-	pushVectorBoolean(&order->constraints, &This->base);
+	pushVectorBooleanOrder(&order->constraints, This);
 	initDefVectorBoolean(GETBOOLEANPARENTS(This));
 	return & This -> base;
 }

@@ -9,13 +9,12 @@ OrderGraph* allocOrderGraph(Order *order) {
 	OrderGraph* This = (OrderGraph*) ourmalloc(sizeof(OrderGraph));
 	This->nodes = allocHashSetOrderNode(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	This->order = order;
-	initDefVectorOrderNode(&This->scc);
 	return This;
 }
 
-void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean* constr) {
-	Polarity polarity=constr->polarity;
-	BooleanValue mustval=constr->boolVal;
+void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, BooleanOrder* constr) {
+	Polarity polarity=constr->base.polarity;
+	BooleanValue mustval=constr->base.boolVal;
 	Order* order=graph->order;
 	switch(polarity) {
 	case P_BOTHTRUEFALSE:
@@ -26,7 +25,7 @@ void addOrderEdge(OrderGraph* graph, OrderNode* node1, OrderNode* node2, Boolean
 		_1to2->polPos = true;
 		addNewOutgoingEdge(node1, _1to2);
 		addNewIncomingEdge(node2, _1to2);
-		if(constr->polarity == P_TRUE)
+		if(constr->base.polarity == P_TRUE)
 			break;
 	}
 	case P_FALSE:{
@@ -83,11 +82,10 @@ OrderEdge* getInverseOrderEdge(OrderGraph* graph, OrderEdge *edge) {
 	return tmp;
 }
 
-void addOrderConstraintToOrderGraph(OrderGraph* graph, Boolean* constr) {
-	BooleanOrder* bOrder = (BooleanOrder*) constr;
+void addOrderConstraintToOrderGraph(OrderGraph* graph, BooleanOrder* bOrder) {
 	OrderNode* from = getOrderNodeFromOrderGraph(graph, bOrder->first);
 	OrderNode* to = getOrderNodeFromOrderGraph(graph, bOrder->second);
-	addOrderEdge(graph, from, to, constr);
+	addOrderEdge(graph, from, to, bOrder);
 }
 
 void deleteOrderGraph(OrderGraph* graph){

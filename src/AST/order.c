@@ -6,7 +6,7 @@
 Order* allocOrder(OrderType type, Set * set){
 	Order* This = (Order*)ourmalloc(sizeof(Order));
 	This->set=set;
-	initDefVectorBoolean(& This->constraints);
+	initDefVectorBooleanOrder(& This->constraints);
 	This->type=type;
 	initOrderEncoding(& This->order, This);
 	This->orderPairTable = NULL;
@@ -18,7 +18,7 @@ void initializeOrderHashTable(Order* This){
 }
 
 void addOrderConstraint(Order* This, BooleanOrder* constraint){
-	pushVectorBoolean( &This->constraints, (Boolean*) constraint);
+	pushVectorBooleanOrder( &This->constraints, constraint);
 }
 
 void setOrderEncodingType(Order* This, OrderEncodingType type){
@@ -26,7 +26,7 @@ void setOrderEncodingType(Order* This, OrderEncodingType type){
 }
 
 void deleteOrder(Order* This){
-	deleteVectorArrayBoolean(& This->constraints);
+	deleteVectorArrayBooleanOrder(& This->constraints);
 	deleteOrderEncoding(& This->order);
 	if(This->orderPairTable != NULL) {
 		resetAndDeleteHashTableOrderPair(This->orderPairTable);

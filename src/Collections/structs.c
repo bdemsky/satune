@@ -9,6 +9,7 @@
 VectorImpl(Table, Table *, 4);
 VectorImpl(Set, Set *, 4);
 VectorImpl(Boolean, Boolean *, 4);
+VectorImpl(BooleanOrder, BooleanOrder *, 4);
 VectorImpl(Function, Function *, 4);
 VectorImpl(Predicate, Predicate *, 4);
 VectorImpl(Element, Element *, 4);

@@ -7,6 +7,7 @@ OrderNode* allocOrderNode(uint64_t id) {
 	This->inEdges = allocHashSetOrderEdge(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	This->outEdges = allocHashSetOrderEdge(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	This->status=NOTVISITED;
+	This->sccNum=0;
 	return This;
 }
 

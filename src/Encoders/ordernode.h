@@ -22,6 +22,7 @@ struct OrderNode {
 	HashSetOrderEdge* inEdges;
 	HashSetOrderEdge* outEdges;
 	NodeStatus status;
+	uint sccNum;
 };
 
 OrderNode* allocOrderNode(uint64_t id);

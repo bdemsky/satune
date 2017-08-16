@@ -15,7 +15,7 @@ OrderGraph* buildOrderGraph(Order *order);
 void computeStronglyConnectedComponentGraph(OrderGraph* graph);
 void orderAnalysis(CSolver* solver);
 void initializeNodeInfoSCC(OrderGraph* graph);
-void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse);
+void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse, uint sccNum);
 void DFS(OrderGraph* graph, VectorOrderNode* finishNodes);
 void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes);
 void completePartialOrderGraph(OrderGraph* graph);
@@ -30,6 +30,7 @@ void reachMustAnalysis(OrderGraph *graph);
 void localMustAnalysisTotal(OrderGraph *graph);
 void localMustAnalysisPartial(OrderGraph *graph);
 void orderAnalysis(CSolver* This);
+void decomposeOrder(Order *order, OrderGraph *graph);
 
 #endif /* ORDERGRAPHBUILDER_H */
 

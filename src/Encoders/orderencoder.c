@@ -9,9 +9,9 @@
 
 OrderGraph* buildOrderGraph(Order *order) {
 	OrderGraph* orderGraph = allocOrderGraph(order);
-	uint constrSize = getSizeVectorBoolean(&order->constraints);
+	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
 	for(uint j=0; j<constrSize; j++){
-		addOrderConstraintToOrderGraph(orderGraph, getVectorBoolean(&order->constraints, j));
+		addOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
 	}
 	return orderGraph;
 }
@@ -22,7 +22,7 @@ void DFS(OrderGraph* graph, VectorOrderNode* finishNodes) {
 		OrderNode* node = nextOrderNode(iterator);
 		if(node->status == NOTVISITED){
 			node->status = VISITED;
-			DFSNodeVisit(node, finishNodes, false);
+			DFSNodeVisit(node, finishNodes, false, 0);
 			node->status = FINISHED;
 			pushVectorOrderNode(finishNodes, node);
 		}
@@ -32,18 +32,20 @@ void DFS(OrderGraph* graph, VectorOrderNode* finishNodes) {
 
 void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	uint size = getSizeVectorOrderNode(finishNodes);
+	uint sccNum=1;
 	for(int i=size-1; i>=0; i--){
 		OrderNode* node = getVectorOrderNode(finishNodes, i);
 		if(node->status == NOTVISITED){
 			node->status = VISITED;
-			DFSNodeVisit(node, NULL, true);
+			DFSNodeVisit(node, NULL, true, sccNum);
+			node->sccNum = sccNum;
 			node->status = FINISHED;
-			pushVectorOrderNode(&graph->scc, node); 
+			sccNum++;
 		}
 	}
 }
 
-void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse) {
+void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse, uint sccNum) {
 	HSIteratorOrderEdge* iterator = isReverse?iteratorOrderEdge(node->inEdges):iteratorOrderEdge(node->outEdges);
 	while(hasNextOrderEdge(iterator)){
 		OrderEdge* edge = nextOrderEdge(iterator);
@@ -52,12 +54,14 @@ void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse)
 		
 		OrderNode* child = isReverse? edge->source: edge->sink;
 
-		if(child->status == NOTVISITED){
+		if(child->status == NOTVISITED) {
 			child->status = VISITED;
-			DFSNodeVisit(child, finishNodes, isReverse);
+			DFSNodeVisit(child, finishNodes, isReverse, sccNum);
 			child->status = FINISHED;
 			if(!isReverse)
 				pushVectorOrderNode(finishNodes, child); 
+			else
+				child->sccNum = sccNum;
 		}
 	}
 	deleteIterOrderEdge(iterator);
@@ -246,6 +250,12 @@ void localMustAnalysisPartial(OrderGraph *graph) {
 	deleteIterOrderEdge(iterator);
 }
 
+void decomposeOrder(Order *order, OrderGraph *graph) {
+	uint size=getSizeVectorBooleanOrder(&order->constraints);
+	for(uint i=0;i<size;i++) {
+	}
+}
+
 void orderAnalysis(CSolver* This) {
 	uint size = getSizeVectorOrder(This->allOrders);
 	for(uint i=0; i<size; i++){
@@ -268,10 +278,14 @@ void orderAnalysis(CSolver* This) {
 			localMustAnalysisTotal(graph);
 		}
 
-		//This analysis is completely optional
+		//This optimization is completely optional
 		removeMustBeTrueNodes(graph);
 
+		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
+
+		decomposeOrder(order, graph);
+			
 		deleteOrderGraph(graph);
 	}
 }
