@@ -11,31 +11,21 @@
 #include "structs.h"
 #include "mymemory.h"
 
-enum NodeStatus {NOTVISITED, VISITED, FINISHED};
-typedef enum NodeStatus NodeStatus;
-
-struct NodeInfo {
-	NodeStatus status;
-};
-
-NodeInfo* allocNodeInfo();
-void deleteNodeInfo(NodeInfo* info);
-
 OrderGraph* buildOrderGraph(Order *order);
 void computeStronglyConnectedComponentGraph(OrderGraph* graph);
 void orderAnalysis(CSolver* solver);
-void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo);
-void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo, bool isReverse);
-void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo);
-void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo);
+void initializeNodeInfoSCC(OrderGraph* graph);
+void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse);
+void DFS(OrderGraph* graph, VectorOrderNode* finishNodes);
+void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes);
 void completePartialOrderGraph(OrderGraph* graph);
-void resetNodeInfoStatusSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo);
+void resetNodeInfoStatusSCC(OrderGraph* graph);
 void removeMustBeTrueNodes(OrderGraph* graph);
-void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node, HashTableNodeInfo* nodeToInfo);
+void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node);
 void completePartialOrderGraph(OrderGraph* graph);
-void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo);
-void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo, bool clearBackEdges);
-void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo);
+void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes);
+void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool clearBackEdges);
+void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes);
 void reachMustAnalysis(OrderGraph *graph);
 void localMustAnalysisTotal(OrderGraph *graph);
 void localMustAnalysisPartial(OrderGraph *graph);

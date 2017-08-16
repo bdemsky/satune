@@ -7,16 +7,6 @@
 #include "ordernode.h"
 
 
-NodeInfo* allocNodeInfo() {
-	NodeInfo* This = (NodeInfo*) ourmalloc(sizeof(NodeInfo));
-	This->status = NOTVISITED;
-	return This;
-}
-
-void deleteNodeInfo(NodeInfo* info) {
-	ourfree(info);
-}
-
 OrderGraph* buildOrderGraph(Order *order) {
 	OrderGraph* orderGraph = allocOrderGraph(order);
 	uint constrSize = getSizeVectorBoolean(&order->constraints);
@@ -26,36 +16,34 @@ OrderGraph* buildOrderGraph(Order *order) {
 	return orderGraph;
 }
 
-void DFS(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo) {
+void DFS(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
 	while(hasNextOrderNode(iterator)){
 		OrderNode* node = nextOrderNode(iterator);
-		NodeInfo* info= getNodeInfo(nodeToInfo, node);
-		if(info->status == NOTVISITED){
-			info->status = VISITED;
-			DFSNodeVisit(node, finishNodes, nodeToInfo, false);
-			info->status = FINISHED;
+		if(node->status == NOTVISITED){
+			node->status = VISITED;
+			DFSNodeVisit(node, finishNodes, false);
+			node->status = FINISHED;
 			pushVectorOrderNode(finishNodes, node);
 		}
 	}
 	deleteIterOrderNode(iterator);
 }
 
-void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo) {
+void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	uint size = getSizeVectorOrderNode(finishNodes);
 	for(int i=size-1; i>=0; i--){
 		OrderNode* node = getVectorOrderNode(finishNodes, i);
-		NodeInfo* info= getNodeInfo(nodeToInfo, node);
-		if(info->status == NOTVISITED){
-			info->status = VISITED;
-			DFSNodeVisit(node, NULL, nodeToInfo, true);
-			info->status = FINISHED;
+		if(node->status == NOTVISITED){
+			node->status = VISITED;
+			DFSNodeVisit(node, NULL, true);
+			node->status = FINISHED;
 			pushVectorOrderNode(&graph->scc, node); 
 		}
 	}
 }
 
-void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo, bool isReverse) {
+void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse) {
 	HSIteratorOrderEdge* iterator = isReverse?iteratorOrderEdge(node->inEdges):iteratorOrderEdge(node->outEdges);
 	while(hasNextOrderEdge(iterator)){
 		OrderEdge* edge = nextOrderEdge(iterator);
@@ -64,11 +52,10 @@ void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNodeIn
 		
 		OrderNode* child = isReverse? edge->source: edge->sink;
 
-		NodeInfo* childInfo = getNodeInfo(nodeToInfo, child);
-		if(childInfo->status == NOTVISITED){
-			childInfo->status = VISITED;
-			DFSNodeVisit(child, finishNodes, nodeToInfo, isReverse);
-			childInfo->status = FINISHED;
+		if(child->status == NOTVISITED){
+			child->status = VISITED;
+			DFSNodeVisit(child, finishNodes, isReverse);
+			child->status = FINISHED;
 			if(!isReverse)
 				pushVectorOrderNode(finishNodes, child); 
 		}
@@ -76,19 +63,10 @@ void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, HashTableNodeIn
 	deleteIterOrderEdge(iterator);
 }
 
-void initializeNodeInfoSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo) {
+void resetNodeInfoStatusSCC(OrderGraph* graph) {
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
 	while(hasNextOrderNode(iterator)){
-		putNodeInfo(nodeToInfo, nextOrderNode(iterator), allocNodeInfo());
-	}
-	deleteIterOrderNode(iterator);
-}
-
-void resetNodeInfoStatusSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo) {
-	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
-	while(hasNextOrderNode(iterator)){
-		NodeInfo* info= getNodeInfo(nodeToInfo, nextOrderNode(iterator));
-		info->status = NOTVISITED;
+		nextOrderNode(iterator)->status = NOTVISITED;
 	}
 	deleteIterOrderNode(iterator);
 }
@@ -96,12 +74,10 @@ void resetNodeInfoStatusSCC(OrderGraph* graph, HashTableNodeInfo* nodeToInfo) {
 void computeStronglyConnectedComponentGraph(OrderGraph* graph) {
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(& finishNodes);
-	HashTableNodeInfo* nodeToInfo = allocHashTableNodeInfo(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
-	initializeNodeInfoSCC(graph, nodeToInfo);
-	DFS(graph, &finishNodes, nodeToInfo);
-	resetNodeInfoStatusSCC(graph, nodeToInfo);
-	DFSReverse(graph, &finishNodes, nodeToInfo);
-	deleteHashTableNodeInfo(nodeToInfo);
+	DFS(graph, &finishNodes);
+	resetNodeInfoStatusSCC(graph);
+	DFSReverse(graph, &finishNodes);
+	resetNodeInfoStatusSCC(graph);
 	deleteVectorArrayOrderNode(&finishNodes);
 }
 
@@ -109,14 +85,13 @@ void removeMustBeTrueNodes(OrderGraph* graph) {
 	//TODO: Nodes that all the incoming/outgoing edges are MUST_BE_TRUE
 }
 
-void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node, HashTableNodeInfo* nodeToInfo) {
+void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node) {
 	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->inEdges);
 	while(hasNextOrderEdge(iterator)){
 		OrderEdge* inEdge = nextOrderEdge(iterator);
 		if (inEdge->polNeg) {
 			OrderNode* src = inEdge->source;
-			NodeInfo* srcInfo = getNodeInfo(nodeToInfo, src);
-			if (srcInfo->status==VISITED) {
+			if (src->status==VISITED) {
 				//Make a pseudoEdge to point backwards
 				OrderEdge * newedge = getOrderEdgeFromOrderGraph(graph, inEdge->sink, inEdge->source);
 				newedge->pseudoPos = true;
@@ -131,11 +106,10 @@ void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node, HashTableNodeInfo* n
 			continue;
 		
 		OrderNode* child = edge->sink;
-		NodeInfo* childInfo = getNodeInfo(nodeToInfo, child);
-		if(childInfo->status == NOTVISITED){
-			childInfo->status = VISITED;
-			DFSPseudoNodeVisit(graph, child, nodeToInfo);
-			childInfo->status = FINISHED;
+		if(child->status == NOTVISITED){
+			child->status = VISITED;
+			DFSPseudoNodeVisit(graph, child);
+			child->status = FINISHED;
 		}
 	}
 	deleteIterOrderEdge(iterator);
@@ -144,50 +118,44 @@ void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node, HashTableNodeInfo* n
 void completePartialOrderGraph(OrderGraph* graph) {
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(& finishNodes);
-	HashTableNodeInfo* nodeToInfo = allocHashTableNodeInfo(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
-	initializeNodeInfoSCC(graph, nodeToInfo);
-	DFS(graph, &finishNodes, nodeToInfo);
-	resetNodeInfoStatusSCC(graph, nodeToInfo);
+	DFS(graph, &finishNodes);
+	resetNodeInfoStatusSCC(graph);
 
 	uint size = getSizeVectorOrderNode(&finishNodes);
 	for(int i=size-1; i>=0; i--){
 		OrderNode* node = getVectorOrderNode(&finishNodes, i);
-		NodeInfo* info= getNodeInfo(nodeToInfo, node);
-		if(info->status == NOTVISITED){
-			info->status = VISITED;
-			DFSPseudoNodeVisit(graph, node, nodeToInfo);
-			info->status = FINISHED;
+		if(node->status == NOTVISITED){
+			node->status = VISITED;
+			DFSPseudoNodeVisit(graph, node);
+			node->status = FINISHED;
 		}
 	}
-	
-	deleteHashTableNodeInfo(nodeToInfo);
+
+	resetNodeInfoStatusSCC(graph);
 	deleteVectorArrayOrderNode(&finishNodes);
 }
 
-void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo) {
+void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
 	while(hasNextOrderNode(iterator)){
 		OrderNode* node = nextOrderNode(iterator);
-		NodeInfo* info= getNodeInfo(nodeToInfo, node);
-		if(info->status == NOTVISITED){
-			info->status = VISITED;
-			DFSMustNodeVisit(node, finishNodes, nodeToInfo, false);
-			info->status = FINISHED;
+		if(node->status == NOTVISITED){
+			node->status = VISITED;
+			DFSMustNodeVisit(node, finishNodes, false);
+			node->status = FINISHED;
 			pushVectorOrderNode(finishNodes, node);
 		}
 	}
 	deleteIterOrderNode(iterator);
 }
 
-void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes,
-											HashTableNodeInfo* nodeToInfo, bool clearBackEdges) {
+void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool clearBackEdges) {
 	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->outEdges);
 	while(hasNextOrderEdge(iterator)){
 		OrderEdge* edge = nextOrderEdge(iterator);
 		OrderNode* child = edge->sink;
-		NodeInfo* childInfo = getNodeInfo(nodeToInfo, child);
 		
-		if (clearBackEdges && childInfo->status==VISITED) {
+		if (clearBackEdges && child->status==VISITED) {
 			//We have a backedge, so note that this edge must be negative
 			edge->mustNeg = true;
 		}
@@ -195,25 +163,24 @@ void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes,
 		if (!edge->mustPos) //Ignore edges that are not must Positive edges
 			continue;
 
-		if(childInfo->status == NOTVISITED){
-			childInfo->status = VISITED;
-			DFSMustNodeVisit(child, finishNodes, nodeToInfo, clearBackEdges);
-			childInfo->status = FINISHED;
+		if(child->status == NOTVISITED){
+			child->status = VISITED;
+			DFSMustNodeVisit(child, finishNodes, clearBackEdges);
+			child->status = FINISHED;
 			pushVectorOrderNode(finishNodes, child); 
 		}
 	}
 	deleteIterOrderEdge(iterator);
 }
 
-void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes, HashTableNodeInfo* nodeToInfo) {
+void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	uint size=getSizeVectorOrderNode(finishNodes);
 	for(int i=size-1; i>=0; i--){
 		OrderNode* node=getVectorOrderNode(finishNodes, i);
-		NodeInfo* info=getNodeInfo(nodeToInfo, node);
-		if(info->status == NOTVISITED){
-			info->status = VISITED;
-			DFSMustNodeVisit(node, NULL, nodeToInfo, true);
-			info->status = FINISHED;
+		if(node->status == NOTVISITED){
+			node->status = VISITED;
+			DFSMustNodeVisit(node, NULL, true);
+			node->status = FINISHED;
 		}
 	}
 }
@@ -222,17 +189,16 @@ void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes, Has
 	 and forces them to be mustNeg. */
 
 void reachMustAnalysis(OrderGraph *graph) {
-	HashTableNodeInfo* nodeToInfo = allocHashTableNodeInfo(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(& finishNodes);
 	//Topologically sort the mustPos edge graph
-	DFSMust(graph, &finishNodes, nodeToInfo);
-	resetNodeInfoStatusSCC(graph, nodeToInfo);
+	DFSMust(graph, &finishNodes);
+	resetNodeInfoStatusSCC(graph);
 
 	//Find any backwards edges that complete cycles and force them to be mustNeg
-	DFSClearContradictions(graph, &finishNodes, nodeToInfo);
+	DFSClearContradictions(graph, &finishNodes);
 	deleteVectorArrayOrderNode(&finishNodes);
-	deleteHashTableNodeInfo(nodeToInfo);
+	resetNodeInfoStatusSCC(graph);
 }
 
 /* This function finds edges that must be positive and forces the
@@ -305,7 +271,6 @@ void orderAnalysis(CSolver* This) {
 		//This analysis is completely optional
 		removeMustBeTrueNodes(graph);
 
-		
 		computeStronglyConnectedComponentGraph(graph);
 		deleteOrderGraph(graph);
 	}

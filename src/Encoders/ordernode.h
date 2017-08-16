@@ -14,10 +14,14 @@
 #include "structs.h"
 #include "orderedge.h"
 
+enum NodeStatus {NOTVISITED, VISITED, FINISHED};
+typedef enum NodeStatus NodeStatus;
+
 struct OrderNode {
 	uint64_t id;
 	HashSetOrderEdge* inEdges;
 	HashSetOrderEdge* outEdges;
+	NodeStatus status;
 };
 
 OrderNode* allocOrderNode(uint64_t id);
