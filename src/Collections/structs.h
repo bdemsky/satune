@@ -25,7 +25,6 @@ VectorDef(OrderGraph, OrderGraph*);
 
 HashTableDef(Void, void *, void *);
 HashTableDef(OrderPair, OrderPair *, OrderPair *);
-HashTableDef(NodeInfo, OrderNode*, NodeInfo*);
 
 HashSetDef(Void, void *);
 HashSetDef(TableEntry, TableEntry*);

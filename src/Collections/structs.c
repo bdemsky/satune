@@ -70,16 +70,7 @@ static inline bool order_edge_equals(OrderEdge* key1, OrderEdge* key2){
 	return key1->sink == key2->sink && key1->source == key2->source;
 }
 
-static inline unsigned int node_info_hash_function(OrderNode * hash) {
-	return (uint)((intptr_t)hash >> 4);
-}
-
-static inline bool node_info_equals(OrderNode * key1, OrderNode * key2) {
-	return key1 == key2;
-}
-
 HashTableImpl(OrderPair, OrderPair *, OrderPair *, order_pair_hash_Function, order_pair_equals, ourfree);
-HashTableImpl(NodeInfo, OrderNode *, NodeInfo *, node_info_hash_function, node_info_equals, ourfree);
 
 HashSetImpl(TableEntry, TableEntry*, table_entry_hash_Function, table_entry_equals);
 HashSetImpl(OrderNode, OrderNode*, order_node_hash_Function, order_node_equals);
