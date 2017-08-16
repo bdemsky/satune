@@ -154,7 +154,19 @@ void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes) {
 }
 
 void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool clearBackEdges) {
+	//First compute implication of transitive closure on must pos edges
 	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->outEdges);
+	while(hasNextOrderEdge(iterator)){
+		OrderEdge* edge = nextOrderEdge(iterator);
+		OrderNode* parent = edge->source;
+		if (parent->status == VISITED) {
+			edge->mustPos = true;
+		}
+	}
+	deleteIterOrderEdge(iterator);
+
+	//Next compute implication of transitive closure on must neg edges
+	iterator = iteratorOrderEdge(node->outEdges);
 	while(hasNextOrderEdge(iterator)){
 		OrderEdge* edge = nextOrderEdge(iterator);
 		OrderNode* child = edge->sink;
@@ -190,7 +202,9 @@ void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes) {
 }
 
 /* This function finds edges that would form a cycle with must edges
-	 and forces them to be mustNeg. */
+	 and forces them to be mustNeg.  It also decides whether an edge
+	 must be true because of transitivity from other must be true
+	 edges. */
 
 void reachMustAnalysis(OrderGraph *graph) {
 	VectorOrderNode finishNodes;
