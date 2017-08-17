@@ -8,28 +8,28 @@
 
 struct SATEncoder {
 	uint varcount;
-	CNF * cnf;
+	CNF *cnf;
 };
 
 #include "satelemencoder.h"
 #include "satorderencoder.h"
 #include "satfunctableencoder.h"
 
-SATEncoder * allocSATEncoder();
+SATEncoder *allocSATEncoder();
 void deleteSATEncoder(SATEncoder *This);
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This);
 Edge getNewVarSATEncoder(SATEncoder *This);
-void getArrayNewVarsSATEncoder(SATEncoder* encoder, uint num, Edge*carray);
+void getArrayNewVarsSATEncoder(SATEncoder *encoder, uint num, Edge *carray);
 Edge encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint);
-Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar * constraint);
-Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic * constraint);
-Edge encodePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
-Edge encodeTablePredicateSATEncoder(SATEncoder * This, BooleanPredicate * constraint);
+Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar *constraint);
+Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic *constraint);
+Edge encodePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint);
+Edge encodeTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint);
 
 
 
-void encodeElementSATEncoder(SATEncoder* encoder, Element *This);
-void encodeElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction *This);
-void encodeTableElementFunctionSATEncoder(SATEncoder* encoder, ElementFunction* This);
+void encodeElementSATEncoder(SATEncoder *encoder, Element *This);
+void encodeElementFunctionSATEncoder(SATEncoder *encoder, ElementFunction *This);
+void encodeTableElementFunctionSATEncoder(SATEncoder *encoder, ElementFunction *This);
 
 #endif

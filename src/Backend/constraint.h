@@ -17,7 +17,7 @@ struct Node;
 typedef struct Node Node;
 
 struct Edge {
-	Node * node_ptr;
+	Node *node_ptr;
 };
 
 VectorDef(Edge, Edge)
@@ -31,11 +31,11 @@ enum NodeType {
 typedef enum NodeType NodeType;
 
 struct NodeFlags {
-	NodeType type:2;
-	int varForced:1;
-	int wasExpanded:2;
-	int cnfVisitedDown:2;
-	int cnfVisitedUp:2;
+	NodeType type : 2;
+	int varForced : 1;
+	int wasExpanded : 2;
+	int cnfVisitedDown : 2;
+	int cnfVisitedUp : 2;
 };
 
 typedef struct NodeFlags NodeFlags;
@@ -45,7 +45,7 @@ struct Node {
 	uint numEdges;
 	uint hashCode;
 	uint intAnnot[2];
-	void * ptrAnnot[2];
+	void *ptrAnnot[2];
 	Edge edges[];
 };
 
@@ -59,8 +59,8 @@ struct CNF {
 	uint mask;
 	uint maxsize;
 	bool enableMatching;
-	Node ** node_array;
-	IncrementalSolver * solver;
+	Node **node_array;
+	IncrementalSolver *solver;
 	VectorEdge constraints;
 	VectorEdge args;
 };
@@ -71,11 +71,11 @@ struct CNFExpr;
 typedef struct CNFExpr CNFExpr;
 
 static inline bool getExpanded(Node *n, int isNegated) {
-	return n->flags.wasExpanded & (1<<isNegated);
+	return n->flags.wasExpanded & (1 << isNegated);
 }
 
 static inline void setExpanded(Node *n, int isNegated) {
-	n->flags.wasExpanded |= (1<<isNegated);
+	n->flags.wasExpanded |= (1 << isNegated);
 }
 
 static inline Edge constraintNegate(Edge e) {
@@ -84,7 +84,7 @@ static inline Edge constraintNegate(Edge e) {
 }
 
 static inline bool sameNodeVarEdge(Edge e1, Edge e2) {
-	return ! (((uintptr_t) e1.node_ptr ^ (uintptr_t) e2.node_ptr) & (~ (uintptr_t) NEGATE_EDGE));
+	return !(((uintptr_t) e1.node_ptr ^ (uintptr_t) e2.node_ptr) & (~(uintptr_t) NEGATE_EDGE));
 }
 
 static inline bool sameSignEdge(Edge e1, Edge e2) {
@@ -111,12 +111,12 @@ static inline bool isNegNodeEdge(Edge e) {
 	return (((uintptr_t) e.node_ptr) & (NEGATE_EDGE | EDGE_IS_VAR_CONSTANT)) == NEGATE_EDGE;
 }
 
-static inline Node * getNodePtrFromEdge(Edge e) {
+static inline Node *getNodePtrFromEdge(Edge e) {
 	return (Node *) (((uintptr_t) e.node_ptr) & ~((uintptr_t) EDGE_MASK));
 }
 
 static inline NodeType getNodeType(Edge e) {
-	Node * n=getNodePtrFromEdge(e);
+	Node *n = getNodePtrFromEdge(e);
 	return n->flags.type;
 }
 
@@ -129,17 +129,17 @@ static inline bool ltEdge(Edge e1, Edge e2) {
 }
 
 static inline uint getNodeSize(Edge e) {
-	Node * n=getNodePtrFromEdge(e);
+	Node *n = getNodePtrFromEdge(e);
 	return n->numEdges;
 }
 
-static inline Edge * getEdgeArray(Edge e) {
-	Node * n=getNodePtrFromEdge(e);
+static inline Edge *getEdgeArray(Edge e) {
+	Node *n = getNodePtrFromEdge(e);
 	return n->edges;
 }
 
 static inline Edge getNonNeg(Edge e) {
-	Edge enew={(Node *)(((uintptr_t)e.node_ptr)&(~((uintptr_t)NEGATE_EDGE)))};
+	Edge enew = {(Node *)(((uintptr_t)e.node_ptr) & (~((uintptr_t)NEGATE_EDGE)))};
 	return enew;
 }
 
@@ -156,7 +156,7 @@ static inline bool edgeIsVarConst(Edge e) {
 }
 
 static inline Edge constraintNegateIf(Edge e, bool negate) {
-	Edge eret={(Node *)(((uintptr_t)e.node_ptr) ^ negate)};
+	Edge eret = {(Node *)(((uintptr_t)e.node_ptr) ^ negate)};
 	return eret;
 }
 
@@ -173,24 +173,24 @@ static inline Literal getProxy(CNFExpr *expr) {
 	return (Literal) (((intptr_t) expr) >> 1);
 }
 
-CNF * createCNF();
-void deleteCNF(CNF * cnf);
+CNF *createCNF();
+void deleteCNF(CNF *cnf);
 
-uint hashNode(NodeType type, uint numEdges, Edge * edges);
-Node * allocNode(NodeType type, uint numEdges, Edge * edges, uint hashCode);
-bool compareNodes(Node * node, NodeType type, uint numEdges, Edge *edges);
-Edge create(CNF *cnf, NodeType type, uint numEdges, Edge * edges);
-Edge constraintOR(CNF * cnf, uint numEdges, Edge *edges);
-Edge constraintAND(CNF * cnf, uint numEdges, Edge * edges);
-Edge constraintOR2(CNF * cnf, Edge left, Edge right);
-Edge constraintAND2(CNF * cnf, Edge left, Edge right);
-Edge constraintIMPLIES(CNF * cnf, Edge left, Edge right);
-Edge constraintIFF(CNF * cnf, Edge left, Edge right);
+uint hashNode(NodeType type, uint numEdges, Edge *edges);
+Node *allocNode(NodeType type, uint numEdges, Edge *edges, uint hashCode);
+bool compareNodes(Node *node, NodeType type, uint numEdges, Edge *edges);
+Edge create(CNF *cnf, NodeType type, uint numEdges, Edge *edges);
+Edge constraintOR(CNF *cnf, uint numEdges, Edge *edges);
+Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges);
+Edge constraintOR2(CNF *cnf, Edge left, Edge right);
+Edge constraintAND2(CNF *cnf, Edge left, Edge right);
+Edge constraintIMPLIES(CNF *cnf, Edge left, Edge right);
+Edge constraintIFF(CNF *cnf, Edge left, Edge right);
 static inline Edge constraintXOR(CNF *cnf, Edge left, Edge right) {return constraintNegate(constraintIFF(cnf, left,right));}
-Edge constraintITE(CNF * cnf, Edge cond, Edge thenedge, Edge elseedge);
+Edge constraintITE(CNF *cnf, Edge cond, Edge thenedge, Edge elseedge);
 Edge constraintNewVar(CNF *cnf);
 void countPass(CNF *cnf);
-void countConstraint(CNF *cnf, VectorEdge * stack, Edge e);
+void countConstraint(CNF *cnf, VectorEdge *stack, Edge e);
 void addConstraintCNF(CNF *cnf, Edge constraint);
 int solveCNF(CNF *cnf);
 bool getValueCNF(CNF *cnf, Edge var);
@@ -198,18 +198,18 @@ void printCNF(Edge e);
 
 void convertPass(CNF *cnf, bool backtrackLit);
 void convertConstraint(CNF *cnf, VectorEdge *stack, Edge e, bool backtrackLit);
-void constrainCNF(CNF * cnf, Literal l, CNFExpr *exp);
-void produceCNF(CNF * cnf, Edge e);
-CNFExpr * produceConjunction(CNF * cnf, Edge e);
-CNFExpr* produceDisjunction(CNF *cnf, Edge e);
-bool propagate(CNF *cnf, CNFExpr ** dest, CNFExpr * src, bool negate);
-void saveCNF(CNF *cnf, CNFExpr* exp, Edge e, bool sign);
-CNFExpr* fillArgs(CNF * cnf, Edge e, bool isNeg, Edge * largestEdge);
-Literal introProxy(CNF * cnf, Edge e, CNFExpr* exp, bool isNeg);
+void constrainCNF(CNF *cnf, Literal l, CNFExpr *exp);
+void produceCNF(CNF *cnf, Edge e);
+CNFExpr *produceConjunction(CNF *cnf, Edge e);
+CNFExpr *produceDisjunction(CNF *cnf, Edge e);
+bool propagate(CNF *cnf, CNFExpr **dest, CNFExpr *src, bool negate);
+void saveCNF(CNF *cnf, CNFExpr *exp, Edge e, bool sign);
+CNFExpr *fillArgs(CNF *cnf, Edge e, bool isNeg, Edge *largestEdge);
+Literal introProxy(CNF *cnf, Edge e, CNFExpr *exp, bool isNeg);
 void outputCNF(CNF *cnf, CNFExpr *expr);
 
-Edge generateBinaryConstraint(CNF *cnf, uint numvars, Edge * vars, uint value);
-Edge generateLTConstraint(CNF *cnf, uint numvars, Edge * vars, uint value);
+Edge generateBinaryConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
+Edge generateLTConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateEquivNVConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2);
 
 extern Edge E_True;

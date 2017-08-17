@@ -9,15 +9,15 @@
 
 struct Order {
 	OrderType type;
-	Set * set;
-	HashTableOrderPair * orderPairTable;
-	VectorBoolean constraints;
+	Set *set;
+	HashTableOrderPair *orderPairTable;
+	VectorBooleanOrder constraints;
 	OrderEncoding order;
 };
 
-Order* allocOrder(OrderType type, Set * set);
-void initializeOrderHashTable(Order * This);
-void addOrderConstraint(Order * This, BooleanOrder * constraint);
-void setOrderEncodingType(Order * This, OrderEncodingType type);
-void deleteOrder(Order * This);
+Order *allocOrder(OrderType type, Set *set);
+void initializeOrderHashTable(Order *This);
+void addOrderConstraint(Order *This, BooleanOrder *constraint);
+void setOrderEncodingType(Order *This, OrderEncodingType type);
+void deleteOrder(Order *This);
 #endif

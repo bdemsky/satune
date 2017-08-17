@@ -5,53 +5,53 @@
 #include "function.h"
 #include "table.h"
 
-Element *allocElementSet(Set * s) {
-	ElementSet * This=(ElementSet *)ourmalloc(sizeof(ElementSet));
-	GETELEMENTTYPE(This)= ELEMSET;
-	This->set=s;
+Element *allocElementSet(Set *s) {
+	ElementSet *This = (ElementSet *)ourmalloc(sizeof(ElementSet));
+	GETELEMENTTYPE(This) = ELEMSET;
+	This->set = s;
 	initDefVectorASTNode(GETELEMENTPARENTS(This));
 	initElementEncoding(&This->encoding, (Element *) This);
 	return &This->base;
 }
 
-Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus){
-	ElementFunction* This = (ElementFunction*) ourmalloc(sizeof(ElementFunction));
-	GETELEMENTTYPE(This)= ELEMFUNCRETURN;
-	This->function=function;
+Element *allocElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
+	ElementFunction *This = (ElementFunction *) ourmalloc(sizeof(ElementFunction));
+	GETELEMENTTYPE(This) = ELEMFUNCRETURN;
+	This->function = function;
 	ASSERT(GETBOOLEANTYPE(overflowstatus) == BOOLEANVAR);
 	This->overflowstatus = overflowstatus;
 	initArrayInitElement(&This->inputs, array, numArrays);
 	initDefVectorASTNode(GETELEMENTPARENTS(This));
-	for(uint i=0;i<numArrays;i++)
+	for (uint i = 0; i < numArrays; i++)
 		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) This);
 	initElementEncoding(&This->rangeencoding, (Element *) This);
 	initFunctionEncoding(&This->functionencoding, (Element *) This);
 	return &This->base;
 }
 
-Element * allocElementConst(uint64_t value, VarType type) {
-	ElementConst * This=(ElementConst *)ourmalloc(sizeof(ElementConst));
-	GETELEMENTTYPE(This)= ELEMCONST;
-	This->value=value;
-	This->set=allocSet(type, (uint64_t[]){value}, 1);
+Element *allocElementConst(uint64_t value, VarType type) {
+	ElementConst *This = (ElementConst *)ourmalloc(sizeof(ElementConst));
+	GETELEMENTTYPE(This) = ELEMCONST;
+	This->value = value;
+	This->set = allocSet(type, (uint64_t[]) {value}, 1);
 	initDefVectorASTNode(GETELEMENTPARENTS(This));
 	initElementEncoding(&This->encoding, (Element *) This);
 	return &This->base;
 }
 
-Set* getElementSet(Element* This){
-	switch(GETELEMENTTYPE(This)){
+Set *getElementSet(Element *This) {
+	switch (GETELEMENTTYPE(This)) {
 	case ELEMSET:
-		return ((ElementSet*)This)->set;
+		return ((ElementSet *)This)->set;
 	case ELEMCONST:
-		return ((ElementConst*)This)->set;
+		return ((ElementConst *)This)->set;
 	case ELEMFUNCRETURN: {
-		Function* func = ((ElementFunction*)This)->function;
-		switch(GETFUNCTIONTYPE(func)){
+		Function *func = ((ElementFunction *)This)->function;
+		switch (GETFUNCTIONTYPE(func)) {
 		case TABLEFUNC:
-			return ((FunctionTable*)func)->table->range;
+			return ((FunctionTable *)func)->table->range;
 		case OPERATORFUNC:
-			return ((FunctionOperator*)func)->range;
+			return ((FunctionOperator *)func)->range;
 		default:
 			ASSERT(0);
 		}
@@ -64,7 +64,7 @@ Set* getElementSet(Element* This){
 }
 
 void deleteElement(Element *This) {
-	switch(GETELEMENTTYPE(This)) {
+	switch (GETELEMENTTYPE(This)) {
 	case ELEMFUNCRETURN: {
 		ElementFunction *ef = (ElementFunction *) This;
 		deleteInlineArrayElement(&ef->inputs);

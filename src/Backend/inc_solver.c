@@ -13,17 +13,17 @@
 #include "common.h"
 #include <string.h>
 
-IncrementalSolver * allocIncrementalSolver() {
-	IncrementalSolver *This=(IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
-	This->buffer=((int *)ourmalloc(sizeof(int)*IS_BUFFERSIZE));
-	This->solution=NULL;
-	This->solutionsize=0;
-	This->offset=0;
+IncrementalSolver *allocIncrementalSolver() {
+	IncrementalSolver *This = (IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
+	This->buffer = ((int *)ourmalloc(sizeof(int) * IS_BUFFERSIZE));
+	This->solution = NULL;
+	This->solutionsize = 0;
+	This->offset = 0;
 	createSolver(This);
 	return This;
 }
 
-void deleteIncrementalSolver(IncrementalSolver * This) {
+void deleteIncrementalSolver(IncrementalSolver *This) {
 	killSolver(This);
 	ourfree(This->buffer);
 	if (This->solution != NULL)
@@ -31,51 +31,51 @@ void deleteIncrementalSolver(IncrementalSolver * This) {
 	ourfree(This);
 }
 
-void resetSolver(IncrementalSolver * This) {
+void resetSolver(IncrementalSolver *This) {
 	killSolver(This);
 	This->offset = 0;
 	createSolver(This);
 }
 
-void addClauseLiteral(IncrementalSolver * This, int literal) {
-	This->buffer[This->offset++]=literal;
-	if (This->offset==IS_BUFFERSIZE) {
+void addClauseLiteral(IncrementalSolver *This, int literal) {
+	This->buffer[This->offset++] = literal;
+	if (This->offset == IS_BUFFERSIZE) {
 		flushBufferSolver(This);
 	}
 }
 
-void addArrayClauseLiteral(IncrementalSolver * This, uint numliterals, int * literals) {
-	uint index=0;
-	while(true) {
-		uint bufferspace=IS_BUFFERSIZE-This->offset;
-		uint numtowrite=numliterals-index;
+void addArrayClauseLiteral(IncrementalSolver *This, uint numliterals, int *literals) {
+	uint index = 0;
+	while (true) {
+		uint bufferspace = IS_BUFFERSIZE - This->offset;
+		uint numtowrite = numliterals - index;
 		if (bufferspace > numtowrite) {
-			memcpy(&This->buffer[This->offset], &literals[index], numtowrite*sizeof(int));
-			This->offset+=numtowrite;
-			This->buffer[This->offset++]=0; //have one extra spot always
-			if (This->offset==IS_BUFFERSIZE) {//Check if full
+			memcpy(&This->buffer[This->offset], &literals[index], numtowrite * sizeof(int));
+			This->offset += numtowrite;
+			This->buffer[This->offset++] = 0;	//have one extra spot always
+			if (This->offset == IS_BUFFERSIZE) {//Check if full
 				flushBufferSolver(This);
 			}
 			return;
 		} else {
-			memcpy(&This->buffer[This->offset], &literals[index], bufferspace*sizeof(int));
-			This->offset+=bufferspace;
-			index+=bufferspace;
+			memcpy(&This->buffer[This->offset], &literals[index], bufferspace * sizeof(int));
+			This->offset += bufferspace;
+			index += bufferspace;
 			flushBufferSolver(This);
 		}
 	}
 }
 
-void finishedClauses(IncrementalSolver * This) {
+void finishedClauses(IncrementalSolver *This) {
 	addClauseLiteral(This, 0);
 }
 
-void freeze(IncrementalSolver * This, int variable) {
+void freeze(IncrementalSolver *This, int variable) {
 	addClauseLiteral(This, IS_FREEZE);
 	addClauseLiteral(This, variable);
 }
 
-int solve(IncrementalSolver * This) {
+int solve(IncrementalSolver *This) {
 	//add an empty clause
 	startSolve(This);
 	return getSolution(This);
@@ -86,14 +86,14 @@ void startSolve(IncrementalSolver *This) {
 	flushBufferSolver(This);
 }
 
-int getSolution(IncrementalSolver * This) {
-	int result=readIntSolver(This);
+int getSolution(IncrementalSolver *This) {
+	int result = readIntSolver(This);
 	if (result == IS_SAT) {
-		int numVars=readIntSolver(This);
+		int numVars = readIntSolver(This);
 		if (numVars > This->solutionsize) {
 			if (This->solution != NULL)
 				ourfree(This->solution);
-			This->solution = (int *) ourmalloc((numVars+1)*sizeof(int));
+			This->solution = (int *) ourmalloc((numVars + 1) * sizeof(int));
 			This->solution[0] = 0;
 		}
 		readSolver(This, &This->solution[1], numVars * sizeof(int));
@@ -102,32 +102,32 @@ int getSolution(IncrementalSolver * This) {
 	return result;
 }
 
-int readIntSolver(IncrementalSolver * This) {
+int readIntSolver(IncrementalSolver *This) {
 	int value;
 	readSolver(This, &value, 4);
 	return value;
 }
 
-void readSolver(IncrementalSolver * This, void * tmp, ssize_t size) {
+void readSolver(IncrementalSolver *This, void *tmp, ssize_t size) {
 	char *result = (char *) tmp;
-	ssize_t bytestoread=size;
-	ssize_t bytesread=0;
+	ssize_t bytestoread = size;
+	ssize_t bytesread = 0;
 	do {
-		ssize_t n=read(This->from_solver_fd, &((char *)result)[bytesread], bytestoread);
+		ssize_t n = read(This->from_solver_fd, &((char *)result)[bytesread], bytestoread);
 		if (n == -1) {
 			model_print("Read failure\n");
 			exit(-1);
 		}
 		bytestoread -= n;
 		bytesread += n;
-	} while(bytestoread != 0);
+	} while (bytestoread != 0);
 }
 
-bool getValueSolver(IncrementalSolver * This, int variable) {
+bool getValueSolver(IncrementalSolver *This, int variable) {
 	return This->solution[variable];
 }
 
-void createSolver(IncrementalSolver * This) {
+void createSolver(IncrementalSolver *This) {
 	int to_pipe[2];
 	int from_pipe[2];
 	if (pipe(to_pipe) || pipe(from_pipe)) {
@@ -142,7 +142,7 @@ void createSolver(IncrementalSolver * This) {
 		//Solver process
 		close(to_pipe[1]);
 		close(from_pipe[0]);
-		int fd=open("log_file", O_WRONLY|O_CREAT|O_TRUNC, S_IRWXU);
+		int fd = open("log_file", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
 
 		if ((dup2(to_pipe[0], 0) == -1) ||
 				(dup2(from_pipe[1], IS_OUT_FD) == -1) ||
@@ -162,7 +162,7 @@ void createSolver(IncrementalSolver * This) {
 	}
 }
 
-void killSolver(IncrementalSolver * This) {
+void killSolver(IncrementalSolver *This) {
 	close(This->to_solver_fd);
 	close(This->from_solver_fd);
 	//Stop the solver
@@ -174,29 +174,29 @@ void killSolver(IncrementalSolver * This) {
 }
 
 //DEBUGGING CODE STARTS
-bool first=true;
+bool first = true;
 //DEBUGGING CODE ENDS
 
-void flushBufferSolver(IncrementalSolver * This) {
-	ssize_t bytestowrite=sizeof(int)*This->offset;
-	ssize_t byteswritten=0;
+void flushBufferSolver(IncrementalSolver *This) {
+	ssize_t bytestowrite = sizeof(int) * This->offset;
+	ssize_t byteswritten = 0;
 	//DEBUGGING CODE STARTS
-	for(uint i=0;i<This->offset;i++) {
+	for (uint i = 0; i < This->offset; i++) {
 		if (first)
 			printf("(");
-		if (This->buffer[i]==0) {
+		if (This->buffer[i] == 0) {
 			printf(")\n");
-			first=true;
+			first = true;
 		} else {
 			if (!first)
 				printf(" + ");
-			first=false;
+			first = false;
 			printf("%d", This->buffer[i]);
 		}
 	}
 	//DEBUGGING CODE ENDS
 	do {
-		ssize_t n=write(This->to_solver_fd, &((char *)This->buffer)[byteswritten], bytestowrite);
+		ssize_t n = write(This->to_solver_fd, &((char *)This->buffer)[byteswritten], bytestowrite);
 		if (n == -1) {
 			perror("Write failure\n");
 			model_print("to_solver_fd=%d\n",This->to_solver_fd);
@@ -204,6 +204,6 @@ void flushBufferSolver(IncrementalSolver * This) {
 		}
 		bytestowrite -= n;
 		byteswritten += n;
-	} while(bytestowrite != 0);
+	} while (bytestowrite != 0);
 	This->offset = 0;
 }

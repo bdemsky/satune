@@ -19,8 +19,8 @@
 #include "classlist.h"
 
 struct IncrementalSolver {
-	int * buffer;
-	int * solution;
+	int *buffer;
+	int *solution;
 	int solutionsize;
 	int offset;
 	pid_t solver_pid;
@@ -28,20 +28,20 @@ struct IncrementalSolver {
 	int from_solver_fd;
 };
 
-IncrementalSolver * allocIncrementalSolver();
-void deleteIncrementalSolver(IncrementalSolver * This);
-void addClauseLiteral(IncrementalSolver * This, int literal);
-void addArrayClauseLiteral(IncrementalSolver * This, uint numliterals, int * literals);
-void finishedClauses(IncrementalSolver * This);
-void freeze(IncrementalSolver * This, int variable);
-int solve(IncrementalSolver * This);
-void startSolve(IncrementalSolver * This);
-int getSolution(IncrementalSolver * This);
-bool getValueSolver(IncrementalSolver * This, int variable);
-void resetSolver(IncrementalSolver * This);
-void createSolver(IncrementalSolver * This);
-void killSolver(IncrementalSolver * This);
-void flushBufferSolver(IncrementalSolver * This);
-int readIntSolver(IncrementalSolver * This);
-void readSolver(IncrementalSolver * This, void * buffer, ssize_t size);
+IncrementalSolver *allocIncrementalSolver();
+void deleteIncrementalSolver(IncrementalSolver *This);
+void addClauseLiteral(IncrementalSolver *This, int literal);
+void addArrayClauseLiteral(IncrementalSolver *This, uint numliterals, int *literals);
+void finishedClauses(IncrementalSolver *This);
+void freeze(IncrementalSolver *This, int variable);
+int solve(IncrementalSolver *This);
+void startSolve(IncrementalSolver *This);
+int getSolution(IncrementalSolver *This);
+bool getValueSolver(IncrementalSolver *This, int variable);
+void resetSolver(IncrementalSolver *This);
+void createSolver(IncrementalSolver *This);
+void killSolver(IncrementalSolver *This);
+void flushBufferSolver(IncrementalSolver *This);
+int readIntSolver(IncrementalSolver *This);
+void readSolver(IncrementalSolver *This, void *buffer, ssize_t size);
 #endif

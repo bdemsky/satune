@@ -6,12 +6,12 @@
 
 struct Table {
 	ArraySet domains;
-	Set * range;
-	HashSetTableEntry* entries;
+	Set *range;
+	HashSetTableEntry *entries;
 };
 
-Table * allocTable(Set ** domains, uint numDomain, Set * range);
-void addNewTableEntry(Table * This, uint64_t * inputs, uint inputSize, uint64_t result);
-TableEntry* getTableEntryFromTable(Table* table, uint64_t* inputs, uint inputSize);
-void deleteTable(Table * This);
+Table *allocTable(Set **domains, uint numDomain, Set *range);
+void addNewTableEntry(Table *This, uint64_t *inputs, uint inputSize, uint64_t result);
+TableEntry *getTableEntryFromTable(Table *table, uint64_t *inputs, uint inputSize);
+void deleteTable(Table *This);
 #endif

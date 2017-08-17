@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   orderpair.h
  * Author: hamed
  *
@@ -12,14 +12,14 @@
 #include "mymemory.h"
 #include "constraint.h"
 
-struct OrderPair{
+struct OrderPair {
 	uint64_t first;
 	uint64_t second;
 	Edge constraint;
-}; 
+};
 
-OrderPair* allocOrderPair(uint64_t first, uint64_t second, Edge constraint);
-void deleteOrderPair(OrderPair* pair);
+OrderPair *allocOrderPair(uint64_t first, uint64_t second, Edge constraint);
+void deleteOrderPair(OrderPair *pair);
 
-#endif /* ORDERPAIR_H */
+#endif/* ORDERPAIR_H */
 
