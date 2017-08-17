@@ -30,7 +30,7 @@ void reachMustAnalysis(OrderGraph *graph);
 void localMustAnalysisTotal(OrderGraph *graph);
 void localMustAnalysisPartial(OrderGraph *graph);
 void orderAnalysis(CSolver *This);
-void decomposeOrder(Order *order, OrderGraph *graph);
+void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph);
 
 #endif/* ORDERGRAPHBUILDER_H */
 

@@ -16,6 +16,7 @@
 	type lastVector ## name(Vector ## name * vector);                      \
 	void popVector ## name(Vector ## name * vector);                       \
 	type getVector ## name(Vector ## name * vector, uint index);           \
+	void setExpandVector ## name(Vector ## name * vector, uint index, type item);	\
 	void setVector ## name(Vector ## name * vector, uint index, type item); \
 	uint getSizeVector ## name(Vector ## name * vector);                   \
 	void setSizeVector ## name(Vector ## name * vector, uint size);        \
@@ -72,6 +73,11 @@
 	type getVector ## name(Vector ## name * vector, uint index) {         \
 		return vector->array[index];                                        \
 	}                                                                     \
+	void setExpandVector ## name(Vector ## name * vector, uint index, type item) { \
+		if (index>=vector->size)																						\
+			setSizeVector ## name(vector, index + 1);													\
+		setVector ## name(vector, index, item);															\
+	}																																			\
 	void setVector ## name(Vector ## name * vector, uint index, type item) { \
 		vector->array[index] = item;                                          \
 	}                                                                     \

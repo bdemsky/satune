@@ -6,6 +6,7 @@
 #include "order.h"
 #include "ordernode.h"
 #include "rewriter.h"
+#include "mutableset.h"
 
 OrderGraph *buildOrderGraph(Order *order) {
 	OrderGraph *orderGraph = allocOrderGraph(order);
@@ -264,7 +265,9 @@ void localMustAnalysisPartial(OrderGraph *graph) {
 	deleteIterOrderEdge(iterator);
 }
 
-void decomposeOrder(Order *order, OrderGraph *graph) {
+void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
+	VectorOrder ordervec;
+	initDefVectorOrder(&ordervec);
 	uint size = getSizeVectorBooleanOrder(&order->constraints);
 	for (uint i = 0; i < size; i++) {
 		BooleanOrder *orderconstraint = getVectorBooleanOrder(&order->constraints, i);
@@ -279,9 +282,28 @@ void decomposeOrder(Order *order, OrderGraph *graph) {
 			replaceBooleanWithFalse((Boolean *)orderconstraint);
 		} else {
 			//Build new order and change constraint's order
-
+			Order * neworder = NULL;
+			if (getSizeVectorOrder(&ordervec) > from->sccNum)
+				neworder = getVectorOrder(&ordervec, from->sccNum);
+			if (neworder == NULL) {
+				Set * set = (Set *) allocMutableSet(order->set->type);
+				neworder = allocOrder(order->type, set);
+				pushVectorOrder(This->allOrders, neworder);
+				setExpandVectorOrder(&ordervec, from->sccNum, neworder);
+			}
+			if (from->status != ADDEDTOSET) {
+				from->status = ADDEDTOSET;
+				addElementMSet((MutableSet *)neworder->set, from->id);
+			}
+			if (to->status != ADDEDTOSET) {
+				to->status = ADDEDTOSET;
+				addElementMSet((MutableSet *)neworder->set, to->id);
+			}
+			orderconstraint->order = neworder;
+			addOrderConstraint(neworder, orderconstraint);
 		}
 	}
+	deleteVectorArrayOrder(&ordervec);
 }
 
 void orderAnalysis(CSolver *This) {
@@ -312,7 +334,7 @@ void orderAnalysis(CSolver *This) {
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
 
-		decomposeOrder(order, graph);
+		decomposeOrder(This, order, graph);
 
 		deleteOrderGraph(graph);
 	}
