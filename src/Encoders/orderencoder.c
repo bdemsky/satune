@@ -313,10 +313,10 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);
 		if (from->sccNum < to->sccNum) {
 			//replace with true
-			replaceBooleanWithTrue((Boolean *)orderconstraint);
+			replaceBooleanWithTrue(This, (Boolean *)orderconstraint);
 		} else if (to->sccNum < from->sccNum) {
 			//replace with false
-			replaceBooleanWithFalse((Boolean *)orderconstraint);
+			replaceBooleanWithFalse(This, (Boolean *)orderconstraint);
 		} else {
 			//Build new order and change constraint's order
 			Order *neworder = NULL;

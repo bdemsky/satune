@@ -1,32 +1,32 @@
 #include "rewriter.h"
 #include "boolean.h"
 
-void replaceBooleanWithTrue(Boolean *This) {
-	uint size = getSizeVectorBoolean(&This->parents);
+void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
+	uint size = getSizeVectorBoolean(&bexpr->parents);
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = getVectorBoolean(&This->parents, i);
+		Boolean *parent = getVectorBoolean(&bexpr->parents, i);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case L_AND:
-			handleANDTrue(logicop, This);
+			handleANDTrue(This, logicop, bexpr);
 			break;
 		case L_OR:
-			replaceBooleanWithTrue(parent);
+			replaceBooleanWithTrue(This, parent);
 			break;
 		case L_NOT:
-			replaceBooleanWithFalse(parent);
+			replaceBooleanWithFalse(This, parent);
 			break;
 		case L_XOR:
-			handleXORTrue(logicop, This);
+			handleXORTrue(logicop, bexpr);
 			break;
 		case L_IMPLIES:
-			handleIMPLIESTrue(logicop, This);
+			handleIMPLIESTrue(This, logicop, bexpr);
 			break;
 		}
 	}
 }
 
-void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb) {
+void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
 	uint size = getSizeVectorBoolean(&oldb->parents);
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = getVectorBoolean(&oldb->parents, i);
@@ -44,105 +44,105 @@ void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb) {
 	}
 }
 
-void handleXORTrue(BooleanLogic *This, Boolean *child) {
-	uint size = getSizeArrayBoolean(&This->inputs);
-	Boolean *b = getArrayBoolean(&This->inputs, 0);
+void handleXORTrue(BooleanLogic *bexpr, Boolean *child) {
+	uint size = getSizeArrayBoolean(&bexpr->inputs);
+	Boolean *b = getArrayBoolean(&bexpr->inputs, 0);
 	uint otherindex = (b == child) ? 1 : 0;
-	removeElementArrayBoolean(&This->inputs, otherindex);
-	This->op = L_NOT;
+	removeElementArrayBoolean(&bexpr->inputs, otherindex);
+	bexpr->op = L_NOT;
 }
 
-void handleXORFalse(BooleanLogic *This, Boolean *child) {
-	uint size = getSizeArrayBoolean(&This->inputs);
-	Boolean *b = getArrayBoolean(&This->inputs, 0);
+void handleXORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+	uint size = getSizeArrayBoolean(&bexpr->inputs);
+	Boolean *b = getArrayBoolean(&bexpr->inputs, 0);
 	uint otherindex = (b == child) ? 1 : 0;
-	replaceBooleanWithBoolean((Boolean *)This, getArrayBoolean(&This->inputs, otherindex));
+	replaceBooleanWithBoolean(This, (Boolean *)bexpr, getArrayBoolean(&bexpr->inputs, otherindex));
 }
 
-void handleIMPLIESTrue(BooleanLogic *This, Boolean *child) {
-	uint size = getSizeArrayBoolean(&This->inputs);
-	Boolean *b = getArrayBoolean(&This->inputs, 0);
+void handleIMPLIESTrue(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+	uint size = getSizeArrayBoolean(&bexpr->inputs);
+	Boolean *b = getArrayBoolean(&bexpr->inputs, 0);
 	if (b == child) {
 		//Replace with other term
-		replaceBooleanWithBoolean((Boolean *)This, getArrayBoolean(&This->inputs, 1));
+		replaceBooleanWithBoolean(This, (Boolean *)bexpr, getArrayBoolean(&bexpr->inputs, 1));
 	} else {
 		//Statement is true...
-		replaceBooleanWithTrue((Boolean *)This);
+		replaceBooleanWithTrue(This, (Boolean *)bexpr);
 	}
 }
 
-void handleIMPLIESFalse(BooleanLogic *This, Boolean *child) {
-	uint size = getSizeArrayBoolean(&This->inputs);
-	Boolean *b = getArrayBoolean(&This->inputs, 0);
+void handleIMPLIESFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+	uint size = getSizeArrayBoolean(&bexpr->inputs);
+	Boolean *b = getArrayBoolean(&bexpr->inputs, 0);
 	if (b == child) {
 		//Statement is true...
-		replaceBooleanWithTrue((Boolean *)This);
+		replaceBooleanWithTrue(This, (Boolean *)bexpr);
 	} else {
 		//Make into negation of first term
-		removeElementArrayBoolean(&This->inputs, 1);
-		This->op = L_NOT;
+		removeElementArrayBoolean(&bexpr->inputs, 1);
+		bexpr->op = L_NOT;
 	}
 }
 
-void handleANDTrue(BooleanLogic *This, Boolean *child) {
-	uint size = getSizeArrayBoolean(&This->inputs);
+void handleANDTrue(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+	uint size = getSizeArrayBoolean(&bexpr->inputs);
 
 	if (size == 1) {
-		replaceBooleanWithTrue((Boolean *)This);
+		replaceBooleanWithTrue(This, (Boolean *)bexpr);
 		return;
 	}
 
 	for (uint i = 0; i < size; i++) {
-		Boolean *b = getArrayBoolean(&This->inputs, i);
+		Boolean *b = getArrayBoolean(&bexpr->inputs, i);
 		if (b == child) {
-			removeElementArrayBoolean(&This->inputs, i);
+			removeElementArrayBoolean(&bexpr->inputs, i);
 		}
 	}
 
 	if (size == 2) {
-		replaceBooleanWithBoolean((Boolean *)This, getArrayBoolean(&This->inputs, 0));
+		replaceBooleanWithBoolean(This, (Boolean *)bexpr, getArrayBoolean(&bexpr->inputs, 0));
 	}
 }
 
-void handleORFalse(BooleanLogic *This, Boolean *child) {
-	uint size = getSizeArrayBoolean(&This->inputs);
+void handleORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+	uint size = getSizeArrayBoolean(&bexpr->inputs);
 
 	if (size == 1) {
-		replaceBooleanWithFalse((Boolean *) This);
+		replaceBooleanWithFalse(This, (Boolean *) bexpr);
 	}
 
 	for (uint i = 0; i < size; i++) {
-		Boolean *b = getArrayBoolean(&This->inputs, i);
+		Boolean *b = getArrayBoolean(&bexpr->inputs, i);
 		if (b == child) {
-			removeElementArrayBoolean(&This->inputs, i);
+			removeElementArrayBoolean(&bexpr->inputs, i);
 		}
 	}
 
 	if (size == 2) {
-		replaceBooleanWithBoolean((Boolean *)This, getArrayBoolean(&This->inputs, 0));
+		replaceBooleanWithBoolean(This, (Boolean *)bexpr, getArrayBoolean(&bexpr->inputs, 0));
 	}
 }
 
-void replaceBooleanWithFalse(Boolean *This) {
-	uint size = getSizeVectorBoolean(&This->parents);
+void replaceBooleanWithFalse(CSolver * This, Boolean *bexpr) {
+	uint size = getSizeVectorBoolean(&bexpr->parents);
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = getVectorBoolean(&This->parents, i);
+		Boolean *parent = getVectorBoolean(&bexpr->parents, i);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case L_AND:
-			replaceBooleanWithFalse(parent);
+			replaceBooleanWithFalse(This, parent);
 			break;
 		case L_OR:
-			handleORFalse(logicop, This);
+			handleORFalse(This, logicop, bexpr);
 			break;
 		case L_NOT:
-			replaceBooleanWithTrue(parent);
+			replaceBooleanWithTrue(This, parent);
 			break;
 		case L_XOR:
-			handleXORFalse(logicop, This);
+			handleXORFalse(This, logicop, bexpr);
 			break;
 		case L_IMPLIES:
-			handleIMPLIESFalse(logicop, This);
+			handleIMPLIESFalse(This, logicop, bexpr);
 			break;
 		}
 	}
