@@ -17,14 +17,14 @@ struct Set {
 	bool isRange;
 	uint64_t low;//also used to count unique items
 	uint64_t high;
-	VectorInt * members;
+	VectorInt *members;
 };
 
-Set * allocSet(VarType t, uint64_t * elements, uint num);
-Set * allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
-bool existsInSet(Set * This, uint64_t element);
-uint getSetSize(Set * This);
-uint64_t getSetElement(Set * This, uint index);
-void deleteSet(Set * This);
+Set *allocSet(VarType t, uint64_t *elements, uint num);
+Set *allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange);
+bool existsInSet(Set *This, uint64_t element);
+uint getSetSize(Set *This);
+uint64_t getSetElement(Set *This, uint index);
+void deleteSet(Set *This);
 #endif/* SET_H */
 

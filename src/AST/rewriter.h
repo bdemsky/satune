@@ -2,8 +2,8 @@
 #define REWRITER_H
 #include "classlist.h"
 
-void replaceBooleanWithTrue(Boolean * This);
-void replaceBooleanWithFalse(Boolean * This);
+void replaceBooleanWithTrue(Boolean *This);
+void replaceBooleanWithFalse(Boolean *This);
 void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
 void handleXORTrue(BooleanLogic *This, Boolean *child);
 void handleXORFalse(BooleanLogic *This, Boolean *child);

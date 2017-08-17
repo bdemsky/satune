@@ -9,7 +9,7 @@
 #include "boolean.h"
 
 #define GETELEMENTTYPE(o) GETASTNODETYPE(o)
-#define GETELEMENTPARENTS(o) (&((Element*)o)->parents)		
+#define GETELEMENTPARENTS(o) (&((Element *)o)->parents)
 struct Element {
 	ASTNode base;
 	VectorASTNode parents;
@@ -17,47 +17,47 @@ struct Element {
 
 struct ElementConst {
 	Element base;
-	Set * set;
+	Set *set;
 	uint64_t value;
 	ElementEncoding encoding;
 };
 
 struct ElementSet {
 	Element base;
-	Set * set;
+	Set *set;
 	ElementEncoding encoding;
 };
 
 struct ElementFunction {
 	Element base;
-	Function * function;
+	Function *function;
 	ArrayElement inputs;
-	Boolean * overflowstatus;
+	Boolean *overflowstatus;
 	FunctionEncoding functionencoding;
 	ElementEncoding rangeencoding;
 };
 
-Element * allocElementConst(uint64_t value, VarType type);
-Element * allocElementSet(Set *s);
-Element* allocElementFunction(Function * function, Element ** array, uint numArrays, Boolean * overflowstatus);
+Element *allocElementConst(uint64_t value, VarType type);
+Element *allocElementSet(Set *s);
+Element *allocElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
 void deleteElement(Element *This);
-Set* getElementSet(Element* This);
+Set *getElementSet(Element *This);
 
-static inline ElementEncoding* getElementEncoding(Element* This){
-	switch(GETELEMENTTYPE(This)){
-		case ELEMSET:
-			return &((ElementSet*)This)->encoding;
-		case ELEMFUNCRETURN:		
-			return &((ElementFunction*)This)->rangeencoding;
-		case ELEMCONST:
-			return &((ElementConst*)This)->encoding;
-		default:
-			ASSERT(0);
+static inline ElementEncoding *getElementEncoding(Element *This) {
+	switch (GETELEMENTTYPE(This)) {
+	case ELEMSET:
+		return &((ElementSet *)This)->encoding;
+	case ELEMFUNCRETURN:
+		return &((ElementFunction *)This)->rangeencoding;
+	case ELEMCONST:
+		return &((ElementConst *)This)->encoding;
+	default:
+		ASSERT(0);
 	}
 	return NULL;
 }
 
-static inline FunctionEncoding* getElementFunctionEncoding(ElementFunction* func){
+static inline FunctionEncoding *getElementFunctionEncoding(ElementFunction *func) {
 	return &func->functionencoding;
 }
 #endif

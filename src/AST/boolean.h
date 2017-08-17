@@ -14,8 +14,8 @@
 
 #define GETBOOLEANTYPE(o) GETASTNODETYPE(o)
 #define GETBOOLEANPARENTS(o) (&((Boolean *)(o))->parents)
-#define GETBOOLEANPOLARITY(b) (((Boolean*)b)->polarity)
-#define GETBOOLEANVALUE(b) (((Boolean*)b)->boolVal)
+#define GETBOOLEANPOLARITY(b) (((Boolean *)b)->polarity)
+#define GETBOOLEANVALUE(b) (((Boolean *)b)->boolVal)
 
 struct Boolean {
 	ASTNode base;
@@ -26,7 +26,7 @@ struct Boolean {
 
 struct BooleanOrder {
 	Boolean base;
-	Order* order;
+	Order *order;
 	uint64_t first;
 	uint64_t second;
 };
@@ -45,18 +45,18 @@ struct BooleanLogic {
 
 struct BooleanPredicate {
 	Boolean base;
-	Predicate * predicate;
+	Predicate *predicate;
 	FunctionEncoding encoding;
 	ArrayElement inputs;
-	Boolean* undefStatus;
+	Boolean *undefStatus;
 };
 
-Boolean * allocBooleanVar(VarType t);
-Boolean * allocBooleanOrder(Order * order, uint64_t first, uint64_t second);
-Boolean * allocBooleanPredicate(Predicate * predicate, Element ** inputs, uint numInputs, Boolean* undefinedStatus);
-Boolean * allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean ** array, uint asize);
-void deleteBoolean(Boolean * This);
-static inline FunctionEncoding* getPredicateFunctionEncoding(BooleanPredicate* func){
+Boolean *allocBooleanVar(VarType t);
+Boolean *allocBooleanOrder(Order *order, uint64_t first, uint64_t second);
+Boolean *allocBooleanPredicate(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus);
+Boolean *allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean **array, uint asize);
+void deleteBoolean(Boolean *This);
+static inline FunctionEncoding *getPredicateFunctionEncoding(BooleanPredicate *func) {
 	return &func->encoding;
 }
 

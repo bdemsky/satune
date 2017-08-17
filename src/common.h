@@ -18,22 +18,22 @@
 #include "config.h"
 
 /*
-extern int model_out;
-extern int model_err;
-extern int switch_alloc;
+   extern int model_out;
+   extern int model_err;
+   extern int switch_alloc;
 
-#define model_dprintf(fd, fmt, ...) do { switch_alloc = 1; dprintf(fd, fmt, ## __VA_ARGS__); switch_alloc = 0; } while (0)
+ #define model_dprintf(fd, fmt, ...) do { switch_alloc = 1; dprintf(fd, fmt, ## __VA_ARGS__); switch_alloc = 0; } while (0)
 
-#define model_print(fmt, ...) do { model_dprintf(model_out, fmt, ## __VA_ARGS__); } while (0)
+ #define model_print(fmt, ...) do { model_dprintf(model_out, fmt, ## __VA_ARGS__); } while (0)
 
-#define model_print_err(fmt, ...) do { model_dprintf(model_err, fmt, ## __VA_ARGS__); } while (0)
+ #define model_print_err(fmt, ...) do { model_dprintf(model_err, fmt, ## __VA_ARGS__); } while (0)
 
-*/
+ */
 
 #define model_print printf
 
-#define NEXTPOW2(x) ((x==1) ? 1 : (1<<(sizeof(uint)*8-__builtin_clz(x-1))))
-#define NUMBITS(x) ((x==0) ? 0 : 8*sizeof(x)-__builtin_clz(x))
+#define NEXTPOW2(x) ((x == 1) ? 1 : (1 << (sizeof(uint) * 8 - __builtin_clz(x - 1))))
+#define NUMBITS(x) ((x == 0) ? 0 : 8 * sizeof(x) - __builtin_clz(x))
 
 #ifdef CONFIG_DEBUG
 #define DEBUG(fmt, ...) do { model_print("*** %15s:%-4d %25s() *** " fmt, __FILE__, __LINE__, __func__, ## __VA_ARGS__); } while (0)

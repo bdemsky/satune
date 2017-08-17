@@ -9,8 +9,8 @@ enum FunctionEncodingType {
 typedef enum FunctionEncodingType FunctionEncodingType;
 
 union ElementPredicate {
-	Element * function;
-	Boolean * predicate;
+	Element *function;
+	Boolean *predicate;
 };
 
 typedef union ElementPredicate ElementPredicate;
@@ -23,8 +23,8 @@ struct FunctionEncoding {
 
 void initFunctionEncoding(FunctionEncoding *encoding, Element *function);
 void initPredicateEncoding(FunctionEncoding *encoding, Boolean *predicate);
-void setFunctionEncodingType(FunctionEncoding* encoding, FunctionEncodingType type);
-static inline FunctionEncodingType getFunctionEncodingType(FunctionEncoding* This) {return This->type;}
+void setFunctionEncodingType(FunctionEncoding *encoding, FunctionEncodingType type);
+static inline FunctionEncodingType getFunctionEncodingType(FunctionEncoding *This) {return This->type;}
 void deleteFunctionEncoding(FunctionEncoding *This);
 
 #endif

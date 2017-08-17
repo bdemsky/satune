@@ -62,7 +62,7 @@
 	bool contains ## Name(const HashTable ## Name * tab, _Key key);       \
 	void resize ## Name(HashTable ## Name * tab, unsigned int newsize);   \
 	double getLoadFactor ## Name(HashTable ## Name * tab);                \
-	unsigned int getCapacity ## Name(HashTable ## Name * tab);						\
+	unsigned int getCapacity ## Name(HashTable ## Name * tab);            \
 	void resetAndDeleteHashTable ## Name(HashTable ## Name * tab);
 
 #define HashTableImpl(Name, _Key, _Val, hash_function, equals, freefunction) \
@@ -78,34 +78,34 @@
 		tab->size = 0;                                                      \
 		return tab;                                                         \
 	}                                                                     \
-																																				\
-	void deleteHashTable ## Name(HashTable ## Name * tab) {								\
+                                                                        \
+	void deleteHashTable ## Name(HashTable ## Name * tab) {               \
 		ourfree(tab->table);                                                \
 		if (tab->zero)                                                      \
 			ourfree(tab->zero);                                               \
 		ourfree(tab);                                                       \
 	}                                                                     \
-																																				\
-	void resetAndDeleteHashTable ## Name(HashTable ## Name * tab) {				\
-		for(uint i=0;i<tab->capacity;i++) {																	\
-			struct hashlistnode ## Name * bin=&tab->table[i];									\
-			if (bin->key!=NULL) {																							\
-				bin->key=NULL;																									\
-				if (bin->val!=NULL) {																						\
-					freefunction(bin->val);																				\
-					bin->val=NULL;																								\
-				}																																\
-			}																																	\
-		}																																		\
-		if (tab->zero)	{																										\
-			if (tab->zero->val != NULL)																				\
-				freefunction(tab->zero->val);																		\
-			ourfree(tab->zero);																								\
-			tab->zero=NULL;																										\
-		}																																		\
-		tab->size=0;																												\
-	}																																			\
-																																				\
+                                                                        \
+	void resetAndDeleteHashTable ## Name(HashTable ## Name * tab) {       \
+		for (uint i = 0; i < tab->capacity; i++) {                                 \
+			struct hashlistnode ## Name *bin = &tab->table[i];                 \
+			if (bin->key != NULL) {                                             \
+				bin->key = NULL;                                                  \
+				if (bin->val != NULL) {                                           \
+					freefunction(bin->val);                                       \
+					bin->val = NULL;                                                \
+				}                                                               \
+			}                                                                 \
+		}                                                                   \
+		if (tab->zero)  {                                                   \
+			if (tab->zero->val != NULL)                                       \
+				freefunction(tab->zero->val);                                   \
+			ourfree(tab->zero);                                               \
+			tab->zero = NULL;                                                   \
+		}                                                                   \
+		tab->size = 0;                                                        \
+	}                                                                     \
+                                                                        \
 	void reset ## Name(HashTable ## Name * tab) {                         \
 		memset(tab->table, 0, tab->capacity * sizeof(struct hashlistnode ## Name)); \
 		if (tab->zero) {                                                    \
@@ -116,7 +116,7 @@
 	}                                                                     \
                                                                         \
 	void resetandfree ## Name(HashTable ## Name * tab) {                  \
-		for(unsigned int i=0;i<tab->capacity;i++) {                         \
+		for (unsigned int i = 0; i < tab->capacity; i++) {                         \
 			struct hashlistnode ## Name *bin = &tab->table[i];                \
 			if (bin->key != NULL) {                                           \
 				bin->key = NULL;                                                \
@@ -138,11 +138,11 @@
 	void put ## Name(HashTable ## Name * tab, _Key key, _Val val) {       \
 		if (!key) {                                                         \
 			if (!tab->zero) {                                                 \
-				tab->zero=(struct hashlistnode ## Name *)ourmalloc(sizeof(struct hashlistnode ## Name)); \
+				tab->zero = (struct hashlistnode ## Name *)ourmalloc(sizeof(struct hashlistnode ## Name)); \
 				tab->size++;                                                    \
 			}                                                                 \
-			tab->zero->key=key;                                               \
-			tab->zero->val=val;                                               \
+			tab->zero->key = key;                                               \
+			tab->zero->val = val;                                               \
 			return;                                                           \
 		}                                                                   \
                                                                         \
@@ -181,7 +181,7 @@
 		}                                                                   \
                                                                         \
 		unsigned int oindex = hash_function(key) & tab->capacitymask;       \
-		unsigned int index=oindex;                                          \
+		unsigned int index = oindex;                                          \
 		do {                                                                \
 			search = &tab->table[index];                                      \
 			if (!search->key) {                                               \
@@ -192,7 +192,7 @@
 				return search->val;                                           \
 			index++;                                                          \
 			index &= tab->capacitymask;                                       \
-			if (index==oindex)                                                \
+			if (index == oindex)                                                \
 				break;                                                          \
 		} while (true);                                                     \
 		return (_Val)0;                                                     \
@@ -205,9 +205,9 @@
 			if (!tab->zero) {                                                 \
 				return (_Val)0;                                                 \
 			} else {                                                          \
-				_Val v=tab->zero->val;                                          \
+				_Val v = tab->zero->val;                                          \
 				ourfree(tab->zero);                                             \
-				tab->zero=NULL;                                                 \
+				tab->zero = NULL;                                                 \
 				tab->size--;                                                    \
 				return v;                                                       \
 			}                                                                 \
@@ -222,9 +222,9 @@
 					break;                                                        \
 			} else                                                            \
 			if (equals(search->key, key)) {                                 \
-				_Val v=search->val;                                           \
-				search->val=(_Val) 1;                                         \
-				search->key=0;                                                \
+				_Val v = search->val;                                           \
+				search->val = (_Val) 1;                                         \
+				search->key = 0;                                                \
 				tab->size--;                                                  \
 				return v;                                                     \
 			}                                                               \
@@ -241,7 +241,7 @@
 	bool contains ## Name(const HashTable ## Name * tab, _Key key) {      \
 		struct hashlistnode ## Name *search;                                \
 		if (!key) {                                                         \
-			return tab->zero!=NULL;                                           \
+			return tab->zero != NULL;                                           \
 		}                                                                   \
 		unsigned int index = hash_function(key);                            \
 		do {                                                                \
@@ -276,7 +276,7 @@
                                                                         \
 		struct hashlistnode ## Name *bin = &oldtable[0];                    \
 		struct hashlistnode ## Name *lastbin = &oldtable[oldcapacity];      \
-		for (;bin < lastbin;bin++) {                                        \
+		for (; bin < lastbin; bin++) {                                        \
 			_Key key = bin->key;                                              \
                                                                         \
 			struct hashlistnode ## Name *search;                              \

@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   ordernode.h
  * Author: hamed
  *
@@ -19,16 +19,16 @@ typedef enum NodeStatus NodeStatus;
 
 struct OrderNode {
 	uint64_t id;
-	HashSetOrderEdge* inEdges;
-	HashSetOrderEdge* outEdges;
+	HashSetOrderEdge *inEdges;
+	HashSetOrderEdge *outEdges;
 	NodeStatus status;
 	uint sccNum;
 };
 
-OrderNode* allocOrderNode(uint64_t id);
-void addNewIncomingEdge(OrderNode* node, OrderEdge* edge);
-void addNewOutgoingEdge(OrderNode* node, OrderEdge* edge);
-void deleteOrderNode(OrderNode* node);
+OrderNode *allocOrderNode(uint64_t id);
+void addNewIncomingEdge(OrderNode *node, OrderEdge *edge);
+void addNewOutgoingEdge(OrderNode *node, OrderEdge *edge);
+void deleteOrderNode(OrderNode *node);
 
-#endif /* ORDERNODE_H */
+#endif/* ORDERNODE_H */
 

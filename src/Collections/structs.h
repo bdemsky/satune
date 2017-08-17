@@ -21,14 +21,14 @@ VectorDef(Order, Order *);
 VectorDef(TableEntry, TableEntry *);
 VectorDef(ASTNode, ASTNode *);
 VectorDef(Int, uint64_t);
-VectorDef(OrderNode, OrderNode*);
-VectorDef(OrderGraph, OrderGraph*);
+VectorDef(OrderNode, OrderNode *);
+VectorDef(OrderGraph, OrderGraph *);
 
 HashTableDef(Void, void *, void *);
 HashTableDef(OrderPair, OrderPair *, OrderPair *);
 
 HashSetDef(Void, void *);
-HashSetDef(TableEntry, TableEntry*);
-HashSetDef(OrderNode, OrderNode*);
-HashSetDef(OrderEdge, OrderEdge*);
+HashSetDef(TableEntry, TableEntry *);
+HashSetDef(OrderNode, OrderNode *);
+HashSetDef(OrderEdge, OrderEdge *);
 #endif

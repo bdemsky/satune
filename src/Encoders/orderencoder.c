@@ -7,20 +7,20 @@
 #include "ordernode.h"
 #include "rewriter.h"
 
-OrderGraph* buildOrderGraph(Order *order) {
-	OrderGraph* orderGraph = allocOrderGraph(order);
+OrderGraph *buildOrderGraph(Order *order) {
+	OrderGraph *orderGraph = allocOrderGraph(order);
 	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
-	for(uint j=0; j<constrSize; j++){
+	for (uint j = 0; j < constrSize; j++) {
 		addOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
 	}
 	return orderGraph;
 }
 
-void DFS(OrderGraph* graph, VectorOrderNode* finishNodes) {
-	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
-	while(hasNextOrderNode(iterator)){
-		OrderNode* node = nextOrderNode(iterator);
-		if(node->status == NOTVISITED){
+void DFS(OrderGraph *graph, VectorOrderNode *finishNodes) {
+	HSIteratorOrderNode *iterator = iteratorOrderNode(graph->nodes);
+	while (hasNextOrderNode(iterator)) {
+		OrderNode *node = nextOrderNode(iterator);
+		if (node->status == NOTVISITED) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, 0);
 			node->status = FINISHED;
@@ -30,12 +30,12 @@ void DFS(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	deleteIterOrderNode(iterator);
 }
 
-void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes) {
+void DFSReverse(OrderGraph *graph, VectorOrderNode *finishNodes) {
 	uint size = getSizeVectorOrderNode(finishNodes);
-	uint sccNum=1;
-	for(int i=size-1; i>=0; i--){
-		OrderNode* node = getVectorOrderNode(finishNodes, i);
-		if(node->status == NOTVISITED){
+	uint sccNum = 1;
+	for (int i = size - 1; i >= 0; i--) {
+		OrderNode *node = getVectorOrderNode(finishNodes, i);
+		if (node->status == NOTVISITED) {
 			node->status = VISITED;
 			DFSNodeVisit(node, NULL, true, sccNum);
 			node->sccNum = sccNum;
@@ -45,21 +45,21 @@ void DFSReverse(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	}
 }
 
-void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse, uint sccNum) {
-	HSIteratorOrderEdge* iterator = isReverse?iteratorOrderEdge(node->inEdges):iteratorOrderEdge(node->outEdges);
-	while(hasNextOrderEdge(iterator)){
-		OrderEdge* edge = nextOrderEdge(iterator);
-		if (!edge->polPos && !edge->pseudoPos) //Ignore edges that do not have positive polarity
+void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse, uint sccNum) {
+	HSIteratorOrderEdge *iterator = isReverse ? iteratorOrderEdge(node->inEdges) : iteratorOrderEdge(node->outEdges);
+	while (hasNextOrderEdge(iterator)) {
+		OrderEdge *edge = nextOrderEdge(iterator);
+		if (!edge->polPos && !edge->pseudoPos)//Ignore edges that do not have positive polarity
 			continue;
-		
-		OrderNode* child = isReverse? edge->source: edge->sink;
 
-		if(child->status == NOTVISITED) {
+		OrderNode *child = isReverse ? edge->source : edge->sink;
+
+		if (child->status == NOTVISITED) {
 			child->status = VISITED;
 			DFSNodeVisit(child, finishNodes, isReverse, sccNum);
 			child->status = FINISHED;
-			if(!isReverse)
-				pushVectorOrderNode(finishNodes, child); 
+			if (!isReverse)
+				pushVectorOrderNode(finishNodes, child);
 			else
 				child->sccNum = sccNum;
 		}
@@ -67,17 +67,17 @@ void DFSNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool isReverse,
 	deleteIterOrderEdge(iterator);
 }
 
-void resetNodeInfoStatusSCC(OrderGraph* graph) {
-	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
-	while(hasNextOrderNode(iterator)){
+void resetNodeInfoStatusSCC(OrderGraph *graph) {
+	HSIteratorOrderNode *iterator = iteratorOrderNode(graph->nodes);
+	while (hasNextOrderNode(iterator)) {
 		nextOrderNode(iterator)->status = NOTVISITED;
 	}
 	deleteIterOrderNode(iterator);
 }
 
-void computeStronglyConnectedComponentGraph(OrderGraph* graph) {
+void computeStronglyConnectedComponentGraph(OrderGraph *graph) {
 	VectorOrderNode finishNodes;
-	initDefVectorOrderNode(& finishNodes);
+	initDefVectorOrderNode(&finishNodes);
 	DFS(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
 	DFSReverse(graph, &finishNodes);
@@ -85,32 +85,32 @@ void computeStronglyConnectedComponentGraph(OrderGraph* graph) {
 	deleteVectorArrayOrderNode(&finishNodes);
 }
 
-void removeMustBeTrueNodes(OrderGraph* graph) {
+void removeMustBeTrueNodes(OrderGraph *graph) {
 	//TODO: Nodes that all the incoming/outgoing edges are MUST_BE_TRUE
 }
 
-void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node) {
-	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->inEdges);
-	while(hasNextOrderEdge(iterator)){
-		OrderEdge* inEdge = nextOrderEdge(iterator);
+void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode *node) {
+	HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->inEdges);
+	while (hasNextOrderEdge(iterator)) {
+		OrderEdge *inEdge = nextOrderEdge(iterator);
 		if (inEdge->polNeg) {
-			OrderNode* src = inEdge->source;
-			if (src->status==VISITED) {
+			OrderNode *src = inEdge->source;
+			if (src->status == VISITED) {
 				//Make a pseudoEdge to point backwards
-				OrderEdge * newedge = getOrderEdgeFromOrderGraph(graph, inEdge->sink, inEdge->source);
+				OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, inEdge->sink, inEdge->source);
 				newedge->pseudoPos = true;
 			}
 		}
 	}
 	deleteIterOrderEdge(iterator);
 	iterator = iteratorOrderEdge(node->outEdges);
-	while(hasNextOrderEdge(iterator)){
-		OrderEdge* edge = nextOrderEdge(iterator);
-		if (!edge->polPos) //Ignore edges that do not have positive polarity
+	while (hasNextOrderEdge(iterator)) {
+		OrderEdge *edge = nextOrderEdge(iterator);
+		if (!edge->polPos)//Ignore edges that do not have positive polarity
 			continue;
-		
-		OrderNode* child = edge->sink;
-		if(child->status == NOTVISITED){
+
+		OrderNode *child = edge->sink;
+		if (child->status == NOTVISITED) {
 			child->status = VISITED;
 			DFSPseudoNodeVisit(graph, child);
 			child->status = FINISHED;
@@ -119,16 +119,16 @@ void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode* node) {
 	deleteIterOrderEdge(iterator);
 }
 
-void completePartialOrderGraph(OrderGraph* graph) {
+void completePartialOrderGraph(OrderGraph *graph) {
 	VectorOrderNode finishNodes;
-	initDefVectorOrderNode(& finishNodes);
+	initDefVectorOrderNode(&finishNodes);
 	DFS(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
 
 	uint size = getSizeVectorOrderNode(&finishNodes);
-	for(int i=size-1; i>=0; i--){
-		OrderNode* node = getVectorOrderNode(&finishNodes, i);
-		if(node->status == NOTVISITED){
+	for (int i = size - 1; i >= 0; i--) {
+		OrderNode *node = getVectorOrderNode(&finishNodes, i);
+		if (node->status == NOTVISITED) {
 			node->status = VISITED;
 			DFSPseudoNodeVisit(graph, node);
 			node->status = FINISHED;
@@ -139,11 +139,11 @@ void completePartialOrderGraph(OrderGraph* graph) {
 	deleteVectorArrayOrderNode(&finishNodes);
 }
 
-void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes) {
-	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
-	while(hasNextOrderNode(iterator)){
-		OrderNode* node = nextOrderNode(iterator);
-		if(node->status == NOTVISITED){
+void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes) {
+	HSIteratorOrderNode *iterator = iteratorOrderNode(graph->nodes);
+	while (hasNextOrderNode(iterator)) {
+		OrderNode *node = nextOrderNode(iterator);
+		if (node->status == NOTVISITED) {
 			node->status = VISITED;
 			DFSMustNodeVisit(node, finishNodes, false);
 			node->status = FINISHED;
@@ -153,12 +153,12 @@ void DFSMust(OrderGraph* graph, VectorOrderNode* finishNodes) {
 	deleteIterOrderNode(iterator);
 }
 
-void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool clearBackEdges) {
+void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool clearBackEdges) {
 	//First compute implication of transitive closure on must pos edges
-	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->outEdges);
-	while(hasNextOrderEdge(iterator)){
-		OrderEdge* edge = nextOrderEdge(iterator);
-		OrderNode* parent = edge->source;
+	HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->outEdges);
+	while (hasNextOrderEdge(iterator)) {
+		OrderEdge *edge = nextOrderEdge(iterator);
+		OrderNode *parent = edge->source;
 		if (parent->status == VISITED) {
 			edge->mustPos = true;
 		}
@@ -167,33 +167,33 @@ void DFSMustNodeVisit(OrderNode* node, VectorOrderNode* finishNodes, bool clearB
 
 	//Next compute implication of transitive closure on must neg edges
 	iterator = iteratorOrderEdge(node->outEdges);
-	while(hasNextOrderEdge(iterator)){
-		OrderEdge* edge = nextOrderEdge(iterator);
-		OrderNode* child = edge->sink;
-		
-		if (clearBackEdges && child->status==VISITED) {
+	while (hasNextOrderEdge(iterator)) {
+		OrderEdge *edge = nextOrderEdge(iterator);
+		OrderNode *child = edge->sink;
+
+		if (clearBackEdges && child->status == VISITED) {
 			//We have a backedge, so note that this edge must be negative
 			edge->mustNeg = true;
 		}
 
-		if (!edge->mustPos) //Ignore edges that are not must Positive edges
+		if (!edge->mustPos)	//Ignore edges that are not must Positive edges
 			continue;
 
-		if(child->status == NOTVISITED){
+		if (child->status == NOTVISITED) {
 			child->status = VISITED;
 			DFSMustNodeVisit(child, finishNodes, clearBackEdges);
 			child->status = FINISHED;
-			pushVectorOrderNode(finishNodes, child); 
+			pushVectorOrderNode(finishNodes, child);
 		}
 	}
 	deleteIterOrderEdge(iterator);
 }
 
-void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes) {
-	uint size=getSizeVectorOrderNode(finishNodes);
-	for(int i=size-1; i>=0; i--){
-		OrderNode* node=getVectorOrderNode(finishNodes, i);
-		if(node->status == NOTVISITED){
+void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes) {
+	uint size = getSizeVectorOrderNode(finishNodes);
+	for (int i = size - 1; i >= 0; i--) {
+		OrderNode *node = getVectorOrderNode(finishNodes, i);
+		if (node->status == NOTVISITED) {
 			node->status = VISITED;
 			DFSMustNodeVisit(node, NULL, true);
 			node->status = FINISHED;
@@ -202,13 +202,13 @@ void DFSClearContradictions(OrderGraph* graph, VectorOrderNode* finishNodes) {
 }
 
 /* This function finds edges that would form a cycle with must edges
-	 and forces them to be mustNeg.  It also decides whether an edge
-	 must be true because of transitivity from other must be true
-	 edges. */
+   and forces them to be mustNeg.  It also decides whether an edge
+   must be true because of transitivity from other must be true
+   edges. */
 
 void reachMustAnalysis(OrderGraph *graph) {
 	VectorOrderNode finishNodes;
-	initDefVectorOrderNode(& finishNodes);
+	initDefVectorOrderNode(&finishNodes);
 	//Topologically sort the mustPos edge graph
 	DFSMust(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
@@ -220,16 +220,16 @@ void reachMustAnalysis(OrderGraph *graph) {
 }
 
 /* This function finds edges that must be positive and forces the
-	 inverse edge to be negative (and clears its positive polarity if it
-	 had one). */
+   inverse edge to be negative (and clears its positive polarity if it
+   had one). */
 
 void localMustAnalysisTotal(OrderGraph *graph) {
-	HSIteratorOrderEdge* iterator = iteratorOrderEdge(graph->edges);
-	while(hasNextOrderEdge(iterator)) {
+	HSIteratorOrderEdge *iterator = iteratorOrderEdge(graph->edges);
+	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
-		if (edge -> mustPos) {
-			OrderEdge *invEdge=getInverseOrderEdge(graph, edge);
-			if (invEdge!= NULL && !invEdge -> mustPos && invEdge->polPos) {
+		if (edge->mustPos) {
+			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
+			if (invEdge != NULL && !invEdge->mustPos && invEdge->polPos) {
 				invEdge->polPos = false;
 			}
 			invEdge->mustNeg = true;
@@ -239,20 +239,20 @@ void localMustAnalysisTotal(OrderGraph *graph) {
 }
 
 /** This finds edges that must be positive and forces the inverse edge
-		to be negative.  It also clears the negative flag of this edge.
-		It also finds edges that must be negative and clears the positive
-		polarity. */
+    to be negative.  It also clears the negative flag of this edge.
+    It also finds edges that must be negative and clears the positive
+    polarity. */
 
 void localMustAnalysisPartial(OrderGraph *graph) {
-	HSIteratorOrderEdge* iterator = iteratorOrderEdge(graph->edges);
-	while(hasNextOrderEdge(iterator)) {
+	HSIteratorOrderEdge *iterator = iteratorOrderEdge(graph->edges);
+	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
-		if (edge -> mustPos) {
+		if (edge->mustPos) {
 			if (edge->polNeg && !edge->mustNeg) {
 				edge->polNeg = false;
 			}
-			OrderEdge *invEdge=getInverseOrderEdge(graph, edge);
-			if (invEdge != NULL && !invEdge -> mustPos) {
+			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
+			if (invEdge != NULL && !invEdge->mustPos) {
 				invEdge->polPos = false;
 			}
 			invEdge->mustNeg = true;
@@ -265,12 +265,12 @@ void localMustAnalysisPartial(OrderGraph *graph) {
 }
 
 void decomposeOrder(Order *order, OrderGraph *graph) {
-	uint size=getSizeVectorBooleanOrder(&order->constraints);
-	for(uint i=0;i<size;i++) {
-		BooleanOrder *orderconstraint=getVectorBooleanOrder(&order->constraints, i);
-		OrderNode *from=getOrderNodeFromOrderGraph(graph, orderconstraint->first);
-		OrderNode *to=getOrderNodeFromOrderGraph(graph, orderconstraint->second);
-		OrderEdge* edge=getOrderEdgeFromOrderGraph(graph, from, to);
+	uint size = getSizeVectorBooleanOrder(&order->constraints);
+	for (uint i = 0; i < size; i++) {
+		BooleanOrder *orderconstraint = getVectorBooleanOrder(&order->constraints, i);
+		OrderNode *from = getOrderNodeFromOrderGraph(graph, orderconstraint->first);
+		OrderNode *to = getOrderNodeFromOrderGraph(graph, orderconstraint->second);
+		OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);
 		if (from->sccNum < to->sccNum) {
 			//replace with true
 			replaceBooleanWithTrue((Boolean *)orderconstraint);
@@ -284,12 +284,12 @@ void decomposeOrder(Order *order, OrderGraph *graph) {
 	}
 }
 
-void orderAnalysis(CSolver* This) {
+void orderAnalysis(CSolver *This) {
 	uint size = getSizeVectorOrder(This->allOrders);
-	for(uint i=0; i<size; i++){
-		Order* order = getVectorOrder(This->allOrders, i);
-		OrderGraph* graph = buildOrderGraph(order);
-		if (order->type==PARTIAL) {
+	for (uint i = 0; i < size; i++) {
+		Order *order = getVectorOrder(This->allOrders, i);
+		OrderGraph *graph = buildOrderGraph(order);
+		if (order->type == PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
 			//makes sure we don't incorrectly optimize graphs with negative
 			//polarity edges
@@ -298,9 +298,9 @@ void orderAnalysis(CSolver* This) {
 
 		//This analysis is completely optional
 		reachMustAnalysis(graph);
-		
+
 		//This pair of analysis is also optional
-		if (order->type==PARTIAL) {
+		if (order->type == PARTIAL) {
 			localMustAnalysisPartial(graph);
 		} else {
 			localMustAnalysisTotal(graph);
@@ -313,7 +313,7 @@ void orderAnalysis(CSolver* This) {
 		computeStronglyConnectedComponentGraph(graph);
 
 		decomposeOrder(order, graph);
-			
+
 		deleteOrderGraph(graph);
 	}
 }
