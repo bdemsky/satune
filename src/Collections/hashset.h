@@ -45,6 +45,7 @@
 	HashSet ## Name * copyHashSet ## Name(HashSet ## Name * set);                \
 	void resetHashSet ## Name(HashSet ## Name * set);                         \
 	bool addHashSet ## Name(HashSet ## Name * set,_Key key);                     \
+	void addAllHashSet ## Name(HashSet ## Name * set,HashSet ## Name * other);  \
 	_Key getHashSet ## Name(HashSet ## Name * set,_Key key);                  \
 	_Key getHashSetFirstKey ## Name(HashSet ## Name * set);                      \
 	bool containsHashSet ## Name(HashSet ## Name * set,_Key key);             \
@@ -124,6 +125,13 @@
 		}                                                                   \
 		set->list = set->tail = NULL;                                           \
 		reset ## Name ## Set(set->table);                                   \
+	}                                                                     \
+                                                                        \
+	void addAllHashSet ## Name(HashSet ## Name * set, HashSet ## Name * other) { \
+		HSIterator ## Name * it = iterator ## Name(other);                  \
+		while (hasNext ## Name(it))                                         \
+			addHashSet ## Name(set, next ## Name(it));                        \
+		deleteIter ## Name(it);                                             \
 	}                                                                     \
                                                                         \
 	bool addHashSet ## Name(HashSet ## Name * set,_Key key) {                    \

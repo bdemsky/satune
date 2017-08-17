@@ -77,3 +77,4 @@ HashSetImpl(TableEntry, TableEntry *, table_entry_hash_Function, table_entry_equ
 HashSetImpl(OrderNode, OrderNode *, order_node_hash_Function, order_node_equals);
 HashSetImpl(OrderEdge, OrderEdge *, order_edge_hash_Function, order_edge_equals);
 
+HashTableImpl(NodeToNodeSet, OrderNode *, HashSetOrderNode *, Ptr_hash_function, Ptr_equals, deleteHashSetOrderNode);

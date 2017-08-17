@@ -146,7 +146,7 @@ void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes) {
 		OrderNode *node = nextOrderNode(iterator);
 		if (node->status == NOTVISITED) {
 			node->status = VISITED;
-			DFSMustNodeVisit(node, finishNodes, false);
+			DFSMustNodeVisit(node, finishNodes);
 			node->status = FINISHED;
 			pushVectorOrderNode(finishNodes, node);
 		}
@@ -154,35 +154,18 @@ void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes) {
 	deleteIterOrderNode(iterator);
 }
 
-void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool clearBackEdges) {
-	//First compute implication of transitive closure on must pos edges
+void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes) {
 	HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->outEdges);
 	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
-		OrderNode *parent = edge->source;
-		if (parent->status == VISITED) {
-			edge->mustPos = true;
-		}
-	}
-	deleteIterOrderEdge(iterator);
-
-	//Next compute implication of transitive closure on must neg edges
-	iterator = iteratorOrderEdge(node->outEdges);
-	while (hasNextOrderEdge(iterator)) {
-		OrderEdge *edge = nextOrderEdge(iterator);
 		OrderNode *child = edge->sink;
-
-		if (clearBackEdges && child->status == VISITED) {
-			//We have a backedge, so note that this edge must be negative
-			edge->mustNeg = true;
-		}
 
 		if (!edge->mustPos)	//Ignore edges that are not must Positive edges
 			continue;
 
 		if (child->status == NOTVISITED) {
 			child->status = VISITED;
-			DFSMustNodeVisit(child, finishNodes, clearBackEdges);
+			DFSMustNodeVisit(child, finishNodes);
 			child->status = FINISHED;
 			pushVectorOrderNode(finishNodes, child);
 		}
@@ -190,16 +173,70 @@ void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool clearB
 	deleteIterOrderEdge(iterator);
 }
 
-void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes) {
+
+void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure) {
 	uint size = getSizeVectorOrderNode(finishNodes);
+	HashTableNodeToNodeSet *table = allocHashTableNodeToNodeSet(128, 0.25);
+
 	for (int i = size - 1; i >= 0; i--) {
 		OrderNode *node = getVectorOrderNode(finishNodes, i);
-		if (node->status == NOTVISITED) {
-			node->status = VISITED;
-			DFSMustNodeVisit(node, NULL, true);
-			node->status = FINISHED;
+		HashSetOrderNode *sources = allocHashSetOrderNode(4, 0.25);
+		putNodeToNodeSet(table, node, sources);
+
+		{
+			//Compute source sets
+			HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->inEdges);
+			while (hasNextOrderEdge(iterator)) {
+				OrderEdge *edge = nextOrderEdge(iterator);
+				OrderNode *parent = edge->source;
+				if (edge->mustPos) {
+					addHashSetOrderNode(sources, parent);
+					HashSetOrderNode *parent_srcs = (HashSetOrderNode *)getNodeToNodeSet(table, parent);
+					addAllHashSetOrderNode(sources, parent_srcs);
+				}
+			}
+			deleteIterOrderEdge(iterator);
+		}
+		if (computeTransitiveClosure) {
+			//Compute full transitive closure for nodes
+			HSIteratorOrderNode *srciterator = iteratorOrderNode(sources);
+			while (hasNextOrderNode(srciterator)) {
+				OrderNode *srcnode = nextOrderNode(srciterator);
+				OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, srcnode, node);
+				newedge->mustPos = true;
+				newedge->polPos = true;
+				addHashSetOrderEdge(srcnode->outEdges,newedge);
+				addHashSetOrderEdge(node->inEdges,newedge);
+			}
+			deleteIterOrderNode(srciterator);
+		}
+		{
+			//Use source sets to compute mustPos edges
+			HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->inEdges);
+			while (hasNextOrderEdge(iterator)) {
+				OrderEdge *edge = nextOrderEdge(iterator);
+				OrderNode *parent = edge->source;
+				if (!edge->mustPos && containsHashSetOrderNode(sources, parent)) {
+					edge->mustPos = true;
+				}
+			}
+			deleteIterOrderEdge(iterator);
+		}
+		{
+			//Use source sets to compute mustNeg edges that would introduce cycle if true
+			HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->outEdges);
+			while (hasNextOrderEdge(iterator)) {
+				OrderEdge *edge = nextOrderEdge(iterator);
+				OrderNode *child = edge->sink;
+				if (!edge->mustPos && containsHashSetOrderNode(sources, child)) {
+					edge->mustNeg = true;
+				}
+			}
+			deleteIterOrderEdge(iterator);
 		}
 	}
+
+	resetAndDeleteHashTableNodeToNodeSet(table);
 }
 
 /* This function finds edges that would form a cycle with must edges
@@ -207,7 +244,7 @@ void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes) {
    must be true because of transitivity from other must be true
    edges. */
 
-void reachMustAnalysis(OrderGraph *graph) {
+void reachMustAnalysis(OrderGraph *graph, bool computeTransitiveClosure) {
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(&finishNodes);
 	//Topologically sort the mustPos edge graph
@@ -215,7 +252,7 @@ void reachMustAnalysis(OrderGraph *graph) {
 	resetNodeInfoStatusSCC(graph);
 
 	//Find any backwards edges that complete cycles and force them to be mustNeg
-	DFSClearContradictions(graph, &finishNodes);
+	DFSClearContradictions(graph, &finishNodes, computeTransitiveClosure);
 	deleteVectorArrayOrderNode(&finishNodes);
 	resetNodeInfoStatusSCC(graph);
 }
@@ -282,11 +319,11 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 			replaceBooleanWithFalse((Boolean *)orderconstraint);
 		} else {
 			//Build new order and change constraint's order
-			Order * neworder = NULL;
+			Order *neworder = NULL;
 			if (getSizeVectorOrder(&ordervec) > from->sccNum)
 				neworder = getVectorOrder(&ordervec, from->sccNum);
 			if (neworder == NULL) {
-				Set * set = (Set *) allocMutableSet(order->set->type);
+				Set *set = (Set *) allocMutableSet(order->set->type);
 				neworder = allocOrder(order->type, set);
 				pushVectorOrder(This->allOrders, neworder);
 				setExpandVectorOrder(&ordervec, from->sccNum, neworder);
@@ -319,7 +356,7 @@ void orderAnalysis(CSolver *This) {
 		}
 
 		//This analysis is completely optional
-		reachMustAnalysis(graph);
+		reachMustAnalysis(graph, false);
 
 		//This pair of analysis is also optional
 		if (order->type == PARTIAL) {
