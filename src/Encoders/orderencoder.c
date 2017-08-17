@@ -5,7 +5,7 @@
 #include "ordergraph.h"
 #include "order.h"
 #include "ordernode.h"
-
+#include "rewriter.h"
 
 OrderGraph* buildOrderGraph(Order *order) {
 	OrderGraph* orderGraph = allocOrderGraph(order);
@@ -267,6 +267,20 @@ void localMustAnalysisPartial(OrderGraph *graph) {
 void decomposeOrder(Order *order, OrderGraph *graph) {
 	uint size=getSizeVectorBooleanOrder(&order->constraints);
 	for(uint i=0;i<size;i++) {
+		BooleanOrder *orderconstraint=getVectorBooleanOrder(&order->constraints, i);
+		OrderNode *from=getOrderNodeFromOrderGraph(graph, orderconstraint->first);
+		OrderNode *to=getOrderNodeFromOrderGraph(graph, orderconstraint->second);
+		OrderEdge* edge=getOrderEdgeFromOrderGraph(graph, from, to);
+		if (from->sccNum < to->sccNum) {
+			//replace with true
+			replaceBooleanWithTrue((Boolean *)orderconstraint);
+		} else if (to->sccNum < from->sccNum) {
+			//replace with false
+			replaceBooleanWithFalse((Boolean *)orderconstraint);
+		} else {
+			//Build new order and change constraint's order
+
+		}
 	}
 }
 

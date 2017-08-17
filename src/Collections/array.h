@@ -18,7 +18,13 @@
 		memcpy(tmp->array, array, size * sizeof(type));											\
 		return tmp;                                                         \
 	}                                                                     \
-	static inline type getArray ## name(Array ## name * This, uint index) {			\
+	static inline void removeElementArray ## name(Array ## name * This, uint index) { \
+		This->size--;																												\
+		for(;index<This->size;index++) {																		\
+			This->array[index]=This->array[index+1];													\
+		}																																		\
+	}																																			\
+	static inline type getArray ## name(Array ## name * This, uint index) {	\
 		return This->array[index];																					\
 	}                                                                     \
 	static inline void setArray ## name(Array ## name * This, uint index, type item) {	\
