@@ -41,7 +41,8 @@
 	typedef struct HashSet ## Name HashSet ## Name;                       \
                                                                         \
 	HashSet ## Name * allocHashSet ## Name (unsigned int initialcapacity, double factor); \
-	void deleteHashSet ## Name(struct HashSet ## Name *set);               \
+	HashSet ## Name * allocDefHashSet ## Name ();													\
+	void deleteHashSet ## Name(struct HashSet ## Name *set);							\
 	HashSet ## Name * copyHashSet ## Name(HashSet ## Name * set);                \
 	void resetHashSet ## Name(HashSet ## Name * set);                         \
 	bool addHashSet ## Name(HashSet ## Name * set,_Key key);                     \
@@ -87,7 +88,11 @@
 		_Key k = hsit->last->key;                                             \
 		removeHashSet ## Name(hsit->set, k);                                    \
 	}                                                                     \
-                                                                        \
+																																				\
+	HashSet ## Name * allocDefHashSet ## Name () {												\
+		return allocHashSet ## Name(16, 0.25);														\
+	}																																			\
+																																				\
 	HashSet ## Name * allocHashSet ## Name (unsigned int initialcapacity, double factor) { \
 		HashSet ## Name * set = (HashSet ## Name *)ourmalloc(sizeof(struct HashSet ## Name));  \
 		set->table = allocHashTable ## Name ## Set(initialcapacity, factor);          \

@@ -12,7 +12,7 @@
 
 CSolver *allocCSolver() {
 	CSolver *This = (CSolver *) ourmalloc(sizeof(CSolver));
-	This->constraints = allocDefVectorBoolean();
+	This->constraints = allocDefHashSetBoolean();
 	This->allBooleans = allocDefVectorBoolean();
 	This->allSets = allocDefVectorSet();
 	This->allElements = allocDefVectorElement();
@@ -27,7 +27,7 @@ CSolver *allocCSolver() {
 /** This function tears down the solver and the entire AST */
 
 void deleteSolver(CSolver *This) {
-	deleteVectorBoolean(This->constraints);
+	deleteHashSetBoolean(This->constraints);
 
 	uint size = getSizeVectorBoolean(This->allBooleans);
 	for (uint i = 0; i < size; i++) {
@@ -178,7 +178,7 @@ Boolean *applyLogicalOperation(CSolver *This, LogicOp op, Boolean **array, uint 
 }
 
 void addConstraint(CSolver *This, Boolean *constraint) {
-	pushVectorBoolean(This->constraints, constraint);
+	addHashSetBoolean(This->constraints, constraint);
 }
 
 Order *createOrder(CSolver *This, OrderType type, Set *set) {

@@ -28,15 +28,15 @@ void deleteSATEncoder(SATEncoder *This) {
 }
 
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This) {
-	VectorBoolean *constraints = csolver->constraints;
-	uint size = getSizeVectorBoolean(constraints);
-	for (uint i = 0; i < size; i++) {
+	HSIteratorBoolean *iterator=iteratorBoolean(csolver->constraints);
+	while(hasNextBoolean(iterator)) {
+		Boolean *constraint = nextBoolean(iterator);
 		model_print("Encoding All ...\n\n");
-		Boolean *constraint = getVectorBoolean(constraints, i);
 		Edge c = encodeConstraintSATEncoder(This, constraint);
 		model_print("Returned Constraint in EncodingAll:\n");
 		addConstraintCNF(This->cnf, c);
 	}
+	deleteIterBoolean(iterator);
 }
 
 Edge encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {

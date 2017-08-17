@@ -7,7 +7,7 @@
 struct CSolver {
 	SATEncoder *satEncoder;
 	/** This is a vector of constraints that must be satisfied. */
-	VectorBoolean *constraints;
+	HashSetBoolean *constraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
 	VectorBoolean *allBooleans;
