@@ -25,10 +25,10 @@ void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode *node);
 void completePartialOrderGraph(OrderGraph *graph);
 void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes);
 void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes);
-void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure);
-void reachMustAnalysis(OrderGraph *graph, bool computeTransitiveClosure);
-void localMustAnalysisTotal(OrderGraph *graph);
-void localMustAnalysisPartial(OrderGraph *graph);
+void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure);
+void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiveClosure);
+void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph);
+void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph);
 void orderAnalysis(CSolver *This);
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph);
 

@@ -174,7 +174,7 @@ void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes) {
 }
 
 
-void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure) {
+void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure) {
 	uint size = getSizeVectorOrderNode(finishNodes);
 	HashTableNodeToNodeSet *table = allocHashTableNodeToNodeSet(128, 0.25);
 
@@ -204,6 +204,8 @@ void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, boo
 				OrderNode *srcnode = nextOrderNode(srciterator);
 				OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, srcnode, node);
 				newedge->mustPos = true;
+				if (newedge->mustNeg)
+					solver->unsat = true;
 				newedge->polPos = true;
 				addHashSetOrderEdge(srcnode->outEdges,newedge);
 				addHashSetOrderEdge(node->inEdges,newedge);
@@ -218,6 +220,8 @@ void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, boo
 				OrderNode *parent = edge->source;
 				if (!edge->mustPos && containsHashSetOrderNode(sources, parent)) {
 					edge->mustPos = true;
+					if (edge->mustNeg)
+						solver->unsat = true;
 				}
 			}
 			deleteIterOrderEdge(iterator);
@@ -230,6 +234,8 @@ void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, boo
 				OrderNode *child = edge->sink;
 				if (!edge->mustNeg && containsHashSetOrderNode(sources, child)) {
 					edge->mustNeg = true;
+					if (edge->mustPos)
+						solver->unsat = true;
 				}
 			}
 			deleteIterOrderEdge(iterator);
@@ -244,7 +250,7 @@ void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, boo
    must be true because of transitivity from other must be true
    edges. */
 
-void reachMustAnalysis(OrderGraph *graph, bool computeTransitiveClosure) {
+void reachMustAnalysis(CSolver * solver, OrderGraph *graph, bool computeTransitiveClosure) {
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(&finishNodes);
 	//Topologically sort the mustPos edge graph
@@ -252,7 +258,7 @@ void reachMustAnalysis(OrderGraph *graph, bool computeTransitiveClosure) {
 	resetNodeInfoStatusSCC(graph);
 
 	//Find any backwards edges that complete cycles and force them to be mustNeg
-	DFSClearContradictions(graph, &finishNodes, computeTransitiveClosure);
+	DFSClearContradictions(solver, graph, &finishNodes, computeTransitiveClosure);
 	deleteVectorArrayOrderNode(&finishNodes);
 	resetNodeInfoStatusSCC(graph);
 }
@@ -261,16 +267,20 @@ void reachMustAnalysis(OrderGraph *graph, bool computeTransitiveClosure) {
    inverse edge to be negative (and clears its positive polarity if it
    had one). */
 
-void localMustAnalysisTotal(OrderGraph *graph) {
+void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
 	HSIteratorOrderEdge *iterator = iteratorOrderEdge(graph->edges);
 	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
 		if (edge->mustPos) {
 			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
-			if (invEdge != NULL && !invEdge->mustPos && invEdge->polPos) {
-				invEdge->polPos = false;
+			if (invEdge != NULL) {
+				if (!invEdge->mustPos) {
+					invEdge->polPos = false;
+				} else {
+					solver->unsat = true;
+				}
+				invEdge->mustNeg = true;
 			}
-			invEdge->mustNeg = true;
 		}
 	}
 	deleteIterOrderEdge(iterator);
@@ -281,18 +291,20 @@ void localMustAnalysisTotal(OrderGraph *graph) {
     It also finds edges that must be negative and clears the positive
     polarity. */
 
-void localMustAnalysisPartial(OrderGraph *graph) {
+void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 	HSIteratorOrderEdge *iterator = iteratorOrderEdge(graph->edges);
 	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
 		if (edge->mustPos) {
-			if (edge->polNeg && !edge->mustNeg) {
+			if (!edge->mustNeg) {
 				edge->polNeg = false;
 			}
 			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
 			if (invEdge != NULL) {
 				if (!invEdge->mustPos)
 					invEdge->polPos = false;
+				else
+					solver->unsat = true;
 				invEdge->mustNeg = true;
 			}
 		}
@@ -357,13 +369,13 @@ void orderAnalysis(CSolver *This) {
 		}
 
 		//This analysis is completely optional
-		reachMustAnalysis(graph, false);
+		reachMustAnalysis(This, graph, false);
 
 		//This pair of analysis is also optional
 		if (order->type == PARTIAL) {
-			localMustAnalysisPartial(graph);
+			localMustAnalysisPartial(This, graph);
 		} else {
-			localMustAnalysisTotal(graph);
+			localMustAnalysisTotal(This, graph);
 		}
 
 		//This optimization is completely optional
