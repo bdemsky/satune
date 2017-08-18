@@ -204,9 +204,9 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode 
 				OrderNode *srcnode = nextOrderNode(srciterator);
 				OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, srcnode, node);
 				newedge->mustPos = true;
+				newedge->polPos = true;
 				if (newedge->mustNeg)
 					solver->unsat = true;
-				newedge->polPos = true;
 				addHashSetOrderEdge(srcnode->outEdges,newedge);
 				addHashSetOrderEdge(node->inEdges,newedge);
 			}
@@ -220,6 +220,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode 
 				OrderNode *parent = edge->source;
 				if (!edge->mustPos && containsHashSetOrderNode(sources, parent)) {
 					edge->mustPos = true;
+					edge->polPos = true;
 					if (edge->mustNeg)
 						solver->unsat = true;
 				}
@@ -234,6 +235,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode 
 				OrderNode *child = edge->sink;
 				if (!edge->mustNeg && containsHashSetOrderNode(sources, child)) {
 					edge->mustNeg = true;
+					edge->polNeg = true;
 					if (edge->mustPos)
 						solver->unsat = true;
 				}
@@ -280,6 +282,7 @@ void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
 					solver->unsat = true;
 				}
 				invEdge->mustNeg = true;
+				invEdge->polNeg = true;
 			}
 		}
 	}
@@ -306,6 +309,7 @@ void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 				else
 					solver->unsat = true;
 				invEdge->mustNeg = true;
+				invEdge->polNeg = true;
 			}
 		}
 		if (edge->mustNeg && !edge->mustPos) {
@@ -323,13 +327,16 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		BooleanOrder *orderconstraint = getVectorBooleanOrder(&order->constraints, i);
 		OrderNode *from = getOrderNodeFromOrderGraph(graph, orderconstraint->first);
 		OrderNode *to = getOrderNodeFromOrderGraph(graph, orderconstraint->second);
-		OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);
-		if (from->sccNum < to->sccNum) {
-			//replace with true
-			replaceBooleanWithTrue(This, (Boolean *)orderconstraint);
-		} else if (to->sccNum < from->sccNum) {
-			//replace with false
-			replaceBooleanWithFalse(This, (Boolean *)orderconstraint);
+		if (from->sccNum != to->sccNum) {
+			OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);			
+			if (edge->polPos) {
+				replaceBooleanWithTrue(This, (Boolean *)orderconstraint);
+			} else if (edge->polNeg) {
+				replaceBooleanWithFalse(This, (Boolean *)orderconstraint);
+			} else {
+				//This case should only be possible if constraint isn't in AST
+				ASSERT(0);
+			}
 		} else {
 			//Build new order and change constraint's order
 			Order *neworder = NULL;
