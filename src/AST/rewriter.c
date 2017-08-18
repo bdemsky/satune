@@ -1,7 +1,12 @@
 #include "rewriter.h"
 #include "boolean.h"
+#include "csolver.h"
 
 void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
+	if (containsHashSetBoolean(This->constraints, bexpr)) {
+		removeHashSetBoolean(This->constraints, bexpr);
+	}
+
 	uint size = getSizeVectorBoolean(&bexpr->parents);
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = getVectorBoolean(&bexpr->parents, i);
@@ -27,6 +32,11 @@ void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
 }
 
 void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
+	if (containsHashSetBoolean(This->constraints, oldb)) {
+		removeHashSetBoolean(This->constraints, oldb);
+		addHashSetBoolean(This->constraints, newb);
+	}
+
 	uint size = getSizeVectorBoolean(&oldb->parents);
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = getVectorBoolean(&oldb->parents, i);
@@ -124,6 +134,11 @@ void handleORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
 }
 
 void replaceBooleanWithFalse(CSolver * This, Boolean *bexpr) {
+	if (containsHashSetBoolean(This->constraints, bexpr)) {
+		This->unsat=true;
+		removeHashSetBoolean(This->constraints, bexpr);
+	}
+	
 	uint size = getSizeVectorBoolean(&bexpr->parents);
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = getVectorBoolean(&bexpr->parents, i);

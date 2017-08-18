@@ -12,6 +12,7 @@
 
 CSolver *allocCSolver() {
 	CSolver *This = (CSolver *) ourmalloc(sizeof(CSolver));
+	This->unsat = false;
 	This->constraints = allocDefHashSetBoolean();
 	This->allBooleans = allocDefVectorBoolean();
 	This->allSets = allocDefVectorSet();
