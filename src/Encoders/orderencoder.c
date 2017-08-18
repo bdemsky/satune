@@ -223,12 +223,12 @@ void DFSClearContradictions(OrderGraph *graph, VectorOrderNode *finishNodes, boo
 			deleteIterOrderEdge(iterator);
 		}
 		{
-			//Use source sets to compute mustNeg edges that would introduce cycle if true
+			//Use source sets to compute mustNeg for edges that would introduce cycle if true
 			HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->outEdges);
 			while (hasNextOrderEdge(iterator)) {
 				OrderEdge *edge = nextOrderEdge(iterator);
 				OrderNode *child = edge->sink;
-				if (!edge->mustPos && containsHashSetOrderNode(sources, child)) {
+				if (!edge->mustNeg && containsHashSetOrderNode(sources, child)) {
 					edge->mustNeg = true;
 				}
 			}
@@ -290,10 +290,11 @@ void localMustAnalysisPartial(OrderGraph *graph) {
 				edge->polNeg = false;
 			}
 			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
-			if (invEdge != NULL && !invEdge->mustPos) {
-				invEdge->polPos = false;
+			if (invEdge != NULL) {
+				if (!invEdge->mustPos)
+					invEdge->polPos = false;
+				invEdge->mustNeg = true;
 			}
-			invEdge->mustNeg = true;
 		}
 		if (edge->mustNeg && !edge->mustPos) {
 			edge->polPos = false;
