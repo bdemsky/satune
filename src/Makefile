@@ -4,9 +4,9 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
+C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
 
-HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
+HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard Tuner.*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
@@ -30,6 +30,7 @@ directories: ${OBJ_DIR}
 ${OBJ_DIR}:
 	${MKDIR_P} ${OBJ_DIR}
 	${MKDIR_P} ${OBJ_DIR}/AST
+	${MKDIR_P} ${OBJ_DIR}/Tuner
 	${MKDIR_P} ${OBJ_DIR}/Collections
 	${MKDIR_P} ${OBJ_DIR}/Backend
 	${MKDIR_P} ${OBJ_DIR}/Encoders

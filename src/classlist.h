@@ -94,6 +94,12 @@ typedef struct OrderEdge OrderEdge;
 struct OrderEncoder;
 typedef struct OrderEncoder OrderEncoder;
 
+struct Tuner;
+typedef struct Tuner Tuner;
+struct TunableDesc;
+typedef struct TunableDesc TunableDesc;
+typedef int TunableParam;
+
 typedef unsigned int uint;
 typedef long int int64;
 typedef uint64_t VarType;
