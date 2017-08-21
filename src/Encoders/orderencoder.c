@@ -329,7 +329,9 @@ void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 		if (edge->mustPos) {
 			if (!edge->mustNeg) {
 				edge->polNeg = false;
-			}
+			} else
+				solver->unsat = true;
+
 			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
 			if (invEdge != NULL) {
 				if (!invEdge->mustPos)
