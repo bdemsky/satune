@@ -8,9 +8,9 @@ void deleteTuner(Tuner *This) {
 	ourfree(This);
 }
 
-int getTunable(Tuner This, TunableParam param, TunableDesc * descriptor) {
+int getTunable(Tuner *This, TunableParam param, TunableDesc * descriptor) {
 	return descriptor->defaultValue;
 }
-int getVarTunable(Tuner This, VarType vartype, TunableParam param, TunableDesc * descriptor) {
+int getVarTunable(Tuner *This, VarType vartype, TunableParam param, TunableDesc * descriptor) {
 	return descriptor->defaultValue;
 }

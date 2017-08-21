@@ -57,8 +57,8 @@ void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
 void handleXORTrue(BooleanLogic *bexpr, Boolean *child) {
 	uint size = getSizeArrayBoolean(&bexpr->inputs);
 	Boolean *b = getArrayBoolean(&bexpr->inputs, 0);
-	uint otherindex = (b == child) ? 1 : 0;
-	removeElementArrayBoolean(&bexpr->inputs, otherindex);
+	uint childindex = (b == child) ? 0 : 1;
+	removeElementArrayBoolean(&bexpr->inputs, childindex);
 	bexpr->op = L_NOT;
 }
 
