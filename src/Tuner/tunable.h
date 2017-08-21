@@ -12,6 +12,9 @@ struct TunableDesc {
 	int defaultValue;
 };
 
+Tuner * allocTuner();
+void deleteTuner(Tuner *This);
+
 int getTunable(Tuner This, TunableParam param, TunableDesc * descriptor);
 int getVarTunable(Tuner This, VarType vartype, TunableParam param, TunableDesc * descriptor);
 

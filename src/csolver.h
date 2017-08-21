@@ -7,7 +7,8 @@
 struct CSolver {
 	SATEncoder *satEncoder;
 	bool unsat;
-
+	Tuner *tuner;
+	
 	/** This is a vector of constraints that must be satisfied. */
 	HashSetBoolean *constraints;
 

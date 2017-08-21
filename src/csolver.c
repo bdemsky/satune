@@ -9,6 +9,7 @@
 #include "function.h"
 #include "satencoder.h"
 #include "sattranslator.h"
+#include "tunable.h"
 
 CSolver *allocCSolver() {
 	CSolver *This = (CSolver *) ourmalloc(sizeof(CSolver));
@@ -22,6 +23,7 @@ CSolver *allocCSolver() {
 	This->allOrders = allocDefVectorOrder();
 	This->allFunctions = allocDefVectorFunction();
 	This->satEncoder = allocSATEncoder();
+	This->tuner = allocTuner();
 	return This;
 }
 
@@ -72,6 +74,7 @@ void deleteSolver(CSolver *This) {
 	}
 	deleteVectorFunction(This->allFunctions);
 	deleteSATEncoder(This->satEncoder);
+	deleteTuner(This->tuner);
 	ourfree(This);
 }
 

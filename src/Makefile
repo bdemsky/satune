@@ -6,12 +6,12 @@ OBJ_DIR = bin
 
 C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
 
-HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard Tuner.*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
+HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CFLAGS := -Wall -g -O0
-CFLAGS += -IAST -ICollections -IBackend -I. -IEncoders
+CFLAGS += -IAST -ICollections -IBackend -I. -IEncoders -ITuner
 LDFLAGS := -ldl -lrt -rdynamic
 SHARED := -shared
 
