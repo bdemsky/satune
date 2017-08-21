@@ -59,9 +59,9 @@ void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse,
 			child->status = VISITED;
 			DFSNodeVisit(child, finishNodes, isReverse, sccNum);
 			child->status = FINISHED;
-			if (!isReverse)
+			if (finishNodes != NULL)
 				pushVectorOrderNode(finishNodes, child);
-			else
+			if (isReverse)
 				child->sccNum = sccNum;
 		}
 	}
@@ -90,53 +90,82 @@ void removeMustBeTrueNodes(OrderGraph *graph) {
 	//TODO: Nodes that all the incoming/outgoing edges are MUST_BE_TRUE
 }
 
-void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode *node) {
-	HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->inEdges);
-	while (hasNextOrderEdge(iterator)) {
-		OrderEdge *inEdge = nextOrderEdge(iterator);
-		if (inEdge->polNeg) {
-			OrderNode *src = inEdge->source;
-			if (src->status == VISITED) {
-				//Make a pseudoEdge to point backwards
-				OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, inEdge->sink, inEdge->source);
-				newedge->pseudoPos = true;
-			}
-		}
-	}
-	deleteIterOrderEdge(iterator);
-	iterator = iteratorOrderEdge(node->outEdges);
-	while (hasNextOrderEdge(iterator)) {
-		OrderEdge *edge = nextOrderEdge(iterator);
-		if (!edge->polPos)//Ignore edges that do not have positive polarity
-			continue;
-
-		OrderNode *child = edge->sink;
-		if (child->status == NOTVISITED) {
-			child->status = VISITED;
-			DFSPseudoNodeVisit(graph, child);
-			child->status = FINISHED;
-		}
-	}
-	deleteIterOrderEdge(iterator);
-}
+/** This function computes a source set for every nodes, the set of
+		nodes that can reach that node via pospolarity edges.  It then
+		looks for negative polarity edges from nodes in the the source set
+		to determine whether we need to generate pseudoPos edges. */
 
 void completePartialOrderGraph(OrderGraph *graph) {
 	VectorOrderNode finishNodes;
 	initDefVectorOrderNode(&finishNodes);
 	DFS(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
+	HashTableNodeToNodeSet *table = allocHashTableNodeToNodeSet(128, 0.25);
 
+	VectorOrderNode sccNodes;
+	initDefVectorOrderNode(&sccNodes);
+	
 	uint size = getSizeVectorOrderNode(&finishNodes);
+	uint sccNum = 1;
 	for (int i = size - 1; i >= 0; i--) {
 		OrderNode *node = getVectorOrderNode(&finishNodes, i);
+		HashSetOrderNode *sources = allocHashSetOrderNode(4, 0.25);
+		putNodeToNodeSet(table, node, sources);
+		
 		if (node->status == NOTVISITED) {
+			//Need to do reverse traversal here...
 			node->status = VISITED;
-			DFSPseudoNodeVisit(graph, node);
+			DFSNodeVisit(node, &sccNodes, true, sccNum);
 			node->status = FINISHED;
+			node->sccNum = sccNum;
+			sccNum++;
+			pushVectorOrderNode(&sccNodes, node);
+
+			//Compute in set for entire SCC
+			uint rSize = getSizeVectorOrderNode(&sccNodes);
+			for (int j = 0; j < rSize; j++) {
+				OrderNode *rnode = getVectorOrderNode(&sccNodes, j);
+				//Compute source sets
+				HSIteratorOrderEdge *iterator = iteratorOrderEdge(rnode->inEdges);
+				while (hasNextOrderEdge(iterator)) {
+					OrderEdge *edge = nextOrderEdge(iterator);
+					OrderNode *parent = edge->source;
+					if (edge->polPos) {
+						addHashSetOrderNode(sources, parent);
+						HashSetOrderNode *parent_srcs = (HashSetOrderNode *)getNodeToNodeSet(table, parent);
+						addAllHashSetOrderNode(sources, parent_srcs);
+					}
+				}
+				deleteIterOrderEdge(iterator);
+			}
+			for (int j=0; j < rSize; j++) {
+				//Copy in set of entire SCC
+				OrderNode *rnode = getVectorOrderNode(&sccNodes, j);
+				HashSetOrderNode * set = (j==0) ? sources : copyHashSetOrderNode(sources);
+				putNodeToNodeSet(table, rnode, set);
+
+				//Use source sets to compute pseudoPos edges
+				HSIteratorOrderEdge *iterator = iteratorOrderEdge(rnode->inEdges);
+				while (hasNextOrderEdge(iterator)) {
+					OrderEdge *edge = nextOrderEdge(iterator);
+					OrderNode *parent = edge->source;
+					ASSERT(parent != rnode);
+					if (edge->polNeg && parent->sccNum != rnode->sccNum &&
+							containsHashSetOrderNode(sources, parent)) {
+						OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, rnode, parent);
+						newedge->pseudoPos = true;
+					}
+				}
+				deleteIterOrderEdge(iterator);
+			}
+			
+			clearVectorOrderNode(&sccNodes);
 		}
 	}
 
+	resetAndDeleteHashTableNodeToNodeSet(table);
 	resetNodeInfoStatusSCC(graph);
+	deleteVectorArrayOrderNode(&sccNodes);
 	deleteVectorArrayOrderNode(&finishNodes);
 }
 
@@ -262,7 +291,6 @@ void reachMustAnalysis(CSolver * solver, OrderGraph *graph, bool computeTransiti
 	//Find any backwards edges that complete cycles and force them to be mustNeg
 	DFSClearContradictions(solver, graph, &finishNodes, computeTransitiveClosure);
 	deleteVectorArrayOrderNode(&finishNodes);
-	resetNodeInfoStatusSCC(graph);
 }
 
 /* This function finds edges that must be positive and forces the
