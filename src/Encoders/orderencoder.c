@@ -7,6 +7,7 @@
 #include "ordernode.h"
 #include "rewriter.h"
 #include "mutableset.h"
+#include "tunable.h"
 
 OrderGraph *buildOrderGraph(Order *order) {
 	OrderGraph *orderGraph = allocOrderGraph(order);
@@ -397,6 +398,11 @@ void orderAnalysis(CSolver *This) {
 	uint size = getSizeVectorOrder(This->allOrders);
 	for (uint i = 0; i < size; i++) {
 		Order *order = getVectorOrder(This->allOrders, i);
+		TunableDesc onoff={9, 1, 1};
+		bool doDecompose=GETVARTUNABLE(This->tuner, order->type, DECOMPOSEORDER, &onoff);
+		if (!doDecompose)
+			continue;
+		
 		OrderGraph *graph = buildOrderGraph(order);
 		if (order->type == PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
@@ -405,24 +411,33 @@ void orderAnalysis(CSolver *This) {
 			completePartialOrderGraph(graph);
 		}
 
-		//This analysis is completely optional
-		reachMustAnalysis(This, graph, false);
 
-		//This pair of analysis is also optional
-		if (order->type == PARTIAL) {
-			localMustAnalysisPartial(This, graph);
-		} else {
-			localMustAnalysisTotal(This, graph);
+		bool mustReachGlobal=GETVARTUNABLE(This->tuner, order->type, MUSTREACHGLOBAL, &onoff);
+
+		if (mustReachGlobal)
+			reachMustAnalysis(This, graph, false);
+
+		bool mustReachLocal=GETVARTUNABLE(This->tuner, order->type, MUSTREACHLOCAL, &onoff);
+		
+		if (mustReachLocal) {
+			//This pair of analysis is also optional
+			if (order->type == PARTIAL) {
+				localMustAnalysisPartial(This, graph);
+			} else {
+				localMustAnalysisTotal(This, graph);
+			}
 		}
 
-		//This optimization is completely optional
-		removeMustBeTrueNodes(graph);
-
+		bool mustReachPrune=GETVARTUNABLE(This->tuner, order->type, MUSTREACHPRUNE, &onoff);
+		
+		if (mustReachPrune)
+			removeMustBeTrueNodes(graph);
+		
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
-
+		
 		decomposeOrder(This, order, graph);
-
+		
 		deleteOrderGraph(graph);
 	}
 }
