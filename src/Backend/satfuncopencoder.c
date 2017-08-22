@@ -197,19 +197,6 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 
 Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
-
-	switch (predicate->op) {
-	case EQUALS: {
-		return encodeCircuitEquals(This, constraint);
-	}
-	default:
-		ASSERT(0);
-	}
-	exit(-1);
-}
-
-Edge encodeCircuitEquals(SATEncoder *This, BooleanPredicate *constraint) {
-	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
 	ASSERT(getSizeArraySet(&predicate->domains) == 2);
 	Element *elem0 = getArrayElement( &constraint->inputs, 0);
 	encodeElementSATEncoder(This, elem0);
@@ -219,10 +206,16 @@ Edge encodeCircuitEquals(SATEncoder *This, BooleanPredicate *constraint) {
 	ElementEncoding *ee1 = getElementEncoding(elem1);
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
-	ASSERT(numVars != 0);
-	Edge carray[numVars];
-	for (uint i = 0; i < numVars; i++) {
-		carray[i] = constraintIFF(This->cnf, ee0->variables[i], ee1->variables[i]);
+	switch (predicate->op) {
+		case EQUALS:
+			return generateEquivNVConstraint(This->cnf, numVars, ee0->variables, ee1->variables);
+		case LT:
+			return generateLTConstraint(This->cnf, numVars, ee0->variables, ee1->variables);
+		case GT:
+			return generateLTConstraint(This->cnf, numVars, ee1->variables, ee0->variables);
+		default:
+			ASSERT(0);
 	}
-	return constraintAND(This->cnf, numVars, carray);
+	exit(-1);
 }
+

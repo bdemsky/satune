@@ -5,6 +5,5 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *const
 Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint);
 void encodeOperatorElementFunctionSATEncoder(SATEncoder *encoder,ElementFunction *This);
 Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate *constraint);
-Edge encodeCircuitEquals(SATEncoder *This, BooleanPredicate *constraint);
 
 #endif
