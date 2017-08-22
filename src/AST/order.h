@@ -11,6 +11,7 @@ struct Order {
 	OrderType type;
 	Set *set;
 	HashTableOrderPair *orderPairTable;
+	OrderGraph *graph;
 	VectorBooleanOrder constraints;
 	OrderEncoding order;
 };

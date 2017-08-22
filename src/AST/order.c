@@ -10,6 +10,7 @@ Order *allocOrder(OrderType type, Set *set) {
 	This->type = type;
 	initOrderEncoding(&This->order, This);
 	This->orderPairTable = NULL;
+	This->graph = NULL;
 	return This;
 }
 

@@ -9,15 +9,6 @@
 #include "mutableset.h"
 #include "tunable.h"
 
-OrderGraph *buildOrderGraph(Order *order) {
-	OrderGraph *orderGraph = allocOrderGraph(order);
-	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
-	for (uint j = 0; j < constrSize; j++) {
-		addOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
-	}
-	return orderGraph;
-}
-
 void DFS(OrderGraph *graph, VectorOrderNode *finishNodes) {
 	HSIteratorOrderNode *iterator = iteratorOrderNode(graph->nodes);
 	while (hasNextOrderNode(iterator)) {
@@ -398,7 +389,6 @@ void orderAnalysis(CSolver *This) {
 	uint size = getSizeVectorOrder(This->allOrders);
 	for (uint i = 0; i < size; i++) {
 		Order *order = getVectorOrder(This->allOrders, i);
-		TunableDesc onoff={9, 1, 1};
 		bool doDecompose=GETVARTUNABLE(This->tuner, order->type, DECOMPOSEORDER, &onoff);
 		if (!doDecompose)
 			continue;

@@ -11,7 +11,6 @@
 #include "structs.h"
 #include "mymemory.h"
 
-OrderGraph *buildOrderGraph(Order *order);
 void computeStronglyConnectedComponentGraph(OrderGraph *graph);
 void orderAnalysis(CSolver *solver);
 void initializeNodeInfoSCC(OrderGraph *graph);

@@ -9,13 +9,14 @@
 struct SATEncoder {
 	uint varcount;
 	CNF *cnf;
+	CSolver *solver;
 };
 
 #include "satelemencoder.h"
 #include "satorderencoder.h"
 #include "satfunctableencoder.h"
 
-SATEncoder *allocSATEncoder();
+SATEncoder *allocSATEncoder(CSolver *solver);
 void deleteSATEncoder(SATEncoder *This);
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This);
 Edge getNewVarSATEncoder(SATEncoder *This);

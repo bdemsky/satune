@@ -2,7 +2,7 @@
 #define SATORDERENCODER_H
 
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint);
-Edge getPairConstraint(SATEncoder *This, HashTableOrderPair *table, OrderPair *pair);
+Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair);
 Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint);
 Edge encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint);
 void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order);

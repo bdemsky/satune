@@ -13,6 +13,25 @@ OrderGraph *allocOrderGraph(Order *order) {
 	return This;
 }
 
+OrderGraph *buildOrderGraph(Order *order) {
+	OrderGraph *orderGraph = allocOrderGraph(order);
+	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
+	for (uint j = 0; j < constrSize; j++) {
+		addOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
+	}
+	return orderGraph;
+}
+
+//Builds only the subgraph for the must order graph.
+OrderGraph *buildMustOrderGraph(Order *order) {
+	OrderGraph *orderGraph = allocOrderGraph(order);
+	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
+	for (uint j = 0; j < constrSize; j++) {
+		addMustOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
+	}
+	return orderGraph;
+}
+
 void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
 	Polarity polarity = constr->base.polarity;
 	BooleanValue mustval = constr->base.boolVal;
@@ -53,6 +72,42 @@ void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boolean
 	}
 }
 
+void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
+	BooleanValue mustval = constr->base.boolVal;
+	Order *order = graph->order;
+	switch (mustval) {
+	case BV_UNSAT:
+	case BV_MUSTBETRUE: {
+		OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+		_1to2->mustPos = true;
+		_1to2->polPos = true;
+		addNewOutgoingEdge(node1, _1to2);
+		addNewIncomingEdge(node2, _1to2);
+		if (constr->base.polarity == BV_MUSTBETRUE)
+			break;
+	}
+	case BV_MUSTBEFALSE: {
+		if (order->type == TOTAL) {
+			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph(graph, node2, node1);
+			_2to1->mustPos = true;
+			_2to1->polPos = true;
+			addNewOutgoingEdge(node2, _2to1);
+			addNewIncomingEdge(node1, _2to1);
+		} else {
+			OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+			_1to2->mustNeg = true;
+			_1to2->polNeg = true;
+			addNewOutgoingEdge(node1, _1to2);
+			addNewIncomingEdge(node2, _1to2);
+		}
+		break;
+	}
+	case BV_UNDEFINED:
+		//Do Nothing
+		break;
+	}
+}
+
 OrderNode *getOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
 	OrderNode *node = allocOrderNode(id);
 	OrderNode *tmp = getHashSetOrderNode(graph->nodes, node);
@@ -63,6 +118,12 @@ OrderNode *getOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
 		addHashSetOrderNode(graph->nodes, node);
 	}
 	return node;
+}
+
+OrderNode *lookupOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
+	OrderNode node = {id, NULL, NULL, 0, 0};
+	OrderNode *tmp = getHashSetOrderNode(graph->nodes, &node);
+	return tmp;
 }
 
 OrderEdge *getOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, OrderNode *end) {
@@ -77,6 +138,12 @@ OrderEdge *getOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, Order
 	return edge;
 }
 
+OrderEdge *lookupOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, OrderNode *end) {
+	OrderEdge edge = {begin, end, 0, 0, 0, 0, 0};
+	OrderEdge *tmp = getHashSetOrderEdge(graph->edges, &edge);
+	return tmp;
+}
+
 OrderEdge *getInverseOrderEdge(OrderGraph *graph, OrderEdge *edge) {
 	OrderEdge inverseedge = {edge->sink, edge->source, false, false, false, false, false};
 	OrderEdge *tmp = getHashSetOrderEdge(graph->edges, &inverseedge);
@@ -87,6 +154,12 @@ void addOrderConstraintToOrderGraph(OrderGraph *graph, BooleanOrder *bOrder) {
 	OrderNode *from = getOrderNodeFromOrderGraph(graph, bOrder->first);
 	OrderNode *to = getOrderNodeFromOrderGraph(graph, bOrder->second);
 	addOrderEdge(graph, from, to, bOrder);
+}
+
+void addMustOrderConstraintToOrderGraph(OrderGraph *graph, BooleanOrder *bOrder) {
+	OrderNode *from = getOrderNodeFromOrderGraph(graph, bOrder->first);
+	OrderNode *to = getOrderNodeFromOrderGraph(graph, bOrder->second);
+	addMustOrderEdge(graph, from, to, bOrder);
 }
 
 void deleteOrderGraph(OrderGraph *graph) {
