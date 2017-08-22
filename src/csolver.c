@@ -10,6 +10,8 @@
 #include "satencoder.h"
 #include "sattranslator.h"
 #include "tunable.h"
+#include "orderencoder.h"
+#include "polarityassignment.h"
 
 CSolver *allocCSolver() {
 	CSolver *This = (CSolver *) ourmalloc(sizeof(CSolver));
@@ -200,6 +202,8 @@ Boolean *orderConstraint(CSolver *This, Order *order, uint64_t first, uint64_t s
 int startEncoding(CSolver *This) {
 	naiveEncodingDecision(This);
 	SATEncoder *satEncoder = This->satEncoder;
+	computePolarities(This);
+	orderAnalysis(This);
 	encodeAllSATEncoder(This, satEncoder);
 	int result = solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
