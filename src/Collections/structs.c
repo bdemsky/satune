@@ -20,11 +20,11 @@ VectorImpl(Int, uint64_t, 4);
 VectorImpl(OrderNode, OrderNode *, 4);
 VectorImpl(OrderGraph, OrderGraph *, 4);
 
-inline unsigned int Ptr_hash_function(void *hash) {
+static inline unsigned int Ptr_hash_function(void *hash) {
 	return (unsigned int)((int64)hash >> 4);
 }
 
-inline bool Ptr_equals(void *key1, void *key2) {
+static inline bool Ptr_equals(void *key1, void *key2) {
 	return key1 == key2;
 }
 

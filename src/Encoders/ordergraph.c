@@ -8,6 +8,7 @@
 OrderGraph *allocOrderGraph(Order *order) {
 	OrderGraph *This = (OrderGraph *) ourmalloc(sizeof(OrderGraph));
 	This->nodes = allocHashSetOrderNode(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	This->edges = allocHashSetOrderEdge(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 	This->order = order;
 	return This;
 }
