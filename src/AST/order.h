@@ -11,6 +11,7 @@ struct Order {
 	OrderType type;
 	Set *set;
 	HashTableOrderPair *orderPairTable;
+	HashSetOrderElement* elementTable;
 	OrderGraph *graph;
 	VectorBooleanOrder constraints;
 	OrderEncoding order;
@@ -18,6 +19,7 @@ struct Order {
 
 Order *allocOrder(OrderType type, Set *set);
 void initializeOrderHashTable(Order *This);
+void initializeOrderElementsHashTable(Order *This);
 void addOrderConstraint(Order *This, BooleanOrder *constraint);
 void setOrderEncodingType(Order *This, OrderEncodingType type);
 void deleteOrder(Order *This);

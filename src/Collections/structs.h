@@ -31,6 +31,7 @@ HashSetDef(Boolean, Boolean *);
 HashSetDef(TableEntry, TableEntry *);
 HashSetDef(OrderNode, OrderNode *);
 HashSetDef(OrderEdge, OrderEdge *);
+HashSetDef(OrderElement, OrderElement *);
 
 HashTableDef(NodeToNodeSet, OrderNode *, HashSetOrderNode *);
 #endif

@@ -3,7 +3,7 @@
 #include "classlist.h"
 
 enum OrderEncodingType {
-	ORDER_UNASSIGNED, PAIRWISE
+	ORDER_UNASSIGNED, PAIRWISE, INTEGERENCODING
 };
 
 typedef enum OrderEncodingType OrderEncodingType;

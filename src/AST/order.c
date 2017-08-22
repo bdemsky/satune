@@ -11,12 +11,17 @@ Order *allocOrder(OrderType type, Set *set) {
 	This->type = type;
 	initOrderEncoding(&This->order, This);
 	This->orderPairTable = NULL;
+	This->elementTable = NULL;
 	This->graph = NULL;
 	return This;
 }
 
 void initializeOrderHashTable(Order *This) {
 	This->orderPairTable = allocHashTableOrderPair(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+}
+
+void initializeOrderElementsHashTable(Order *This){
+	This->elementTable = allocHashSetOrderElement(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
 void addOrderConstraint(Order *This, BooleanOrder *constraint) {
@@ -33,6 +38,9 @@ void deleteOrder(Order *This) {
 	if (This->orderPairTable != NULL) {
 		resetAndDeleteHashTableOrderPair(This->orderPairTable);
 		deleteHashTableOrderPair(This->orderPairTable);
+	}
+	if(This->elementTable != NULL){
+		deleteHashSetOrderElement(This->elementTable);
 	}
 	if (This->graph != NULL) {
 		deleteOrderGraph(This->graph);

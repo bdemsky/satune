@@ -5,6 +5,7 @@
 #include "ordernode.h"
 #include "orderedge.h"
 #include "ordergraph.h"
+#include "orderelement.h"
 
 VectorImpl(Table, Table *, 4);
 VectorImpl(Set, Set *, 4);
@@ -71,11 +72,20 @@ static inline bool order_edge_equals(OrderEdge *key1, OrderEdge *key2) {
 	return key1->sink == key2->sink && key1->source == key2->source;
 }
 
-HashTableImpl(OrderPair, OrderPair *, OrderPair *, order_pair_hash_function, order_pair_equals, ourfree);
+static inline unsigned int order_element_hash_function(OrderElement* This) {
+	return (uint)This->item;
+}
+
+static inline bool order_element_equals(OrderElement* key1, OrderElement* key2) {
+	return key1->item == key2->item;
+}
+
 
 HashSetImpl(Boolean, Boolean *, Ptr_hash_function, Ptr_equals);
 HashSetImpl(TableEntry, TableEntry *, table_entry_hash_function, table_entry_equals);
 HashSetImpl(OrderNode, OrderNode *, order_node_hash_function, order_node_equals);
 HashSetImpl(OrderEdge, OrderEdge *, order_edge_hash_function, order_edge_equals);
+HashSetImpl(OrderElement, OrderElement *, order_element_hash_function, order_element_equals);
 
 HashTableImpl(NodeToNodeSet, OrderNode *, HashSetOrderNode *, Ptr_hash_function, Ptr_equals, deleteHashSetOrderNode);
+HashTableImpl(OrderPair, OrderPair *, OrderPair *, order_pair_hash_function, order_pair_equals, ourfree);

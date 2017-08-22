@@ -70,6 +70,9 @@ typedef struct Order Order;
 struct OrderPair;
 typedef struct OrderPair OrderPair;
 
+struct OrderElement;
+typedef struct OrderElement OrderElement;
+
 struct ElementEncoding;
 typedef struct ElementEncoding ElementEncoding;
 
