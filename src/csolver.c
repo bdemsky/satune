@@ -24,8 +24,8 @@ CSolver *allocCSolver() {
 	This->allTables = allocDefVectorTable();
 	This->allOrders = allocDefVectorOrder();
 	This->allFunctions = allocDefVectorFunction();
-	This->satEncoder = allocSATEncoder();
 	This->tuner = allocTuner();
+	This->satEncoder = allocSATEncoder(This);
 	return This;
 }
 

@@ -2,8 +2,13 @@
 #include "structs.h"
 #include "common.h"
 #include "order.h"
+#include "csolver.h"
 #include "orderpair.h"
 #include "set.h"
+#include "tunable.h"
+#include "orderencoder.h"
+#include "ordergraph.h"
+#include "orderedge.h"
 
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
 	switch ( constraint->order->type) {
@@ -17,7 +22,29 @@ Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
 	return E_BOGUS;
 }
 
-Edge getPairConstraint(SATEncoder *This, HashTableOrderPair *table, OrderPair *pair) {
+Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
+	if (order->graph != NULL) {
+		OrderGraph *graph=order->graph;
+		OrderNode *first=lookupOrderNodeFromOrderGraph(graph, pair->first);
+		OrderNode *second=lookupOrderNodeFromOrderGraph(graph, pair->second);
+		if ((first != NULL) && (second != NULL)) {
+			OrderEdge *edge=lookupOrderEdgeFromOrderGraph(graph, first, second);
+			if (edge != NULL) {
+				if (edge->mustPos)
+					return E_True;
+				else if (edge->mustNeg)
+					return E_False;
+			}
+			OrderEdge *invedge=getOrderEdgeFromOrderGraph(graph, second, first);
+			if (invedge != NULL) {
+				if (invedge->mustPos)
+					return E_False;
+				else if (invedge->mustNeg)
+					return E_True;
+			}
+		}
+	}
+	HashTableOrderPair *table = order->orderPairTable;
 	bool negate = false;
 	OrderPair flipped;
 	if (pair->first < pair->second) {
@@ -41,11 +68,15 @@ Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
 		initializeOrderHashTable(boolOrder->order);
+		bool doOptOrderStructure=GETVARTUNABLE(This->solver->tuner, boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
+		if (doOptOrderStructure) {
+			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
+			reachMustAnalysis(This->solver, boolOrder->order->graph, true);
+		}
 		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
 	}
-	HashTableOrderPair *orderPairTable = boolOrder->order->orderPairTable;
 	OrderPair pair = {boolOrder->first, boolOrder->second, E_NULL};
-	Edge constraint = getPairConstraint(This, orderPairTable, &pair);
+	Edge constraint = getPairConstraint(This, boolOrder->order, &pair);
 	return constraint;
 }
 
@@ -56,20 +87,19 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order) {
 #endif
 	ASSERT(order->type == TOTAL);
 	VectorInt *mems = order->set->members;
-	HashTableOrderPair *table = order->orderPairTable;
 	uint size = getSizeVectorInt(mems);
 	for (uint i = 0; i < size; i++) {
 		uint64_t valueI = getVectorInt(mems, i);
 		for (uint j = i + 1; j < size; j++) {
 			uint64_t valueJ = getVectorInt(mems, j);
 			OrderPair pairIJ = {valueI, valueJ};
-			Edge constIJ = getPairConstraint(This, table, &pairIJ);
+			Edge constIJ = getPairConstraint(This, order, &pairIJ);
 			for (uint k = j + 1; k < size; k++) {
 				uint64_t valueK = getVectorInt(mems, k);
 				OrderPair pairJK = {valueJ, valueK};
 				OrderPair pairIK = {valueI, valueK};
-				Edge constIK = getPairConstraint(This, table, &pairIK);
-				Edge constJK = getPairConstraint(This, table, &pairJK);
+				Edge constIK = getPairConstraint(This, order, &pairIK);
+				Edge constJK = getPairConstraint(This, order, &pairJK);
 				addConstraintCNF(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK));
 			}
 		}

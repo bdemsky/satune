@@ -103,9 +103,9 @@
 			ourfree(tab->zero);                                               \
 			tab->zero = NULL;                                                   \
 		}                                                                   \
-		tab->size = 0;                                                        \
-	}                                                                     \
-                                                                        \
+		tab->size = 0;																											\
+	}																																			\
+																																				\
 	void reset ## Name(HashTable ## Name * tab) {                         \
 		memset(tab->table, 0, tab->capacity * sizeof(struct hashlistnode ## Name)); \
 		if (tab->zero) {                                                    \

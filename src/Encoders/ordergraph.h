@@ -18,10 +18,16 @@ struct OrderGraph {
 };
 
 OrderGraph *allocOrderGraph(Order *order);
+OrderGraph *buildOrderGraph(Order *order);
+OrderGraph *buildMustOrderGraph(Order *order);
 void addOrderConstraintToOrderGraph(OrderGraph *graph, BooleanOrder *bOrder);
+void addMustOrderConstraintToOrderGraph(OrderGraph *graph, BooleanOrder *bOrder);
 OrderNode *getOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id);
 OrderEdge *getOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, OrderNode *end);
+OrderNode *lookupOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id);
+OrderEdge *lookupOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, OrderNode *end);
 void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
+void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 void deleteOrderGraph(OrderGraph *graph);
 OrderEdge *getInverseOrderEdge(OrderGraph *graph, OrderEdge *edge);
 #endif/* ORDERGRAPH_H */

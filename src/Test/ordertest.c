@@ -16,12 +16,7 @@ int main(int numargs, char **argv) {
 	addConstraint(solver, b1);
 	addConstraint(solver, b2);
 	if (startEncoding(solver) == 1)
-		printf("O(5,1)=%d O(1,4)=%d O(5,4)=%d O(1,5)=%d O(1111,5)=%d\n",
-					 getOrderConstraintValue(solver, order, 5, 1),
-					 getOrderConstraintValue(solver, order, 1, 4),
-					 getOrderConstraintValue(solver, order, 5, 4),
-					 getOrderConstraintValue(solver, order, 1, 5),
-					 getOrderConstraintValue(solver, order, 1111, 5));
+		printf("SAT\n");
 	else
 		printf("UNSAT\n");
 	deleteSolver(solver);
