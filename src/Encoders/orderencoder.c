@@ -357,6 +357,7 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		BooleanOrder *orderconstraint = getVectorBooleanOrder(&order->constraints, i);
 		OrderNode *from = getOrderNodeFromOrderGraph(graph, orderconstraint->first);
 		OrderNode *to = getOrderNodeFromOrderGraph(graph, orderconstraint->second);
+		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
 		if (from->sccNum != to->sccNum) {
 			OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);			
 			if (edge->polPos) {
@@ -389,6 +390,11 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 			orderconstraint->order = neworder;
 			addOrderConstraint(neworder, orderconstraint);
 		}
+	}
+	for(uint i=0; i<getSizeVectorOrder(&ordervec); i++){
+		Order* order = getVectorOrder(&ordervec, i);
+		if(order!=NULL)
+			model_print("i=%u\t", i);
 	}
 	deleteVectorArrayOrder(&ordervec);
 }
