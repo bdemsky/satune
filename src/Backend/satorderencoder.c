@@ -35,7 +35,7 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 				else if (edge->mustNeg)
 					return E_False;
 			}
-			OrderEdge *invedge=getOrderEdgeFromOrderGraph(graph, first, second);
+			OrderEdge *invedge=getOrderEdgeFromOrderGraph(graph, second, first);
 			if (invedge != NULL) {
 				if (invedge->mustPos)
 					return E_False;
