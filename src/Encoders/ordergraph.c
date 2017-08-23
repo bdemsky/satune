@@ -83,7 +83,7 @@ void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boo
 		_1to2->polPos = true;
 		addNewOutgoingEdge(node1, _1to2);
 		addNewIncomingEdge(node2, _1to2);
-		if (constr->base.polarity == BV_MUSTBETRUE)
+		if (constr->base.boolVal == BV_MUSTBETRUE)
 			break;
 	}
 	case BV_MUSTBEFALSE: {
@@ -176,5 +176,7 @@ void deleteOrderGraph(OrderGraph *graph) {
 		deleteOrderEdge(edge);
 	}
 	deleteIterOrderEdge(eiterator);
+	deleteHashSetOrderNode(graph->nodes);
+	deleteHashSetOrderEdge(graph->edges);
 	ourfree(graph);
 }

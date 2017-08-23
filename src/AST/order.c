@@ -2,6 +2,7 @@
 #include "structs.h"
 #include "set.h"
 #include "boolean.h"
+#include "ordergraph.h"
 
 Order *allocOrder(OrderType type, Set *set) {
 	Order *This = (Order *)ourmalloc(sizeof(Order));
@@ -32,6 +33,9 @@ void deleteOrder(Order *This) {
 	if (This->orderPairTable != NULL) {
 		resetAndDeleteHashTableOrderPair(This->orderPairTable);
 		deleteHashTableOrderPair(This->orderPairTable);
+	}
+	if (This->graph != NULL) {
+		deleteOrderGraph(This->graph);
 	}
 	ourfree(This);
 }

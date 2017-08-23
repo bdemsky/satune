@@ -160,6 +160,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 	}
 
 	resetAndDeleteHashTableNodeToNodeSet(table);
+	deleteHashTableNodeToNodeSet(table);
 	resetNodeInfoStatusSCC(graph);
 	deleteVectorArrayOrderNode(&sccNodes);
 	deleteVectorArrayOrderNode(&finishNodes);
@@ -250,6 +251,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode 
 	}
 
 	resetAndDeleteHashTableNodeToNodeSet(table);
+	deleteHashTableNodeToNodeSet(table);
 }
 
 /* This function finds edges that would form a cycle with must edges
