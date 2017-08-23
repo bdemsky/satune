@@ -15,7 +15,7 @@ void DFS(OrderGraph *graph, VectorOrderNode *finishNodes) {
 		OrderNode *node = nextOrderNode(iterator);
 		if (node->status == NOTVISITED) {
 			node->status = VISITED;
-			DFSNodeVisit(node, finishNodes, false, 0);
+			DFSNodeVisit(node, finishNodes, false, false, 0);
 			node->status = FINISHED;
 			pushVectorOrderNode(finishNodes, node);
 		}
@@ -30,7 +30,7 @@ void DFSReverse(OrderGraph *graph, VectorOrderNode *finishNodes) {
 		OrderNode *node = getVectorOrderNode(finishNodes, i);
 		if (node->status == NOTVISITED) {
 			node->status = VISITED;
-			DFSNodeVisit(node, NULL, true, sccNum);
+			DFSNodeVisit(node, NULL, true, false, sccNum);
 			node->sccNum = sccNum;
 			node->status = FINISHED;
 			sccNum++;
@@ -38,18 +38,22 @@ void DFSReverse(OrderGraph *graph, VectorOrderNode *finishNodes) {
 	}
 }
 
-void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse, uint sccNum) {
+void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse, bool mustvisit, uint sccNum) {
 	HSIteratorOrderEdge *iterator = isReverse ? iteratorOrderEdge(node->inEdges) : iteratorOrderEdge(node->outEdges);
 	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
-		if (!edge->polPos && !edge->pseudoPos)//Ignore edges that do not have positive polarity
-			continue;
+		if (mustvisit) {
+			if (!edge->mustPos)
+				continue;
+		} else
+			if (!edge->polPos && !edge->pseudoPos)//Ignore edges that do not have positive polarity
+				continue;
 
 		OrderNode *child = isReverse ? edge->source : edge->sink;
 
 		if (child->status == NOTVISITED) {
 			child->status = VISITED;
-			DFSNodeVisit(child, finishNodes, isReverse, sccNum);
+			DFSNodeVisit(child, finishNodes, isReverse, mustvisit, sccNum);
 			child->status = FINISHED;
 			if (finishNodes != NULL)
 				pushVectorOrderNode(finishNodes, child);
@@ -107,7 +111,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 		if (node->status == NOTVISITED) {
 			//Need to do reverse traversal here...
 			node->status = VISITED;
-			DFSNodeVisit(node, &sccNodes, true, sccNum);
+			DFSNodeVisit(node, &sccNodes, true, false, sccNum);
 			node->status = FINISHED;
 			node->sccNum = sccNum;
 			sccNum++;
@@ -167,33 +171,13 @@ void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes) {
 		OrderNode *node = nextOrderNode(iterator);
 		if (node->status == NOTVISITED) {
 			node->status = VISITED;
-			DFSMustNodeVisit(node, finishNodes);
+			DFSNodeVisit(node, finishNodes, false, true, 0);
 			node->status = FINISHED;
 			pushVectorOrderNode(finishNodes, node);
 		}
 	}
 	deleteIterOrderNode(iterator);
 }
-
-void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes) {
-	HSIteratorOrderEdge *iterator = iteratorOrderEdge(node->outEdges);
-	while (hasNextOrderEdge(iterator)) {
-		OrderEdge *edge = nextOrderEdge(iterator);
-		OrderNode *child = edge->sink;
-
-		if (!edge->mustPos)	//Ignore edges that are not must Positive edges
-			continue;
-
-		if (child->status == NOTVISITED) {
-			child->status = VISITED;
-			DFSMustNodeVisit(child, finishNodes);
-			child->status = FINISHED;
-			pushVectorOrderNode(finishNodes, child);
-		}
-	}
-	deleteIterOrderEdge(iterator);
-}
-
 
 void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure) {
 	uint size = getSizeVectorOrderNode(finishNodes);

@@ -14,16 +14,14 @@
 void computeStronglyConnectedComponentGraph(OrderGraph *graph);
 void orderAnalysis(CSolver *solver);
 void initializeNodeInfoSCC(OrderGraph *graph);
-void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse, uint sccNum);
+void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse, bool mustvisit, uint sccNum);
 void DFS(OrderGraph *graph, VectorOrderNode *finishNodes);
 void DFSReverse(OrderGraph *graph, VectorOrderNode *finishNodes);
 void completePartialOrderGraph(OrderGraph *graph);
 void resetNodeInfoStatusSCC(OrderGraph *graph);
 void removeMustBeTrueNodes(OrderGraph *graph);
-void DFSPseudoNodeVisit(OrderGraph *graph, OrderNode *node);
 void completePartialOrderGraph(OrderGraph *graph);
 void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes);
-void DFSMustNodeVisit(OrderNode *node, VectorOrderNode *finishNodes);
 void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure);
 void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiveClosure);
 void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph);
