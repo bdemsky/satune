@@ -327,7 +327,9 @@ void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 	VectorOrder ordervec;
+	VectorOrder partialcandidatevec;
 	initDefVectorOrder(&ordervec);
+	initDefVectorOrder(&partialcandidatevec);
 	uint size = getSizeVectorBooleanOrder(&order->constraints);
 	for (uint i = 0; i < size; i++) {
 		BooleanOrder *orderconstraint = getVectorBooleanOrder(&order->constraints, i);
@@ -353,6 +355,10 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 				neworder = allocOrder(order->type, set);
 				pushVectorOrder(This->allOrders, neworder);
 				setExpandVectorOrder(&ordervec, from->sccNum, neworder);
+				if (order->type == PARTIAL)
+					setExpandVectorOrder(&partialcandidatevec, from->sccNum, neworder);
+				else
+					setExpandVectorOrder(&partialcandidatevec, from->sccNum, NULL);
 			}
 			if (from->status != ADDEDTOSET) {
 				from->status = ADDEDTOSET;
@@ -362,11 +368,25 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 				to->status = ADDEDTOSET;
 				addElementMSet((MutableSet *)neworder->set, to->id);
 			}
+			if (order->type == PARTIAL) {
+				OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);
+				if (edge->polNeg)
+					setExpandVectorOrder(&partialcandidatevec, from->sccNum, NULL);
+			}
 			orderconstraint->order = neworder;
 			addOrderConstraint(neworder, orderconstraint);
 		}
 	}
+
+	uint pcvsize=getSizeVectorOrder(&partialcandidatevec);
+	for(uint i=0;i<pcvsize;i++) {
+		Order * neworder=getVectorOrder(&partialcandidatevec, i);
+		if (neworder != NULL)
+			neworder->type = TOTAL;
+	}
+	
 	deleteVectorArrayOrder(&ordervec);
+	deleteVectorArrayOrder(&partialcandidatevec);
 }
 
 void orderAnalysis(CSolver *This) {
