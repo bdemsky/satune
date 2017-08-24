@@ -13,11 +13,11 @@ void computePolarities(CSolver *This) {
 }
 
 void updatePolarity(Boolean *This, Polarity polarity) {
-	This->polarity |= polarity;
+	This->polarity = (Polarity) (This->polarity | polarity);
 }
 
 void updateMustValue(Boolean *This, BooleanValue value) {
-	This->boolVal |= value;
+	This->boolVal = (BooleanValue) (This->boolVal | value);
 }
 
 void computePolarityAndBooleanValue(Boolean *This) {

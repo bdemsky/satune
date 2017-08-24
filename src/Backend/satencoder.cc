@@ -16,7 +16,7 @@
 //TODO: Should handle sharing of AST Nodes without recoding them a second time
 
 SATEncoder *allocSATEncoder(CSolver *solver) {
-	SATEncoder *This = ourmalloc(sizeof (SATEncoder));
+	SATEncoder *This = (SATEncoder *)ourmalloc(sizeof (SATEncoder));
 	This->solver = solver;
 	This->varcount = 1;
 	This->cnf = createCNF();

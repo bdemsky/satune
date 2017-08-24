@@ -1,7 +1,7 @@
 #include "tunable.h"
 
 Tuner * allocTuner() {
-	return ourmalloc(sizeof(Tuner));
+	return (Tuner *) ourmalloc(sizeof(Tuner));
 }
 
 void deleteTuner(Tuner *This) {

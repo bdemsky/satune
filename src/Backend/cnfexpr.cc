@@ -43,7 +43,7 @@ VectorImpl(LitVector, LitVector *, 4)
 static inline uint boundedSize(uint x) { return (x > MERGESIZE) ? MERGESIZE : x; }
 
 LitVector *allocLitVector() {
-	LitVector *This = ourmalloc(sizeof(LitVector));
+	LitVector *This = (LitVector *)ourmalloc(sizeof(LitVector));
 	initLitVector(This);
 	return This;
 }
@@ -51,14 +51,14 @@ LitVector *allocLitVector() {
 void initLitVector(LitVector *This) {
 	This->size = 0;
 	This->capacity = LITCAPACITY;
-	This->literals = ourmalloc(This->capacity * sizeof(Literal));
+	This->literals = (Literal *)ourmalloc(This->capacity * sizeof(Literal));
 }
 
 LitVector *cloneLitVector(LitVector *orig) {
-	LitVector *This = ourmalloc(sizeof(LitVector));
+	LitVector *This = (LitVector *)ourmalloc(sizeof(LitVector));
 	This->size = orig->size;
 	This->capacity = orig->capacity;
-	This->literals = ourmalloc(This->capacity * sizeof(Literal));
+	This->literals = (Literal *)ourmalloc(This->capacity * sizeof(Literal));
 	memcpy(This->literals, orig->literals, sizeof(Literal) * This->size);
 	return This;
 }
@@ -102,7 +102,7 @@ void addLiteralLitVector(LitVector *This, Literal l) {
 	}
 	if ((++This->size) >= This->capacity) {
 		This->capacity <<= 1;
-		This->literals = ourrealloc(This->literals, This->capacity * sizeof(Literal));
+		This->literals = (Literal *) ourrealloc(This->literals, This->capacity * sizeof(Literal));
 	}
 
 	if (vec_size < MERGESIZE) {
@@ -114,7 +114,7 @@ void addLiteralLitVector(LitVector *This, Literal l) {
 }
 
 CNFExpr *allocCNFExprBool(bool isTrue) {
-	CNFExpr *This = ourmalloc(sizeof(CNFExpr));
+	CNFExpr *This = (CNFExpr *)ourmalloc(sizeof(CNFExpr));
 	This->litSize = 0;
 	This->isTrue = isTrue;
 	initVectorLitVector(&This->clauses, 2);
@@ -123,7 +123,7 @@ CNFExpr *allocCNFExprBool(bool isTrue) {
 }
 
 CNFExpr *allocCNFExprLiteral(Literal l) {
-	CNFExpr *This = ourmalloc(sizeof(CNFExpr));
+	CNFExpr *This = (CNFExpr *)ourmalloc(sizeof(CNFExpr));
 	This->litSize = 1;
 	This->isTrue = false;
 	initVectorLitVector(&This->clauses, 2);
@@ -290,8 +290,8 @@ void disjoinCNFLit(CNFExpr *This, Literal l) {
 #define MERGETHRESHOLD 2
 LitVector *mergeLitVectors(LitVector *This, LitVector *expr) {
 	uint maxsize = This->size + expr->size + MERGETHRESHOLD;
-	LitVector *merged = ourmalloc(sizeof(LitVector));
-	merged->literals = ourmalloc(sizeof(Literal) * maxsize);
+	LitVector *merged = (LitVector *)ourmalloc(sizeof(LitVector));
+	merged->literals = (Literal *)ourmalloc(sizeof(Literal) * maxsize);
 	merged->capacity = maxsize;
 	uint thisSize = boundedSize(This->size);
 	uint exprSize = boundedSize(expr->size);
@@ -372,7 +372,7 @@ void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 	/** Handle the full cross product */
 	uint mergeIndex = 0;
 	uint newCapacity = getClauseSizeCNF(This) * getClauseSizeCNF(expr);
-	LitVector **mergeArray = ourmalloc(newCapacity * sizeof(LitVector *));
+	LitVector **mergeArray = (LitVector **)ourmalloc(newCapacity * sizeof(LitVector *));
 	uint singleIndex = 0;
 	/** First do the singleton, clause pairs */
 	for (uint i = 0; i < getSizeLitVector(&This->singletons); i++) {

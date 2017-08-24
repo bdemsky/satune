@@ -24,13 +24,13 @@ void deleteElementEncoding(ElementEncoding *This) {
 }
 
 void allocEncodingArrayElement(ElementEncoding *This, uint size) {
-	This->encodingArray = ourcalloc(1, sizeof(uint64_t) * size);
+	This->encodingArray = (uint64_t *) ourcalloc(1, sizeof(uint64_t) * size);
 	This->encArraySize = size;
 }
 
 void allocInUseArrayElement(ElementEncoding *This, uint size) {
 	uint bytes = ((size + ((1 << 9) - 1)) >> 6) & ~7;//Depends on size of inUseArray
-	This->inUseArray = ourcalloc(1, bytes);
+	This->inUseArray = (uint64_t *) ourcalloc(1, bytes);
 }
 
 void setElementEncodingType(ElementEncoding *This, ElementEncodingType type) {

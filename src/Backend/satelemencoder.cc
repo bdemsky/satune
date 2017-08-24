@@ -88,7 +88,7 @@ Edge getElementValueBinaryValueConstraint(SATEncoder *This, Element *element, ui
 
 void allocElementConstraintVariables(ElementEncoding *This, uint numVars) {
 	This->numVars = numVars;
-	This->variables = ourmalloc(sizeof(Edge) * numVars);
+	This->variables = (Edge *)ourmalloc(sizeof(Edge) * numVars);
 }
 
 void generateBinaryValueEncodingVars(SATEncoder *This, ElementEncoding *encoding) {

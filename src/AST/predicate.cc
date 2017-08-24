@@ -4,7 +4,7 @@
 #include "table.h"
 
 Predicate *allocPredicateOperator(CompOp op, Set **domain, uint numDomain) {
-	PredicateOperator *This = ourmalloc(sizeof(PredicateOperator));
+	PredicateOperator *This = (PredicateOperator *)ourmalloc(sizeof(PredicateOperator));
 	GETPREDICATETYPE(This) = OPERATORPRED;
 	initArrayInitSet(&This->domains, domain, numDomain);
 	This->op = op;
@@ -13,7 +13,7 @@ Predicate *allocPredicateOperator(CompOp op, Set **domain, uint numDomain) {
 
 Predicate *allocPredicateTable(Table *table, UndefinedBehavior undefBehavior) {
 	ASSERT(table->range == NULL);
-	PredicateTable *This = ourmalloc(sizeof(PredicateTable));
+	PredicateTable *This = (PredicateTable *) ourmalloc(sizeof(PredicateTable));
 	GETPREDICATETYPE(This) = TABLEPRED;
 	This->table = table;
 	This->undefinedbehavior = undefBehavior;

@@ -121,7 +121,7 @@ OrderNode *getOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
 }
 
 OrderNode *lookupOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
-	OrderNode node = {id, NULL, NULL, 0, 0};
+	OrderNode node = {id, NULL, NULL, NOTVISITED, 0};
 	OrderNode *tmp = getHashSetOrderNode(graph->nodes, &node);
 	return tmp;
 }

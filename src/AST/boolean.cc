@@ -46,7 +46,7 @@ Boolean *allocBooleanPredicate(Predicate *predicate, Element **inputs, uint numI
 }
 
 Boolean *allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean **array, uint asize) {
-	BooleanLogic *This = ourmalloc(sizeof(BooleanLogic));
+	BooleanLogic *This = (BooleanLogic *) ourmalloc(sizeof(BooleanLogic));
 	GETBOOLEANTYPE(This) = LOGICOP;
 	GETBOOLEANVALUE(This) = BV_UNDEFINED;
 	GETBOOLEANPOLARITY(This) = P_UNDEFINED;

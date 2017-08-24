@@ -48,11 +48,11 @@ Edge E_NULL = {(Node *)NULL};
 
 
 CNF *createCNF() {
-	CNF *cnf = ourmalloc(sizeof(CNF));
+	CNF *cnf = (CNF *) ourmalloc(sizeof(CNF));
 	cnf->varcount = 1;
 	cnf->capacity = DEFAULT_CNF_ARRAY_SIZE;
 	cnf->mask = cnf->capacity - 1;
-	cnf->node_array = ourcalloc(1, sizeof(Node *) * cnf->capacity);
+	cnf->node_array = (Node **) ourcalloc(1, sizeof(Node *) * cnf->capacity);
 	cnf->size = 0;
 	cnf->maxsize = (uint)(((double)cnf->capacity) * LOAD_FACTOR);
 	cnf->enableMatching = true;
@@ -77,7 +77,7 @@ void deleteCNF(CNF *cnf) {
 
 void resizeCNF(CNF *cnf, uint newCapacity) {
 	Node **old_array = cnf->node_array;
-	Node **new_array = ourcalloc(1, sizeof(Node *) * newCapacity);
+	Node **new_array = (Node **) ourcalloc(1, sizeof(Node *) * newCapacity);
 	uint oldCapacity = cnf->capacity;
 	uint newMask = newCapacity - 1;
 	for (uint i = 0; i < oldCapacity; i++) {
@@ -362,7 +362,7 @@ void countConstraint(CNF *cnf, VectorEdge *stack, Edge eroot) {
 		if (getExpanded(n,  polarity)) {
 			if (n->flags.type == NodeType_IFF ||
 					n->flags.type == NodeType_ITE) {
-				Edge pExp = {n->ptrAnnot[polarity]};
+				Edge pExp = {(Node *)n->ptrAnnot[polarity]};
 				getNodePtrFromEdge(pExp)->intAnnot[0]++;
 			} else {
 				n->intAnnot[polarity]++;
