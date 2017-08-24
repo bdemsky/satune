@@ -212,6 +212,7 @@ Edge generateBinaryConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateLTValueConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateEquivNVConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2);
 Edge generateLTConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2);
+Edge generateLTEConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2);
 
 extern Edge E_True;
 extern Edge E_False;
