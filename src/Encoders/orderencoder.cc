@@ -82,8 +82,58 @@ void computeStronglyConnectedComponentGraph(OrderGraph *graph) {
 	deleteVectorArrayOrderNode(&finishNodes);
 }
 
-void removeMustBeTrueNodes(OrderGraph *graph) {
-	//TODO: Nodes that all the incoming/outgoing edges are MUST_BE_TRUE
+bool isMustBeTrueNode(OrderNode* node){
+	HSIteratorOrderEdge* iterator = iteratorOrderEdge(node->inEdges);
+	while(hasNextOrderEdge(iterator)){
+		OrderEdge* edge = nextOrderEdge(iterator);
+		if(!edge->mustPos)
+			return false;
+	}
+	deleteIterOrderEdge(iterator);
+	iterator = iteratorOrderEdge(node->outEdges);
+	while(hasNextOrderEdge(iterator)){
+		OrderEdge* edge = nextOrderEdge(iterator);
+		if(!edge->mustPos)
+			return false;
+	}
+	deleteIterOrderEdge(iterator);
+	return true;
+}
+
+void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
+	HSIteratorOrderEdge* iterin = iteratorOrderEdge(node->inEdges);
+	while(hasNextOrderEdge(iterin)){
+		OrderEdge* inEdge = nextOrderEdge(iterin);
+		OrderNode* srcNode = inEdge->source;
+		removeHashSetOrderEdge(srcNode->outEdges, inEdge);
+		HSIteratorOrderEdge* iterout = iteratorOrderEdge(node->outEdges);
+		while(hasNextOrderEdge(iterout)){
+			OrderEdge* outEdge = nextOrderEdge(iterout);
+			OrderNode* sinkNode = outEdge->sink;
+			removeHashSetOrderEdge(sinkNode->inEdges, outEdge);
+			//Adding new edge to new sink and src nodes ...
+			OrderEdge *newEdge =getOrderEdgeFromOrderGraph(graph, srcNode, sinkNode);
+			newEdge->mustPos = true;
+			newEdge->polPos = true;
+			if (newEdge->mustNeg)
+				This->unsat = true;
+			addHashSetOrderEdge(srcNode->outEdges, newEdge);
+			addHashSetOrderEdge(sinkNode->inEdges, newEdge);
+		}
+		deleteIterOrderEdge(iterout);
+	}
+	deleteIterOrderEdge(iterin);
+}
+
+void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
+	HSIteratorOrderNode* iterator = iteratorOrderNode(graph->nodes);
+	while(hasNextOrderNode(iterator)){
+		OrderNode* node = nextOrderNode(iterator);
+		if(isMustBeTrueNode(node)){
+			bypassMustBeTrueNode(This,graph, node);
+		}
+	}
+	deleteIterOrderNode(iterator);
 }
 
 /** This function computes a source set for every nodes, the set of
@@ -430,7 +480,7 @@ void orderAnalysis(CSolver *This) {
 		bool mustReachPrune=GETVARTUNABLE(This->tuner, order->type, MUSTREACHPRUNE, &onoff);
 		
 		if (mustReachPrune)
-			removeMustBeTrueNodes(graph);
+			removeMustBeTrueNodes(This, graph);
 		
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
