@@ -17,13 +17,12 @@ class Function {
 class FunctionOperator : public Function {
  public:
 	ArithOp op;
-	ArraySet domains;
+	Array<Set *> domains;
 	Set *range;
 	OverFlowBehavior overflowbehavior;
 	FunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range, OverFlowBehavior overflowbehavior);
 	uint64_t applyFunctionOperator(uint numVals, uint64_t *values);
 	bool isInRangeFunction(uint64_t val);
-	~FunctionOperator();
 	MEMALLOC;
 };
 

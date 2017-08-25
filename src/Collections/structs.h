@@ -6,10 +6,6 @@
 #include "classlist.h"
 #include "array.h"
 
-ArrayDef(Element, Element *);
-ArrayDef(Boolean, Boolean *);
-ArrayDef(Set, Set *);
-
 VectorDef(Table, Table *);
 VectorDef(Set, Set *);
 VectorDef(Boolean, Boolean *);

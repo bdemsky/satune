@@ -3,15 +3,10 @@
 #include "set.h"
 #include "table.h"
 
-PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED) , op(_op) {
-	initArrayInitSet(&domains, domain, numDomain);
+PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED) , op(_op), domains(domain, numDomain) {
 }
 
 PredicateTable::PredicateTable(Table *_table, UndefinedBehavior _undefBehavior) : Predicate(TABLEPRED), table(_table), undefinedbehavior(_undefBehavior) {
-}
-
-PredicateOperator::~PredicateOperator() {
-	deleteInlineArraySet(&domains);
 }
 
 bool PredicateOperator::evalPredicateOperator(uint64_t *inputs) {

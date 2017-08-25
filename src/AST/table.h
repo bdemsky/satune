@@ -10,7 +10,7 @@ class Table {
 	void addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result);
 	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);
 	~Table();
-	ArraySet domains;
+	Array<Set *> domains;
 	Set *range;
 	HashSetTableEntry *entries;
 	MEMALLOC;

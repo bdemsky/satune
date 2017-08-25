@@ -5,8 +5,9 @@
 #include "set.h"
 #include "mutableset.h"
 
-Table::Table(Set **_domains, uint numDomain, Set *_range) : range(_range) {
-	initArrayInitSet(&domains, _domains, numDomain);
+Table::Table(Set **_domains, uint numDomain, Set *_range) :
+	domains(_domains, numDomain),
+	range(_range) {
 	entries = allocHashSetTableEntry(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
@@ -28,7 +29,6 @@ TableEntry * Table::getTableEntry(uint64_t *inputs, uint inputSize) {
 }
 
 Table::~Table() {
-	deleteInlineArraySet(&domains);
 	HSIteratorTableEntry *iterator = iteratorTableEntry(entries);
 	while (hasNextTableEntry(iterator)) {
 		deleteTableEntry(nextTableEntry(iterator));

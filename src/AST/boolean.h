@@ -50,7 +50,7 @@ class BooleanPredicate : public Boolean {
 	~BooleanPredicate();
 	Predicate *predicate;
 	FunctionEncoding encoding;
-	ArrayElement inputs;
+	Array<Element *> inputs;
 	Boolean *undefStatus;
 	FunctionEncoding * getFunctionEncoding() {return &encoding;}
 	MEMALLOC;
@@ -59,9 +59,8 @@ class BooleanPredicate : public Boolean {
 class BooleanLogic : public Boolean {
  public:
 	BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint asize);
-	~BooleanLogic();
 	LogicOp op;
-	ArrayBoolean inputs;
+	Array<Boolean *> inputs;
 	MEMALLOC;
 };
 #endif

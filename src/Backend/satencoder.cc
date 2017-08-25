@@ -73,23 +73,20 @@ Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar *constraint) {
 }
 
 Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic *constraint) {
-	Edge array[getSizeArrayBoolean(&constraint->inputs)];
-	for (uint i = 0; i < getSizeArrayBoolean(&constraint->inputs); i++)
-		array[i] = encodeConstraintSATEncoder(This, getArrayBoolean(&constraint->inputs, i));
+	Edge array[constraint->inputs.getSize()];
+	for (uint i = 0; i < constraint->inputs.getSize(); i++)
+		array[i] = encodeConstraintSATEncoder(This, constraint->inputs.get(i));
 
 	switch (constraint->op) {
 	case L_AND:
-		return constraintAND(This->cnf, getSizeArrayBoolean(&constraint->inputs), array);
+		return constraintAND(This->cnf, constraint->inputs.getSize(), array);
 	case L_OR:
-		return constraintOR(This->cnf, getSizeArrayBoolean(&constraint->inputs), array);
+		return constraintOR(This->cnf, constraint->inputs.getSize(), array);
 	case L_NOT:
-		ASSERT( getSizeArrayBoolean(&constraint->inputs) == 1);
 		return constraintNegate(array[0]);
 	case L_XOR:
-		ASSERT( getSizeArrayBoolean(&constraint->inputs) == 2);
 		return constraintXOR(This->cnf, array[0], array[1]);
 	case L_IMPLIES:
-		ASSERT( getSizeArrayBoolean( &constraint->inputs) == 2);
 		return constraintIMPLIES(This->cnf, array[0], array[1]);
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);

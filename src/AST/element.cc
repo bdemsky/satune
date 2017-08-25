@@ -13,8 +13,7 @@ Element::Element(ASTNodeType _type) : ASTNode(_type) {
 ElementSet::ElementSet(Set *s) : Element(ELEMSET), set(s) {
 }
 
-ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) : Element(ELEMFUNCRETURN), function(_function), overflowstatus(_overflowstatus) {
-	initArrayInitElement(&inputs, array, numArrays);
+ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) : Element(ELEMFUNCRETURN), function(_function), inputs(array, numArrays), overflowstatus(_overflowstatus) {
 	for (uint i = 0; i < numArrays; i++)
 		pushVectorASTNode(GETELEMENTPARENTS(array[i]), this);
 	initFunctionEncoding(&functionencoding, this);
@@ -50,7 +49,6 @@ Set *getElementSet(Element *This) {
 }
 
 ElementFunction::~ElementFunction() {
-	deleteInlineArrayElement(&inputs);
 	deleteFunctionEncoding(&functionencoding);
 }
 

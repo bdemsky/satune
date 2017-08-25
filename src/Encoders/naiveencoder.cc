@@ -45,8 +45,8 @@ void naiveEncodingConstraint(Boolean *This) {
 }
 
 void naiveEncodingLogicOp(BooleanLogic *This) {
-	for (uint i = 0; i < getSizeArrayBoolean(&This->inputs); i++) {
-		naiveEncodingConstraint(getArrayBoolean(&This->inputs, i));
+	for (uint i = 0; i < This->inputs.getSize(); i++) {
+		naiveEncodingConstraint(This->inputs.get(i));
 	}
 }
 
@@ -55,8 +55,8 @@ void naiveEncodingPredicate(BooleanPredicate *This) {
 	if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
 		setFunctionEncodingType(This->getFunctionEncoding(), ENUMERATEIMPLICATIONS);
 
-	for (uint i = 0; i < getSizeArrayElement(&This->inputs); i++) {
-		Element *element = getArrayElement(&This->inputs, i);
+	for (uint i = 0; i < This->inputs.getSize(); i++) {
+		Element *element = This->inputs.get(i);
 		naiveEncodingElement(element);
 	}
 }
@@ -70,8 +70,8 @@ void naiveEncodingElement(Element *This) {
 
 	if (GETELEMENTTYPE(This) == ELEMFUNCRETURN) {
 		ElementFunction *function = (ElementFunction *) This;
-		for (uint i = 0; i < getSizeArrayElement(&function->inputs); i++) {
-			Element *element = getArrayElement(&function->inputs, i);
+		for (uint i = 0; i < function->inputs.getSize(); i++) {
+			Element *element = function->inputs.get(i);
 			naiveEncodingElement(element);
 		}
 		FunctionEncoding *encoding = getElementFunctionEncoding(function);

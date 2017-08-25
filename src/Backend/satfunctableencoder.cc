@@ -16,8 +16,8 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Table *table = ((PredicateTable *)constraint->predicate)->table;
 	FunctionEncodingType encType = constraint->encoding.type;
-	ArrayElement *inputs = &constraint->inputs;
-	uint inputNum = getSizeArrayElement(inputs);
+	Array<Element*> * inputs = &constraint->inputs;
+	uint inputNum = inputs->getSize();
 	uint size = getSizeHashSetTableEntry(table->entries);
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
@@ -34,7 +34,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 		}
 		Edge carray[inputNum];
 		for (uint j = 0; j < inputNum; j++) {
-			Element *el = getArrayElement(inputs, j);
+			Element *el = inputs->get(j);
 			carray[j] = getElementValueConstraint(This, el, entry->inputs[j]);
 			printCNF(carray[j]);
 			model_print("\n");
@@ -73,11 +73,11 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 #endif
 	ASSERT(GETPREDICATETYPE(constraint->predicate) == TABLEPRED);
 	//First encode children
-	ArrayElement *inputs = &constraint->inputs;
-	uint inputNum = getSizeArrayElement(inputs);
+	Array<Element *> *inputs = &constraint->inputs;
+	uint inputNum = inputs->getSize();
 	//Encode all the inputs first ...
 	for (uint i = 0; i < inputNum; i++) {
-		encodeElementSATEncoder(This, getArrayElement(inputs, i));
+		encodeElementSATEncoder(This, inputs->get(i));
 	}
 	PredicateTable *predicate = (PredicateTable *)constraint->predicate;
 	switch (predicate->undefinedbehavior) {
@@ -88,7 +88,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 		break;
 	}
 	bool generateNegation = constraint->encoding.type == ENUMERATEIMPLICATIONSNEGATE;
-	uint numDomains = getSizeArraySet(&predicate->table->domains);
+	uint numDomains = predicate->table->domains.getSize();
 
 	VectorEdge *clauses = allocDefVectorEdge();
 
@@ -97,7 +97,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = getArraySet(&predicate->table->domains, i);
+		Set *set = predicate->table->domains.get(i);
 		vals[i] = set->getElement(indices[i]);
 	}
 	bool hasOverflow = false;
@@ -113,7 +113,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 		}
 		Edge clause;
 		for (uint i = 0; i < numDomains; i++) {
-			Element *elem = getArrayElement(&constraint->inputs, i);
+			Element *elem = constraint->inputs.get(i);
 			carray[i] = getElementValueConstraint(This, elem, vals[i]);
 		}
 
@@ -150,7 +150,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = getArraySet(&predicate->table->domains, i);
+			Set *set = predicate->table->domains.get(i);
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);
@@ -179,7 +179,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction *func) {
 	UndefinedBehavior undefStatus = ((FunctionTable *) func->function)->undefBehavior;
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
-	ArrayElement *elements = &func->inputs;
+	Array<Element *> *elements = &func->inputs;
 	Table *table = ((FunctionTable *) (func->function))->table;
 	uint size = getSizeHashSetTableEntry(table->entries);
 	Edge constraints[size];
@@ -188,10 +188,10 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction 
 	while (hasNextTableEntry(iterator)) {
 		TableEntry *entry = nextTableEntry(iterator);
 		ASSERT(entry != NULL);
-		uint inputNum = getSizeArrayElement(elements);
+		uint inputNum = elements->getSize();
 		Edge carray[inputNum];
 		for (uint j = 0; j < inputNum; j++) {
-			Element *el = getArrayElement(elements, j);
+			Element *el = elements->get(j);
 			carray[j] = getElementValueConstraint(This, el, entry->inputs[j]);
 		}
 		Edge output = getElementValueConstraint(This, (Element *)func, entry->output);
@@ -222,9 +222,9 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 #endif
 	ASSERT(GETFUNCTIONTYPE(elemFunc->function) == TABLEFUNC);
 	//First encode children
-	ArrayElement *elements = &elemFunc->inputs;
-	for (uint i = 0; i < getSizeArrayElement(elements); i++) {
-		Element *elem = getArrayElement( elements, i);
+	Array<Element *> *elements = &elemFunc->inputs;
+	for (uint i = 0; i < elements->getSize(); i++) {
+		Element *elem = elements->get(i);
 		encodeElementSATEncoder(This, elem);
 	}
 
@@ -237,7 +237,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		break;
 	}
 
-	uint numDomains = getSizeArraySet(&function->table->domains);
+	uint numDomains = function->table->domains.getSize();
 
 	VectorEdge *clauses = allocDefVectorEdge();	// Setup array of clauses
 
@@ -246,7 +246,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = getArraySet(&function->table->domains, i);
+		Set *set = function->table->domains.get(i);
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -258,7 +258,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		bool isInRange = tableEntry != NULL;
 		ASSERT(function->undefBehavior == UNDEFINEDSETSFLAG || function->undefBehavior == FLAGIFFUNDEFINED);
 		for (uint i = 0; i < numDomains; i++) {
-			Element *elem = getArrayElement(&elemFunc->inputs, i);
+			Element *elem = elemFunc->inputs.get(i);
 			carray[i] = getElementValueConstraint(This, elem, vals[i]);
 		}
 		if (isInRange) {
@@ -300,7 +300,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = getArraySet(&function->table->domains, i);
+			Set *set = function->table->domains.get(i);
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);

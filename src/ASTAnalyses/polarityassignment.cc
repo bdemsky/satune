@@ -44,9 +44,9 @@ void computePredicatePolarityAndBooleanValue(BooleanPredicate *This) {
 void computeLogicOpPolarityAndBooleanValue(BooleanLogic *This) {
 	computeLogicOpBooleanValue(This);
 	computeLogicOpPolarity(This);
-	uint size = getSizeArrayBoolean(&This->inputs);
+	uint size = This->inputs.getSize();
 	for (uint i = 0; i < size; i++) {
-		computePolarityAndBooleanValue(getArrayBoolean(&This->inputs, i));
+		computePolarityAndBooleanValue(This->inputs.get(i));
 	}
 }
 
@@ -83,27 +83,27 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 	switch (This->op) {
 	case L_AND:
 	case L_OR: {
-		uint size = getSizeArrayBoolean(&This->inputs);
+		uint size = This->inputs.getSize();
 		for (uint i = 0; i < size; i++) {
-			Boolean *tmp = getArrayBoolean(&This->inputs, i);
+			Boolean *tmp = This->inputs.get(i);
 			updatePolarity(tmp, parentpolarity);
 		}
 		break;
 	}
 	case L_NOT: {
-		Boolean *tmp = getArrayBoolean(&This->inputs, 0);
+		Boolean *tmp = This->inputs.get(0);
 		updatePolarity(tmp, negatePolarity(parentpolarity));
 		break;
 	}
 	case L_XOR: {
-		updatePolarity(getArrayBoolean(&This->inputs, 0), P_BOTHTRUEFALSE);
-		updatePolarity(getArrayBoolean(&This->inputs, 1), P_BOTHTRUEFALSE);
+		updatePolarity(This->inputs.get(0), P_BOTHTRUEFALSE);
+		updatePolarity(This->inputs.get(1), P_BOTHTRUEFALSE);
 		break;
 	}
 	case L_IMPLIES: {
-		Boolean *left = getArrayBoolean(&This->inputs, 0);
+		Boolean *left = This->inputs.get(0);
 		updatePolarity(left, negatePolarity( parentpolarity));
-		Boolean *right = getArrayBoolean(&This->inputs, 1);
+		Boolean *right = This->inputs.get(1);
 		updatePolarity(right, parentpolarity);
 		break;
 	}
@@ -117,31 +117,31 @@ void computeLogicOpBooleanValue(BooleanLogic *This) {
 	switch (This->op) {
 	case L_AND: {
 		if (parentbv == BV_MUSTBETRUE || parentbv == BV_UNSAT) {
-			uint size = getSizeArrayBoolean(&This->inputs);
+			uint size = This->inputs.getSize();
 			for (uint i = 0; i < size; i++) {
-				updateMustValue(getArrayBoolean(&This->inputs, i), parentbv);
+				updateMustValue(This->inputs.get(i), parentbv);
 			}
 		}
 		return;
 	}
 	case L_OR: {
 		if (parentbv == BV_MUSTBEFALSE || parentbv == BV_UNSAT) {
-			uint size = getSizeArrayBoolean(&This->inputs);
+			uint size = This->inputs.getSize();
 			for (uint i = 0; i < size; i++) {
-				updateMustValue(getArrayBoolean(&This->inputs, i), parentbv);
+				updateMustValue(This->inputs.get(i), parentbv);
 			}
 		}
 		return;
 	}
 	case L_NOT:
-		updateMustValue(getArrayBoolean(&This->inputs, 0), negateBooleanValue(parentbv));
+		updateMustValue(This->inputs.get(0), negateBooleanValue(parentbv));
 		return;
 	case L_IMPLIES:
 		//implies is really an or with the first term negated
 		if (parentbv == BV_MUSTBEFALSE || parentbv == BV_UNSAT) {
-			uint size = getSizeArrayBoolean(&This->inputs);
-			updateMustValue(getArrayBoolean(&This->inputs, 0), negateBooleanValue(parentbv));
-			updateMustValue(getArrayBoolean(&This->inputs, 1), parentbv);
+			uint size = This->inputs.getSize();
+			updateMustValue(This->inputs.get(0), negateBooleanValue(parentbv));
+			updateMustValue(This->inputs.get(1), parentbv);
 		}
 		return;
 	case L_XOR:

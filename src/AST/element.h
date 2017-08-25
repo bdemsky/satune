@@ -40,7 +40,7 @@ class ElementFunction : public Element {
 	ElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
 	~ElementFunction();
 	Function *function;
-	ArrayElement inputs;
+	Array<Element *> inputs;
 	Boolean *overflowstatus;
 	FunctionEncoding functionencoding;
 	MEMALLOC;

@@ -17,10 +17,9 @@ class Predicate {
 class PredicateOperator : public Predicate {
  public:
 	PredicateOperator(CompOp op, Set **domain, uint numDomain);
-	~PredicateOperator();
 	bool evalPredicateOperator(uint64_t *inputs);
 	CompOp op;
-	ArraySet domains;
+	Array<Set *> domains;
 	MEMALLOC;
 };
 

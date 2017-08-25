@@ -25,14 +25,14 @@ Edge encodeOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *const
 
 Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *)constraint->predicate;
-	uint numDomains = getSizeArraySet(&predicate->domains);
+	uint numDomains = predicate->domains.getSize();
 
 	FunctionEncodingType encType = constraint->encoding.type;
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 
 	/* Call base encoders for children */
 	for (uint i = 0; i < numDomains; i++) {
-		Element *elem = getArrayElement( &constraint->inputs, i);
+		Element *elem = constraint->inputs.get(i);
 		encodeElementSATEncoder(This, elem);
 	}
 	VectorEdge *clauses = allocDefVectorEdge();	// Setup array of clauses
@@ -42,7 +42,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = getArraySet(&predicate->domains, i);
+		Set *set = predicate->domains.get(i);
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -53,7 +53,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 		if (predicate->evalPredicateOperator(vals) ^ generateNegation) {
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
-				Element *elem = getArrayElement(&constraint->inputs, i);
+				Element *elem = constraint->inputs.get(i);
 				carray[i] = getElementValueConstraint(This, elem, vals[i]);
 			}
 			Edge term = constraintAND(This->cnf, numDomains, carray);
@@ -63,7 +63,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = getArraySet(&predicate->domains, i);
+			Set *set = predicate->domains.get(i);
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);
@@ -90,11 +90,11 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 	model_print("Operator Function ...\n");
 #endif
 	FunctionOperator *function = (FunctionOperator *) func->function;
-	uint numDomains = getSizeArrayElement(&func->inputs);
+	uint numDomains = func->inputs.getSize();
 
 	/* Call base encoders for children */
 	for (uint i = 0; i < numDomains; i++) {
-		Element *elem = getArrayElement( &func->inputs, i);
+		Element *elem = func->inputs.get(i);
 		encodeElementSATEncoder(This, elem);
 	}
 
@@ -105,7 +105,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = getElementSet(getArrayElement(&func->inputs, i));
+		Set *set = getElementSet(func->inputs.get(i));
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -125,7 +125,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 		if (needClause) {
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
-				Element *elem = getArrayElement(&func->inputs, i);
+				Element *elem = func->inputs.get(i);
 				carray[i] = getElementValueConstraint(This, elem, vals[i]);
 			}
 			if (isInRange) {
@@ -174,7 +174,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = getElementSet(getArrayElement(&func->inputs, i));
+			Set *set = getElementSet(func->inputs.get(i));
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);
@@ -197,10 +197,9 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 
 Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
-	ASSERT(getSizeArraySet(&predicate->domains) == 2);
-	Element *elem0 = getArrayElement( &constraint->inputs, 0);
+	Element *elem0 = constraint->inputs.get(0);
 	encodeElementSATEncoder(This, elem0);
-	Element *elem1 = getArrayElement( &constraint->inputs, 1);
+	Element *elem1 = constraint->inputs.get(1);
 	encodeElementSATEncoder(This, elem1);
 	ElementEncoding *ee0 = getElementEncoding(elem0);
 	ElementEncoding *ee1 = getElementEncoding(elem1);
