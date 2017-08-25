@@ -14,7 +14,7 @@ class CSolver {
 	Tuner *tuner;
 	
 	/** This is a vector of constraints that must be satisfied. */
-	HashSetBoolean *constraints;
+	HashSetBoolean constraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
 	Vector<Boolean *> allBooleans;

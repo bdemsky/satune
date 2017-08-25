@@ -100,17 +100,18 @@ Edge inferOrderConstraintFromGraph(Order* order, uint64_t _first, uint64_t _seco
 Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
 	HashSetOrderElement* eset = order->elementTable;
 	OrderElement oelement ={item, NULL};
-	if( !containsHashSetOrderElement(eset, &oelement)){
+	if( !eset->contains(&oelement)){
 		Element* elem = new ElementSet(order->set);
 		ElementEncoding* encoding = getElementEncoding(elem);
 		setElementEncodingType(encoding, BINARYINDEX);
 		encodingArrayInitialization(encoding);
 		encodeElementSATEncoder(This, elem);
-		addHashSetOrderElement(eset, allocOrderElement(item, elem));
+		eset->add(allocOrderElement(item, elem));
 		return elem;
-	}else
-		return getHashSetOrderElement(eset, &oelement)->elem;
+	} else
+		return eset->get(&oelement)->elem;
 }
+
 Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 	Edge gvalue = inferOrderConstraintFromGraph(order, pair->first, pair->second);
 	if(!edgeIsNull(gvalue))
@@ -126,13 +127,13 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 		pair = &flipped;
 	}
 	Edge constraint;
-	if (!containsOrderPair(table, pair)) {
+	if (!(table->contains(pair))) {
 		constraint = getNewVarSATEncoder(This);
 		OrderPair *paircopy = allocOrderPair(pair->first, pair->second, constraint);
-		putOrderPair(table, paircopy, paircopy);
+		table->put(paircopy, paircopy);
 	} else
-		constraint = getOrderPair(table, pair)->constraint;
-
+		constraint = table->get(pair)->constraint;
+	
 	return negate ? constraintNegate(constraint) : constraint;
 }
 
@@ -188,10 +189,10 @@ Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair) {
 		flipped.second = pair->first;
 		pair = &flipped;
 	}
-	if (!containsOrderPair(table, pair)) {
+	if (!table->contains(pair)) {
 		return E_NULL;
 	}
-	Edge constraint = getOrderPair(table, pair)->constraint;
+	Edge constraint = table->get(pair)->constraint;
 	ASSERT(!edgeIsNull(constraint));
 	return negate ? constraintNegate(constraint) : constraint;
 }

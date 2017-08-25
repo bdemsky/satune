@@ -18,16 +18,16 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	FunctionEncodingType encType = constraint->encoding.type;
 	Array<Element*> * inputs = &constraint->inputs;
 	uint inputNum = inputs->getSize();
-	uint size = getSizeHashSetTableEntry(table->entries);
+	uint size = table->entries->getSize();
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
 	Edge undefConst = encodeConstraintSATEncoder(This, constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
-	HSIteratorTableEntry *iterator = iteratorTableEntry(table->entries);
+	HSIteratorTableEntry *iterator = table->entries->iterator();
 	uint i = 0;
-	while (hasNextTableEntry(iterator)) {
-		TableEntry *entry = nextTableEntry(iterator);
+	while (iterator->hasNext()) {
+		TableEntry *entry = iterator->next();
 		if (generateNegation == (entry->output != 0) && undefStatus == IGNOREBEHAVIOR) {
 			//Skip the irrelevant entries
 			continue;
@@ -60,7 +60,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 
 		model_print("\n\n");
 	}
-	deleteIterTableEntry(iterator);
+	delete iterator;
 	ASSERT(i != 0);
 	Edge result = generateNegation ? constraintNegate(constraintOR(This->cnf, i, constraints))
 								: constraintOR(This->cnf, i, constraints);
@@ -181,12 +181,12 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction 
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Array<Element *> *elements = &func->inputs;
 	Table *table = ((FunctionTable *) (func->function))->table;
-	uint size = getSizeHashSetTableEntry(table->entries);
+	uint size = table->entries->getSize();
 	Edge constraints[size];
-	HSIteratorTableEntry *iterator = iteratorTableEntry(table->entries);
+	HSIteratorTableEntry *iterator = table->entries->iterator();
 	uint i = 0;
-	while (hasNextTableEntry(iterator)) {
-		TableEntry *entry = nextTableEntry(iterator);
+	while (iterator->hasNext()) {
+		TableEntry *entry = iterator->next();
 		ASSERT(entry != NULL);
 		uint inputNum = elements->getSize();
 		Edge carray[inputNum];
@@ -212,7 +212,7 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction 
 		}
 		constraints[i++] = row;
 	}
-	deleteIterTableEntry(iterator);
+	delete iterator;
 	addConstraintCNF(This->cnf, constraintAND(This->cnf, size, constraints));
 }
 

@@ -6,14 +6,28 @@
 #include "classlist.h"
 #include "array.h"
 
-HashTableDef(Void, void *, void *);
-HashTableDef(OrderPair, OrderPair *, OrderPair *);
+unsigned int table_entry_hash_function(TableEntry *This);
+bool table_entry_equals(TableEntry *key1, TableEntry *key2);
+unsigned int order_node_hash_function(OrderNode *This);
+bool order_node_equals(OrderNode *key1, OrderNode *key2);
+unsigned int order_edge_hash_function(OrderEdge *This);
+bool order_edge_equals(OrderEdge *key1, OrderEdge *key2);
+unsigned int order_element_hash_function(OrderElement* This);
+bool order_element_equals(OrderElement* key1, OrderElement* key2);
+unsigned int order_pair_hash_function(OrderPair *This);
+bool order_pair_equals(OrderPair *key1, OrderPair *key2);
 
-HashSetDef(Boolean, Boolean *);
-HashSetDef(TableEntry, TableEntry *);
-HashSetDef(OrderNode, OrderNode *);
-HashSetDef(OrderEdge, OrderEdge *);
-HashSetDef(OrderElement, OrderElement *);
+typedef HashSet<Boolean *, uintptr_t, 4> HashSetBoolean;
+typedef HashSet<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HashSetTableEntry;
+typedef HashSet<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HashSetOrderNode;
+typedef HashSet<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HashSetOrderEdge;
+typedef HashSet<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashSetOrderElement;
+typedef HashTable<OrderNode *, HashSetOrderNode *, uintptr_t, 4> HashTableNodeToNodeSet;
+typedef HashTable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashTableOrderPair;
 
-HashTableDef(NodeToNodeSet, OrderNode *, HashSetOrderNode *);
+typedef HSIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HSIteratorTableEntry;
+typedef HSIterator<Boolean *, uintptr_t, 4> HSIteratorBoolean;
+typedef HSIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HSIteratorOrderEdge;
+typedef HSIterator<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HSIteratorOrderNode;
+
 #endif

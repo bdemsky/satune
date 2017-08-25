@@ -14,7 +14,6 @@
 #include "polarityassignment.h"
 
 CSolver::CSolver() : unsat(false) {
-	constraints = allocDefHashSetBoolean();
 	tuner = allocTuner();
 	satEncoder = allocSATEncoder(this);
 }
@@ -22,8 +21,6 @@ CSolver::CSolver() : unsat(false) {
 /** This function tears down the solver and the entire AST */
 
 CSolver::~CSolver() {
-	deleteHashSetBoolean(constraints);
-
 	uint size = allBooleans.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allBooleans.get(i);
@@ -168,7 +165,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 }
 
 void CSolver::addConstraint(Boolean *constraint) {
-	addHashSetBoolean(constraints, constraint);
+	constraints.add(constraint);
 }
 
 Order *CSolver::createOrder(OrderType type, Set *set) {

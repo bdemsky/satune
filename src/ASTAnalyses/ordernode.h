@@ -19,8 +19,8 @@ typedef enum NodeStatus NodeStatus;
 
 struct OrderNode {
 	uint64_t id;
-	HashSetOrderEdge *inEdges;
-	HashSetOrderEdge *outEdges;
+	HashSetOrderEdge * inEdges;
+	HashSetOrderEdge * outEdges;
 	NodeStatus status;
 	uint sccNum;
 };

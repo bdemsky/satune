@@ -14,12 +14,12 @@
 #include <strings.h>
 
 void naiveEncodingDecision(CSolver *This) {
-	HSIteratorBoolean *iterator=iteratorBoolean(This->constraints);
-	while(hasNextBoolean(iterator)) {
-		Boolean *boolean = nextBoolean(iterator);
+	HSIteratorBoolean *iterator=This->constraints.iterator();
+	while(iterator->hasNext()) {
+		Boolean *boolean = iterator->next();
 		naiveEncodingConstraint(boolean);
 	}
-	deleteIterBoolean(iterator);
+	delete iterator;
 }
 
 void naiveEncodingConstraint(Boolean *This) {

@@ -3,8 +3,8 @@
 #include "csolver.h"
 
 void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
-	if (containsHashSetBoolean(This->constraints, bexpr)) {
-		removeHashSetBoolean(This->constraints, bexpr);
+	if (This->constraints.contains(bexpr)) {
+		This->constraints.remove(bexpr);
 	}
 
 	uint size = bexpr->parents.getSize();
@@ -32,9 +32,9 @@ void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
 }
 
 void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
-	if (containsHashSetBoolean(This->constraints, oldb)) {
-		removeHashSetBoolean(This->constraints, oldb);
-		addHashSetBoolean(This->constraints, newb);
+	if (This->constraints.contains(oldb)) {
+		This->constraints.remove(oldb);
+		This->constraints.add(newb);
 	}
 
 	uint size = oldb->parents.getSize();
@@ -134,9 +134,9 @@ void handleORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
 }
 
 void replaceBooleanWithFalse(CSolver * This, Boolean *bexpr) {
-	if (containsHashSetBoolean(This->constraints, bexpr)) {
+	if (This->constraints.contains(bexpr)) {
 		This->unsat=true;
-		removeHashSetBoolean(This->constraints, bexpr);
+		This->constraints.remove(bexpr);
 	}
 	
 	uint size = bexpr->parents.getSize();

@@ -9,11 +9,11 @@ Order::Order(OrderType _type, Set *_set) : type(_type), set(_set), orderPairTabl
 }
 
 void Order::initializeOrderHashTable() {
-	orderPairTable = allocHashTableOrderPair(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	orderPairTable = new HashTableOrderPair();
 }
 
 void Order::initializeOrderElementsHashTable() {
-	elementTable = allocHashSetOrderElement(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+	elementTable = new HashSetOrderElement();
 }
 
 void Order::addOrderConstraint(BooleanOrder *constraint) {
@@ -27,11 +27,11 @@ void Order::setOrderEncodingType(OrderEncodingType type) {
 Order::~Order() {
 	deleteOrderEncoding(&order);
 	if (orderPairTable != NULL) {
-		resetAndDeleteHashTableOrderPair(orderPairTable);
-		deleteHashTableOrderPair(orderPairTable);
+		orderPairTable->resetanddelete();
+		delete orderPairTable;
 	}
-	if(elementTable != NULL){
-		deleteHashSetOrderElement(elementTable);
+	if (elementTable != NULL) {
+		delete elementTable;
 	}
 	if (graph != NULL) {
 		deleteOrderGraph(graph);

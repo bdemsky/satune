@@ -2,14 +2,14 @@
 #include "csolver.h"
 
 void computePolarities(CSolver *This) {
-	HSIteratorBoolean *iterator=iteratorBoolean(This->constraints);
-	while(hasNextBoolean(iterator)) {
-		Boolean *boolean = nextBoolean(iterator);
+	HSIteratorBoolean *iterator=This->constraints.iterator();
+	while(iterator->hasNext()) {
+		Boolean *boolean = iterator->next();
 		updatePolarity(boolean, P_TRUE);
 		updateMustValue(boolean, BV_MUSTBETRUE);
 		computePolarityAndBooleanValue(boolean);
 	}
-	deleteIterBoolean(iterator);
+	delete iterator;
 }
 
 void updatePolarity(Boolean *This, Polarity polarity) {
