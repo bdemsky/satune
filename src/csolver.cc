@@ -36,13 +36,13 @@ void deleteSolver(CSolver *This) {
 
 	uint size = getSizeVectorBoolean(This->allBooleans);
 	for (uint i = 0; i < size; i++) {
-		deleteBoolean(getVectorBoolean(This->allBooleans, i));
+		delete getVectorBoolean(This->allBooleans, i);
 	}
 	deleteVectorBoolean(This->allBooleans);
 
 	size = getSizeVectorSet(This->allSets);
 	for (uint i = 0; i < size; i++) {
-		deleteSet(getVectorSet(This->allSets, i));
+		delete getVectorSet(This->allSets, i);
 	}
 	deleteVectorSet(This->allSets);
 
@@ -54,25 +54,25 @@ void deleteSolver(CSolver *This) {
 
 	size = getSizeVectorTable(This->allTables);
 	for (uint i = 0; i < size; i++) {
-		deleteTable(getVectorTable(This->allTables, i));
+		delete getVectorTable(This->allTables, i);
 	}
 	deleteVectorTable(This->allTables);
 
 	size = getSizeVectorPredicate(This->allPredicates);
 	for (uint i = 0; i < size; i++) {
-		deletePredicate(getVectorPredicate(This->allPredicates, i));
+		delete getVectorPredicate(This->allPredicates, i);
 	}
 	deleteVectorPredicate(This->allPredicates);
 
 	size = getSizeVectorOrder(This->allOrders);
 	for (uint i = 0; i < size; i++) {
-		deleteOrder(getVectorOrder(This->allOrders, i));
+		delete getVectorOrder(This->allOrders, i);
 	}
 	deleteVectorOrder(This->allOrders);
 
 	size = getSizeVectorFunction(This->allFunctions);
 	for (uint i = 0; i < size; i++) {
-		deleteFunction(getVectorFunction(This->allFunctions, i));
+		delete getVectorFunction(This->allFunctions, i);
 	}
 	deleteVectorFunction(This->allFunctions);
 	deleteSATEncoder(This->satEncoder);
@@ -81,13 +81,13 @@ void deleteSolver(CSolver *This) {
 }
 
 Set *createSet(CSolver *This, VarType type, uint64_t *elements, uint numelements) {
-	Set *set = allocSet(type, elements, numelements);
+	Set *set = new Set(type, elements, numelements);
 	pushVectorSet(This->allSets, set);
 	return set;
 }
 
 Set *createRangeSet(CSolver *This, VarType type, uint64_t lowrange, uint64_t highrange) {
-	Set *set = allocSetRange(type, lowrange, highrange);
+	Set *set = new Set(type, lowrange, highrange);
 	pushVectorSet(This->allSets, set);
 	return set;
 }
@@ -121,31 +121,31 @@ Element *getElementConst(CSolver *This, VarType type, uint64_t value) {
 }
 
 Boolean *getBooleanVar(CSolver *This, VarType type) {
-	Boolean *boolean = allocBooleanVar(type);
+	Boolean *boolean = new BooleanVar(type);
 	pushVectorBoolean(This->allBooleans, boolean);
 	return boolean;
 }
 
 Function *createFunctionOperator(CSolver *This, ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
-	Function *function = allocFunctionOperator(op, domain, numDomain, range, overflowbehavior);
+	Function *function = new FunctionOperator(op, domain, numDomain, range, overflowbehavior);
 	pushVectorFunction(This->allFunctions, function);
 	return function;
 }
 
 Predicate *createPredicateOperator(CSolver *This, CompOp op, Set **domain, uint numDomain) {
-	Predicate *predicate = allocPredicateOperator(op, domain,numDomain);
+	Predicate *predicate = new PredicateOperator(op, domain,numDomain);
 	pushVectorPredicate(This->allPredicates, predicate);
 	return predicate;
 }
 
 Predicate *createPredicateTable(CSolver *This, Table *table, UndefinedBehavior behavior) {
-	Predicate *predicate = allocPredicateTable(table, behavior);
+	Predicate *predicate = new PredicateTable(table, behavior);
 	pushVectorPredicate(This->allPredicates, predicate);
 	return predicate;
 }
 
 Table *createTable(CSolver *This, Set **domains, uint numDomain, Set *range) {
-	Table *table = allocTable(domains,numDomain,range);
+	Table *table = new Table(domains,numDomain,range);
 	pushVectorTable(This->allTables, table);
 	return table;
 }
@@ -155,11 +155,11 @@ Table *createTableForPredicate(CSolver *solver, Set **domains, uint numDomain) {
 }
 
 void addTableEntry(CSolver *This, Table *table, uint64_t *inputs, uint inputSize, uint64_t result) {
-	addNewTableEntry(table,inputs, inputSize,result);
+	table->addNewTableEntry(inputs, inputSize,result);
 }
 
 Function *completeTable(CSolver *This, Table *table, UndefinedBehavior behavior) {
-	Function *function = allocFunctionTable(table, behavior);
+	Function *function = new FunctionTable(table, behavior);
 	pushVectorFunction(This->allFunctions,function);
 	return function;
 }
@@ -188,7 +188,7 @@ void addConstraint(CSolver *This, Boolean *constraint) {
 }
 
 Order *createOrder(CSolver *This, OrderType type, Set *set) {
-	Order *order = allocOrder(type, set);
+	Order *order = new Order(type, set);
 	pushVectorOrder(This->allOrders, order);
 	return order;
 }

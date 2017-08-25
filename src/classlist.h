@@ -31,35 +31,23 @@ class ASTNode;
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 
-struct Set;
-typedef struct Set Set;
-typedef struct Set MutableSet;
+class Set;
+typedef class Set MutableSet;
 
 class ElementFunction;
 class ElementSet;
 class ElementConst;
 class Element;
 
-typedef struct FunctionOperator FunctionOperator;
-typedef struct FunctionTable FunctionTable;
+class FunctionOperator;
+class FunctionTable;
+class Function;
 
-struct Function;
-typedef struct Function Function;
-
-struct Predicate;
-typedef struct Predicate Predicate;
-
-struct PredicateTable;
-typedef struct PredicateTable PredicateTable;
-
-struct PredicateOperator;
-typedef struct PredicateOperator PredicateOperator;
-
-struct Table;
-typedef struct Table Table;
-
-struct Order;
-typedef struct Order Order;
+class Predicate;
+class PredicateTable;
+class PredicateOperator;
+class Table;
+class Order;
 
 struct OrderPair;
 typedef struct OrderPair OrderPair;

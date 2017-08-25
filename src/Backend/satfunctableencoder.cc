@@ -98,7 +98,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
 		Set *set = getArraySet(&predicate->table->domains, i);
-		vals[i] = getSetElement(set, indices[i]);
+		vals[i] = set->getElement(indices[i]);
 	}
 	bool hasOverflow = false;
 	Edge undefConstraint = encodeConstraintSATEncoder (This, constraint->undefStatus);
@@ -106,7 +106,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains];
-		TableEntry *tableEntry = getTableEntryFromTable(predicate->table, vals, numDomains);
+		TableEntry *tableEntry = predicate->table->getTableEntry(vals, numDomains);
 		bool isInRange = tableEntry != NULL;
 		if (!isInRange && !hasOverflow) {
 			hasOverflow = true;
@@ -152,13 +152,13 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 			uint index = ++indices[i];
 			Set *set = getArraySet(&predicate->table->domains, i);
 
-			if (index < getSetSize(set)) {
-				vals[i] = getSetElement(set, index);
+			if (index < set->getSize()) {
+				vals[i] = set->getElement(index);
 				notfinished = true;
 				break;
 			} else {
 				indices[i] = 0;
-				vals[i] = getSetElement(set, 0);
+				vals[i] = set->getElement(0);
 			}
 		}
 	}
@@ -247,14 +247,14 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
 		Set *set = getArraySet(&function->table->domains, i);
-		vals[i] = getSetElement(set, indices[i]);
+		vals[i] = set->getElement(indices[i]);
 	}
 
 	Edge undefConstraint = encodeConstraintSATEncoder(This, elemFunc->overflowstatus);
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains + 1];
-		TableEntry *tableEntry = getTableEntryFromTable(function->table, vals, numDomains);
+		TableEntry *tableEntry = function->table->getTableEntry(vals, numDomains);
 		bool isInRange = tableEntry != NULL;
 		ASSERT(function->undefBehavior == UNDEFINEDSETSFLAG || function->undefBehavior == FLAGIFFUNDEFINED);
 		for (uint i = 0; i < numDomains; i++) {
@@ -302,13 +302,13 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 			uint index = ++indices[i];
 			Set *set = getArraySet(&function->table->domains, i);
 
-			if (index < getSetSize(set)) {
-				vals[i] = getSetElement(set, index);
+			if (index < set->getSize()) {
+				vals[i] = set->getElement(index);
 				notfinished = true;
 				break;
 			} else {
 				indices[i] = 0;
-				vals[i] = getSetElement(set, 0);
+				vals[i] = set->getElement(0);
 			}
 		}
 	}

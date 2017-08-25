@@ -405,7 +405,7 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 				neworder = getVectorOrder(&ordervec, from->sccNum);
 			if (neworder == NULL) {
 				Set *set = (Set *) allocMutableSet(order->set->type);
-				neworder = allocOrder(order->type, set);
+				neworder = new Order(order->type, set);
 				pushVectorOrder(This->allOrders, neworder);
 				setExpandVectorOrder(&ordervec, from->sccNum, neworder);
 				if (order->type == PARTIAL)
@@ -427,7 +427,7 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 					setExpandVectorOrder(&partialcandidatevec, from->sccNum, NULL);
 			}
 			orderconstraint->order = neworder;
-			addOrderConstraint(neworder, orderconstraint);
+			neworder->addOrderConstraint(orderconstraint);
 		}
 	}
 

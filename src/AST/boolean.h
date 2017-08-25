@@ -52,9 +52,9 @@ class BooleanPredicate : public Boolean {
 	FunctionEncoding encoding;
 	ArrayElement inputs;
 	Boolean *undefStatus;
+	FunctionEncoding * getFunctionEncoding() {return &encoding;}
 	MEMALLOC;
 };
-
 
 class BooleanLogic : public Boolean {
  public:
@@ -64,16 +64,4 @@ class BooleanLogic : public Boolean {
 	ArrayBoolean inputs;
 	MEMALLOC;
 };
-
-
-
-Boolean *allocBooleanVar(VarType t);
-Boolean *allocBooleanOrder(Order *order, uint64_t first, uint64_t second);
-Boolean *allocBooleanPredicate(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus);
-Boolean *allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean **array, uint asize);
-void deleteBoolean(Boolean *This);
-static inline FunctionEncoding *getPredicateFunctionEncoding(BooleanPredicate *func) {
-	return &func->encoding;
-}
-
 #endif

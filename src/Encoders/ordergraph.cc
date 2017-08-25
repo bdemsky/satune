@@ -33,8 +33,8 @@ OrderGraph *buildMustOrderGraph(Order *order) {
 }
 
 void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
-	Polarity polarity = constr->base.polarity;
-	BooleanValue mustval = constr->base.boolVal;
+	Polarity polarity = constr->polarity;
+	BooleanValue mustval = constr->boolVal;
 	Order *order = graph->order;
 	switch (polarity) {
 	case P_BOTHTRUEFALSE:
@@ -45,7 +45,7 @@ void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boolean
 		_1to2->polPos = true;
 		addNewOutgoingEdge(node1, _1to2);
 		addNewIncomingEdge(node2, _1to2);
-		if (constr->base.polarity == P_TRUE)
+		if (constr->polarity == P_TRUE)
 			break;
 	}
 	case P_FALSE: {
@@ -73,7 +73,7 @@ void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boolean
 }
 
 void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
-	BooleanValue mustval = constr->base.boolVal;
+	BooleanValue mustval = constr->boolVal;
 	Order *order = graph->order;
 	switch (mustval) {
 	case BV_UNSAT:
@@ -83,7 +83,7 @@ void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boo
 		_1to2->polPos = true;
 		addNewOutgoingEdge(node1, _1to2);
 		addNewIncomingEdge(node2, _1to2);
-		if (constr->base.boolVal == BV_MUSTBETRUE)
+		if (constr->boolVal == BV_MUSTBETRUE)
 			break;
 	}
 	case BV_MUSTBEFALSE: {

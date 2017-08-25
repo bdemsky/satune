@@ -4,46 +4,38 @@
 #include "boolean.h"
 #include "ordergraph.h"
 
-Order *allocOrder(OrderType type, Set *set) {
-	Order *This = (Order *)ourmalloc(sizeof(Order));
-	This->set = set;
-	initDefVectorBooleanOrder(&This->constraints);
-	This->type = type;
-	initOrderEncoding(&This->order, This);
-	This->orderPairTable = NULL;
-	This->elementTable = NULL;
-	This->graph = NULL;
-	return This;
+Order::Order(OrderType _type, Set *_set) : type(_type), set(_set), orderPairTable(NULL), elementTable(NULL), graph(NULL) {
+	initDefVectorBooleanOrder(&constraints);
+	initOrderEncoding(&order, this);
 }
 
-void initializeOrderHashTable(Order *This) {
-	This->orderPairTable = allocHashTableOrderPair(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+void Order::initializeOrderHashTable() {
+	orderPairTable = allocHashTableOrderPair(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
-void initializeOrderElementsHashTable(Order *This){
-	This->elementTable = allocHashSetOrderElement(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
+void Order::initializeOrderElementsHashTable() {
+	elementTable = allocHashSetOrderElement(HT_INITIAL_CAPACITY, HT_DEFAULT_FACTOR);
 }
 
-void addOrderConstraint(Order *This, BooleanOrder *constraint) {
-	pushVectorBooleanOrder( &This->constraints, constraint);
+void Order::addOrderConstraint(BooleanOrder *constraint) {
+	pushVectorBooleanOrder(&constraints, constraint);
 }
 
-void setOrderEncodingType(Order *This, OrderEncodingType type) {
-	This->order.type = type;
+void Order::setOrderEncodingType(OrderEncodingType type) {
+	order.type = type;
 }
 
-void deleteOrder(Order *This) {
-	deleteVectorArrayBooleanOrder(&This->constraints);
-	deleteOrderEncoding(&This->order);
-	if (This->orderPairTable != NULL) {
-		resetAndDeleteHashTableOrderPair(This->orderPairTable);
-		deleteHashTableOrderPair(This->orderPairTable);
+Order::~Order() {
+	deleteVectorArrayBooleanOrder(&constraints);
+	deleteOrderEncoding(&order);
+	if (orderPairTable != NULL) {
+		resetAndDeleteHashTableOrderPair(orderPairTable);
+		deleteHashTableOrderPair(orderPairTable);
 	}
-	if(This->elementTable != NULL){
-		deleteHashSetOrderElement(This->elementTable);
+	if(elementTable != NULL){
+		deleteHashSetOrderElement(elementTable);
 	}
-	if (This->graph != NULL) {
-		deleteOrderGraph(This->graph);
+	if (graph != NULL) {
+		deleteOrderGraph(graph);
 	}
-	ourfree(This);
 }

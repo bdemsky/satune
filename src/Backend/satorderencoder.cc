@@ -43,7 +43,7 @@ Edge orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 		return gvalue;
 	
 	if (boolOrder->order->elementTable == NULL) {
-		initializeOrderElementsHashTable(boolOrder->order);
+		boolOrder->order->initializeOrderElementsHashTable();
 	}
 	//getting two elements and using LT predicate ...
 	Element* elem1 = getOrderIntegerElement(This, order, boolOrder->first);
@@ -59,10 +59,10 @@ Edge orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 		encodingArrayInitialization(encoding);
 	}
 	Set * sarray[]={order->set, order->set};
-	Predicate *predicate =allocPredicateOperator(LT, sarray, 2);
+	Predicate *predicate =new PredicateOperator(LT, sarray, 2);
 	Element * parray[]={elem1, elem2};
-	Boolean * boolean=allocBooleanPredicate(predicate, parray, 2, NULL);
-	setFunctionEncodingType(getPredicateFunctionEncoding((BooleanPredicate*)boolean), CIRCUIT);
+	BooleanPredicate * boolean=new BooleanPredicate(predicate, parray, 2, NULL);
+	setFunctionEncodingType(boolean->getFunctionEncoding(), CIRCUIT);
 	{//Adding new elements and boolean/predicate to solver regarding memory management
 		pushVectorBoolean(This->solver->allBooleans, boolean);
 		pushVectorPredicate(This->solver->allPredicates, predicate);
@@ -101,7 +101,7 @@ Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
 	HashSetOrderElement* eset = order->elementTable;
 	OrderElement oelement ={item, NULL};
 	if( !containsHashSetOrderElement(eset, &oelement)){
-		Element* elem = allocElementSet(order->set);
+		Element* elem = new ElementSet(order->set);
 		ElementEncoding* encoding = getElementEncoding(elem);
 		setElementEncodingType(encoding, BINARYINDEX);
 		encodingArrayInitialization(encoding);
@@ -139,7 +139,7 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
-		initializeOrderHashTable(boolOrder->order);
+		boolOrder->order->initializeOrderHashTable();
 		bool doOptOrderStructure=GETVARTUNABLE(This->solver->tuner, boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);

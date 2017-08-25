@@ -1,56 +1,42 @@
 #include "set.h"
 #include <stddef.h>
 
-Set *allocSet(VarType t, uint64_t *elements, uint num) {
-	Set *This = (Set *)ourmalloc(sizeof(Set));
-	This->type = t;
-	This->isRange = false;
-	This->low = 0;
-	This->high = 0;
-	This->members = allocVectorArrayInt(num, elements);
-	return This;
+Set::Set(VarType t, uint64_t *elements, uint num) : type(t), isRange(false), low(0), high(0) {
+	members = allocVectorArrayInt(num, elements);
 }
 
-Set *allocSetRange(VarType t, uint64_t lowrange, uint64_t highrange) {
-	Set *This = (Set *)ourmalloc(sizeof(Set));
-	This->type = t;
-	This->isRange = true;
-	This->low = lowrange;
-	This->high = highrange;
-	This->members = NULL;
-	return This;
+Set::Set(VarType t, uint64_t lowrange, uint64_t highrange) : type(t), isRange(true), low(lowrange), high(highrange), members(NULL) {
 }
 
-bool existsInSet(Set *This, uint64_t element) {
-	if (This->isRange) {
-		return element >= This->low && element <= This->high;
+bool Set::exists(uint64_t element) {
+	if (isRange) {
+		return element >= low && element <= high;
 	} else {
-		uint size = getSizeVectorInt(This->members);
+		uint size = getSizeVectorInt(members);
 		for (uint i = 0; i < size; i++) {
-			if (element == getVectorInt(This->members, i))
+			if (element == getVectorInt(members, i))
 				return true;
 		}
 		return false;
 	}
 }
 
-uint64_t getSetElement(Set *This, uint index) {
-	if (This->isRange)
-		return This->low + index;
+uint64_t Set::getElement(uint index) {
+	if (isRange)
+		return low + index;
 	else
-		return getVectorInt(This->members, index);
+		return getVectorInt(members, index);
 }
 
-uint getSetSize(Set *This) {
-	if (This->isRange) {
-		return This->high - This->low + 1;
+uint Set::getSize() {
+	if (isRange) {
+		return high - low + 1;
 	} else {
-		return getSizeVectorInt(This->members);
+		return getSizeVectorInt(members);
 	}
 }
 
-void deleteSet(Set *This) {
-	if (!This->isRange)
-		deleteVectorInt(This->members);
-	ourfree(This);
+Set::~Set() {
+	if (!isRange)
+		deleteVectorInt(members);
 }

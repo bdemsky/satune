@@ -28,7 +28,7 @@ void naiveEncodingConstraint(Boolean *This) {
 		return;
 	}
 	case ORDERCONST: {
-		setOrderEncodingType( ((BooleanOrder *)This)->order, PAIRWISE );
+		((BooleanOrder *) This)->order->setOrderEncodingType(PAIRWISE);
 		return;
 	}
 	case LOGICOP: {
@@ -51,9 +51,9 @@ void naiveEncodingLogicOp(BooleanLogic *This) {
 }
 
 void naiveEncodingPredicate(BooleanPredicate *This) {
-	FunctionEncoding *encoding = getPredicateFunctionEncoding(This);
+	FunctionEncoding *encoding = This->getFunctionEncoding();
 	if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
-		setFunctionEncodingType(getPredicateFunctionEncoding(This), ENUMERATEIMPLICATIONS);
+		setFunctionEncodingType(This->getFunctionEncoding(), ENUMERATEIMPLICATIONS);
 
 	for (uint i = 0; i < getSizeArrayElement(&This->inputs); i++) {
 		Element *element = getArrayElement(&This->inputs, i);

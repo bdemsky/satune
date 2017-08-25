@@ -7,7 +7,10 @@
 #include "orderencoding.h"
 #include "boolean.h"
 
-struct Order {
+class Order {
+ public:
+	Order(OrderType type, Set *set);
+	~Order();
 	OrderType type;
 	Set *set;
 	HashTableOrderPair *orderPairTable;
@@ -15,12 +18,11 @@ struct Order {
 	OrderGraph *graph;
 	VectorBooleanOrder constraints;
 	OrderEncoding order;
+	void initializeOrderHashTable();
+	void initializeOrderElementsHashTable();
+	void addOrderConstraint(BooleanOrder *constraint);
+	void setOrderEncodingType(OrderEncodingType type);
+	MEMALLOC;
 };
 
-Order *allocOrder(OrderType type, Set *set);
-void initializeOrderHashTable(Order *This);
-void initializeOrderElementsHashTable(Order *This);
-void addOrderConstraint(Order *This, BooleanOrder *constraint);
-void setOrderEncodingType(Order *This, OrderEncodingType type);
-void deleteOrder(Order *This);
 #endif

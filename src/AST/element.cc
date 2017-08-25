@@ -22,7 +22,7 @@ ElementFunction::ElementFunction(Function *_function, Element **array, uint numA
 
 ElementConst::ElementConst(uint64_t _value, VarType _type) : Element(ELEMCONST), value(_value) {
 	uint64_t array[]={value};
-	set = allocSet(_type, array, 1);
+	set = new Set(_type, array, 1);
 }
 
 Set *getElementSet(Element *This) {
@@ -55,7 +55,7 @@ ElementFunction::~ElementFunction() {
 }
 
 ElementConst::~ElementConst() {
-	deleteSet(set);
+	delete set;
 }
 
 Element::~Element() {

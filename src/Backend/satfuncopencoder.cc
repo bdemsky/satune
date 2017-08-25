@@ -43,14 +43,14 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
 		Set *set = getArraySet(&predicate->domains, i);
-		vals[i] = getSetElement(set, indices[i]);
+		vals[i] = set->getElement(indices[i]);
 	}
 
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains];
 
-		if (evalPredicateOperator(predicate, vals) ^ generateNegation) {
+		if (predicate->evalPredicateOperator(vals) ^ generateNegation) {
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
 				Element *elem = getArrayElement(&constraint->inputs, i);
@@ -65,13 +65,13 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 			uint index = ++indices[i];
 			Set *set = getArraySet(&predicate->domains, i);
 
-			if (index < getSetSize(set)) {
-				vals[i] = getSetElement(set, index);
+			if (index < set->getSize()) {
+				vals[i] = set->getElement(index);
 				notfinished = true;
 				break;
 			} else {
 				indices[i] = 0;
-				vals[i] = getSetElement(set, 0);
+				vals[i] = set->getElement(0);
 			}
 		}
 	}
@@ -106,7 +106,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
 		Set *set = getElementSet(getArrayElement(&func->inputs, i));
-		vals[i] = getSetElement(set, indices[i]);
+		vals[i] = set->getElement(indices[i]);
 	}
 
 	Edge overFlowConstraint = ((BooleanVar *) func->overflowstatus)->var;
@@ -115,8 +115,8 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 	while (notfinished) {
 		Edge carray[numDomains + 1];
 
-		uint64_t result = applyFunctionOperator(function, numDomains, vals);
-		bool isInRange = isInRangeFunction((FunctionOperator *)func->function, result);
+		uint64_t result = function->applyFunctionOperator(numDomains, vals);
+		bool isInRange = ((FunctionOperator *)func->function)->isInRangeFunction(result);
 		bool needClause = isInRange;
 		if (function->overflowbehavior == OVERFLOWSETSFLAG || function->overflowbehavior == FLAGIFFOVERFLOW) {
 			needClause = true;
@@ -176,13 +176,13 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 			uint index = ++indices[i];
 			Set *set = getElementSet(getArrayElement(&func->inputs, i));
 
-			if (index < getSetSize(set)) {
-				vals[i] = getSetElement(set, index);
+			if (index < set->getSize()) {
+				vals[i] = set->getElement(index);
 				notfinished = true;
 				break;
 			} else {
 				indices[i] = 0;
-				vals[i] = getSetElement(set, 0);
+				vals[i] = set->getElement(0);
 			}
 		}
 	}

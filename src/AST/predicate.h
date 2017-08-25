@@ -7,24 +7,28 @@
 
 #define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
 
-struct Predicate {
+class Predicate {
+ public:
+  Predicate(PredicateType _type) : type(_type) {}
 	PredicateType type;
+	MEMALLOC;
 };
 
-struct PredicateOperator {
-	Predicate base;
+class PredicateOperator : public Predicate {
+ public:
+	PredicateOperator(CompOp op, Set **domain, uint numDomain);
+	~PredicateOperator();
+	bool evalPredicateOperator(uint64_t *inputs);
 	CompOp op;
 	ArraySet domains;
+	MEMALLOC;
 };
 
-struct PredicateTable {
-	Predicate base;
+class PredicateTable : public Predicate {
+ public:
+	PredicateTable(Table *table, UndefinedBehavior undefBehavior);
 	Table *table;
 	UndefinedBehavior undefinedbehavior;
+	MEMALLOC;
 };
-
-Predicate *allocPredicateOperator(CompOp op, Set **domain, uint numDomain);
-Predicate *allocPredicateTable(Table *table, UndefinedBehavior undefBehavior);
-bool evalPredicateOperator(PredicateOperator *This, uint64_t *inputs);
-void deletePredicate(Predicate *This);
 #endif

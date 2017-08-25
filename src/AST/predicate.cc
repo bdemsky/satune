@@ -3,40 +3,19 @@
 #include "set.h"
 #include "table.h"
 
-Predicate *allocPredicateOperator(CompOp op, Set **domain, uint numDomain) {
-	PredicateOperator *This = (PredicateOperator *)ourmalloc(sizeof(PredicateOperator));
-	GETPREDICATETYPE(This) = OPERATORPRED;
-	initArrayInitSet(&This->domains, domain, numDomain);
-	This->op = op;
-	return &This->base;
+PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED) , op(_op) {
+	initArrayInitSet(&domains, domain, numDomain);
 }
 
-Predicate *allocPredicateTable(Table *table, UndefinedBehavior undefBehavior) {
-	ASSERT(table->range == NULL);
-	PredicateTable *This = (PredicateTable *) ourmalloc(sizeof(PredicateTable));
-	GETPREDICATETYPE(This) = TABLEPRED;
-	This->table = table;
-	This->undefinedbehavior = undefBehavior;
-	return &This->base;
+PredicateTable::PredicateTable(Table *_table, UndefinedBehavior _undefBehavior) : Predicate(TABLEPRED), table(_table), undefinedbehavior(_undefBehavior) {
 }
 
-void deletePredicate(Predicate *This) {
-	switch (GETPREDICATETYPE(This)) {
-	case OPERATORPRED: {
-		PredicateOperator *operpred = (PredicateOperator *) This;
-		deleteInlineArraySet(&operpred->domains);
-		break;
-	}
-	case TABLEPRED: {
-		break;
-	}
-	}
-	//need to handle freeing array...
-	ourfree(This);
+PredicateOperator::~PredicateOperator() {
+	deleteInlineArraySet(&domains);
 }
 
-bool evalPredicateOperator(PredicateOperator *This, uint64_t *inputs) {
-	switch (This->op) {
+bool PredicateOperator::evalPredicateOperator(uint64_t *inputs) {
+	switch (op) {
 	case EQUALS:
 		return inputs[0] == inputs[1];
 	case LT:
