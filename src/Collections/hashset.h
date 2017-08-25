@@ -120,12 +120,12 @@ public:
 	/** @brief Adds a new key to the hashset.  Returns false if the key
 	 *  is already present. */
 
-  void addAll(HashSet<_Key, _KeyInt, _Shift, hash_function, equals> * table) {
+	void addAll(HashSet<_Key, _KeyInt, _Shift, hash_function, equals> * table) {
 		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> * it=iterator();
 		while(it->hasNext())
 			add(it->next());
 		delete it;
-  }
+	}
 
 	/** @brief Adds a new key to the hashset.  Returns false if the key
 	 *  is already present. */
