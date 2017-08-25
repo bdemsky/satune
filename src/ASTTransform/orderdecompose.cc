@@ -85,6 +85,7 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 				neworder = ordervec.get(from->sccNum);
 			if (neworder == NULL) {
 				MutableSet *set = new MutableSet(order->set->type);
+				This->allSets.push(set);
 				neworder = new Order(order->type, set);
 				This->allOrders.push(neworder);
 				ordervec.setExpand(from->sccNum, neworder);

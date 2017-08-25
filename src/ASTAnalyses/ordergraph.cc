@@ -10,7 +10,6 @@ OrderGraph *allocOrderGraph(Order *order) {
 	This->nodes = new HashSetOrderNode();
 	This->edges = new HashSetOrderEdge();
 	This->order = order;
-	order->graph = This;
 	return This;
 }
 
