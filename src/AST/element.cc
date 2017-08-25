@@ -5,39 +5,24 @@
 #include "function.h"
 #include "table.h"
 
-Element *allocElementSet(Set *s) {
-	ElementSet *This = (ElementSet *)ourmalloc(sizeof(ElementSet));
-	GETELEMENTTYPE(This) = ELEMSET;
-	This->set = s;
-	initDefVectorASTNode(GETELEMENTPARENTS(This));
-	initElementEncoding(&This->encoding, (Element *) This);
-	return &This->base;
+Element::Element(ASTNodeType _type) : ASTNode(_type) {
+	initDefVectorASTNode(GETELEMENTPARENTS(this));
+	initElementEncoding(&encoding, (Element *) this);
 }
 
-Element *allocElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
-	ElementFunction *This = (ElementFunction *) ourmalloc(sizeof(ElementFunction));
-	GETELEMENTTYPE(This) = ELEMFUNCRETURN;
-	This->function = function;
-	ASSERT(GETBOOLEANTYPE(overflowstatus) == BOOLEANVAR);
-	This->overflowstatus = overflowstatus;
-	initArrayInitElement(&This->inputs, array, numArrays);
-	initDefVectorASTNode(GETELEMENTPARENTS(This));
+ElementSet::ElementSet(Set *s) : Element(ELEMSET), set(s) {
+}
+
+ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) : Element(ELEMFUNCRETURN), function(_function), overflowstatus(_overflowstatus) {
+	initArrayInitElement(&inputs, array, numArrays);
 	for (uint i = 0; i < numArrays; i++)
-		pushVectorASTNode(GETELEMENTPARENTS(array[i]), (ASTNode *) This);
-	initElementEncoding(&This->rangeencoding, (Element *) This);
-	initFunctionEncoding(&This->functionencoding, (Element *) This);
-	return &This->base;
+		pushVectorASTNode(GETELEMENTPARENTS(array[i]), this);
+	initFunctionEncoding(&functionencoding, this);
 }
 
-Element *allocElementConst(uint64_t value, VarType type) {
-	ElementConst *This = (ElementConst *)ourmalloc(sizeof(ElementConst));
-	GETELEMENTTYPE(This) = ELEMCONST;
-	This->value = value;
+ElementConst::ElementConst(uint64_t _value, VarType _type) : Element(ELEMCONST), value(_value) {
 	uint64_t array[]={value};
-	This->set = allocSet(type, array, 1);
-	initDefVectorASTNode(GETELEMENTPARENTS(This));
-	initElementEncoding(&This->encoding, (Element *) This);
-	return &This->base;
+	set = allocSet(_type, array, 1);
 }
 
 Set *getElementSet(Element *This) {
@@ -64,29 +49,16 @@ Set *getElementSet(Element *This) {
 	return NULL;
 }
 
-void deleteElement(Element *This) {
-	switch (GETELEMENTTYPE(This)) {
-	case ELEMFUNCRETURN: {
-		ElementFunction *ef = (ElementFunction *) This;
-		deleteInlineArrayElement(&ef->inputs);
-		deleteElementEncoding(&ef->rangeencoding);
-		deleteFunctionEncoding(&ef->functionencoding);
-		break;
-	}
-	case ELEMSET: {
-		ElementSet *es = (ElementSet *) This;
-		deleteElementEncoding(&es->encoding);
-		break;
-	}
-	case ELEMCONST: {
-		ElementConst *ec = (ElementConst *) This;
-		deleteSet(ec->set);//Client did not create, so we free it
-		deleteElementEncoding(&ec->encoding);
-		break;
-	}
-	default:
-		ASSERT(0);
-	}
-	deleteVectorArrayASTNode(GETELEMENTPARENTS(This));
-	ourfree(This);
+ElementFunction::~ElementFunction() {
+	deleteInlineArrayElement(&inputs);
+	deleteFunctionEncoding(&functionencoding);
+}
+
+ElementConst::~ElementConst() {
+	deleteSet(set);
+}
+
+Element::~Element() {
+	deleteElementEncoding(&encoding);
+	deleteVectorArrayASTNode(GETELEMENTPARENTS(this));
 }

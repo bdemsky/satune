@@ -48,7 +48,7 @@ void deleteSolver(CSolver *This) {
 
 	size = getSizeVectorElement(This->allElements);
 	for (uint i = 0; i < size; i++) {
-		deleteElement(getVectorElement(This->allElements, i));
+		delete getVectorElement(This->allElements, i);
 	}
 	deleteVectorElement(This->allElements);
 
@@ -109,13 +109,13 @@ uint64_t createUniqueItem(CSolver *This, MutableSet *set) {
 }
 
 Element *getElementVar(CSolver *This, Set *set) {
-	Element *element = allocElementSet(set);
+	Element *element = new ElementSet(set);
 	pushVectorElement(This->allElements, element);
 	return element;
 }
 
 Element *getElementConst(CSolver *This, VarType type, uint64_t value) {
-	Element *element = allocElementConst(value, type);
+	Element *element = new ElementConst(value, type);
 	pushVectorElement(This->allElements, element);
 	return element;
 }
@@ -165,7 +165,7 @@ Function *completeTable(CSolver *This, Table *table, UndefinedBehavior behavior)
 }
 
 Element *applyFunction(CSolver *This, Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
-	Element *element = allocElementFunction(function,array,numArrays,overflowstatus);
+	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
 	pushVectorElement(This->allElements, element);
 	return element;
 }
@@ -174,13 +174,13 @@ Boolean *applyPredicate(CSolver *This, Predicate *predicate, Element **inputs, u
 	return applyPredicateTable(This, predicate, inputs, numInputs, NULL);
 }
 Boolean *applyPredicateTable(CSolver *This, Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
-	Boolean *boolean = allocBooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
+	Boolean *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
 	pushVectorBoolean(This->allBooleans, boolean);
 	return boolean;
 }
 
 Boolean *applyLogicalOperation(CSolver *This, LogicOp op, Boolean **array, uint asize) {
-	return allocBooleanLogicArray(This, op, array, asize);
+	return new BooleanLogic(This, op, array, asize);
 }
 
 void addConstraint(CSolver *This, Boolean *constraint) {
@@ -194,7 +194,7 @@ Order *createOrder(CSolver *This, OrderType type, Set *set) {
 }
 
 Boolean *orderConstraint(CSolver *This, Order *order, uint64_t first, uint64_t second) {
-	Boolean *constraint = allocBooleanOrder(order, first, second);
+	Boolean *constraint = new BooleanOrder(order, first, second);
 	pushVectorBoolean(This->allBooleans,constraint);
 	return constraint;
 }

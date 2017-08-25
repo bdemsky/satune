@@ -21,16 +21,12 @@ typedef struct CSolver CSolver;
 struct SATEncoder;
 typedef struct SATEncoder SATEncoder;
 
-typedef struct BooleanOrder BooleanOrder;
-typedef struct BooleanVar BooleanVar;
-typedef struct BooleanLogic BooleanLogic;
-typedef struct BooleanPredicate BooleanPredicate;
-
-struct ASTNode;
-typedef struct ASTNode ASTNode;
-
-struct Boolean;
-typedef struct Boolean Boolean;
+class Boolean;
+class BooleanOrder;
+class BooleanVar;
+class BooleanLogic;
+class BooleanPredicate;
+class ASTNode;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
@@ -39,12 +35,10 @@ struct Set;
 typedef struct Set Set;
 typedef struct Set MutableSet;
 
-typedef struct ElementFunction ElementFunction;
-typedef struct ElementSet ElementSet;
-typedef struct ElementConst ElementConst;
-
-struct Element;
-typedef struct Element Element;
+class ElementFunction;
+class ElementSet;
+class ElementConst;
+class Element;
 
 typedef struct FunctionOperator FunctionOperator;
 typedef struct FunctionTable FunctionTable;

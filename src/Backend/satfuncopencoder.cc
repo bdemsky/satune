@@ -129,7 +129,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 				carray[i] = getElementValueConstraint(This, elem, vals[i]);
 			}
 			if (isInRange) {
-				carray[numDomains] = getElementValueConstraint(This, &func->base, result);
+				carray[numDomains] = getElementValueConstraint(This, func, result);
 			}
 
 			Edge clause;

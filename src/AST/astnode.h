@@ -3,9 +3,11 @@
 #include "classlist.h"
 #include "ops.h"
 
-struct ASTNode {
+class ASTNode {
+ public:
+  ASTNode(ASTNodeType _type) : type(_type) {}
 	ASTNodeType type;
+	MEMALLOC;
 };
 
-#define GETASTNODETYPE(o) (((ASTNode *) o)->type)
 #endif
