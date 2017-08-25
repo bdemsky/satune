@@ -23,6 +23,6 @@ int getVarTunable(Tuner *This, VarType vartype, TunableParam param, TunableDesc 
 
 static TunableDesc onoff={0, 1, 1};
 static TunableDesc offon={0, 1, 0};
-enum Tunables {DECOMPOSEORDER, MUSTREACHGLOBAL, MUSTREACHLOCAL, MUSTREACHPRUNE, OPTIMIZEORDERSTRUCTURE};
+enum Tunables {DECOMPOSEORDER, MUSTREACHGLOBAL, MUSTREACHLOCAL, MUSTREACHPRUNE, OPTIMIZEORDERSTRUCTURE, ORDERINTEGERENCODING};
 typedef enum Tunables Tunables;
 #endif

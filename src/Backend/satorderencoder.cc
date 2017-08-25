@@ -14,62 +14,30 @@
 #include "orderelement.h"
 
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
-	if(constraint->order->order.type == INTEGERENCODING){
-		return orderIntegerEncodingSATEncoder(This, constraint);
-	}
-	switch ( constraint->order->type) {
-	case PARTIAL:
-		return encodePartialOrderSATEncoder(This, constraint);
-	case TOTAL:
-		return encodeTotalOrderSATEncoder(This, constraint);
-	default:
-		ASSERT(0);
+	switch (constraint->order->order.type){
+		case PAIRWISE:
+			switch ( constraint->order->type) {
+				case PARTIAL:
+					return encodePartialOrderSATEncoder(This, constraint);
+				case TOTAL:
+					return encodeTotalOrderSATEncoder(This, constraint);
+				default:
+					ASSERT(0);
+			}
+		case INTEGERENCODING:{
+			//Infer the value from graph ...
+			Order* order = constraint->order;
+			Edge gvalue = inferOrderConstraintFromGraph(order, constraint->first, constraint->second);
+			if(!edgeIsNull(gvalue))
+				return gvalue;
+			//If we couldn't infer the value from graph, we have already generated a predicate for that ...
+			// So, we should do nothing
+			return E_BOGUS;
+		}
+		default:
+			ASSERT(0);
 	}
 	return E_BOGUS;
-}
-
-Edge orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
-	if(boolOrder->order->graph == NULL){
-		bool doOptOrderStructure=GETVARTUNABLE(This->solver->tuner, boolOrder->order->type,
-			OPTIMIZEORDERSTRUCTURE, &onoff);
-		if (doOptOrderStructure ) {
-			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
-			reachMustAnalysis(This->solver, boolOrder->order->graph, true);
-		}
-	}
-	Order* order = boolOrder->order;
-	Edge gvalue = inferOrderConstraintFromGraph(order, boolOrder->first, boolOrder->second);
-	if(!edgeIsNull(gvalue))
-		return gvalue;
-	
-	if (boolOrder->order->elementTable == NULL) {
-		boolOrder->order->initializeOrderElementsHashTable();
-	}
-	//getting two elements and using LT predicate ...
-	Element* elem1 = getOrderIntegerElement(This, order, boolOrder->first);
-	ElementEncoding *encoding = getElementEncoding(elem1);
-	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
-		encoding->setElementEncodingType(BINARYINDEX);
-		encoding->encodingArrayInitialization();
-	}
-	Element* elem2 = getOrderIntegerElement(This, order, boolOrder->second);
-	encoding = getElementEncoding(elem2);
-	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
-		encoding->setElementEncodingType(BINARYINDEX);
-		encoding->encodingArrayInitialization();
-	}
-	Set * sarray[]={order->set, order->set};
-	Predicate *predicate =new PredicateOperator(LT, sarray, 2);
-	Element * parray[]={elem1, elem2};
-	BooleanPredicate * boolean=new BooleanPredicate(predicate, parray, 2, NULL);
-	boolean->getFunctionEncoding()->setFunctionEncodingType(CIRCUIT);
-	{//Adding new elements and boolean/predicate to solver regarding memory management
-		This->solver->allBooleans.push(boolean);
-		This->solver->allPredicates.push(predicate);
-		This->solver->allElements.push(elem1);
-		This->solver->allElements.push(elem2);
-	}
-	return encodeConstraintSATEncoder(This, boolean);
 }
 
 Edge inferOrderConstraintFromGraph(Order* order, uint64_t _first, uint64_t _second){
@@ -95,21 +63,6 @@ Edge inferOrderConstraintFromGraph(Order* order, uint64_t _first, uint64_t _seco
 		}
 	}
 	return E_NULL;
-}
-
-Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
-	HashSetOrderElement* eset = order->elementTable;
-	OrderElement oelement ={item, NULL};
-	if( !eset->contains(&oelement)){
-		Element* elem = new ElementSet(order->set);
-		ElementEncoding* encoding = getElementEncoding(elem);
-		encoding->setElementEncodingType(BINARYINDEX);
-		encoding->encodingArrayInitialization();
-		encodeElementSATEncoder(This, elem);
-		eset->add(allocOrderElement(item, elem));
-		return elem;
-	} else
-		return eset->get(&oelement)->elem;
 }
 
 Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
