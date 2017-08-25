@@ -10,9 +10,8 @@
 #include "satencoder.h"
 #include "sattranslator.h"
 #include "tunable.h"
-#include "orderencoder.h"
 #include "polarityassignment.h"
-#include "asttransform.h"
+#include "orderdecompose.h"
 
 CSolver::CSolver() : unsat(false) {
 	tuner = allocTuner();
@@ -183,9 +182,8 @@ Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second)
 
 int CSolver::startEncoding() {
 	computePolarities(this);
-	ASTTransform(this);
-	naiveEncodingDecision(this);
 	orderAnalysis(this);
+	naiveEncodingDecision(this);
 	encodeAllSATEncoder(this, satEncoder);
 	int result = solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);

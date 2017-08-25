@@ -28,8 +28,6 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiveClosure);
 void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph);
 void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph);
-void orderAnalysis(CSolver *This);
-void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph);
 
 #endif/* ORDERGRAPHBUILDER_H */
 

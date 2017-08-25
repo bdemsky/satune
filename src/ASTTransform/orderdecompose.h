@@ -16,6 +16,7 @@
 #include "classlist.h"
 #include "structs.h"
 
+void orderAnalysis(CSolver *This);
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph);
 
 #endif /* ORDERDECOMPOSE_H */

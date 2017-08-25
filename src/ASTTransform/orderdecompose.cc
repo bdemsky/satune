@@ -9,6 +9,55 @@
 #include "mutableset.h"
 #include "ops.h"
 #include "csolver.h"
+#include "orderencoder.h"
+#include "tunable.h"
+
+void orderAnalysis(CSolver *This) {
+	uint size = This->allOrders.getSize();
+	for (uint i = 0; i < size; i++) {
+		Order *order = This->allOrders.get(i);
+		bool doDecompose=GETVARTUNABLE(This->tuner, order->type, DECOMPOSEORDER, &onoff);
+		if (!doDecompose)
+			continue;
+		
+		OrderGraph *graph = buildOrderGraph(order);
+		if (order->type == PARTIAL) {
+			//Required to do SCC analysis for partial order graphs.  It
+			//makes sure we don't incorrectly optimize graphs with negative
+			//polarity edges
+			completePartialOrderGraph(graph);
+		}
+
+
+		bool mustReachGlobal=GETVARTUNABLE(This->tuner, order->type, MUSTREACHGLOBAL, &onoff);
+
+		if (mustReachGlobal)
+			reachMustAnalysis(This, graph, false);
+
+		bool mustReachLocal=GETVARTUNABLE(This->tuner, order->type, MUSTREACHLOCAL, &onoff);
+		
+		if (mustReachLocal) {
+			//This pair of analysis is also optional
+			if (order->type == PARTIAL) {
+				localMustAnalysisPartial(This, graph);
+			} else {
+				localMustAnalysisTotal(This, graph);
+			}
+		}
+
+		bool mustReachPrune=GETVARTUNABLE(This->tuner, order->type, MUSTREACHPRUNE, &onoff);
+		
+		if (mustReachPrune)
+			removeMustBeTrueNodes(This, graph);
+		
+		//This is needed for splitorder
+		computeStronglyConnectedComponentGraph(graph);
+		
+		decomposeOrder(This, order, graph);
+		
+		deleteOrderGraph(graph);
+	}
+}
 
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 	Vector<Order *> ordervec;
