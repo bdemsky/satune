@@ -16,8 +16,7 @@
 #define true 1
 #define false 0
 
-struct CSolver;
-typedef struct CSolver CSolver;
+class CSolver;
 struct SATEncoder;
 typedef struct SATEncoder SATEncoder;
 

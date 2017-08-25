@@ -13,198 +13,194 @@
 #include "orderencoder.h"
 #include "polarityassignment.h"
 
-CSolver *allocCSolver() {
-	CSolver *This = (CSolver *) ourmalloc(sizeof(CSolver));
-	This->unsat = false;
-	This->constraints = allocDefHashSetBoolean();
-	This->allBooleans = allocDefVectorBoolean();
-	This->allSets = allocDefVectorSet();
-	This->allElements = allocDefVectorElement();
-	This->allPredicates = allocDefVectorPredicate();
-	This->allTables = allocDefVectorTable();
-	This->allOrders = allocDefVectorOrder();
-	This->allFunctions = allocDefVectorFunction();
-	This->tuner = allocTuner();
-	This->satEncoder = allocSATEncoder(This);
-	return This;
+CSolver::CSolver() : unsat(false) {
+	constraints = allocDefHashSetBoolean();
+	allBooleans = allocDefVectorBoolean();
+	allSets = allocDefVectorSet();
+	allElements = allocDefVectorElement();
+	allPredicates = allocDefVectorPredicate();
+	allTables = allocDefVectorTable();
+	allOrders = allocDefVectorOrder();
+	allFunctions = allocDefVectorFunction();
+	tuner = allocTuner();
+	satEncoder = allocSATEncoder(this);
 }
 
 /** This function tears down the solver and the entire AST */
 
-void deleteSolver(CSolver *This) {
-	deleteHashSetBoolean(This->constraints);
+CSolver::~CSolver() {
+	deleteHashSetBoolean(constraints);
 
-	uint size = getSizeVectorBoolean(This->allBooleans);
+	uint size = getSizeVectorBoolean(allBooleans);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorBoolean(This->allBooleans, i);
+		delete getVectorBoolean(allBooleans, i);
 	}
-	deleteVectorBoolean(This->allBooleans);
+	deleteVectorBoolean(allBooleans);
 
-	size = getSizeVectorSet(This->allSets);
+	size = getSizeVectorSet(allSets);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorSet(This->allSets, i);
+		delete getVectorSet(allSets, i);
 	}
-	deleteVectorSet(This->allSets);
+	deleteVectorSet(allSets);
 
-	size = getSizeVectorElement(This->allElements);
+	size = getSizeVectorElement(allElements);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorElement(This->allElements, i);
+		delete getVectorElement(allElements, i);
 	}
-	deleteVectorElement(This->allElements);
+	deleteVectorElement(allElements);
 
-	size = getSizeVectorTable(This->allTables);
+	size = getSizeVectorTable(allTables);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorTable(This->allTables, i);
+		delete getVectorTable(allTables, i);
 	}
-	deleteVectorTable(This->allTables);
+	deleteVectorTable(allTables);
 
-	size = getSizeVectorPredicate(This->allPredicates);
+	size = getSizeVectorPredicate(allPredicates);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorPredicate(This->allPredicates, i);
+		delete getVectorPredicate(allPredicates, i);
 	}
-	deleteVectorPredicate(This->allPredicates);
+	deleteVectorPredicate(allPredicates);
 
-	size = getSizeVectorOrder(This->allOrders);
+	size = getSizeVectorOrder(allOrders);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorOrder(This->allOrders, i);
+		delete getVectorOrder(allOrders, i);
 	}
-	deleteVectorOrder(This->allOrders);
+	deleteVectorOrder(allOrders);
 
-	size = getSizeVectorFunction(This->allFunctions);
+	size = getSizeVectorFunction(allFunctions);
 	for (uint i = 0; i < size; i++) {
-		delete getVectorFunction(This->allFunctions, i);
+		delete getVectorFunction(allFunctions, i);
 	}
-	deleteVectorFunction(This->allFunctions);
-	deleteSATEncoder(This->satEncoder);
-	deleteTuner(This->tuner);
-	ourfree(This);
+	deleteVectorFunction(allFunctions);
+	deleteSATEncoder(satEncoder);
+	deleteTuner(tuner);
 }
 
-Set *createSet(CSolver *This, VarType type, uint64_t *elements, uint numelements) {
+Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
 	Set *set = new Set(type, elements, numelements);
-	pushVectorSet(This->allSets, set);
+	pushVectorSet(allSets, set);
 	return set;
 }
 
-Set *createRangeSet(CSolver *This, VarType type, uint64_t lowrange, uint64_t highrange) {
+Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange) {
 	Set *set = new Set(type, lowrange, highrange);
-	pushVectorSet(This->allSets, set);
+	pushVectorSet(allSets, set);
 	return set;
 }
 
-MutableSet *createMutableSet(CSolver *This, VarType type) {
+MutableSet *CSolver::createMutableSet(VarType type) {
 	MutableSet *set = allocMutableSet(type);
-	pushVectorSet(This->allSets, set);
+	pushVectorSet(allSets, set);
 	return set;
 }
 
-void addItem(CSolver *This, MutableSet *set, uint64_t element) {
+void CSolver::addItem(MutableSet *set, uint64_t element) {
 	addElementMSet(set, element);
 }
 
-uint64_t createUniqueItem(CSolver *This, MutableSet *set) {
+uint64_t CSolver::createUniqueItem(MutableSet *set) {
 	uint64_t element = set->low++;
 	addElementMSet(set, element);
 	return element;
 }
 
-Element *getElementVar(CSolver *This, Set *set) {
+Element *CSolver::getElementVar(Set *set) {
 	Element *element = new ElementSet(set);
-	pushVectorElement(This->allElements, element);
+	pushVectorElement(allElements, element);
 	return element;
 }
 
-Element *getElementConst(CSolver *This, VarType type, uint64_t value) {
+Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	Element *element = new ElementConst(value, type);
-	pushVectorElement(This->allElements, element);
+	pushVectorElement(allElements, element);
 	return element;
 }
 
-Boolean *getBooleanVar(CSolver *This, VarType type) {
+Boolean *CSolver::getBooleanVar(VarType type) {
 	Boolean *boolean = new BooleanVar(type);
-	pushVectorBoolean(This->allBooleans, boolean);
+	pushVectorBoolean(allBooleans, boolean);
 	return boolean;
 }
 
-Function *createFunctionOperator(CSolver *This, ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
+Function *CSolver::createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
 	Function *function = new FunctionOperator(op, domain, numDomain, range, overflowbehavior);
-	pushVectorFunction(This->allFunctions, function);
+	pushVectorFunction(allFunctions, function);
 	return function;
 }
 
-Predicate *createPredicateOperator(CSolver *This, CompOp op, Set **domain, uint numDomain) {
+Predicate *CSolver::createPredicateOperator(CompOp op, Set **domain, uint numDomain) {
 	Predicate *predicate = new PredicateOperator(op, domain,numDomain);
-	pushVectorPredicate(This->allPredicates, predicate);
+	pushVectorPredicate(allPredicates, predicate);
 	return predicate;
 }
 
-Predicate *createPredicateTable(CSolver *This, Table *table, UndefinedBehavior behavior) {
+Predicate *CSolver::createPredicateTable(Table *table, UndefinedBehavior behavior) {
 	Predicate *predicate = new PredicateTable(table, behavior);
-	pushVectorPredicate(This->allPredicates, predicate);
+	pushVectorPredicate(allPredicates, predicate);
 	return predicate;
 }
 
-Table *createTable(CSolver *This, Set **domains, uint numDomain, Set *range) {
+Table *CSolver::createTable(Set **domains, uint numDomain, Set *range) {
 	Table *table = new Table(domains,numDomain,range);
-	pushVectorTable(This->allTables, table);
+	pushVectorTable(allTables, table);
 	return table;
 }
 
-Table *createTableForPredicate(CSolver *solver, Set **domains, uint numDomain) {
-	return createTable(solver, domains, numDomain, NULL);
+Table *CSolver::createTableForPredicate(Set **domains, uint numDomain) {
+	return createTable(domains, numDomain, NULL);
 }
 
-void addTableEntry(CSolver *This, Table *table, uint64_t *inputs, uint inputSize, uint64_t result) {
-	table->addNewTableEntry(inputs, inputSize,result);
+void CSolver::addTableEntry(Table *table, uint64_t *inputs, uint inputSize, uint64_t result) {
+	table->addNewTableEntry(inputs, inputSize, result);
 }
 
-Function *completeTable(CSolver *This, Table *table, UndefinedBehavior behavior) {
+Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 	Function *function = new FunctionTable(table, behavior);
-	pushVectorFunction(This->allFunctions,function);
+	pushVectorFunction(allFunctions,function);
 	return function;
 }
 
-Element *applyFunction(CSolver *This, Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
+Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
-	pushVectorElement(This->allElements, element);
+	pushVectorElement(allElements, element);
 	return element;
 }
 
-Boolean *applyPredicate(CSolver *This, Predicate *predicate, Element **inputs, uint numInputs) {
-	return applyPredicateTable(This, predicate, inputs, numInputs, NULL);
+Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
+	return applyPredicateTable(predicate, inputs, numInputs, NULL);
 }
-Boolean *applyPredicateTable(CSolver *This, Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
+
+Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
 	Boolean *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
-	pushVectorBoolean(This->allBooleans, boolean);
+	pushVectorBoolean(allBooleans, boolean);
 	return boolean;
 }
 
-Boolean *applyLogicalOperation(CSolver *This, LogicOp op, Boolean **array, uint asize) {
-	return new BooleanLogic(This, op, array, asize);
+Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
+	return new BooleanLogic(this, op, array, asize);
 }
 
-void addConstraint(CSolver *This, Boolean *constraint) {
-	addHashSetBoolean(This->constraints, constraint);
+void CSolver::addConstraint(Boolean *constraint) {
+	addHashSetBoolean(constraints, constraint);
 }
 
-Order *createOrder(CSolver *This, OrderType type, Set *set) {
+Order *CSolver::createOrder(OrderType type, Set *set) {
 	Order *order = new Order(type, set);
-	pushVectorOrder(This->allOrders, order);
+	pushVectorOrder(allOrders, order);
 	return order;
 }
 
-Boolean *orderConstraint(CSolver *This, Order *order, uint64_t first, uint64_t second) {
+Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
 	Boolean *constraint = new BooleanOrder(order, first, second);
-	pushVectorBoolean(This->allBooleans,constraint);
+	pushVectorBoolean(allBooleans,constraint);
 	return constraint;
 }
 
-int startEncoding(CSolver *This) {
-	naiveEncodingDecision(This);
-	SATEncoder *satEncoder = This->satEncoder;
-	computePolarities(This);
-	orderAnalysis(This);
-	encodeAllSATEncoder(This, satEncoder);
+int CSolver::startEncoding() {
+	naiveEncodingDecision(this);
+	computePolarities(this);
+	orderAnalysis(this);
+	encodeAllSATEncoder(this, satEncoder);
 	int result = solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
 	for (int i = 1; i <= satEncoder->cnf->solver->solutionsize; i++) {
@@ -214,29 +210,29 @@ int startEncoding(CSolver *This) {
 	return result;
 }
 
-uint64_t getElementValue(CSolver *This, Element *element) {
+uint64_t CSolver::getElementValue(Element *element) {
 	switch (GETELEMENTTYPE(element)) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
-		return getElementValueSATTranslator(This, element);
+		return getElementValueSATTranslator(this, element);
 	default:
 		ASSERT(0);
 	}
 	exit(-1);
 }
 
-bool getBooleanValue( CSolver *This, Boolean *boolean) {
+bool CSolver::getBooleanValue(Boolean *boolean) {
 	switch (GETBOOLEANTYPE(boolean)) {
 	case BOOLEANVAR:
-		return getBooleanVariableValueSATTranslator(This, boolean);
+		return getBooleanVariableValueSATTranslator(this, boolean);
 	default:
 		ASSERT(0);
 	}
 	exit(-1);
 }
 
-HappenedBefore getOrderConstraintValue(CSolver *This, Order *order, uint64_t first, uint64_t second) {
-	return getOrderConstraintValueSATTranslator(This, order, first, second);
+HappenedBefore CSolver::getOrderConstraintValue(Order *order, uint64_t first, uint64_t second) {
+	return getOrderConstraintValueSATTranslator(this, order, first, second);
 }
 
