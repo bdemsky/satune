@@ -22,8 +22,6 @@ Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
 		default:
 			ASSERT(0);
 	}
-	default:
-		ASSERT(0);
 	return E_BOGUS;
 }
 
