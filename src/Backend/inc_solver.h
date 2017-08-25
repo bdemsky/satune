@@ -22,7 +22,7 @@ struct IncrementalSolver {
 	int *buffer;
 	int *solution;
 	int solutionsize;
-	int offset;
+	uint offset;
 	pid_t solver_pid;
 	int to_solver_fd;
 	int from_solver_fd;

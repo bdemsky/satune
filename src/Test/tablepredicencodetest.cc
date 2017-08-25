@@ -42,7 +42,8 @@ int main(int numargs, char **argv) {
 	addTableEntry(solver, t1, row6, 3, true);
 	Predicate *p1 = createPredicateTable(solver, t1, FLAGIFFUNDEFINED);
 	Boolean *undef = getBooleanVar(solver, 2);
-	Boolean *b1 = applyPredicateTable(solver, p1, (Element * []) {e1, e2, e3}, 3, undef);
+	Element * tmparray[] = {e1, e2, e3};
+	Boolean *b1 = applyPredicateTable(solver, p1, tmparray, 3, undef);
 	addConstraint(solver, b1);
 
 	Set *deq[] = {s3,s2};
@@ -53,7 +54,8 @@ int main(int numargs, char **argv) {
 
 	Set *d1[] = {s1, s2};
 	Predicate *eq = createPredicateOperator(solver, EQUALS, d1, 2);
-	Boolean *pred2 = applyPredicate(solver, eq,(Element *[]) {e1, e2}, 2);
+	Element * tmparray2[] = {e1, e2};
+	Boolean *pred2 = applyPredicate(solver, eq, tmparray2, 2);
 	addConstraint(solver, pred2);
 
 	if (startEncoding(solver) == 1)

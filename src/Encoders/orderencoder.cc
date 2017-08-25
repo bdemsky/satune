@@ -119,7 +119,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 
 			//Compute in set for entire SCC
 			uint rSize = getSizeVectorOrderNode(&sccNodes);
-			for (int j = 0; j < rSize; j++) {
+			for (uint j = 0; j < rSize; j++) {
 				OrderNode *rnode = getVectorOrderNode(&sccNodes, j);
 				//Compute source sets
 				HSIteratorOrderEdge *iterator = iteratorOrderEdge(rnode->inEdges);
@@ -134,7 +134,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 				}
 				deleteIterOrderEdge(iterator);
 			}
-			for (int j=0; j < rSize; j++) {
+			for (uint j=0; j < rSize; j++) {
 				//Copy in set of entire SCC
 				OrderNode *rnode = getVectorOrderNode(&sccNodes, j);
 				HashSetOrderNode * set = (j==0) ? sources : copyHashSetOrderNode(sources);

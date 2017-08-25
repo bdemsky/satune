@@ -58,8 +58,10 @@ Edge orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 		setElementEncodingType(encoding, BINARYINDEX);
 		encodingArrayInitialization(encoding);
 	}
-	Predicate *predicate =allocPredicateOperator(LT, (Set*[]){order->set, order->set}, 2);
-	Boolean * boolean=allocBooleanPredicate(predicate, (Element *[]){elem1,elem2}, 2, NULL);
+	Set * sarray[]={order->set, order->set};
+	Predicate *predicate =allocPredicateOperator(LT, sarray, 2);
+	Element * parray[]={elem1, elem2};
+	Boolean * boolean=allocBooleanPredicate(predicate, parray, 2, NULL);
 	setFunctionEncodingType(getPredicateFunctionEncoding((BooleanPredicate*)boolean), CIRCUIT);
 	{//Adding new elements and boolean/predicate to solver regarding memory management
 		pushVectorBoolean(This->solver->allBooleans, boolean);

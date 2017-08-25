@@ -28,7 +28,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	uint i = 0;
 	while (hasNextTableEntry(iterator)) {
 		TableEntry *entry = nextTableEntry(iterator);
-		if (generateNegation == entry->output && undefStatus == IGNOREBEHAVIOR) {
+		if (generateNegation == (entry->output != 0) && undefStatus == IGNOREBEHAVIOR) {
 			//Skip the irrelevant entries
 			continue;
 		}
@@ -46,7 +46,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 			break;
 		case FLAGFORCEUNDEFINED: {
 			addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray),  constraintNegate(undefConst)));
-			if (generateNegation == entry->output) {
+			if (generateNegation == (entry->output != 0)) {
 				continue;
 			}
 			row = constraintAND(This->cnf, inputNum, carray);

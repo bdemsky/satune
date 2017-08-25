@@ -41,7 +41,8 @@ int main(int numargs, char **argv) {
 	addTableEntry(solver, t1, row5, 2, 3);
 	addTableEntry(solver, t1, row6, 2, 5);
 	Function *f1 = completeTable(solver, t1, FLAGIFFUNDEFINED);
-	Element *e3 = applyFunction(solver, f1, (Element * []) {e1,e2}, 2, overflow);
+	Element * tmparray[]={e1, e2};
+	Element *e3 = applyFunction(solver, f1, tmparray, 2, overflow);
 
 	Set *deq[] = {s3,s2};
 	Predicate *lte = createPredicateOperator(solver, LTE, deq, 2);

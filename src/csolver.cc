@@ -207,7 +207,7 @@ int startEncoding(CSolver *This) {
 	encodeAllSATEncoder(This, satEncoder);
 	int result = solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
-	for (uint i = 1; i <= satEncoder->cnf->solver->solutionsize; i++) {
+	for (int i = 1; i <= satEncoder->cnf->solver->solutionsize; i++) {
 		model_print("%d, ", satEncoder->cnf->solver->solution[i]);
 	}
 	model_print("\n");

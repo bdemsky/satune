@@ -13,12 +13,17 @@ int main(int numargs, char **argv) {
 	Boolean *b3 = getBooleanVar(solver, 0);
 	Boolean *b4 = getBooleanVar(solver, 0);
 	//L_AND, L_OR, L_NOT, L_XOR, L_IMPLIES
-	Boolean *andb1b2 = applyLogicalOperation(solver, L_AND,(Boolean *[]) {b1, b2}, 2);
-	Boolean *imply = applyLogicalOperation(solver, L_IMPLIES, (Boolean *[]) {andb1b2, b3}, 2);
+	Boolean * barray1[]={b1,b2};
+	Boolean *andb1b2 = applyLogicalOperation(solver, L_AND, barray1, 2);
+	Boolean * barray2[]={andb1b2, b3};
+	Boolean *imply = applyLogicalOperation(solver, L_IMPLIES, barray2, 2);
 	addConstraint(solver, imply);
-	Boolean *notb3 = applyLogicalOperation(solver, L_NOT, (Boolean *[]) {b3}, 1);
-	addConstraint(solver, applyLogicalOperation(solver, L_OR, (Boolean *[]) {notb3, b4}, 2));
-	addConstraint(solver, applyLogicalOperation(solver, L_XOR, (Boolean * []) {b1, b4}, 2));
+	Boolean * barray3[] ={b3};
+	Boolean *notb3 = applyLogicalOperation(solver, L_NOT, barray3, 1);
+	Boolean * barray4[] ={notb3, b4};
+	addConstraint(solver, applyLogicalOperation(solver, L_OR, barray4, 2));
+	Boolean * barray5[] ={b1, b4};
+	addConstraint(solver, applyLogicalOperation(solver, L_XOR, barray5, 2));
 	if (startEncoding(solver) == 1)
 		printf("b1=%d b2=%d b3=%d b4=%d\n",
 					 getBooleanValue(solver,b1), getBooleanValue(solver, b2),

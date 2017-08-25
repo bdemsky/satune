@@ -183,7 +183,7 @@ int comparefunction(const Edge *e1, const Edge *e2) {
 Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 	ASSERT(numEdges != 0);
 	qsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *))comparefunction);
-	int initindex = 0;
+	uint initindex = 0;
 	while (initindex < numEdges && equalsEdge(edges[initindex], E_True))
 		initindex++;
 
@@ -288,18 +288,22 @@ Edge constraintITE(CNF *cnf, Edge cond, Edge thenedge, Edge elseedge) {
 	if (equalsEdge(cond, E_True)) {
 		result = thenedge;
 	} else if (equalsEdge(thenedge, E_True) || equalsEdge(cond, thenedge)) {
-		result = constraintOR(cnf,  2, (Edge[]) {cond, elseedge});
+		Edge array[] = {cond, elseedge};
+		result = constraintOR(cnf,  2, array);
 	} else if (equalsEdge(elseedge, E_True) || sameNodeOppSign(cond, elseedge)) {
 		result = constraintIMPLIES(cnf, cond, thenedge);
 	} else if (equalsEdge(thenedge, E_False) || equalsEdge(cond, elseedge)) {
-		result = constraintAND(cnf, 2, (Edge[]) {cond, thenedge});
+		Edge array[] = {cond, thenedge};
+		result = constraintAND(cnf, 2, array);
 	} else if (equalsEdge(thenedge, elseedge)) {
 		result = thenedge;
 	} else if (sameNodeOppSign(thenedge, elseedge)) {
 		if (ltEdge(cond, thenedge)) {
-			result = createNode(cnf, NodeType_IFF, 2, (Edge[]) {cond, thenedge});
+			Edge array[] = {cond, thenedge};
+			result = createNode(cnf, NodeType_IFF, 2, array);
 		} else {
-			result = createNode(cnf, NodeType_IFF, 2, (Edge[]) {thenedge, cond});
+			Edge array[] = {thenedge, cond};
+			result = createNode(cnf, NodeType_IFF, 2, array);
 		}
 	} else {
 		Edge edges[] = {cond, thenedge, elseedge};

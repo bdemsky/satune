@@ -16,6 +16,7 @@ int main(int numargs, char **argv) {
 	Boolean *o58 =  orderConstraint(solver, order, 5, 8);
 	Boolean *o81 =  orderConstraint(solver, order, 8, 1);
 	
+	/*
 	addConstraint(solver, applyLogicalOperation(solver, L_OR,(Boolean *[]) {o12, o13, o24, o34}, 4) );
 	Boolean *b1 = applyLogicalOperation(solver, L_XOR, (Boolean *[]) {o41, o57}, 2);
 	Boolean *o34n = applyLogicalOperation(solver, L_NOT, (Boolean *[]) {o34}, 1);
@@ -32,6 +33,6 @@ int main(int numargs, char **argv) {
 	if (startEncoding(solver) == 1)
 		printf("SAT\n");
 	else
-		printf("UNSAT\n");
+	printf("UNSAT\n");*/
 	deleteSolver(solver);
 }

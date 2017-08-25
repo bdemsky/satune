@@ -33,7 +33,8 @@ Element *allocElementConst(uint64_t value, VarType type) {
 	ElementConst *This = (ElementConst *)ourmalloc(sizeof(ElementConst));
 	GETELEMENTTYPE(This) = ELEMCONST;
 	This->value = value;
-	This->set = allocSet(type, (uint64_t[]) {value}, 1);
+	uint64_t array[]={value};
+	This->set = allocSet(type, array, 1);
 	initDefVectorASTNode(GETELEMENTPARENTS(This));
 	initElementEncoding(&This->encoding, (Element *) This);
 	return &This->base;
