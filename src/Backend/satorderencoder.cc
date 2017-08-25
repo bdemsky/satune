@@ -14,29 +14,16 @@
 #include "orderelement.h"
 
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
-	switch (constraint->order->order.type){
-		case PAIRWISE:
-			switch ( constraint->order->type) {
-				case PARTIAL:
-					return encodePartialOrderSATEncoder(This, constraint);
-				case TOTAL:
-					return encodeTotalOrderSATEncoder(This, constraint);
-				default:
-					ASSERT(0);
-			}
-		case INTEGERENCODING:{
-			//Infer the value from graph ...
-			Order* order = constraint->order;
-			Edge gvalue = inferOrderConstraintFromGraph(order, constraint->first, constraint->second);
-			if(!edgeIsNull(gvalue))
-				return gvalue;
-			//If we couldn't infer the value from graph, we have already generated a predicate for that ...
-			// So, we should do nothing
-			return E_BOGUS;
-		}
+	switch ( constraint->order->type) {
+		case PARTIAL:
+			return encodePartialOrderSATEncoder(This, constraint);
+		case TOTAL:
+			return encodeTotalOrderSATEncoder(This, constraint);
 		default:
 			ASSERT(0);
 	}
+	default:
+		ASSERT(0);
 	return E_BOGUS;
 }
 

@@ -5,6 +5,7 @@
 #include "csolver.h"
 #include "predicate.h"
 #include "element.h"
+#include "rewriter.h"
 
 void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 	Order* order = boolOrder->order;
@@ -25,6 +26,7 @@ void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 		This->solver->allElements.push(elem2);
 		This->solver->constraints.add(boolean);
 	}
+	replaceBooleanWithBoolean(This->solver, boolOrder, boolean);
 }
 
 
