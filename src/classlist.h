@@ -26,10 +26,6 @@ class BooleanVar;
 class BooleanLogic;
 class BooleanPredicate;
 class ASTNode;
-
-struct IncrementalSolver;
-typedef struct IncrementalSolver IncrementalSolver;
-
 class Set;
 typedef class Set MutableSet;
 
@@ -47,6 +43,9 @@ class PredicateTable;
 class PredicateOperator;
 class Table;
 class Order;
+
+struct IncrementalSolver;
+typedef struct IncrementalSolver IncrementalSolver;
 
 struct OrderPair;
 typedef struct OrderPair OrderPair;
