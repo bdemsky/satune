@@ -12,7 +12,6 @@ Order::Order(OrderType _type, Set *_set) :
 	graph(NULL),
 	order(this)
 {
-	auxSet = new Set(_type,(uint64_t) 1,(uint64_t) _set->getSize());
 }
 
 void Order::initializeOrderHashTable() {

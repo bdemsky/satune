@@ -5,7 +5,7 @@
 #include "csolver.h"
 #include "predicate.h"
 #include "element.h"
-
+/*
 void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 	Order* order = boolOrder->order;
 	if (order->elementTable == NULL) {
@@ -39,3 +39,4 @@ Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
 		return eset->get(&oelement)->elem;
 }
 
+*/

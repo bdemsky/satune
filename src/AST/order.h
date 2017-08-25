@@ -14,7 +14,6 @@ class Order {
 	~Order();
 	OrderType type;
 	Set *set;
-	Set* auxSet;
 	HashTableOrderPair *orderPairTable;
 	HashSetOrderElement* elementTable;
 	OrderGraph *graph;
