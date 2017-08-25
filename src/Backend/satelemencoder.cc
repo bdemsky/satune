@@ -31,7 +31,7 @@ Edge getElementValueBinaryIndexConstraint(SATEncoder *This, Element *elem, uint6
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
-		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i] == value) {
+		if (elemEnc->isinUseElement(i) && elemEnc->encodingArray[i] == value) {
 			return (elemEnc->numVars == 0) ? E_True : generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, i);
 		}
 	}
@@ -43,7 +43,7 @@ Edge getElementValueOneHotConstraint(SATEncoder *This, Element *elem, uint64_t v
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
-		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i] == value) {
+		if (elemEnc->isinUseElement(i) && elemEnc->encodingArray[i] == value) {
 			return (elemEnc->numVars == 0) ? E_True : elemEnc->variables[i];
 		}
 	}
@@ -55,7 +55,7 @@ Edge getElementValueUnaryConstraint(SATEncoder *This, Element *elem, uint64_t va
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
-		if (isinUseElement(elemEnc, i) && elemEnc->encodingArray[i] == value) {
+		if (elemEnc->isinUseElement(i) && elemEnc->encodingArray[i] == value) {
 			if (elemEnc->numVars == 0)
 				return E_True;
 			if (i == 0)

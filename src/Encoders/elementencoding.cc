@@ -3,38 +3,50 @@
 #include "naiveencoder.h"
 #include "element.h"
 #include "satencoder.h"
+#include "set.h"
 
-void initElementEncoding(ElementEncoding *This, Element *element) {
-	This->element = element;
-	This->type = ELEM_UNASSIGNED;
-	This->variables = NULL;
-	This->encodingArray = NULL;
-	This->inUseArray = NULL;
-	This->numVars = 0;
-	This->encArraySize = 0;
+ElementEncoding::ElementEncoding(Element *_element) :
+	type(ELEM_UNASSIGNED),
+	element(_element),
+	variables(NULL),
+	encodingArray(NULL),
+	inUseArray(NULL),
+	encArraySize(0),
+	numVars(0) {
 }
 
-void deleteElementEncoding(ElementEncoding *This) {
-	if (This->variables != NULL)
-		ourfree(This->variables);
-	if (This->encodingArray != NULL)
-		ourfree(This->encodingArray);
-	if (This->inUseArray != NULL)
-		ourfree(This->inUseArray);
+ElementEncoding::~ElementEncoding() {
+	if (variables != NULL)
+		ourfree(variables);
+	if (encodingArray != NULL)
+		ourfree(encodingArray);
+	if (inUseArray != NULL)
+		ourfree(inUseArray);
 }
 
-void allocEncodingArrayElement(ElementEncoding *This, uint size) {
-	This->encodingArray = (uint64_t *) ourcalloc(1, sizeof(uint64_t) * size);
-	This->encArraySize = size;
+void ElementEncoding::allocEncodingArrayElement(uint size) {
+	encodingArray = (uint64_t *) ourcalloc(1, sizeof(uint64_t) * size);
+	encArraySize = size;
 }
 
-void allocInUseArrayElement(ElementEncoding *This, uint size) {
+void ElementEncoding::allocInUseArrayElement(uint size) {
 	uint bytes = ((size + ((1 << 9) - 1)) >> 6) & ~7;//Depends on size of inUseArray
-	This->inUseArray = (uint64_t *) ourcalloc(1, bytes);
+	inUseArray = (uint64_t *) ourcalloc(1, bytes);
 }
 
-void setElementEncodingType(ElementEncoding *This, ElementEncodingType type) {
-	This->type = type;
+void ElementEncoding::setElementEncodingType(ElementEncodingType _type) {
+	type = _type;
 }
 
-
+void ElementEncoding::encodingArrayInitialization() {
+	Set *set = getElementSet(element);
+	ASSERT(!set->isRange);
+	uint size = set->members->getSize();
+	uint encSize = getSizeEncodingArray(size);
+	allocEncodingArrayElement(encSize);
+	allocInUseArrayElement(encSize);
+	for (uint i = 0; i < size; i++) {
+		encodingArray[i] = set->members->get(i);
+		setInUseElement(i);
+	}
+}

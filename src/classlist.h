@@ -50,14 +50,9 @@ typedef struct IncrementalSolver IncrementalSolver;
 struct OrderElement;
 typedef struct OrderElement OrderElement;
 
-struct ElementEncoding;
-typedef struct ElementEncoding ElementEncoding;
-
-struct FunctionEncoding;
-typedef struct FunctionEncoding FunctionEncoding;
-
-struct OrderEncoding;
-typedef struct OrderEncoding OrderEncoding;
+class ElementEncoding;
+class FunctionEncoding;
+class OrderEncoding;
 
 struct TableEntry;
 typedef struct TableEntry TableEntry;

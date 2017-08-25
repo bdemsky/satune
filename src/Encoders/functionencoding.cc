@@ -1,18 +1,17 @@
 #include "functionencoding.h"
 
-void initFunctionEncoding(FunctionEncoding *This, Element *function) {
-	This->op.function = function;
-	This->type = FUNC_UNASSIGNED;
+FunctionEncoding::FunctionEncoding(Element *function) :
+	type(FUNC_UNASSIGNED)
+{
+	op.function = function;
 }
 
-void initPredicateEncoding(FunctionEncoding *This,  Boolean *predicate) {
-	This->op.predicate = predicate;
-	This->type = FUNC_UNASSIGNED;
+FunctionEncoding::FunctionEncoding(Boolean *predicate) :
+	type(FUNC_UNASSIGNED)
+{
+	op.predicate = predicate;
 }
 
-void deleteFunctionEncoding(FunctionEncoding *This) {
-}
-
-void setFunctionEncodingType(FunctionEncoding *encoding, FunctionEncodingType type) {
-	encoding->type = type;
+void FunctionEncoding::setFunctionEncodingType(FunctionEncodingType _type) {
+	type = _type;
 }

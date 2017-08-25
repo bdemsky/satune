@@ -13,8 +13,8 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver *This, ElementEncoding 
 		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
 			index |= 1;
 	}
-	model_print("index:%u\tencArraySize:%u\tisInUseElement:%u\n", index, elemEnc->encArraySize, isinUseElement(elemEnc, index));
-	ASSERT(elemEnc->encArraySize > index && isinUseElement(elemEnc, index));
+	model_print("index:%u\tencArraySize:%u\tisInUseElement:%u\n", index, elemEnc->encArraySize, elemEnc->isinUseElement(index));
+	ASSERT(elemEnc->encArraySize > index && elemEnc->isinUseElement(index));
 	return elemEnc->encodingArray[index];
 }
 
@@ -41,7 +41,7 @@ uint64_t getElementValueOneHotSATTranslator(CSolver *This, ElementEncoding *elem
 		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
 			index = i;
 	}
-	ASSERT(elemEnc->encArraySize > index && isinUseElement(elemEnc, index));
+	ASSERT(elemEnc->encArraySize > index && elemEnc->isinUseElement(index));
 	return elemEnc->encodingArray[index];
 }
 

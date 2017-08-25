@@ -4,8 +4,13 @@
 #include "boolean.h"
 #include "ordergraph.h"
 
-Order::Order(OrderType _type, Set *_set) : type(_type), set(_set), orderPairTable(NULL), elementTable(NULL), graph(NULL) {
-	initOrderEncoding(&order, this);
+Order::Order(OrderType _type, Set *_set) :
+	type(_type),
+	set(_set),
+	orderPairTable(NULL),
+	elementTable(NULL),
+	graph(NULL),
+	order(this) {
 }
 
 void Order::initializeOrderHashTable() {
@@ -25,7 +30,6 @@ void Order::setOrderEncodingType(OrderEncodingType type) {
 }
 
 Order::~Order() {
-	deleteOrderEncoding(&order);
 	if (orderPairTable != NULL) {
 		orderPairTable->resetanddelete();
 		delete orderPairTable;

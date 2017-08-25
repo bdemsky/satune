@@ -1,9 +1,6 @@
 #include "orderencoding.h"
 
-void initOrderEncoding(OrderEncoding *This, Order *order) {
-	This->type = ORDER_UNASSIGNED;
-	This->order = order;
-}
-
-void deleteOrderEncoding(OrderEncoding *This) {
+OrderEncoding::OrderEncoding(Order *_order) :
+	type(ORDER_UNASSIGNED),
+	order(_order) {
 }

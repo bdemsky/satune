@@ -5,17 +5,24 @@
 #include "function.h"
 #include "table.h"
 
-Element::Element(ASTNodeType _type) : ASTNode(_type) {
-	initElementEncoding(&encoding, (Element *) this);
+Element::Element(ASTNodeType _type) :
+	ASTNode(_type),
+	encoding(this) {
 }
 
-ElementSet::ElementSet(Set *s) : Element(ELEMSET), set(s) {
+ElementSet::ElementSet(Set *s) :
+	Element(ELEMSET),
+	set(s) {
 }
 
-ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) : Element(ELEMFUNCRETURN), function(_function), inputs(array, numArrays), overflowstatus(_overflowstatus) {
+ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) :
+	Element(ELEMFUNCRETURN),
+	function(_function),
+	inputs(array, numArrays),
+	overflowstatus(_overflowstatus),
+	functionencoding(this) {
 	for (uint i = 0; i < numArrays; i++)
 		GETELEMENTPARENTS(array[i])->push(this);
-	initFunctionEncoding(&functionencoding, this);
 }
 
 ElementConst::ElementConst(uint64_t _value, VarType _type) : Element(ELEMCONST), value(_value) {
@@ -48,7 +55,6 @@ Set *getElementSet(Element *This) {
 }
 
 ElementFunction::~ElementFunction() {
-	deleteFunctionEncoding(&functionencoding);
 }
 
 ElementConst::~ElementConst() {
@@ -56,5 +62,4 @@ ElementConst::~ElementConst() {
 }
 
 Element::~Element() {
-	deleteElementEncoding(&encoding);
 }

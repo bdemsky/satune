@@ -52,8 +52,8 @@ void naiveEncodingLogicOp(BooleanLogic *This) {
 
 void naiveEncodingPredicate(BooleanPredicate *This) {
 	FunctionEncoding *encoding = This->getFunctionEncoding();
-	if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
-		setFunctionEncodingType(This->getFunctionEncoding(), ENUMERATEIMPLICATIONS);
+	if (encoding->getFunctionEncodingType() == FUNC_UNASSIGNED)
+		This->getFunctionEncoding()->setFunctionEncodingType(ENUMERATEIMPLICATIONS);
 
 	for (uint i = 0; i < This->inputs.getSize(); i++) {
 		Element *element = This->inputs.get(i);
@@ -63,9 +63,9 @@ void naiveEncodingPredicate(BooleanPredicate *This) {
 
 void naiveEncodingElement(Element *This) {
 	ElementEncoding *encoding = getElementEncoding(This);
-	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
-		setElementEncodingType(encoding, BINARYINDEX);
-		encodingArrayInitialization(encoding);
+	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
+		encoding->setElementEncodingType(BINARYINDEX);
+		encoding->encodingArrayInitialization();
 	}
 
 	if (GETELEMENTTYPE(This) == ELEMFUNCRETURN) {
@@ -75,34 +75,8 @@ void naiveEncodingElement(Element *This) {
 			naiveEncodingElement(element);
 		}
 		FunctionEncoding *encoding = getElementFunctionEncoding(function);
-		if (getFunctionEncodingType(encoding) == FUNC_UNASSIGNED)
-			setFunctionEncodingType(getElementFunctionEncoding(function), ENUMERATEIMPLICATIONS);
+		if (encoding->getFunctionEncodingType() == FUNC_UNASSIGNED)
+			getElementFunctionEncoding(function)->setFunctionEncodingType(ENUMERATEIMPLICATIONS);
 	}
 }
 
-uint getSizeEncodingArray(ElementEncoding *This, uint setSize) {
-	switch (This->type) {
-	case BINARYINDEX:
-		return NEXTPOW2(setSize);
-	case ONEHOT:
-	case UNARY:
-		return setSize;
-	default:
-		ASSERT(0);
-	}
-	return -1;
-}
-
-void encodingArrayInitialization(ElementEncoding *This) {
-	Element *element = This->element;
-	Set *set = getElementSet(element);
-	ASSERT(set->isRange == false);
-	uint size = set->members->getSize();
-	uint encSize = getSizeEncodingArray(This, size);
-	allocEncodingArrayElement(This, encSize);
-	allocInUseArrayElement(This, encSize);
-	for (uint i = 0; i < size; i++) {
-		This->encodingArray[i] = set->members->get(i);
-		setInUseElement(This, i);
-	}
-}

@@ -28,12 +28,12 @@ BooleanOrder::BooleanOrder(Order *_order, uint64_t _first, uint64_t _second) :
 BooleanPredicate::BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, Boolean *_undefinedStatus) :
 	Boolean(PREDICATEOP),
 	predicate(_predicate),
+	encoding(this),
 	inputs(_inputs, _numInputs),
 	undefStatus(_undefinedStatus) {
 	for (uint i = 0; i < _numInputs; i++) {
 		GETELEMENTPARENTS(_inputs[i])->push(this);
 	}
-	initPredicateEncoding(&encoding, this);
 }
 
 BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint asize) :
@@ -44,5 +44,4 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint a
 }
 
 BooleanPredicate::~BooleanPredicate() {
-	deleteFunctionEncoding(&encoding);
 }

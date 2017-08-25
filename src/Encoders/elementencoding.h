@@ -10,7 +10,33 @@ enum ElementEncodingType {
 
 typedef enum ElementEncodingType ElementEncodingType;
 
-struct ElementEncoding {
+class ElementEncoding {
+ public:
+	ElementEncoding(Element *element);
+	ElementEncodingType getElementEncodingType() {return type;}
+	~ElementEncoding();
+	void setElementEncodingType(ElementEncodingType type);
+	void deleteElementEncoding();
+	void allocEncodingArrayElement(uint size);
+	void allocInUseArrayElement(uint size);
+	uint numEncodingVars() {return numVars;}
+	bool isinUseElement(uint offset) { return (inUseArray[(offset >> 6)] >> (offset & 63)) & 0x1;}
+	void setInUseElement(uint offset) {inUseArray[(offset >> 6)] |= 1 << (offset & 63);}
+	void encodingArrayInitialization();
+	uint getSizeEncodingArray(uint setSize) {
+		switch (type) {
+		case BINARYINDEX:
+			return NEXTPOW2(setSize);
+		case ONEHOT:
+		case UNARY:
+			return setSize;
+		default:
+			ASSERT(0);
+		}
+		return -1;
+	}
+
+	
 	ElementEncodingType type;
 	Element *element;
 	Edge *variables;/* List Variables Used To Encode Element */
@@ -29,22 +55,9 @@ struct ElementEncoding {
 		};
 	};
 	uint numVars;	/* Number of variables */
+	MEMALLOC;
 };
 
-void initElementEncoding(ElementEncoding *This, Element *element);
-static inline ElementEncodingType getElementEncodingType(ElementEncoding *This) {return This->type;}
-void setElementEncodingType(ElementEncoding *This, ElementEncodingType type);
-void deleteElementEncoding(ElementEncoding *This);
-void allocEncodingArrayElement(ElementEncoding *This, uint size);
-void allocInUseArrayElement(ElementEncoding *This, uint size);
-static inline uint numEncodingVars(ElementEncoding *This) {return This->numVars;}
 
-static inline bool isinUseElement(ElementEncoding *This, uint offset) {
-	return (This->inUseArray[(offset >> 6)] >> (offset & 63)) & 0x1;
-}
-
-static inline void setInUseElement(ElementEncoding *This, uint offset) {
-	This->inUseArray[(offset >> 6)] |= 1 << (offset & 63);
-}
 
 #endif

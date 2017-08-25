@@ -48,21 +48,21 @@ Edge orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 	//getting two elements and using LT predicate ...
 	Element* elem1 = getOrderIntegerElement(This, order, boolOrder->first);
 	ElementEncoding *encoding = getElementEncoding(elem1);
-	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
-		setElementEncodingType(encoding, BINARYINDEX);
-		encodingArrayInitialization(encoding);
+	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
+		encoding->setElementEncodingType(BINARYINDEX);
+		encoding->encodingArrayInitialization();
 	}
 	Element* elem2 = getOrderIntegerElement(This, order, boolOrder->second);
 	encoding = getElementEncoding(elem2);
-	if (getElementEncodingType(encoding) == ELEM_UNASSIGNED) {
-		setElementEncodingType(encoding, BINARYINDEX);
-		encodingArrayInitialization(encoding);
+	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
+		encoding->setElementEncodingType(BINARYINDEX);
+		encoding->encodingArrayInitialization();
 	}
 	Set * sarray[]={order->set, order->set};
 	Predicate *predicate =new PredicateOperator(LT, sarray, 2);
 	Element * parray[]={elem1, elem2};
 	BooleanPredicate * boolean=new BooleanPredicate(predicate, parray, 2, NULL);
-	setFunctionEncodingType(boolean->getFunctionEncoding(), CIRCUIT);
+	boolean->getFunctionEncoding()->setFunctionEncodingType(CIRCUIT);
 	{//Adding new elements and boolean/predicate to solver regarding memory management
 		This->solver->allBooleans.push(boolean);
 		This->solver->allPredicates.push(predicate);
@@ -103,8 +103,8 @@ Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
 	if( !eset->contains(&oelement)){
 		Element* elem = new ElementSet(order->set);
 		ElementEncoding* encoding = getElementEncoding(elem);
-		setElementEncodingType(encoding, BINARYINDEX);
-		encodingArrayInitialization(encoding);
+		encoding->setElementEncodingType(BINARYINDEX);
+		encoding->encodingArrayInitialization();
 		encodeElementSATEncoder(This, elem);
 		eset->add(allocOrderElement(item, elem));
 		return elem;
