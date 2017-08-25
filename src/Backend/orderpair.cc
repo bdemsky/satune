@@ -1,14 +1,14 @@
 #include "orderpair.h"
 
 
-OrderPair *allocOrderPair(uint64_t first, uint64_t second, Edge constraint) {
-	OrderPair *pair = (OrderPair *) ourmalloc(sizeof(OrderPair));
-	pair->first = first;
-	pair->second = second;
-	pair->constraint = constraint;
-	return pair;
+OrderPair::OrderPair(uint64_t _first, uint64_t _second, Edge _constraint) :
+	first(_first),
+	second(_second),
+	constraint(_constraint) {
 }
 
-void deleteOrderPair(OrderPair *pair) {
-	ourfree(pair);
+OrderPair::OrderPair() :
+	first(0),
+	second(0),
+	constraint(E_NULL) {
 }

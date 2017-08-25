@@ -6,6 +6,7 @@
 #include "ops.h"
 #include "orderencoding.h"
 #include "boolean.h"
+#include "orderpair.h"
 
 class Order {
  public:

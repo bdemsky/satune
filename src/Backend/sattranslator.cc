@@ -87,7 +87,7 @@ bool getBooleanVariableValueSATTranslator( CSolver *This, Boolean *boolean) {
 
 HappenedBefore getOrderConstraintValueSATTranslator(CSolver *This, Order *order, uint64_t first, uint64_t second) {
 	ASSERT(order->orderPairTable != NULL);
-	OrderPair pair = {first, second, E_NULL};
+	OrderPair pair(first, second, E_NULL);
 	Edge var = getOrderConstraint(order->orderPairTable, &pair);
 	if (edgeIsNull(var))
 		return UNORDERED;

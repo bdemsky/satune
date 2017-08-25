@@ -129,7 +129,7 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 	Edge constraint;
 	if (!(table->contains(pair))) {
 		constraint = getNewVarSATEncoder(This);
-		OrderPair *paircopy = allocOrderPair(pair->first, pair->second, constraint);
+		OrderPair *paircopy = new OrderPair(pair->first, pair->second, constraint);
 		table->put(paircopy, paircopy);
 	} else
 		constraint = table->get(pair)->constraint;
@@ -148,7 +148,7 @@ Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
 		}
 		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
 	}
-	OrderPair pair = {boolOrder->first, boolOrder->second, E_NULL};
+	OrderPair pair(boolOrder->first, boolOrder->second, E_NULL);
 	Edge constraint = getPairConstraint(This, boolOrder->order, &pair);
 	return constraint;
 }
@@ -165,12 +165,12 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order) {
 		uint64_t valueI = mems->get(i);
 		for (uint j = i + 1; j < size; j++) {
 			uint64_t valueJ = mems->get(j);
-			OrderPair pairIJ = {valueI, valueJ};
+			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			Edge constIJ = getPairConstraint(This, order, &pairIJ);
 			for (uint k = j + 1; k < size; k++) {
 				uint64_t valueK = mems->get(k);
-				OrderPair pairJK = {valueJ, valueK};
-				OrderPair pairIK = {valueI, valueK};
+				OrderPair pairJK(valueJ, valueK, E_NULL);
+				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPairConstraint(This, order, &pairIK);
 				Edge constJK = getPairConstraint(This, order, &pairJK);
 				addConstraintCNF(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK));

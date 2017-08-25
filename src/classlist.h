@@ -40,12 +40,12 @@ class PredicateTable;
 class PredicateOperator;
 class Table;
 class Order;
+class OrderPair;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 
-struct OrderPair;
-typedef struct OrderPair OrderPair;
+
 
 struct OrderElement;
 typedef struct OrderElement OrderElement;
