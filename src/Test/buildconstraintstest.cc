@@ -49,7 +49,7 @@ int main(int numargs, char **argv) {
 	Predicate *equal2 = solver->createPredicateOperator(EQUALS, domain2, 2);
 	Element *inputs2 [] = {e4, e3};
 	Boolean *pred = solver->applyPredicate(equal2, inputs2, 2);
-solver->	addConstraint(pred);
+	solver->addConstraint(pred);
 
 	if (solver->startEncoding() == 1)
 		printf("e1=%llu e2=%llu\n", solver->getElementValue(e1), solver->getElementValue(e2));

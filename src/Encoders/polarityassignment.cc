@@ -35,8 +35,10 @@ void computePolarityAndBooleanValue(Boolean *This) {
 }
 
 void computePredicatePolarityAndBooleanValue(BooleanPredicate *This) {
-	updatePolarity(This->undefStatus, P_BOTHTRUEFALSE);
-	computePolarityAndBooleanValue(This->undefStatus);
+	if (This->undefStatus != NULL) {
+		updatePolarity(This->undefStatus, P_BOTHTRUEFALSE);
+		computePolarityAndBooleanValue(This->undefStatus);
+	}
 }
 
 void computeLogicOpPolarityAndBooleanValue(BooleanLogic *This) {
