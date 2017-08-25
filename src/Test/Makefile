@@ -1,6 +1,6 @@
 BASE := ..
 
-OBJECTS := $(patsubst %.c, ../bin/%, $(wildcard *.c))
+OBJECTS := $(patsubst %.cc, ../bin/%, $(wildcard *.cc))
 
 include $(BASE)/common.mk
 
@@ -12,8 +12,8 @@ all: $(OBJECTS) ../bin/run.sh
 
 -include $(DEPS)
 
-../bin/%: %.c
-	$(CC) -MMD -MF $(@D)/.$(@F).d -o ../bin/$@ $< $(CPPFLAGS) -L$(BASE)/bin/ -l_cons_comp
+../bin/%: %.cc
+	$(CXX) -MMD -MF $(@D)/.$(@F).d -o ../bin/$@ $< $(CPPFLAGS) -L$(BASE)/bin/ -l_cons_comp
 
 ../bin/run.sh: run.sh
 	cp run.sh ../bin/run.sh

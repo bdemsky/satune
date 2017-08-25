@@ -4,14 +4,16 @@
 #include "mymemory.h"
 #include "structs.h"
 
-struct Table {
-	ArraySet domains;
+class Table {
+ public:
+	Table(Set **domains, uint numDomain, Set *range);
+	void addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result);
+	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);
+	~Table();
+	Array<Set *> domains;
 	Set *range;
 	HashSetTableEntry *entries;
+	MEMALLOC;
 };
 
-Table *allocTable(Set **domains, uint numDomain, Set *range);
-void addNewTableEntry(Table *This, uint64_t *inputs, uint inputSize, uint64_t result);
-TableEntry *getTableEntryFromTable(Table *table, uint64_t *inputs, uint inputSize);
-void deleteTable(Table *This);
 #endif

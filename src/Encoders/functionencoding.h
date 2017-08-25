@@ -15,16 +15,18 @@ union ElementPredicate {
 
 typedef union ElementPredicate ElementPredicate;
 
-struct FunctionEncoding {
+class FunctionEncoding {
+ public:
 	FunctionEncodingType type;
 	bool isFunction;//true for function, false for predicate
 	ElementPredicate op;
+	FunctionEncoding(Element *function);
+	FunctionEncoding(Boolean *predicate);
+	void setFunctionEncodingType(FunctionEncodingType type);
+	FunctionEncodingType getFunctionEncodingType() {return type;}
+	MEMALLOC;
 };
 
-void initFunctionEncoding(FunctionEncoding *encoding, Element *function);
-void initPredicateEncoding(FunctionEncoding *encoding, Boolean *predicate);
-void setFunctionEncodingType(FunctionEncoding *encoding, FunctionEncodingType type);
-static inline FunctionEncodingType getFunctionEncodingType(FunctionEncoding *This) {return This->type;}
-void deleteFunctionEncoding(FunctionEncoding *This);
+
 
 #endif

@@ -4,14 +4,16 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
+CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc)
 
-HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
+C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
+
+HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CFLAGS := -Wall -g -O0
-CFLAGS += -IAST -ICollections -IBackend -I. -IEncoders -ITuner
+CFLAGS += -IAST -IASTTransform -IASTAnalyses -ICollections -IBackend -I. -IEncoders -ITuner
 LDFLAGS := -ldl -lrt -rdynamic
 SHARED := -shared
 
@@ -30,6 +32,8 @@ directories: ${OBJ_DIR}
 ${OBJ_DIR}:
 	${MKDIR_P} ${OBJ_DIR}
 	${MKDIR_P} ${OBJ_DIR}/AST
+	${MKDIR_P} ${OBJ_DIR}/ASTAnalyses
+	${MKDIR_P} ${OBJ_DIR}/ASTTransform
 	${MKDIR_P} ${OBJ_DIR}/Tuner
 	${MKDIR_P} ${OBJ_DIR}/Collections
 	${MKDIR_P} ${OBJ_DIR}/Backend
@@ -46,7 +50,10 @@ docs: $(C_SOURCES) $(HEADERS)
 	doxygen
 
 ${OBJ_DIR}/$(LIB_SO): $(OBJECTS)
-	$(CC) -g $(SHARED) -o ${OBJ_DIR}/$(LIB_SO) $+ $(LDFLAGS)
+	$(CXX) -g $(SHARED) -o ${OBJ_DIR}/$(LIB_SO) $+ $(LDFLAGS)
+
+${OBJ_DIR}/%.o: %.cc
+	$(CXX) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable
 
 ${OBJ_DIR}/%.o: %.c
 	$(CC) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable
@@ -67,10 +74,10 @@ tags:
 	ctags -R
 
 tabbing:
-	uncrustify -c C.cfg --no-backup *.c */*.c
+	uncrustify -c C.cfg --no-backup *.cc */*.cc
 	uncrustify -c C.cfg --no-backup *.h */*.h
 
 wc:
-	wc */*.c */*.h *.c *.h
+	wc */*.cc */*.h *.cc *.h
 
 .PHONY: $(PHONY)

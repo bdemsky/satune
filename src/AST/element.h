@@ -8,53 +8,48 @@
 #include "elementencoding.h"
 #include "boolean.h"
 
-#define GETELEMENTTYPE(o) GETASTNODETYPE(o)
+#define GETELEMENTTYPE(o) (o->type)
 #define GETELEMENTPARENTS(o) (&((Element *)o)->parents)
-struct Element {
-	ASTNode base;
-	VectorASTNode parents;
+class Element : public ASTNode {
+ public:
+	Element(ASTNodeType type);
+	~Element();
+	Vector<ASTNode *> parents;
+	ElementEncoding encoding;
+	MEMALLOC;
 };
 
-struct ElementConst {
-	Element base;
+class ElementConst : public Element {
+ public:
+	ElementConst(uint64_t value, VarType type);
+	~ElementConst();
 	Set *set;
 	uint64_t value;
-	ElementEncoding encoding;
+	MEMALLOC;
 };
 
-struct ElementSet {
-	Element base;
+class ElementSet : public Element {
+ public:
+	ElementSet(Set *s);
 	Set *set;
-	ElementEncoding encoding;
+	MEMALLOC;
 };
 
-struct ElementFunction {
-	Element base;
+class ElementFunction : public Element {
+ public:
+	ElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
+	~ElementFunction();
 	Function *function;
-	ArrayElement inputs;
+	Array<Element *> inputs;
 	Boolean *overflowstatus;
 	FunctionEncoding functionencoding;
-	ElementEncoding rangeencoding;
+	MEMALLOC;
 };
 
-Element *allocElementConst(uint64_t value, VarType type);
-Element *allocElementSet(Set *s);
-Element *allocElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
-void deleteElement(Element *This);
 Set *getElementSet(Element *This);
 
-static inline ElementEncoding *getElementEncoding(Element *This) {
-	switch (GETELEMENTTYPE(This)) {
-	case ELEMSET:
-		return &((ElementSet *)This)->encoding;
-	case ELEMFUNCRETURN:
-		return &((ElementFunction *)This)->rangeencoding;
-	case ELEMCONST:
-		return &((ElementConst *)This)->encoding;
-	default:
-		ASSERT(0);
-	}
-	return NULL;
+static inline ElementEncoding *getElementEncoding(Element *e) {
+	return &e->encoding;
 }
 
 static inline FunctionEncoding *getElementFunctionEncoding(ElementFunction *func) {

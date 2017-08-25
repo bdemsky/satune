@@ -12,52 +12,54 @@
     This is a little sketchy, but apparently legit.
     https://www.python.org/dev/peps/pep-3123/ */
 
-#define GETBOOLEANTYPE(o) GETASTNODETYPE(o)
-#define GETBOOLEANPARENTS(o) (&((Boolean *)(o))->parents)
-#define GETBOOLEANPOLARITY(b) (((Boolean *)b)->polarity)
-#define GETBOOLEANVALUE(b) (((Boolean *)b)->boolVal)
+#define GETBOOLEANTYPE(o) (o->type)
+#define GETBOOLEANPARENTS(o) (&(o->parents))
+#define GETBOOLEANPOLARITY(b) (b->polarity)
+#define GETBOOLEANVALUE(b) (b->boolVal)
 
-struct Boolean {
-	ASTNode base;
+class Boolean : public ASTNode {
+ public:
+	Boolean(ASTNodeType _type);
 	Polarity polarity;
 	BooleanValue boolVal;
-	VectorBoolean parents;
+	Vector<Boolean *> parents;
+	MEMALLOC;
 };
 
-struct BooleanOrder {
-	Boolean base;
+class BooleanVar : public Boolean {
+ public:
+	BooleanVar(VarType t);
+	VarType vtype;
+	Edge var;
+	MEMALLOC;
+};
+
+class BooleanOrder : public Boolean {
+ public:
+	BooleanOrder(Order *_order, uint64_t _first, uint64_t _second);
 	Order *order;
 	uint64_t first;
 	uint64_t second;
+	MEMALLOC;
 };
 
-struct BooleanVar {
-	Boolean base;
-	VarType vtype;
-	Edge var;
-};
-
-struct BooleanLogic {
-	Boolean base;
-	LogicOp op;
-	ArrayBoolean inputs;
-};
-
-struct BooleanPredicate {
-	Boolean base;
+class BooleanPredicate : public Boolean {
+ public:
+	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, Boolean *_undefinedStatus);
+	~BooleanPredicate();
 	Predicate *predicate;
 	FunctionEncoding encoding;
-	ArrayElement inputs;
+	Array<Element *> inputs;
 	Boolean *undefStatus;
+	FunctionEncoding * getFunctionEncoding() {return &encoding;}
+	MEMALLOC;
 };
 
-Boolean *allocBooleanVar(VarType t);
-Boolean *allocBooleanOrder(Order *order, uint64_t first, uint64_t second);
-Boolean *allocBooleanPredicate(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus);
-Boolean *allocBooleanLogicArray(CSolver *solver, LogicOp op, Boolean **array, uint asize);
-void deleteBoolean(Boolean *This);
-static inline FunctionEncoding *getPredicateFunctionEncoding(BooleanPredicate *func) {
-	return &func->encoding;
-}
-
+class BooleanLogic : public Boolean {
+ public:
+	BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint asize);
+	LogicOp op;
+	Array<Boolean *> inputs;
+	MEMALLOC;
+};
 #endif

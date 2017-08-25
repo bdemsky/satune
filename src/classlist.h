@@ -12,75 +12,47 @@
 
 #include "mymemory.h"
 #include <inttypes.h>
-#define bool int
-#define true 1
-#define false 0
 
-struct CSolver;
-typedef struct CSolver CSolver;
+class CSolver;
 struct SATEncoder;
 typedef struct SATEncoder SATEncoder;
 
-typedef struct BooleanOrder BooleanOrder;
-typedef struct BooleanVar BooleanVar;
-typedef struct BooleanLogic BooleanLogic;
-typedef struct BooleanPredicate BooleanPredicate;
+class Boolean;
+class BooleanOrder;
+class BooleanVar;
+class BooleanLogic;
+class BooleanPredicate;
+class ASTNode;
+class Set;
+class MutableSet;
 
-struct ASTNode;
-typedef struct ASTNode ASTNode;
+class ElementFunction;
+class ElementSet;
+class ElementConst;
+class Element;
 
-struct Boolean;
-typedef struct Boolean Boolean;
+class FunctionOperator;
+class FunctionTable;
+class Function;
+
+class Predicate;
+class PredicateTable;
+class PredicateOperator;
+class Table;
+class Order;
+class OrderPair;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 
-struct Set;
-typedef struct Set Set;
-typedef struct Set MutableSet;
 
-typedef struct ElementFunction ElementFunction;
-typedef struct ElementSet ElementSet;
-typedef struct ElementConst ElementConst;
-
-struct Element;
-typedef struct Element Element;
-
-typedef struct FunctionOperator FunctionOperator;
-typedef struct FunctionTable FunctionTable;
-
-struct Function;
-typedef struct Function Function;
-
-struct Predicate;
-typedef struct Predicate Predicate;
-
-struct PredicateTable;
-typedef struct PredicateTable PredicateTable;
-
-struct PredicateOperator;
-typedef struct PredicateOperator PredicateOperator;
-
-struct Table;
-typedef struct Table Table;
-
-struct Order;
-typedef struct Order Order;
-
-struct OrderPair;
-typedef struct OrderPair OrderPair;
 
 struct OrderElement;
 typedef struct OrderElement OrderElement;
 
-struct ElementEncoding;
-typedef struct ElementEncoding ElementEncoding;
-
-struct FunctionEncoding;
-typedef struct FunctionEncoding FunctionEncoding;
-
-struct OrderEncoding;
-typedef struct OrderEncoding OrderEncoding;
+class ElementEncoding;
+class FunctionEncoding;
+class OrderEncoding;
 
 struct TableEntry;
 typedef struct TableEntry TableEntry;

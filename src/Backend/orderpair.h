@@ -12,14 +12,15 @@
 #include "mymemory.h"
 #include "constraint.h"
 
-struct OrderPair {
-	uint64_t first;
+class OrderPair {
+ public:
+	OrderPair(uint64_t first, uint64_t second, Edge constraint);
+	OrderPair();
+ 	uint64_t first;
 	uint64_t second;
 	Edge constraint;
+	MEMALLOC;
 };
-
-OrderPair *allocOrderPair(uint64_t first, uint64_t second, Edge constraint);
-void deleteOrderPair(OrderPair *pair);
 
 #endif/* ORDERPAIR_H */
 

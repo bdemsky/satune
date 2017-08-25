@@ -8,12 +8,13 @@ enum OrderEncodingType {
 
 typedef enum OrderEncodingType OrderEncodingType;
 
-struct OrderEncoding {
+class OrderEncoding {
+ public:
+	OrderEncoding(Order *order);
+
 	OrderEncodingType type;
 	Order *order;
+	MEMALLOC;
 };
-
-void initOrderEncoding(OrderEncoding *This, Order *order);
-void deleteOrderEncoding(OrderEncoding *This);
 
 #endif

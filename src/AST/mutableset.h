@@ -2,6 +2,10 @@
 #define MUTABLESET_H
 #include "set.h"
 
-MutableSet *allocMutableSet(VarType t);
-void addElementMSet(MutableSet *set, uint64_t element);
+class MutableSet : public Set {
+ public:
+	MutableSet(VarType t);
+	void addElementMSet(uint64_t element);
+	MEMALLOC;
+};
 #endif

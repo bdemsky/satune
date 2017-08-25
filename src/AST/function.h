@@ -7,28 +7,31 @@
 
 #define GETFUNCTIONTYPE(o) (((Function *)o)->type)
 
-struct Function {
+class Function {
+ public:
+  Function(FunctionType _type) : type(_type) {}
 	FunctionType type;
+	MEMALLOC;
 };
 
-struct FunctionOperator {
-	Function base;
+class FunctionOperator : public Function {
+ public:
 	ArithOp op;
-	ArraySet domains;
+	Array<Set *> domains;
 	Set *range;
 	OverFlowBehavior overflowbehavior;
+	FunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range, OverFlowBehavior overflowbehavior);
+	uint64_t applyFunctionOperator(uint numVals, uint64_t *values);
+	bool isInRangeFunction(uint64_t val);
+	MEMALLOC;
 };
 
-struct FunctionTable {
-	Function base;
+class FunctionTable : public Function {
+ public:
 	Table *table;
 	UndefinedBehavior undefBehavior;
+	FunctionTable (Table *table, UndefinedBehavior behavior);
+	MEMALLOC;
 };
-
-Function *allocFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range, OverFlowBehavior overflowbehavior);
-Function *allocFunctionTable (Table *table, UndefinedBehavior behavior);
-uint64_t applyFunctionOperator(FunctionOperator *This, uint numVals, uint64_t *values);
-bool isInRangeFunction(FunctionOperator *This, uint64_t val);
-void deleteFunction(Function *This);
 
 #endif
