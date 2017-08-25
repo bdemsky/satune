@@ -27,7 +27,7 @@ class BooleanLogic;
 class BooleanPredicate;
 class ASTNode;
 class Set;
-typedef class Set MutableSet;
+class MutableSet;
 
 class ElementFunction;
 class ElementSet;

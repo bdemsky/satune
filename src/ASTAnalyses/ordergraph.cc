@@ -15,9 +15,9 @@ OrderGraph *allocOrderGraph(Order *order) {
 
 OrderGraph *buildOrderGraph(Order *order) {
 	OrderGraph *orderGraph = allocOrderGraph(order);
-	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
+	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
-		addOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
+		addOrderConstraintToOrderGraph(orderGraph, order->constraints.get(j));
 	}
 	return orderGraph;
 }
@@ -25,9 +25,9 @@ OrderGraph *buildOrderGraph(Order *order) {
 //Builds only the subgraph for the must order graph.
 OrderGraph *buildMustOrderGraph(Order *order) {
 	OrderGraph *orderGraph = allocOrderGraph(order);
-	uint constrSize = getSizeVectorBooleanOrder(&order->constraints);
+	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
-		addMustOrderConstraintToOrderGraph(orderGraph, getVectorBooleanOrder(&order->constraints, j));
+		addMustOrderConstraintToOrderGraph(orderGraph, order->constraints.get(j));
 	}
 	return orderGraph;
 }

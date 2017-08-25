@@ -5,7 +5,6 @@
 #include "ordergraph.h"
 
 Order::Order(OrderType _type, Set *_set) : type(_type), set(_set), orderPairTable(NULL), elementTable(NULL), graph(NULL) {
-	initDefVectorBooleanOrder(&constraints);
 	initOrderEncoding(&order, this);
 }
 
@@ -18,7 +17,7 @@ void Order::initializeOrderElementsHashTable() {
 }
 
 void Order::addOrderConstraint(BooleanOrder *constraint) {
-	pushVectorBooleanOrder(&constraints, constraint);
+	constraints.push(constraint);
 }
 
 void Order::setOrderEncodingType(OrderEncodingType type) {
@@ -26,7 +25,6 @@ void Order::setOrderEncodingType(OrderEncodingType type) {
 }
 
 Order::~Order() {
-	deleteVectorArrayBooleanOrder(&constraints);
 	deleteOrderEncoding(&order);
 	if (orderPairTable != NULL) {
 		resetAndDeleteHashTableOrderPair(orderPairTable);

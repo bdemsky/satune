@@ -7,9 +7,9 @@ void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
 		removeHashSetBoolean(This->constraints, bexpr);
 	}
 
-	uint size = getSizeVectorBoolean(&bexpr->parents);
+	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = getVectorBoolean(&bexpr->parents, i);
+		Boolean *parent = bexpr->parents.get(i);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case L_AND:
@@ -37,9 +37,9 @@ void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
 		addHashSetBoolean(This->constraints, newb);
 	}
 
-	uint size = getSizeVectorBoolean(&oldb->parents);
+	uint size = oldb->parents.getSize();
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = getVectorBoolean(&oldb->parents, i);
+		Boolean *parent = oldb->parents.get(i);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 
 		uint parentsize = logicop->inputs.getSize();
@@ -48,7 +48,7 @@ void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
 			Boolean *b = logicop->inputs.get(i);
 			if (b == oldb) {
 				logicop->inputs.set(i, newb);
-				pushVectorBoolean(&newb->parents, parent);
+				newb->parents.push(parent);
 			}
 		}
 	}
@@ -139,9 +139,9 @@ void replaceBooleanWithFalse(CSolver * This, Boolean *bexpr) {
 		removeHashSetBoolean(This->constraints, bexpr);
 	}
 	
-	uint size = getSizeVectorBoolean(&bexpr->parents);
+	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = getVectorBoolean(&bexpr->parents, i);
+		Boolean *parent = bexpr->parents.get(i);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case L_AND:

@@ -97,12 +97,12 @@ void encodingArrayInitialization(ElementEncoding *This) {
 	Element *element = This->element;
 	Set *set = getElementSet(element);
 	ASSERT(set->isRange == false);
-	uint size = getSizeVectorInt(set->members);
+	uint size = set->members->getSize();
 	uint encSize = getSizeEncodingArray(This, size);
 	allocEncodingArrayElement(This, encSize);
 	allocInUseArrayElement(This, encSize);
 	for (uint i = 0; i < size; i++) {
-		This->encodingArray[i] = getVectorInt(set->members, i);
+		This->encodingArray[i] = set->members->get(i);
 		setInUseElement(This, i);
 	}
 }

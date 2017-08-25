@@ -17,25 +17,25 @@ class CSolver {
 	HashSetBoolean *constraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
-	VectorBoolean *allBooleans;
+	Vector<Boolean *> allBooleans;
 
 	/** This is a vector of all set structs that we have allocated. */
-	VectorSet *allSets;
+	Vector<Set *> allSets;
 
 	/** This is a vector of all element structs that we have allocated. */
-	VectorElement *allElements;
+	Vector<Element *> allElements;
 
 	/** This is a vector of all predicate structs that we have allocated. */
-	VectorPredicate *allPredicates;
+	Vector<Predicate *> allPredicates;
 
 	/** This is a vector of all table structs that we have allocated. */
-	VectorTable *allTables;
+	Vector<Table *> allTables;
 
 	/** This is a vector of all order structs that we have allocated. */
-	VectorOrder *allOrders;
+	Vector<Order *> allOrders;
 
 	/** This is a vector of all function structs that we have allocated. */
-	VectorFunction *allFunctions;
+	Vector<Function *> allFunctions;
 
 	/** This function creates a set containing the elements passed in the array. */
 

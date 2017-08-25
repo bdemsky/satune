@@ -64,10 +64,10 @@ Edge orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 	BooleanPredicate * boolean=new BooleanPredicate(predicate, parray, 2, NULL);
 	setFunctionEncodingType(boolean->getFunctionEncoding(), CIRCUIT);
 	{//Adding new elements and boolean/predicate to solver regarding memory management
-		pushVectorBoolean(This->solver->allBooleans, boolean);
-		pushVectorPredicate(This->solver->allPredicates, predicate);
-		pushVectorElement(This->solver->allElements, elem1);
-		pushVectorElement(This->solver->allElements, elem2);
+		This->solver->allBooleans.push(boolean);
+		This->solver->allPredicates.push(predicate);
+		This->solver->allElements.push(elem1);
+		This->solver->allElements.push(elem2);
 	}
 	return encodeConstraintSATEncoder(This, boolean);
 }
@@ -158,16 +158,16 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order) {
 	model_print("in total order ...\n");
 #endif
 	ASSERT(order->type == TOTAL);
-	VectorInt *mems = order->set->members;
-	uint size = getSizeVectorInt(mems);
+	Vector<uint64_t> *mems = order->set->members;
+	uint size = mems->getSize();
 	for (uint i = 0; i < size; i++) {
-		uint64_t valueI = getVectorInt(mems, i);
+		uint64_t valueI = mems->get(i);
 		for (uint j = i + 1; j < size; j++) {
-			uint64_t valueJ = getVectorInt(mems, j);
+			uint64_t valueJ = mems->get(j);
 			OrderPair pairIJ = {valueI, valueJ};
 			Edge constIJ = getPairConstraint(This, order, &pairIJ);
 			for (uint k = j + 1; k < size; k++) {
-				uint64_t valueK = getVectorInt(mems, k);
+				uint64_t valueK = mems->get(k);
 				OrderPair pairJK = {valueJ, valueK};
 				OrderPair pairIK = {valueI, valueK};
 				Edge constIK = getPairConstraint(This, order, &pairIK);

@@ -14,7 +14,7 @@ class Element : public ASTNode {
  public:
 	Element(ASTNodeType type);
 	~Element();
-	VectorASTNode parents;
+	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
 	MEMALLOC;
 };

@@ -1,25 +1,11 @@
-#include "structs.h"
 #include "mymemory.h"
+#include "structs.h"
 #include "orderpair.h"
 #include "tableentry.h"
 #include "ordernode.h"
 #include "orderedge.h"
 #include "ordergraph.h"
 #include "orderelement.h"
-
-VectorImpl(Table, Table *, 4);
-VectorImpl(Set, Set *, 4);
-VectorImpl(Boolean, Boolean *, 4);
-VectorImpl(BooleanOrder, BooleanOrder *, 4);
-VectorImpl(Function, Function *, 4);
-VectorImpl(Predicate, Predicate *, 4);
-VectorImpl(Element, Element *, 4);
-VectorImpl(Order, Order *, 4);
-VectorImpl(TableEntry, TableEntry *, 4);
-VectorImpl(ASTNode, ASTNode *, 4);
-VectorImpl(Int, uint64_t, 4);
-VectorImpl(OrderNode, OrderNode *, 4);
-VectorImpl(OrderGraph, OrderGraph *, 4);
 
 static inline unsigned int Ptr_hash_function(void *hash) {
 	return (unsigned int)((int64)hash >> 4);

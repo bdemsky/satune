@@ -15,13 +15,6 @@
 
 CSolver::CSolver() : unsat(false) {
 	constraints = allocDefHashSetBoolean();
-	allBooleans = allocDefVectorBoolean();
-	allSets = allocDefVectorSet();
-	allElements = allocDefVectorElement();
-	allPredicates = allocDefVectorPredicate();
-	allTables = allocDefVectorTable();
-	allOrders = allocDefVectorOrder();
-	allFunctions = allocDefVectorFunction();
 	tuner = allocTuner();
 	satEncoder = allocSATEncoder(this);
 }
@@ -31,118 +24,112 @@ CSolver::CSolver() : unsat(false) {
 CSolver::~CSolver() {
 	deleteHashSetBoolean(constraints);
 
-	uint size = getSizeVectorBoolean(allBooleans);
+	uint size = allBooleans.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorBoolean(allBooleans, i);
+		delete allBooleans.get(i);
 	}
-	deleteVectorBoolean(allBooleans);
 
-	size = getSizeVectorSet(allSets);
+	size = allSets.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorSet(allSets, i);
+		delete allSets.get(i);
 	}
-	deleteVectorSet(allSets);
 
-	size = getSizeVectorElement(allElements);
+	size = allElements.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorElement(allElements, i);
+		delete allElements.get(i);
 	}
-	deleteVectorElement(allElements);
 
-	size = getSizeVectorTable(allTables);
+	size = allTables.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorTable(allTables, i);
+		delete allTables.get(i);
 	}
-	deleteVectorTable(allTables);
 
-	size = getSizeVectorPredicate(allPredicates);
+	size = allPredicates.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorPredicate(allPredicates, i);
+		delete allPredicates.get(i);
 	}
-	deleteVectorPredicate(allPredicates);
 
-	size = getSizeVectorOrder(allOrders);
+	size = allOrders.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorOrder(allOrders, i);
+		delete allOrders.get(i);
 	}
-	deleteVectorOrder(allOrders);
 
-	size = getSizeVectorFunction(allFunctions);
+	size = allFunctions.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete getVectorFunction(allFunctions, i);
+		delete allFunctions.get(i);
 	}
-	deleteVectorFunction(allFunctions);
+
 	deleteSATEncoder(satEncoder);
 	deleteTuner(tuner);
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
 	Set *set = new Set(type, elements, numelements);
-	pushVectorSet(allSets, set);
+	allSets.push(set);
 	return set;
 }
 
 Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange) {
 	Set *set = new Set(type, lowrange, highrange);
-	pushVectorSet(allSets, set);
+	allSets.push(set);
 	return set;
 }
 
 MutableSet *CSolver::createMutableSet(VarType type) {
-	MutableSet *set = allocMutableSet(type);
-	pushVectorSet(allSets, set);
+	MutableSet *set = new MutableSet(type);
+	allSets.push(set);
 	return set;
 }
 
 void CSolver::addItem(MutableSet *set, uint64_t element) {
-	addElementMSet(set, element);
+	set->addElementMSet(element);
 }
 
 uint64_t CSolver::createUniqueItem(MutableSet *set) {
 	uint64_t element = set->low++;
-	addElementMSet(set, element);
+	set->addElementMSet(element);
 	return element;
 }
 
 Element *CSolver::getElementVar(Set *set) {
 	Element *element = new ElementSet(set);
-	pushVectorElement(allElements, element);
+	allElements.push(element);
 	return element;
 }
 
 Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	Element *element = new ElementConst(value, type);
-	pushVectorElement(allElements, element);
+	allElements.push(element);
 	return element;
 }
 
 Boolean *CSolver::getBooleanVar(VarType type) {
 	Boolean *boolean = new BooleanVar(type);
-	pushVectorBoolean(allBooleans, boolean);
+	allBooleans.push(boolean);
 	return boolean;
 }
 
 Function *CSolver::createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
 	Function *function = new FunctionOperator(op, domain, numDomain, range, overflowbehavior);
-	pushVectorFunction(allFunctions, function);
+	allFunctions.push(function);
 	return function;
 }
 
 Predicate *CSolver::createPredicateOperator(CompOp op, Set **domain, uint numDomain) {
 	Predicate *predicate = new PredicateOperator(op, domain,numDomain);
-	pushVectorPredicate(allPredicates, predicate);
+	allPredicates.push(predicate);
 	return predicate;
 }
 
 Predicate *CSolver::createPredicateTable(Table *table, UndefinedBehavior behavior) {
 	Predicate *predicate = new PredicateTable(table, behavior);
-	pushVectorPredicate(allPredicates, predicate);
+	allPredicates.push(predicate);
 	return predicate;
 }
 
 Table *CSolver::createTable(Set **domains, uint numDomain, Set *range) {
 	Table *table = new Table(domains,numDomain,range);
-	pushVectorTable(allTables, table);
+	allTables.push(table);
 	return table;
 }
 
@@ -156,13 +143,13 @@ void CSolver::addTableEntry(Table *table, uint64_t *inputs, uint inputSize, uint
 
 Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 	Function *function = new FunctionTable(table, behavior);
-	pushVectorFunction(allFunctions,function);
+	allFunctions.push(function);
 	return function;
 }
 
 Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
-	pushVectorElement(allElements, element);
+	allElements.push(element);
 	return element;
 }
 
@@ -172,7 +159,7 @@ Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint nu
 
 Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
 	Boolean *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
-	pushVectorBoolean(allBooleans, boolean);
+	allBooleans.push(boolean);
 	return boolean;
 }
 
@@ -186,13 +173,13 @@ void CSolver::addConstraint(Boolean *constraint) {
 
 Order *CSolver::createOrder(OrderType type, Set *set) {
 	Order *order = new Order(type, set);
-	pushVectorOrder(allOrders, order);
+	allOrders.push(order);
 	return order;
 }
 
 Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
 	Boolean *constraint = new BooleanOrder(order, first, second);
-	pushVectorBoolean(allBooleans,constraint);
+	allBooleans.push(constraint);
 	return constraint;
 }
 

@@ -16,7 +16,7 @@ class Order {
 	HashTableOrderPair *orderPairTable;
 	HashSetOrderElement* elementTable;
 	OrderGraph *graph;
-	VectorBooleanOrder constraints;
+	Vector<BooleanOrder *> constraints;
 	OrderEncoding order;
 	void initializeOrderHashTable();
 	void initializeOrderElementsHashTable();

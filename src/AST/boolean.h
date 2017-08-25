@@ -22,8 +22,7 @@ class Boolean : public ASTNode {
 	Boolean(ASTNodeType _type);
 	Polarity polarity;
 	BooleanValue boolVal;
-	VectorBoolean parents;
-	~Boolean();
+	Vector<Boolean *> parents;
 	MEMALLOC;
 };
 

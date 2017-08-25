@@ -6,7 +6,6 @@
 #include "table.h"
 
 Element::Element(ASTNodeType _type) : ASTNode(_type) {
-	initDefVectorASTNode(GETELEMENTPARENTS(this));
 	initElementEncoding(&encoding, (Element *) this);
 }
 
@@ -15,7 +14,7 @@ ElementSet::ElementSet(Set *s) : Element(ELEMSET), set(s) {
 
 ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) : Element(ELEMFUNCRETURN), function(_function), inputs(array, numArrays), overflowstatus(_overflowstatus) {
 	for (uint i = 0; i < numArrays; i++)
-		pushVectorASTNode(GETELEMENTPARENTS(array[i]), this);
+		GETELEMENTPARENTS(array[i])->push(this);
 	initFunctionEncoding(&functionencoding, this);
 }
 
@@ -58,5 +57,4 @@ ElementConst::~ElementConst() {
 
 Element::~Element() {
 	deleteElementEncoding(&encoding);
-	deleteVectorArrayASTNode(GETELEMENTPARENTS(this));
 }

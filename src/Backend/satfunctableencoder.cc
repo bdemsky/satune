@@ -319,5 +319,4 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 	Edge cor = constraintAND(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	addConstraintCNF(This->cnf, cor);
 	deleteVectorEdge(clauses);
-
 }

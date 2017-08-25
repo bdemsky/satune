@@ -9,7 +9,7 @@
 #include "mutableset.h"
 #include "tunable.h"
 
-void DFS(OrderGraph *graph, VectorOrderNode *finishNodes) {
+void DFS(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
 	HSIteratorOrderNode *iterator = iteratorOrderNode(graph->nodes);
 	while (hasNextOrderNode(iterator)) {
 		OrderNode *node = nextOrderNode(iterator);
@@ -17,17 +17,17 @@ void DFS(OrderGraph *graph, VectorOrderNode *finishNodes) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, false, 0);
 			node->status = FINISHED;
-			pushVectorOrderNode(finishNodes, node);
+			finishNodes->push(node);
 		}
 	}
 	deleteIterOrderNode(iterator);
 }
 
-void DFSReverse(OrderGraph *graph, VectorOrderNode *finishNodes) {
-	uint size = getSizeVectorOrderNode(finishNodes);
+void DFSReverse(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
+	uint size = finishNodes->getSize();
 	uint sccNum = 1;
 	for (int i = size - 1; i >= 0; i--) {
-		OrderNode *node = getVectorOrderNode(finishNodes, i);
+		OrderNode *node = finishNodes->get(i);
 		if (node->status == NOTVISITED) {
 			node->status = VISITED;
 			DFSNodeVisit(node, NULL, true, false, sccNum);
@@ -38,7 +38,7 @@ void DFSReverse(OrderGraph *graph, VectorOrderNode *finishNodes) {
 	}
 }
 
-void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse, bool mustvisit, uint sccNum) {
+void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum) {
 	HSIteratorOrderEdge *iterator = isReverse ? iteratorOrderEdge(node->inEdges) : iteratorOrderEdge(node->outEdges);
 	while (hasNextOrderEdge(iterator)) {
 		OrderEdge *edge = nextOrderEdge(iterator);
@@ -56,7 +56,7 @@ void DFSNodeVisit(OrderNode *node, VectorOrderNode *finishNodes, bool isReverse,
 			DFSNodeVisit(child, finishNodes, isReverse, mustvisit, sccNum);
 			child->status = FINISHED;
 			if (finishNodes != NULL)
-				pushVectorOrderNode(finishNodes, child);
+				finishNodes->push(child);
 			if (isReverse)
 				child->sccNum = sccNum;
 		}
@@ -73,13 +73,11 @@ void resetNodeInfoStatusSCC(OrderGraph *graph) {
 }
 
 void computeStronglyConnectedComponentGraph(OrderGraph *graph) {
-	VectorOrderNode finishNodes;
-	initDefVectorOrderNode(&finishNodes);
+	Vector<OrderNode *> finishNodes;
 	DFS(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
 	DFSReverse(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
-	deleteVectorArrayOrderNode(&finishNodes);
 }
 
 bool isMustBeTrueNode(OrderNode* node){
@@ -142,19 +140,17 @@ void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
 		to determine whether we need to generate pseudoPos edges. */
 
 void completePartialOrderGraph(OrderGraph *graph) {
-	VectorOrderNode finishNodes;
-	initDefVectorOrderNode(&finishNodes);
+	Vector<OrderNode *> finishNodes;
 	DFS(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
 	HashTableNodeToNodeSet *table = allocHashTableNodeToNodeSet(128, 0.25);
 
-	VectorOrderNode sccNodes;
-	initDefVectorOrderNode(&sccNodes);
+	Vector<OrderNode *> sccNodes;
 	
-	uint size = getSizeVectorOrderNode(&finishNodes);
+	uint size = finishNodes.getSize();
 	uint sccNum = 1;
 	for (int i = size - 1; i >= 0; i--) {
-		OrderNode *node = getVectorOrderNode(&finishNodes, i);
+		OrderNode *node = finishNodes.get(i);
 		HashSetOrderNode *sources = allocHashSetOrderNode(4, 0.25);
 		putNodeToNodeSet(table, node, sources);
 		
@@ -165,12 +161,12 @@ void completePartialOrderGraph(OrderGraph *graph) {
 			node->status = FINISHED;
 			node->sccNum = sccNum;
 			sccNum++;
-			pushVectorOrderNode(&sccNodes, node);
+			sccNodes.push(node);
 
 			//Compute in set for entire SCC
-			uint rSize = getSizeVectorOrderNode(&sccNodes);
+			uint rSize = sccNodes.getSize();
 			for (uint j = 0; j < rSize; j++) {
-				OrderNode *rnode = getVectorOrderNode(&sccNodes, j);
+				OrderNode *rnode = sccNodes.get(j);
 				//Compute source sets
 				HSIteratorOrderEdge *iterator = iteratorOrderEdge(rnode->inEdges);
 				while (hasNextOrderEdge(iterator)) {
@@ -186,7 +182,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 			}
 			for (uint j=0; j < rSize; j++) {
 				//Copy in set of entire SCC
-				OrderNode *rnode = getVectorOrderNode(&sccNodes, j);
+				OrderNode *rnode = sccNodes.get(j);
 				HashSetOrderNode * set = (j==0) ? sources : copyHashSetOrderNode(sources);
 				putNodeToNodeSet(table, rnode, set);
 
@@ -205,18 +201,16 @@ void completePartialOrderGraph(OrderGraph *graph) {
 				deleteIterOrderEdge(iterator);
 			}
 			
-			clearVectorOrderNode(&sccNodes);
+			sccNodes.clear();
 		}
 	}
 
 	resetAndDeleteHashTableNodeToNodeSet(table);
 	deleteHashTableNodeToNodeSet(table);
 	resetNodeInfoStatusSCC(graph);
-	deleteVectorArrayOrderNode(&sccNodes);
-	deleteVectorArrayOrderNode(&finishNodes);
 }
 
-void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes) {
+void DFSMust(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
 	HSIteratorOrderNode *iterator = iteratorOrderNode(graph->nodes);
 	while (hasNextOrderNode(iterator)) {
 		OrderNode *node = nextOrderNode(iterator);
@@ -224,18 +218,18 @@ void DFSMust(OrderGraph *graph, VectorOrderNode *finishNodes) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, true, 0);
 			node->status = FINISHED;
-			pushVectorOrderNode(finishNodes, node);
+			finishNodes->push(node);
 		}
 	}
 	deleteIterOrderNode(iterator);
 }
 
-void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode *finishNodes, bool computeTransitiveClosure) {
-	uint size = getSizeVectorOrderNode(finishNodes);
+void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode *> *finishNodes, bool computeTransitiveClosure) {
+	uint size = finishNodes->getSize();
 	HashTableNodeToNodeSet *table = allocHashTableNodeToNodeSet(128, 0.25);
 
 	for (int i = size - 1; i >= 0; i--) {
-		OrderNode *node = getVectorOrderNode(finishNodes, i);
+		OrderNode *node = finishNodes->get(i);
 		HashSetOrderNode *sources = allocHashSetOrderNode(4, 0.25);
 		putNodeToNodeSet(table, node, sources);
 
@@ -310,15 +304,13 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, VectorOrderNode 
    edges. */
 
 void reachMustAnalysis(CSolver * solver, OrderGraph *graph, bool computeTransitiveClosure) {
-	VectorOrderNode finishNodes;
-	initDefVectorOrderNode(&finishNodes);
+	Vector<OrderNode *> finishNodes;
 	//Topologically sort the mustPos edge graph
 	DFSMust(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
 
 	//Find any backwards edges that complete cycles and force them to be mustNeg
 	DFSClearContradictions(solver, graph, &finishNodes, computeTransitiveClosure);
-	deleteVectorArrayOrderNode(&finishNodes);
 }
 
 /* This function finds edges that must be positive and forces the
@@ -378,13 +370,11 @@ void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 }
 
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
-	VectorOrder ordervec;
-	VectorOrder partialcandidatevec;
-	initDefVectorOrder(&ordervec);
-	initDefVectorOrder(&partialcandidatevec);
-	uint size = getSizeVectorBooleanOrder(&order->constraints);
+	Vector<Order *> ordervec;
+	Vector<Order *> partialcandidatevec;
+	uint size = order->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
-		BooleanOrder *orderconstraint = getVectorBooleanOrder(&order->constraints, i);
+		BooleanOrder *orderconstraint = order->constraints.get(i);
 		OrderNode *from = getOrderNodeFromOrderGraph(graph, orderconstraint->first);
 		OrderNode *to = getOrderNodeFromOrderGraph(graph, orderconstraint->second);
 		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
@@ -401,53 +391,50 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		} else {
 			//Build new order and change constraint's order
 			Order *neworder = NULL;
-			if (getSizeVectorOrder(&ordervec) > from->sccNum)
-				neworder = getVectorOrder(&ordervec, from->sccNum);
+			if (ordervec.getSize() > from->sccNum)
+				neworder = ordervec.get(from->sccNum);
 			if (neworder == NULL) {
-				Set *set = (Set *) allocMutableSet(order->set->type);
+				MutableSet *set = new MutableSet(order->set->type);
 				neworder = new Order(order->type, set);
-				pushVectorOrder(This->allOrders, neworder);
-				setExpandVectorOrder(&ordervec, from->sccNum, neworder);
+				This->allOrders.push(neworder);
+				ordervec.setExpand(from->sccNum, neworder);
 				if (order->type == PARTIAL)
-					setExpandVectorOrder(&partialcandidatevec, from->sccNum, neworder);
+					partialcandidatevec.setExpand(from->sccNum, neworder);
 				else
-					setExpandVectorOrder(&partialcandidatevec, from->sccNum, NULL);
+					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}
 			if (from->status != ADDEDTOSET) {
 				from->status = ADDEDTOSET;
-				addElementMSet((MutableSet *)neworder->set, from->id);
+				((MutableSet *)neworder->set)->addElementMSet(from->id);
 			}
 			if (to->status != ADDEDTOSET) {
 				to->status = ADDEDTOSET;
-				addElementMSet((MutableSet *)neworder->set, to->id);
+				((MutableSet *)neworder->set)->addElementMSet(to->id);
 			}
 			if (order->type == PARTIAL) {
 				OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);
 				if (edge->polNeg)
-					setExpandVectorOrder(&partialcandidatevec, from->sccNum, NULL);
+					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}
 			orderconstraint->order = neworder;
 			neworder->addOrderConstraint(orderconstraint);
 		}
 	}
 
-	uint pcvsize=getSizeVectorOrder(&partialcandidatevec);
+	uint pcvsize=partialcandidatevec.getSize();
 	for(uint i=0;i<pcvsize;i++) {
-		Order * neworder=getVectorOrder(&partialcandidatevec, i);
+		Order * neworder=partialcandidatevec.get(i);
 		if (neworder != NULL){
 			neworder->type = TOTAL;
 			model_print("i=%u\t", i);
 		}
 	}
-	
-	deleteVectorArrayOrder(&ordervec);
-	deleteVectorArrayOrder(&partialcandidatevec);
 }
 
 void orderAnalysis(CSolver *This) {
-	uint size = getSizeVectorOrder(This->allOrders);
+	uint size = This->allOrders.getSize();
 	for (uint i = 0; i < size; i++) {
-		Order *order = getVectorOrder(This->allOrders, i);
+		Order *order = This->allOrders.get(i);
 		bool doDecompose=GETVARTUNABLE(This->tuner, order->type, DECOMPOSEORDER, &onoff);
 		if (!doDecompose)
 			continue;

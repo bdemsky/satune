@@ -14,6 +14,7 @@
 
 class Set {
  public:
+	Set(VarType t);
 	Set(VarType t, uint64_t *elements, uint num);
 	Set(VarType t, uint64_t lowrange, uint64_t highrange);
 	~Set();
@@ -25,10 +26,9 @@ class Set {
 	bool isRange;
 	uint64_t low;//also used to count unique items
 	uint64_t high;
-	VectorInt *members;
+	Vector<uint64_t> *members;
 	MEMALLOC;
 };
-
 
 #endif/* SET_H */
 
