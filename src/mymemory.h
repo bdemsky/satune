@@ -31,4 +31,21 @@ static inline void ourfree(void *ptr) { free(ptr); }
 static inline void *ourcalloc(size_t count, size_t size) { return calloc(count, size); }
 static inline void *ourrealloc(void *ptr, size_t size) { return realloc(ptr, size); }
 
+#define MEMALLOC													 \
+	void * operator new(size_t size) {			 \
+		return ourmalloc(size);								 \
+	}																									 \
+	void operator delete(void *p, size_t size) {			 \
+		ourfree(p);																			 \
+	}																									 \
+	void * operator new[](size_t size) {							 \
+		return ourmalloc(size);													 \
+	}																										 \
+	void operator delete[](void *p, size_t size) {			 \
+		ourfree(p);																				 \
+	}																																			\
+	void * operator new(size_t size, void *p) {                             /* placement new */ \
+		return p;																														\
+	}
+
 #endif/* _MY_MEMORY_H */
