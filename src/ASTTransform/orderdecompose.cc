@@ -11,6 +11,7 @@
 #include "csolver.h"
 #include "orderencoder.h"
 #include "tunable.h"
+#include "integerencoding.h"
 
 void orderAnalysis(CSolver *This) {
 	uint size = This->allOrders.getSize();
@@ -52,10 +53,17 @@ void orderAnalysis(CSolver *This) {
 		
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
-		
 		decomposeOrder(This, order, graph);
-		
 		deleteOrderGraph(graph);
+		
+		bool doIntegerEncoding = GETVARTUNABLE(This->tuner, order->order.type, ORDERINTEGERENCODING, &onoff );
+		if(!doIntegerEncoding)
+			continue;
+		uint size = order->constraints.getSize();
+		for(uint i=0; i<size; i++){
+			orderIntegerEncodingSATEncoder(This->satEncoder, order->constraints.get(i));
+		}
+
 	}
 }
 
