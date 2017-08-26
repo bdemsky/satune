@@ -110,7 +110,7 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
 			OrderNode* sinkNode = outEdge->sink;
 			sinkNode->inEdges.remove(outEdge);
 			//Adding new edge to new sink and src nodes ...
-			OrderEdge *newEdge =getOrderEdgeFromOrderGraph(graph, srcNode, sinkNode);
+			OrderEdge *newEdge = graph->getOrderEdgeFromOrderGraph(srcNode, sinkNode);
 			newEdge->mustPos = true;
 			newEdge->polPos = true;
 			if (newEdge->mustNeg)
@@ -128,7 +128,7 @@ void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
 	while(iterator->hasNext()) {
 		OrderNode* node = iterator->next();
 		if(isMustBeTrueNode(node)){
-			bypassMustBeTrueNode(This,graph, node);
+			bypassMustBeTrueNode(This, graph, node);
 		}
 	}
 	delete iterator;
@@ -194,7 +194,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 					ASSERT(parent != rnode);
 					if (edge->polNeg && parent->sccNum != rnode->sccNum &&
 							sources->contains(parent)) {
-						OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, rnode, parent);
+						OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(rnode, parent);
 						newedge->pseudoPos = true;
 					}
 				}
@@ -252,7 +252,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 			HSIteratorOrderNode *srciterator = sources->iterator();
 			while (srciterator->hasNext()) {
 				OrderNode *srcnode = srciterator->next();
-				OrderEdge *newedge = getOrderEdgeFromOrderGraph(graph, srcnode, node);
+				OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(srcnode, node);
 				newedge->mustPos = true;
 				newedge->polPos = true;
 				if (newedge->mustNeg)
@@ -322,7 +322,7 @@ void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
 		if (edge->mustPos) {
-			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
+			OrderEdge *invEdge = graph->getInverseOrderEdge(edge);
 			if (invEdge != NULL) {
 				if (!invEdge->mustPos) {
 					invEdge->polPos = false;
@@ -352,7 +352,7 @@ void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 			} else
 				solver->unsat = true;
 
-			OrderEdge *invEdge = getInverseOrderEdge(graph, edge);
+			OrderEdge *invEdge = graph->getInverseOrderEdge(edge);
 			if (invEdge != NULL) {
 				if (!invEdge->mustPos)
 					invEdge->polPos = false;

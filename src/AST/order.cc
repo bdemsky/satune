@@ -39,6 +39,6 @@ Order::~Order() {
 		delete elementTable;
 	}
 	if (graph != NULL) {
-		deleteOrderGraph(graph);
+		delete graph;
 	}
 }

@@ -54,7 +54,7 @@ void orderAnalysis(CSolver *This) {
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
 		decomposeOrder(This, order, graph);
-		deleteOrderGraph(graph);
+		delete graph;
 		
 		bool doIntegerEncoding = GETVARTUNABLE(This->tuner, order->order.type, ORDERINTEGERENCODING, &offon );
 		if(!doIntegerEncoding)
@@ -73,11 +73,11 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 	uint size = order->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
 		BooleanOrder *orderconstraint = order->constraints.get(i);
-		OrderNode *from = getOrderNodeFromOrderGraph(graph, orderconstraint->first);
-		OrderNode *to = getOrderNodeFromOrderGraph(graph, orderconstraint->second);
+		OrderNode *from = graph->getOrderNodeFromOrderGraph(orderconstraint->first);
+		OrderNode *to = graph->getOrderNodeFromOrderGraph(orderconstraint->second);
 		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
 		if (from->sccNum != to->sccNum) {
-			OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);			
+			OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);			
 			if (edge->polPos) {
 				replaceBooleanWithTrue(This, (Boolean *)orderconstraint);
 			} else if (edge->polNeg) {
@@ -111,7 +111,7 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 				((MutableSet *)neworder->set)->addElementMSet(to->id);
 			}
 			if (order->type == PARTIAL) {
-				OrderEdge *edge = getOrderEdgeFromOrderGraph(graph, from, to);
+				OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);
 				if (edge->polNeg)
 					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}

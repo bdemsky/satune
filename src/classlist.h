@@ -56,9 +56,7 @@ class OrderEncoding;
 struct TableEntry;
 typedef struct TableEntry TableEntry;
 
-struct OrderGraph;
-typedef struct OrderGraph OrderGraph;
-
+class OrderGraph;
 class OrderNode;
 class OrderEdge;
 

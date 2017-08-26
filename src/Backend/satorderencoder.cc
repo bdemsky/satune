@@ -28,17 +28,17 @@ Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
 Edge inferOrderConstraintFromGraph(Order* order, uint64_t _first, uint64_t _second){
 	if (order->graph != NULL) {
 		OrderGraph *graph=order->graph;
-		OrderNode *first=lookupOrderNodeFromOrderGraph(graph, _first);
-		OrderNode *second=lookupOrderNodeFromOrderGraph(graph, _second);
+		OrderNode *first=graph->lookupOrderNodeFromOrderGraph(_first);
+		OrderNode *second=graph->lookupOrderNodeFromOrderGraph(_second);
 		if ((first != NULL) && (second != NULL)) {
-			OrderEdge *edge=lookupOrderEdgeFromOrderGraph(graph, first, second);
+			OrderEdge *edge=graph->lookupOrderEdgeFromOrderGraph(first, second);
 			if (edge != NULL) {
 				if (edge->mustPos)
 					return E_True;
 				else if (edge->mustNeg)
 					return E_False;
 			}
-			OrderEdge *invedge=getOrderEdgeFromOrderGraph(graph, second, first);
+			OrderEdge *invedge=graph->lookupOrderEdgeFromOrderGraph(second, first);
 			if (invedge != NULL) {
 				if (invedge->mustPos)
 					return E_False;
