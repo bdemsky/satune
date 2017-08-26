@@ -10,6 +10,7 @@
 class Predicate {
  public:
   Predicate(PredicateType _type) : type(_type) {}
+	virtual ~Predicate() {}
 	PredicateType type;
 	MEMALLOC;
 };

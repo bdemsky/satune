@@ -13,7 +13,7 @@
 class Element : public ASTNode {
  public:
 	Element(ASTNodeType type);
-	~Element();
+	virtual ~Element();
 	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
 	MEMALLOC;
