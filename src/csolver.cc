@@ -155,7 +155,7 @@ Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint nu
 }
 
 Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
-	Boolean *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
+	BooleanPredicate *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
 	allBooleans.push(boolean);
 	return boolean;
 }

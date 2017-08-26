@@ -20,6 +20,7 @@
 class Boolean : public ASTNode {
  public:
 	Boolean(ASTNodeType _type);
+	virtual ~Boolean() {}
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
