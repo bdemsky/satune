@@ -49,8 +49,8 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains];
-
-		if (predicate->evalPredicateOperator(vals) ^ generateNegation) {
+		
+		if (predicate->evalPredicateOperator(vals) != generateNegation) {
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
 				Element *elem = constraint->inputs.get(i);
