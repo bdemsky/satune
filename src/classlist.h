@@ -47,8 +47,7 @@ typedef struct IncrementalSolver IncrementalSolver;
 
 
 
-struct OrderElement;
-typedef struct OrderElement OrderElement;
+class OrderElement;
 
 class ElementEncoding;
 class FunctionEncoding;
@@ -60,11 +59,8 @@ typedef struct TableEntry TableEntry;
 struct OrderGraph;
 typedef struct OrderGraph OrderGraph;
 
-struct OrderNode;
-typedef struct OrderNode OrderNode;
-
-struct OrderEdge;
-typedef struct OrderEdge OrderEdge;
+class OrderNode;
+class OrderEdge;
 
 struct OrderEncoder;
 typedef struct OrderEncoder OrderEncoder;

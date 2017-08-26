@@ -17,18 +17,17 @@
 enum NodeStatus {NOTVISITED, VISITED, FINISHED, ADDEDTOSET};
 typedef enum NodeStatus NodeStatus;
 
-struct OrderNode {
+class OrderNode {
+ public:
+	OrderNode(uint64_t id);
+	void addNewIncomingEdge(OrderEdge *edge);
+	void addNewOutgoingEdge(OrderEdge *edge);
+
 	uint64_t id;
-	HashSetOrderEdge * inEdges;
-	HashSetOrderEdge * outEdges;
 	NodeStatus status;
 	uint sccNum;
+	HashSetOrderEdge inEdges;
+	HashSetOrderEdge outEdges;
 };
-
-OrderNode *allocOrderNode(uint64_t id);
-void addNewIncomingEdge(OrderNode *node, OrderEdge *edge);
-void addNewOutgoingEdge(OrderNode *node, OrderEdge *edge);
-void deleteOrderNode(OrderNode *node);
-
 #endif/* ORDERNODE_H */
 

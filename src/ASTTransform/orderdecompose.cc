@@ -56,7 +56,7 @@ void orderAnalysis(CSolver *This) {
 		decomposeOrder(This, order, graph);
 		deleteOrderGraph(graph);
 		
-		bool doIntegerEncoding = GETVARTUNABLE(This->tuner, order->order.type, ORDERINTEGERENCODING, &onoff );
+		bool doIntegerEncoding = GETVARTUNABLE(This->tuner, order->order.type, ORDERINTEGERENCODING, &offon );
 		if(!doIntegerEncoding)
 			continue;
 		uint size = order->constraints.getSize();

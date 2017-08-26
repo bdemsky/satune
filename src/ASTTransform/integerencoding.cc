@@ -32,11 +32,11 @@ void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
 
 Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
 	HashSetOrderElement* eset = order->elementTable;
-	OrderElement oelement ={item, NULL};
+	OrderElement oelement(item, NULL);
 	if( !eset->contains(&oelement)){
 		Set* set = new Set(order->set->type, 1, (uint64_t) order->set->getSize());
 		Element* elem = new ElementSet(set);
-		eset->add(allocOrderElement(item, elem));
+		eset->add(new OrderElement(item, elem));
 		This->solver->allElements.push(elem);
 		This->solver->allSets.push(set);
 		return elem;

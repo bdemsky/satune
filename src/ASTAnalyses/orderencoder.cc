@@ -39,7 +39,7 @@ void DFSReverse(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
 }
 
 void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum) {
-	HSIteratorOrderEdge *iterator = isReverse ? node->inEdges->iterator() : node->outEdges->iterator();
+	HSIteratorOrderEdge *iterator = isReverse ? node->inEdges.iterator() : node->outEdges.iterator();
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
 		if (mustvisit) {
@@ -81,14 +81,14 @@ void computeStronglyConnectedComponentGraph(OrderGraph *graph) {
 }
 
 bool isMustBeTrueNode(OrderNode* node){
-	HSIteratorOrderEdge* iterator = node->inEdges->iterator();
+	HSIteratorOrderEdge* iterator = node->inEdges.iterator();
 	while(iterator->hasNext()){
 		OrderEdge* edge = iterator->next();
 		if(!edge->mustPos)
 			return false;
 	}
 	delete iterator;
-	iterator = node->outEdges->iterator();
+	iterator = node->outEdges.iterator();
 	while(iterator->hasNext()){
 		OrderEdge* edge = iterator->next();
 		if(!edge->mustPos)
@@ -99,24 +99,24 @@ bool isMustBeTrueNode(OrderNode* node){
 }
 
 void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
-	HSIteratorOrderEdge* iterin = node->inEdges->iterator();
+	HSIteratorOrderEdge* iterin = node->inEdges.iterator();
 	while(iterin->hasNext()){
 		OrderEdge* inEdge = iterin->next();
 		OrderNode* srcNode = inEdge->source;
-		srcNode->outEdges->remove(inEdge);
-		HSIteratorOrderEdge* iterout = node->outEdges->iterator();
+		srcNode->outEdges.remove(inEdge);
+		HSIteratorOrderEdge* iterout = node->outEdges.iterator();
 		while(iterout->hasNext()){
 			OrderEdge* outEdge = iterout->next();
 			OrderNode* sinkNode = outEdge->sink;
-			sinkNode->inEdges->remove(outEdge);
+			sinkNode->inEdges.remove(outEdge);
 			//Adding new edge to new sink and src nodes ...
 			OrderEdge *newEdge =getOrderEdgeFromOrderGraph(graph, srcNode, sinkNode);
 			newEdge->mustPos = true;
 			newEdge->polPos = true;
 			if (newEdge->mustNeg)
 				This->unsat = true;
-			srcNode->outEdges->add(newEdge);
-			sinkNode->inEdges->add(newEdge);
+			srcNode->outEdges.add(newEdge);
+			sinkNode->inEdges.add(newEdge);
 		}
 		delete iterout;
 	}
@@ -168,7 +168,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 			for (uint j = 0; j < rSize; j++) {
 				OrderNode *rnode = sccNodes.get(j);
 				//Compute source sets
-				HSIteratorOrderEdge *iterator = rnode->inEdges->iterator();
+				HSIteratorOrderEdge *iterator = rnode->inEdges.iterator();
 				while (iterator->hasNext()) {
 					OrderEdge *edge = iterator->next();
 					OrderNode *parent = edge->source;
@@ -187,7 +187,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 				table->put(rnode, set);
 
 				//Use source sets to compute pseudoPos edges
-				HSIteratorOrderEdge *iterator = node->inEdges->iterator();
+				HSIteratorOrderEdge *iterator = node->inEdges.iterator();
 				while (iterator->hasNext()) {
 					OrderEdge *edge = iterator->next();
 					OrderNode *parent = edge->source;
@@ -235,7 +235,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 
 		{
 			//Compute source sets
-			HSIteratorOrderEdge *iterator = node->inEdges->iterator();
+			HSIteratorOrderEdge *iterator = node->inEdges.iterator();
 			while (iterator->hasNext()) {
 				OrderEdge *edge = iterator->next();
 				OrderNode *parent = edge->source;
@@ -257,14 +257,14 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				newedge->polPos = true;
 				if (newedge->mustNeg)
 					solver->unsat = true;
-				srcnode->outEdges->add(newedge);
-				node->inEdges->add(newedge);
+				srcnode->outEdges.add(newedge);
+				node->inEdges.add(newedge);
 			}
 			delete srciterator;
 		}
 		{
 			//Use source sets to compute mustPos edges
-			HSIteratorOrderEdge *iterator =node->inEdges->iterator();
+			HSIteratorOrderEdge *iterator =node->inEdges.iterator();
 			while (iterator->hasNext()) {
 				OrderEdge *edge = iterator->next();
 				OrderNode *parent = edge->source;
@@ -279,7 +279,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 		}
 		{
 			//Use source sets to compute mustNeg for edges that would introduce cycle if true
-			HSIteratorOrderEdge *iterator = node->outEdges->iterator();
+			HSIteratorOrderEdge *iterator = node->outEdges.iterator();
 			while (iterator->hasNext()) {
 				OrderEdge *edge = iterator->next();
 				OrderNode *child = edge->sink;

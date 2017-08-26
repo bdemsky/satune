@@ -12,13 +12,14 @@
 #include "mymemory.h"
 #include "constraint.h"
 
-struct OrderElement {
+class OrderElement {
+ public:
+	OrderElement(uint64_t item, Element* elem);
 	uint64_t item;
 	Element* elem;
+	MEMALLOC;
 };
 
-OrderElement *allocOrderElement(uint64_t item, Element* elem);
-void deleteOrderElement(OrderElement *pair);
 
 #endif/* ORDERELEMENT_H */
 

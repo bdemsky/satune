@@ -13,8 +13,8 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver *This, ElementEncoding 
 		if (getValueSolver(This->satEncoder->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
 			index |= 1;
 	}
-	model_print("index:%u\tencArraySize:%u\tisInUseElement:%u\n", index, elemEnc->encArraySize, elemEnc->isinUseElement(index));
-	ASSERT(elemEnc->encArraySize > index && elemEnc->isinUseElement(index));
+	if (elemEnc->encArraySize <= index || !elemEnc->isinUseElement(index))
+		model_print("WARNING: Element has undefined value!\n");
 	return elemEnc->encodingArray[index];
 }
 
