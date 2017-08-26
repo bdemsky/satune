@@ -14,7 +14,7 @@
 #include "orderdecompose.h"
 
 CSolver::CSolver() : unsat(false) {
-	tuner = allocTuner();
+	tuner = new Tuner();
 	satEncoder = allocSATEncoder(this);
 }
 
@@ -57,7 +57,7 @@ CSolver::~CSolver() {
 	}
 
 	deleteSATEncoder(satEncoder);
-	deleteTuner(tuner);
+	delete tuner;
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {

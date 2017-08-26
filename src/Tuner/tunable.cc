@@ -1,16 +1,11 @@
 #include "tunable.h"
 
-Tuner * allocTuner() {
-	return (Tuner *) ourmalloc(sizeof(Tuner));
+Tuner::Tuner() {
 }
 
-void deleteTuner(Tuner *This) {
-	ourfree(This);
-}
-
-int getTunable(Tuner *This, TunableParam param, TunableDesc * descriptor) {
+int Tuner::getTunable(TunableParam param, TunableDesc * descriptor) {
 	return descriptor->defaultValue;
 }
-int getVarTunable(Tuner *This, VarType vartype, TunableParam param, TunableDesc * descriptor) {
+int Tuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc * descriptor) {
 	return descriptor->defaultValue;
 }
