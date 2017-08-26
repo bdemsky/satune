@@ -12,7 +12,6 @@
 #include "mymemory.h"
 
 void computeStronglyConnectedComponentGraph(OrderGraph *graph);
-void orderAnalysis(CSolver *solver);
 void initializeNodeInfoSCC(OrderGraph *graph);
 void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum);
 void DFS(OrderGraph *graph, Vector<OrderNode *> *finishNodes);
