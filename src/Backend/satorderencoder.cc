@@ -15,30 +15,30 @@
 
 Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
 	switch ( constraint->order->type) {
-		case PARTIAL:
-			return encodePartialOrderSATEncoder(This, constraint);
-		case TOTAL:
-			return encodeTotalOrderSATEncoder(This, constraint);
-		default:
-			ASSERT(0);
+	case PARTIAL:
+		return encodePartialOrderSATEncoder(This, constraint);
+	case TOTAL:
+		return encodeTotalOrderSATEncoder(This, constraint);
+	default:
+		ASSERT(0);
 	}
 	return E_BOGUS;
 }
 
-Edge inferOrderConstraintFromGraph(Order* order, uint64_t _first, uint64_t _second){
+Edge inferOrderConstraintFromGraph(Order *order, uint64_t _first, uint64_t _second) {
 	if (order->graph != NULL) {
-		OrderGraph *graph=order->graph;
-		OrderNode *first=lookupOrderNodeFromOrderGraph(graph, _first);
-		OrderNode *second=lookupOrderNodeFromOrderGraph(graph, _second);
+		OrderGraph *graph = order->graph;
+		OrderNode *first = graph->lookupOrderNodeFromOrderGraph(_first);
+		OrderNode *second = graph->lookupOrderNodeFromOrderGraph(_second);
 		if ((first != NULL) && (second != NULL)) {
-			OrderEdge *edge=lookupOrderEdgeFromOrderGraph(graph, first, second);
+			OrderEdge *edge = graph->lookupOrderEdgeFromOrderGraph(first, second);
 			if (edge != NULL) {
 				if (edge->mustPos)
 					return E_True;
 				else if (edge->mustNeg)
 					return E_False;
 			}
-			OrderEdge *invedge=getOrderEdgeFromOrderGraph(graph, second, first);
+			OrderEdge *invedge = graph->lookupOrderEdgeFromOrderGraph(second, first);
 			if (invedge != NULL) {
 				if (invedge->mustPos)
 					return E_False;
@@ -52,9 +52,9 @@ Edge inferOrderConstraintFromGraph(Order* order, uint64_t _first, uint64_t _seco
 
 Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 	Edge gvalue = inferOrderConstraintFromGraph(order, pair->first, pair->second);
-	if(!edgeIsNull(gvalue))
+	if (!edgeIsNull(gvalue))
 		return gvalue;
-	
+
 	HashTableOrderPair *table = order->orderPairTable;
 	bool negate = false;
 	OrderPair flipped;
@@ -71,7 +71,7 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 		table->put(paircopy, paircopy);
 	} else
 		constraint = table->get(pair)->constraint;
-	
+
 	return negate ? constraintNegate(constraint) : constraint;
 }
 
@@ -79,7 +79,7 @@ Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
 		boolOrder->order->initializeOrderHashTable();
-		bool doOptOrderStructure=GETVARTUNABLE(This->solver->tuner, boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
+		bool doOptOrderStructure = GETVARTUNABLE(This->solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
 			reachMustAnalysis(This->solver, boolOrder->order->graph, true);

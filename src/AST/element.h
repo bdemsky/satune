@@ -11,7 +11,7 @@
 #define GETELEMENTTYPE(o) (o->type)
 #define GETELEMENTPARENTS(o) (&((Element *)o)->parents)
 class Element : public ASTNode {
- public:
+public:
 	Element(ASTNodeType type);
 	virtual ~Element();
 	Vector<ASTNode *> parents;
@@ -20,7 +20,7 @@ class Element : public ASTNode {
 };
 
 class ElementConst : public Element {
- public:
+public:
 	ElementConst(uint64_t value, VarType type);
 	~ElementConst();
 	Set *set;
@@ -29,14 +29,14 @@ class ElementConst : public Element {
 };
 
 class ElementSet : public Element {
- public:
+public:
 	ElementSet(Set *s);
 	Set *set;
 	MEMALLOC;
 };
 
 class ElementFunction : public Element {
- public:
+public:
 	ElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
 	~ElementFunction();
 	Function *function;

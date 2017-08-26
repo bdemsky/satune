@@ -29,13 +29,13 @@ void deleteSATEncoder(SATEncoder *This) {
 }
 
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This) {
-	HSIteratorBoolean *iterator=csolver->constraints.iterator();
-	while(iterator->hasNext()) {
+	HSIteratorBoolean *iterator = csolver->getConstraints();
+	while (iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
 		model_print("Encoding All ...\n\n");
 		Edge c = encodeConstraintSATEncoder(This, constraint);
 		model_print("Returned Constraint in EncodingAll:\n");
-		ASSERT( ! equalsEdge(c, E_BOGUS));
+		ASSERT( !equalsEdge(c, E_BOGUS));
 		addConstraintCNF(This->cnf, c);
 	}
 	delete iterator;

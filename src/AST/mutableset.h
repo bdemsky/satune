@@ -3,7 +3,7 @@
 #include "set.h"
 
 class MutableSet : public Set {
- public:
+public:
 	MutableSet(VarType t);
 	void addElementMSet(uint64_t element);
 	MEMALLOC;

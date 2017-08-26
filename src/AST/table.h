@@ -5,7 +5,7 @@
 #include "structs.h"
 
 class Table {
- public:
+public:
 	Table(Set **domains, uint numDomain, Set *range);
 	void addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result);
 	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);

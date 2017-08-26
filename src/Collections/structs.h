@@ -12,8 +12,8 @@ unsigned int order_node_hash_function(OrderNode *This);
 bool order_node_equals(OrderNode *key1, OrderNode *key2);
 unsigned int order_edge_hash_function(OrderEdge *This);
 bool order_edge_equals(OrderEdge *key1, OrderEdge *key2);
-unsigned int order_element_hash_function(OrderElement* This);
-bool order_element_equals(OrderElement* key1, OrderElement* key2);
+unsigned int order_element_hash_function(OrderElement *This);
+bool order_element_equals(OrderElement *key1, OrderElement *key2);
 unsigned int order_pair_hash_function(OrderPair *This);
 bool order_pair_equals(OrderPair *key1, OrderPair *key2);
 

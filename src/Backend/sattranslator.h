@@ -15,7 +15,7 @@
 bool getBooleanVariableValueSATTranslator( CSolver *This, Boolean *boolean);
 HappenedBefore getOrderConstraintValueSATTranslator(CSolver *This, Order *order, uint64_t first, uint64_t second);
 /**
- * most significant bit is represented by variable index 0 
+ * most significant bit is represented by variable index 0
  */
 uint64_t getElementValueBinaryIndexSATTranslator(CSolver *This, ElementEncoding *elemEnc);
 uint64_t getElementValueBinaryValueSATTranslator(CSolver *This, ElementEncoding *elemEnc);

@@ -9,13 +9,13 @@
 #include "orderpair.h"
 
 class Order {
- public:
+public:
 	Order(OrderType type, Set *set);
 	~Order();
 	OrderType type;
 	Set *set;
 	HashTableOrderPair *orderPairTable;
-	HashSetOrderElement* elementTable;
+	HashSetOrderElement *elementTable;
 	OrderGraph *graph;
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding order;

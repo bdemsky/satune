@@ -86,7 +86,7 @@ public:
 	}
 
 	/** Override: new operator */
-	void * operator new(size_t size) {
+	void *operator new(size_t size) {
 		return ourmalloc(size);
 	}
 
@@ -96,7 +96,7 @@ public:
 	}
 
 	/** Override: new[] operator */
-	void * operator new[](size_t size) {
+	void *operator new[](size_t size) {
 		return ourmalloc(size);
 	}
 
@@ -116,7 +116,7 @@ public:
 	}
 
 	void resetanddelete() {
-		for(unsigned int i=0;i<capacity;i++) {
+		for (unsigned int i = 0; i < capacity; i++) {
 			struct hashlistnode<_Key, _Val> *bin = &table[i];
 			if (bin->key != NULL) {
 				bin->key = NULL;
@@ -136,7 +136,7 @@ public:
 	}
 
 	void resetandfree() {
-		for(unsigned int i=0;i<capacity;i++) {
+		for (unsigned int i = 0; i < capacity; i++) {
 			struct hashlistnode<_Key, _Val> *bin = &table[i];
 			if (bin->key != NULL) {
 				bin->key = NULL;
@@ -164,11 +164,11 @@ public:
 		/* HashTable cannot handle 0 as a key */
 		if (!key) {
 			if (!zero) {
-				zero=(struct hashlistnode<_Key, _Val> *)ourmalloc(sizeof(struct hashlistnode<_Key, _Val>));
+				zero = (struct hashlistnode<_Key, _Val> *)ourmalloc(sizeof(struct hashlistnode<_Key, _Val>));
 				size++;
 			}
-			zero->key=key;
-			zero->val=val;
+			zero->key = key;
+			zero->val = val;
 			return;
 		}
 
@@ -214,7 +214,7 @@ public:
 		}
 
 		unsigned int oindex = hash_function(key) & capacitymask;
-		unsigned int index=oindex;
+		unsigned int index = oindex;
 		do {
 			search = &table[index];
 			if (!search->key) {
@@ -225,7 +225,7 @@ public:
 				return search->val;
 			index++;
 			index &= capacitymask;
-			if (index==oindex)
+			if (index == oindex)
 				break;
 		} while (true);
 		return (_Val)0;
@@ -244,9 +244,9 @@ public:
 			if (!zero) {
 				return (_Val)0;
 			} else {
-				_Val v=zero->val;
+				_Val v = zero->val;
 				ourfree(zero);
-				zero=NULL;
+				zero = NULL;
 				size--;
 				return v;
 			}
@@ -262,10 +262,10 @@ public:
 					break;
 			} else
 			if (equals(search->key, key)) {
-				_Val v=search->val;
+				_Val v = search->val;
 				//empty out this bin
-				search->val=(_Val) 1;
-				search->key=0;
+				search->val = (_Val) 1;
+				search->key = 0;
 				size--;
 				return v;
 			}
@@ -289,7 +289,7 @@ public:
 
 		/* HashTable cannot handle 0 as a key */
 		if (!key) {
-			return zero!=NULL;
+			return zero != NULL;
 		}
 
 		unsigned int index = hash_function(key);
@@ -329,7 +329,7 @@ public:
 
 		struct hashlistnode<_Key, _Val> *bin = &oldtable[0];
 		struct hashlistnode<_Key, _Val> *lastbin = &oldtable[oldcapacity];
-		for (;bin < lastbin;bin++) {
+		for (; bin < lastbin; bin++) {
 			_Key key = bin->key;
 
 			struct hashlistnode<_Key, _Val> *search;

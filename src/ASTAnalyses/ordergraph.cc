@@ -5,64 +5,61 @@
 #include "ordergraph.h"
 #include "order.h"
 
-OrderGraph *allocOrderGraph(Order *order) {
-	OrderGraph *This = (OrderGraph *) ourmalloc(sizeof(OrderGraph));
-	This->nodes = new HashSetOrderNode();
-	This->edges = new HashSetOrderEdge();
-	This->order = order;
-	return This;
+OrderGraph::OrderGraph(Order *_order) :
+	nodes(new HashSetOrderNode()),
+	edges(new HashSetOrderEdge()),
+	order(_order) {
 }
 
 OrderGraph *buildOrderGraph(Order *order) {
-	OrderGraph *orderGraph = allocOrderGraph(order);
+	OrderGraph *orderGraph = new OrderGraph(order);
 	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
-		addOrderConstraintToOrderGraph(orderGraph, order->constraints.get(j));
+		orderGraph->addOrderConstraintToOrderGraph(order->constraints.get(j));
 	}
 	return orderGraph;
 }
 
 //Builds only the subgraph for the must order graph.
 OrderGraph *buildMustOrderGraph(Order *order) {
-	OrderGraph *orderGraph = allocOrderGraph(order);
+	OrderGraph *orderGraph = new OrderGraph(order);
 	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
-		addMustOrderConstraintToOrderGraph(orderGraph, order->constraints.get(j));
+		orderGraph->addMustOrderConstraintToOrderGraph(order->constraints.get(j));
 	}
 	return orderGraph;
 }
 
-void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
+void OrderGraph::addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
 	Polarity polarity = constr->polarity;
 	BooleanValue mustval = constr->boolVal;
-	Order *order = graph->order;
 	switch (polarity) {
 	case P_BOTHTRUEFALSE:
 	case P_TRUE: {
-		OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+		OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(node1, node2);
 		if (mustval == BV_MUSTBETRUE || mustval == BV_UNSAT)
 			_1to2->mustPos = true;
 		_1to2->polPos = true;
-		addNewOutgoingEdge(node1, _1to2);
-		addNewIncomingEdge(node2, _1to2);
+		node1->addNewOutgoingEdge(_1to2);
+		node2->addNewIncomingEdge(_1to2);
 		if (constr->polarity == P_TRUE)
 			break;
 	}
 	case P_FALSE: {
 		if (order->type == TOTAL) {
-			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph(graph, node2, node1);
+			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph( node2, node1);
 			if (mustval == BV_MUSTBEFALSE || mustval == BV_UNSAT)
 				_2to1->mustPos = true;
 			_2to1->polPos = true;
-			addNewOutgoingEdge(node2, _2to1);
-			addNewIncomingEdge(node1, _2to1);
+			node2->addNewOutgoingEdge(_2to1);
+			node1->addNewIncomingEdge(_2to1);
 		} else {
-			OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+			OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(node1, node2);
 			if (mustval == BV_MUSTBEFALSE || mustval == BV_UNSAT)
 				_1to2->mustNeg = true;
 			_1to2->polNeg = true;
-			addNewOutgoingEdge(node1, _1to2);
-			addNewIncomingEdge(node2, _1to2);
+			node1->addNewOutgoingEdge(_1to2);
+			node2->addNewIncomingEdge(_1to2);
 		}
 		break;
 	}
@@ -72,33 +69,32 @@ void addOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boolean
 	}
 }
 
-void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
+void OrderGraph::addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
 	BooleanValue mustval = constr->boolVal;
-	Order *order = graph->order;
 	switch (mustval) {
 	case BV_UNSAT:
 	case BV_MUSTBETRUE: {
-		OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+		OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(node1, node2);
 		_1to2->mustPos = true;
 		_1to2->polPos = true;
-		addNewOutgoingEdge(node1, _1to2);
-		addNewIncomingEdge(node2, _1to2);
+		node1->addNewOutgoingEdge(_1to2);
+		node2->addNewIncomingEdge(_1to2);
 		if (constr->boolVal == BV_MUSTBETRUE)
 			break;
 	}
 	case BV_MUSTBEFALSE: {
 		if (order->type == TOTAL) {
-			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph(graph, node2, node1);
+			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph(node2, node1);
 			_2to1->mustPos = true;
 			_2to1->polPos = true;
-			addNewOutgoingEdge(node2, _2to1);
-			addNewIncomingEdge(node1, _2to1);
+			node2->addNewOutgoingEdge(_2to1);
+			node1->addNewIncomingEdge(_2to1);
 		} else {
-			OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(graph, node1, node2);
+			OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(node1, node2);
 			_1to2->mustNeg = true;
 			_1to2->polNeg = true;
-			addNewOutgoingEdge(node1, _1to2);
-			addNewIncomingEdge(node2, _1to2);
+			node1->addNewOutgoingEdge(_1to2);
+			node2->addNewIncomingEdge(_1to2);
 		}
 		break;
 	}
@@ -108,75 +104,74 @@ void addMustOrderEdge(OrderGraph *graph, OrderNode *node1, OrderNode *node2, Boo
 	}
 }
 
-OrderNode *getOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
-	OrderNode *node = allocOrderNode(id);
-	OrderNode *tmp = graph->nodes->get(node);
+OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id) {
+	OrderNode *node = new OrderNode(id);
+	OrderNode *tmp = nodes->get(node);
 	if ( tmp != NULL) {
-		deleteOrderNode(node);
+		delete node;
 		node = tmp;
 	} else {
-		graph->nodes->add(node);
+		nodes->add(node);
 	}
 	return node;
 }
 
-OrderNode *lookupOrderNodeFromOrderGraph(OrderGraph *graph, uint64_t id) {
-	OrderNode node = {id, NULL, NULL, NOTVISITED, 0};
-	OrderNode *tmp = graph->nodes->get(&node);
+OrderNode *OrderGraph::lookupOrderNodeFromOrderGraph(uint64_t id) {
+	OrderNode node(id);
+	OrderNode *tmp = nodes->get(&node);
 	return tmp;
 }
 
-OrderEdge *getOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, OrderNode *end) {
-	OrderEdge *edge = allocOrderEdge(begin, end);
-	OrderEdge *tmp = graph->edges->get(edge);
+OrderEdge *OrderGraph::getOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end) {
+	OrderEdge *edge = new OrderEdge(begin, end);
+	OrderEdge *tmp = edges->get(edge);
 	if ( tmp != NULL ) {
-		deleteOrderEdge(edge);
+		delete edge;
 		edge = tmp;
 	} else {
-		graph->edges->add(edge);
+		edges->add(edge);
 	}
 	return edge;
 }
 
-OrderEdge *lookupOrderEdgeFromOrderGraph(OrderGraph *graph, OrderNode *begin, OrderNode *end) {
-	OrderEdge edge = {begin, end, 0, 0, 0, 0, 0};
-	OrderEdge *tmp = graph->edges->get(&edge);
+OrderEdge *OrderGraph::lookupOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end) {
+	OrderEdge edge(begin, end);
+	OrderEdge *tmp = edges->get(&edge);
 	return tmp;
 }
 
-OrderEdge *getInverseOrderEdge(OrderGraph *graph, OrderEdge *edge) {
-	OrderEdge inverseedge = {edge->sink, edge->source, false, false, false, false, false};
-	OrderEdge *tmp = graph->edges->get(&inverseedge);
+OrderEdge *OrderGraph::getInverseOrderEdge(OrderEdge *edge) {
+	OrderEdge inverseedge(edge->sink, edge->source);
+	OrderEdge *tmp = edges->get(&inverseedge);
 	return tmp;
 }
 
-void addOrderConstraintToOrderGraph(OrderGraph *graph, BooleanOrder *bOrder) {
-	OrderNode *from = getOrderNodeFromOrderGraph(graph, bOrder->first);
-	OrderNode *to = getOrderNodeFromOrderGraph(graph, bOrder->second);
-	addOrderEdge(graph, from, to, bOrder);
+void OrderGraph::addOrderConstraintToOrderGraph(BooleanOrder *bOrder) {
+	OrderNode *from = getOrderNodeFromOrderGraph(bOrder->first);
+	OrderNode *to = getOrderNodeFromOrderGraph(bOrder->second);
+	addOrderEdge(from, to, bOrder);
 }
 
-void addMustOrderConstraintToOrderGraph(OrderGraph *graph, BooleanOrder *bOrder) {
-	OrderNode *from = getOrderNodeFromOrderGraph(graph, bOrder->first);
-	OrderNode *to = getOrderNodeFromOrderGraph(graph, bOrder->second);
-	addMustOrderEdge(graph, from, to, bOrder);
+void OrderGraph::addMustOrderConstraintToOrderGraph(BooleanOrder *bOrder) {
+	OrderNode *from = getOrderNodeFromOrderGraph(bOrder->first);
+	OrderNode *to = getOrderNodeFromOrderGraph(bOrder->second);
+	addMustOrderEdge(from, to, bOrder);
 }
 
-void deleteOrderGraph(OrderGraph *graph) {
-	HSIteratorOrderNode *iterator = graph->nodes->iterator();
+OrderGraph::~OrderGraph() {
+	HSIteratorOrderNode *iterator = nodes->iterator();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
-		deleteOrderNode(node);
+		delete node;
 	}
 	delete iterator;
 
-	HSIteratorOrderEdge *eiterator = graph->edges->iterator();
+	HSIteratorOrderEdge *eiterator = edges->iterator();
 	while (eiterator->hasNext()) {
 		OrderEdge *edge = eiterator->next();
-		deleteOrderEdge(edge);
+		delete edge;
 	}
 	delete eiterator;
-	delete graph->nodes;
-	delete graph->edges;
-	ourfree(graph);
+	delete nodes;
+	delete edges;
 }

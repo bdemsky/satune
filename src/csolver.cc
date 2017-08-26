@@ -14,7 +14,7 @@
 #include "orderdecompose.h"
 
 CSolver::CSolver() : unsat(false) {
-	tuner = allocTuner();
+	tuner = new Tuner();
 	satEncoder = allocSATEncoder(this);
 }
 
@@ -57,7 +57,7 @@ CSolver::~CSolver() {
 	}
 
 	deleteSATEncoder(satEncoder);
-	deleteTuner(tuner);
+	delete tuner;
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
@@ -161,7 +161,9 @@ Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, ui
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
-	return new BooleanLogic(this, op, array, asize);
+	Boolean *boolean = new BooleanLogic(this, op, array, asize);
+	allBooleans.push(boolean);
+	return boolean;
 }
 
 void CSolver::addConstraint(Boolean *constraint) {

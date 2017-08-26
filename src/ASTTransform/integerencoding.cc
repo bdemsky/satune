@@ -9,36 +9,30 @@
 #include "set.h"
 
 
-void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder){
-	Order* order = boolOrder->order;
+void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
+	Order *order = boolOrder->order;
 	if (order->elementTable == NULL) {
 		order->initializeOrderElementsHashTable();
 	}
 	//getting two elements and using LT predicate ...
-	ElementSet* elem1 = (ElementSet*)getOrderIntegerElement(This, order, boolOrder->first);
-	ElementSet* elem2 = (ElementSet*)getOrderIntegerElement(This, order, boolOrder->second);
-	Set * sarray[]={elem1->set, elem2->set};
-	Predicate *predicate =new PredicateOperator(LT, sarray, 2);
-	Element * parray[]={elem1, elem2};
-	BooleanPredicate * boolean=new BooleanPredicate(predicate, parray, 2, NULL);
-	{//Adding new elements and boolean/predicate to solver regarding memory management
-		This->solver->allBooleans.push(boolean);
-		This->solver->allPredicates.push(predicate);
-		This->solver->constraints.add(boolean);
-	}
-	replaceBooleanWithBoolean(This->solver, boolOrder, boolean);
+	ElementSet *elem1 = (ElementSet *)getOrderIntegerElement(This, order, boolOrder->first);
+	ElementSet *elem2 = (ElementSet *)getOrderIntegerElement(This, order, boolOrder->second);
+	Set *sarray[] = {elem1->set, elem2->set};
+	Predicate *predicate = This->solver->createPredicateOperator(LT, sarray, 2);
+	Element *parray[] = {elem1, elem2};
+	Boolean *boolean = This->solver->applyPredicate(predicate, parray, 2);
+	This->solver->addConstraint(boolean);
+	This->solver->replaceBooleanWithBoolean(boolOrder, boolean);
 }
 
 
-Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item) {
-	HashSetOrderElement* eset = order->elementTable;
-	OrderElement oelement ={item, NULL};
-	if( !eset->contains(&oelement)){
-		Set* set = new Set(order->set->type, 1, (uint64_t) order->set->getSize());
-		Element* elem = new ElementSet(set);
-		eset->add(allocOrderElement(item, elem));
-		This->solver->allElements.push(elem);
-		This->solver->allSets.push(set);
+Element *getOrderIntegerElement(SATEncoder *This,Order *order, uint64_t item) {
+	HashSetOrderElement *eset = order->elementTable;
+	OrderElement oelement(item, NULL);
+	if ( !eset->contains(&oelement)) {
+		Set *set = This->solver->createRangeSet(order->set->type, 1, (uint64_t) order->set->getSize());
+		Element *elem = This->solver->getElementVar(set);
+		eset->add(new OrderElement(item, elem));
 		return elem;
 	} else
 		return eset->get(&oelement)->elem;

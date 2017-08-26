@@ -13,10 +13,10 @@
 #include "constraint.h"
 
 class OrderPair {
- public:
+public:
 	OrderPair(uint64_t first, uint64_t second, Edge constraint);
 	OrderPair();
- 	uint64_t first;
+	uint64_t first;
 	uint64_t second;
 	Edge constraint;
 	MEMALLOC;

@@ -8,15 +8,15 @@
 #define GETFUNCTIONTYPE(o) (((Function *)o)->type)
 
 class Function {
- public:
-  Function(FunctionType _type) : type(_type) {}
+public:
+	Function(FunctionType _type) : type(_type) {}
 	FunctionType type;
 	MEMALLOC;
 	virtual ~Function() {}
 };
 
 class FunctionOperator : public Function {
- public:
+public:
 	ArithOp op;
 	Array<Set *> domains;
 	Set *range;
@@ -28,7 +28,7 @@ class FunctionOperator : public Function {
 };
 
 class FunctionTable : public Function {
- public:
+public:
 	Table *table;
 	UndefinedBehavior undefBehavior;
 	FunctionTable (Table *table, UndefinedBehavior behavior);

@@ -2,8 +2,8 @@
 #include "csolver.h"
 
 void computePolarities(CSolver *This) {
-	HSIteratorBoolean *iterator=This->constraints.iterator();
-	while(iterator->hasNext()) {
+	HSIteratorBoolean *iterator = This->getConstraints();
+	while (iterator->hasNext()) {
 		Boolean *boolean = iterator->next();
 		updatePolarity(boolean, P_TRUE);
 		updateMustValue(boolean, BV_MUSTBETRUE);

@@ -16,7 +16,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Table *table = ((PredicateTable *)constraint->predicate)->table;
 	FunctionEncodingType encType = constraint->encoding.type;
-	Array<Element*> * inputs = &constraint->inputs;
+	Array<Element *> *inputs = &constraint->inputs;
 	uint inputNum = inputs->getSize();
 	uint size = table->entries->getSize();
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;

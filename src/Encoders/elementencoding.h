@@ -11,7 +11,7 @@ enum ElementEncodingType {
 typedef enum ElementEncodingType ElementEncodingType;
 
 class ElementEncoding {
- public:
+public:
 	ElementEncoding(Element *element);
 	ElementEncodingType getElementEncodingType() {return type;}
 	~ElementEncoding();
@@ -36,7 +36,7 @@ class ElementEncoding {
 		return -1;
 	}
 
-	
+
 	ElementEncodingType type;
 	Element *element;
 	Edge *variables;/* List Variables Used To Encode Element */

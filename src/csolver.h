@@ -5,48 +5,19 @@
 #include "structs.h"
 
 class CSolver {
- public:
+public:
 	CSolver();
 	~CSolver();
-	
-	SATEncoder *satEncoder;
-	bool unsat;
-	Tuner *tuner;
-	
-	/** This is a vector of constraints that must be satisfied. */
-	HashSetBoolean constraints;
-
-	/** This is a vector of all boolean structs that we have allocated. */
-	Vector<Boolean *> allBooleans;
-
-	/** This is a vector of all set structs that we have allocated. */
-	Vector<Set *> allSets;
-
-	/** This is a vector of all element structs that we have allocated. */
-	Vector<Element *> allElements;
-
-	/** This is a vector of all predicate structs that we have allocated. */
-	Vector<Predicate *> allPredicates;
-
-	/** This is a vector of all table structs that we have allocated. */
-	Vector<Table *> allTables;
-
-	/** This is a vector of all order structs that we have allocated. */
-	Vector<Order *> allOrders;
-
-	/** This is a vector of all function structs that we have allocated. */
-	Vector<Function *> allFunctions;
 
 	/** This function creates a set containing the elements passed in the array. */
-
 	Set *createSet(VarType type, uint64_t *elements, uint num);
 
 	/** This function creates a set from lowrange to highrange (inclusive). */
 
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
-	
+
 	/** This function creates a mutable set. */
-	
+
 	MutableSet *createMutableSet(VarType type);
 
 	/** This function adds a new item to a set. */
@@ -54,9 +25,9 @@ class CSolver {
 	void addItem(MutableSet *set, uint64_t element);
 
 	/** This function adds a new unique item to the set and returns it.
-			This function cannot be used in conjunction with manually adding
-			items to the set. */
-	
+	    This function cannot be used in conjunction with manually adding
+	    items to the set. */
+
 	uint64_t createUniqueItem(MutableSet *set);
 
 	/** This function creates an element variable over a set. */
@@ -109,7 +80,7 @@ class CSolver {
 	Boolean *applyLogicalOperation(LogicOp op, Boolean **array, uint asize);
 
 	/** This function adds a boolean constraint to the set of constraints
-			to be satisfied */
+	    to be satisfied */
 
 	void addConstraint(Boolean *constraint);
 
@@ -130,7 +101,58 @@ class CSolver {
 
 	HappenedBefore getOrderConstraintValue(Order *order, uint64_t first, uint64_t second);
 
-	MEMALLOC;
-};
+	void setUnSAT() { unsat = true; }
 
+	bool isUnSAT() { return unsat; }
+
+	Vector<Order *> *getOrders() { return &allOrders;}
+
+	Tuner *getTuner() { return tuner; }
+
+	HSIteratorBoolean *getConstraints() { return constraints.iterator(); }
+
+	SATEncoder *getSATEncoder() {return satEncoder;}
+
+	void replaceBooleanWithTrue(Boolean *bexpr);
+	void replaceBooleanWithFalse(Boolean *bexpr);
+	void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
+
+
+	MEMALLOC;
+
+private:
+	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);
+	void handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child);
+	void handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child);
+	void handleANDTrue(BooleanLogic *bexpr, Boolean *child);
+	void handleORFalse(BooleanLogic *bexpr, Boolean *child);
+
+	/** This is a vector of constraints that must be satisfied. */
+	HashSetBoolean constraints;
+
+	/** This is a vector of all boolean structs that we have allocated. */
+	Vector<Boolean *> allBooleans;
+
+	/** This is a vector of all set structs that we have allocated. */
+	Vector<Set *> allSets;
+
+	/** This is a vector of all element structs that we have allocated. */
+	Vector<Element *> allElements;
+
+	/** This is a vector of all predicate structs that we have allocated. */
+	Vector<Predicate *> allPredicates;
+
+	/** This is a vector of all table structs that we have allocated. */
+	Vector<Table *> allTables;
+
+	/** This is a vector of all order structs that we have allocated. */
+	Vector<Order *> allOrders;
+
+	/** This is a vector of all function structs that we have allocated. */
+	Vector<Function *> allFunctions;
+
+	SATEncoder *satEncoder;
+	bool unsat;
+	Tuner *tuner;
+};
 #endif

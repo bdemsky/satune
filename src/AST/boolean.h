@@ -18,7 +18,7 @@
 #define GETBOOLEANVALUE(b) (b->boolVal)
 
 class Boolean : public ASTNode {
- public:
+public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
 	Polarity polarity;
@@ -28,7 +28,7 @@ class Boolean : public ASTNode {
 };
 
 class BooleanVar : public Boolean {
- public:
+public:
 	BooleanVar(VarType t);
 	VarType vtype;
 	Edge var;
@@ -36,7 +36,7 @@ class BooleanVar : public Boolean {
 };
 
 class BooleanOrder : public Boolean {
- public:
+public:
 	BooleanOrder(Order *_order, uint64_t _first, uint64_t _second);
 	Order *order;
 	uint64_t first;
@@ -45,19 +45,19 @@ class BooleanOrder : public Boolean {
 };
 
 class BooleanPredicate : public Boolean {
- public:
+public:
 	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, Boolean *_undefinedStatus);
 	~BooleanPredicate();
 	Predicate *predicate;
 	FunctionEncoding encoding;
 	Array<Element *> inputs;
 	Boolean *undefStatus;
-	FunctionEncoding * getFunctionEncoding() {return &encoding;}
+	FunctionEncoding *getFunctionEncoding() {return &encoding;}
 	MEMALLOC;
 };
 
 class BooleanLogic : public Boolean {
- public:
+public:
 	BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint asize);
 	LogicOp op;
 	Array<Boolean *> inputs;

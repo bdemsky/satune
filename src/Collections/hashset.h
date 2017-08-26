@@ -24,14 +24,14 @@ class HashSet;
 template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
 class HSIterator {
 public:
-	HSIterator(LinkNode<_Key> *_curr, HashSet <_Key, _KeyInt, _Shift, hash_function, equals> * _set) :
+	HSIterator(LinkNode<_Key> *_curr, HashSet <_Key, _KeyInt, _Shift, hash_function, equals> *_set) :
 		curr(_curr),
 		set(_set)
 	{
 	}
 
 	/** Override: new operator */
-	void * operator new(size_t size) {
+	void *operator new(size_t size) {
 		return ourmalloc(size);
 	}
 
@@ -41,7 +41,7 @@ public:
 	}
 
 	/** Override: new[] operator */
-	void * operator new[](size_t size) {
+	void *operator new[](size_t size) {
 		return ourmalloc(size);
 	}
 
@@ -51,13 +51,13 @@ public:
 	}
 
 	bool hasNext() {
-		return curr!=NULL;
+		return curr != NULL;
 	}
 
 	_Key next() {
-		_Key k=curr->key;
-		last=curr;
-		curr=curr->next;
+		_Key k = curr->key;
+		last = curr;
+		curr = curr->next;
 		return k;
 	}
 
@@ -66,14 +66,14 @@ public:
 	}
 
 	void remove() {
-		_Key k=last->key;
+		_Key k = last->key;
 		set->remove(k);
 	}
 
 private:
 	LinkNode<_Key> *curr;
 	LinkNode<_Key> *last;
-	HashSet <_Key, _KeyInt, _Shift, hash_function, equals> * set;
+	HashSet <_Key, _KeyInt, _Shift, hash_function, equals> *set;
 };
 
 template<typename _Key, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
@@ -88,41 +88,41 @@ public:
 
 	/** @brief Hashset destructor */
 	~HashSet() {
-		LinkNode<_Key> *tmp=list;
-		while(tmp!=NULL) {
-			LinkNode<_Key> *tmpnext=tmp->next;
+		LinkNode<_Key> *tmp = list;
+		while (tmp != NULL) {
+			LinkNode<_Key> *tmpnext = tmp->next;
 			ourfree(tmp);
-			tmp=tmpnext;
+			tmp = tmpnext;
 		}
 		delete table;
 	}
 
-	HashSet<_Key, _KeyInt, _Shift, hash_function, equals> * copy() {
-		HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy=new HashSet<_Key, _KeyInt, _Shift, hash_function, equals>(table->getCapacity(), table->getLoadFactor());
-		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> * it=iterator();
-		while(it->hasNext())
+	HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy() {
+		HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy = new HashSet<_Key, _KeyInt, _Shift, hash_function, equals>(table->getCapacity(), table->getLoadFactor());
+		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
+		while (it->hasNext())
 			copy->add(it->next());
 		delete it;
 		return copy;
 	}
 
 	void reset() {
-		LinkNode<_Key> *tmp=list;
-		while(tmp!=NULL) {
-			LinkNode<_Key> *tmpnext=tmp->next;
+		LinkNode<_Key> *tmp = list;
+		while (tmp != NULL) {
+			LinkNode<_Key> *tmpnext = tmp->next;
 			ourfree(tmp);
-			tmp=tmpnext;
+			tmp = tmpnext;
 		}
-		list=tail=NULL;
+		list = tail = NULL;
 		table->reset();
 	}
 
 	/** @brief Adds a new key to the hashset.  Returns false if the key
 	 *  is already present. */
 
-	void addAll(HashSet<_Key, _KeyInt, _Shift, hash_function, equals> * table) {
-		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> * it=iterator();
-		while(it->hasNext())
+	void addAll(HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *table) {
+		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
+		while (it->hasNext())
 			add(it->next());
 		delete it;
 	}
@@ -131,17 +131,17 @@ public:
 	 *  is already present. */
 
 	bool add(_Key key) {
-		LinkNode<_Key> * val=table->get(key);
-		if (val==NULL) {
-			LinkNode<_Key> * newnode=(LinkNode<_Key> *)ourmalloc(sizeof(struct LinkNode<_Key>));
-			newnode->prev=tail;
-			newnode->next=NULL;
-			newnode->key=key;
-			if (tail!=NULL)
-				tail->next=newnode;
+		LinkNode<_Key> *val = table->get(key);
+		if (val == NULL) {
+			LinkNode<_Key> *newnode = (LinkNode<_Key> *)ourmalloc(sizeof(struct LinkNode<_Key>));
+			newnode->prev = tail;
+			newnode->next = NULL;
+			newnode->key = key;
+			if (tail != NULL)
+				tail->next = newnode;
 			else
-				list=newnode;
-			tail=newnode;
+				list = newnode;
+			tail = newnode;
 			table->put(key, newnode);
 			return true;
 		} else
@@ -152,8 +152,8 @@ public:
 	 *  hashset.  Returns NULL if not present. */
 
 	_Key get(_Key key) {
-		LinkNode<_Key> * val=table->get(key);
-		if (val!=NULL)
+		LinkNode<_Key> *val = table->get(key);
+		if (val != NULL)
 			return val->key;
 		else
 			return NULL;
@@ -164,26 +164,26 @@ public:
 	}
 
 	bool contains(_Key key) {
-		return table->get(key)!=NULL;
+		return table->get(key) != NULL;
 	}
 
 	bool remove(_Key key) {
-		LinkNode<_Key> * oldlinknode;
-		oldlinknode=table->get(key);
-		if (oldlinknode==NULL) {
+		LinkNode<_Key> *oldlinknode;
+		oldlinknode = table->get(key);
+		if (oldlinknode == NULL) {
 			return false;
 		}
 		table->remove(key);
 
 		//remove link node from the list
-		if (oldlinknode->prev==NULL)
-			list=oldlinknode->next;
+		if (oldlinknode->prev == NULL)
+			list = oldlinknode->next;
 		else
-			oldlinknode->prev->next=oldlinknode->next;
-		if (oldlinknode->next!=NULL)
-			oldlinknode->next->prev=oldlinknode->prev;
+			oldlinknode->prev->next = oldlinknode->next;
+		if (oldlinknode->next != NULL)
+			oldlinknode->next->prev = oldlinknode->prev;
 		else
-			tail=oldlinknode->prev;
+			tail = oldlinknode->prev;
 		ourfree(oldlinknode);
 		return true;
 	}
@@ -193,15 +193,15 @@ public:
 	}
 
 	bool isEmpty() {
-		return getSize()==0;
+		return getSize() == 0;
 	}
 
-	HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> * iterator() {
+	HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> *iterator() {
 		return new HSIterator<_Key, _KeyInt, _Shift, hash_function, equals>(list, this);
 	}
 
 	/** Override: new operator */
-	void * operator new(size_t size) {
+	void *operator new(size_t size) {
 		return ourmalloc(size);
 	}
 
@@ -211,7 +211,7 @@ public:
 	}
 
 	/** Override: new[] operator */
-	void * operator new[](size_t size) {
+	void *operator new[](size_t size) {
 		return ourmalloc(size);
 	}
 
@@ -220,7 +220,7 @@ public:
 		ourfree(p);
 	}
 private:
-	HashTable<_Key, LinkNode<_Key>*, _KeyInt, _Shift, hash_function, equals> * table;
+	HashTable<_Key, LinkNode<_Key> *, _KeyInt, _Shift, hash_function, equals> *table;
 	LinkNode<_Key> *list;
 	LinkNode<_Key> *tail;
 };

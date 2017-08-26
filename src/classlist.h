@@ -42,37 +42,29 @@ class Table;
 class Order;
 class OrderPair;
 
-struct IncrementalSolver;
-typedef struct IncrementalSolver IncrementalSolver;
-
-
-
-struct OrderElement;
-typedef struct OrderElement OrderElement;
+class OrderElement;
 
 class ElementEncoding;
 class FunctionEncoding;
 class OrderEncoding;
 
+class OrderGraph;
+class OrderNode;
+class OrderEdge;
+
+
+struct IncrementalSolver;
+typedef struct IncrementalSolver IncrementalSolver;
+
 struct TableEntry;
 typedef struct TableEntry TableEntry;
-
-struct OrderGraph;
-typedef struct OrderGraph OrderGraph;
-
-struct OrderNode;
-typedef struct OrderNode OrderNode;
-
-struct OrderEdge;
-typedef struct OrderEdge OrderEdge;
 
 struct OrderEncoder;
 typedef struct OrderEncoder OrderEncoder;
 
-struct Tuner;
-typedef struct Tuner Tuner;
-struct TunableDesc;
-typedef struct TunableDesc TunableDesc;
+class Tuner;
+class TunableDesc;
+
 typedef int TunableParam;
 
 typedef unsigned int uint;

@@ -9,7 +9,7 @@ int main(int numargs, char **argv) {
 	CSolver *solver = new CSolver();
 	uint64_t set1[] = {5};
 	uint64_t set3[] = {1, 3, 4, 6};
-	Set *s1 = solver->createSet(0, set1, 3);
+	Set *s1 = solver->createSet(0, set1, 1);
 	Set *s3 = solver->createSet(0, set3, 4);
 	Element *e1 = solver->getElementConst(4, 5);
 	Element *e2 = solver->getElementVar(s3);

@@ -21,7 +21,7 @@ void Table::addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result) 
 	ASSERT(status);
 }
 
-TableEntry * Table::getTableEntry(uint64_t *inputs, uint inputSize) {
+TableEntry *Table::getTableEntry(uint64_t *inputs, uint inputSize) {
 	TableEntry *temp = allocTableEntry(inputs, inputSize, -1);
 	TableEntry *result = entries->get(temp);
 	deleteTableEntry(temp);
