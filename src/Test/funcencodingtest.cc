@@ -74,7 +74,7 @@ int main(int numargs, char **argv) {
 	solver->addConstraint(pred);
 
 	if (solver->startEncoding() == 1)
-		printf("e1=%llu e2=%llu e7=%llu\n",
+		printf("e1=%" PRIu64 " e2=%" PRIu64 " e7=%" PRIu64 "\n",
 					 solver->getElementValue(e1), solver->getElementValue(e2), solver->getElementValue(e7));
 	else
 		printf("UNSAT\n");

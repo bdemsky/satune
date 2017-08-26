@@ -12,6 +12,7 @@ class Function {
   Function(FunctionType _type) : type(_type) {}
 	FunctionType type;
 	MEMALLOC;
+	virtual ~Function() {}
 };
 
 class FunctionOperator : public Function {

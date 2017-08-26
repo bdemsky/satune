@@ -51,7 +51,7 @@ int main(int numargs, char **argv) {
 	solver->addConstraint(pred);
 
 	if (solver->startEncoding() == 1)
-		printf("e1=%llu e2=%llu e3=%llu e4=%llu overFlow:%d\n",
+		printf("e1=%" PRIu64 " e2=%" PRIu64 " e3=%" PRIu64 " e4=%" PRIu64 " overFlow:%d\n",
 					 solver->getElementValue(e1), solver->getElementValue(e2), solver->getElementValue(e3),
 					 solver->getElementValue(e4), solver->getBooleanValue(overflow));
 	else
