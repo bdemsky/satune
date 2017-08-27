@@ -28,6 +28,7 @@ class OrderNode {
 	uint sccNum;
 	HashSetOrderEdge inEdges;
 	HashSetOrderEdge outEdges;
+	MEMALLOC;
 };
 #endif/* ORDERNODE_H */
 

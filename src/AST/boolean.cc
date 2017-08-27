@@ -40,7 +40,6 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint a
 	Boolean(LOGICOP),
 	op(_op),
 	inputs(array, asize) {
-	solver->allBooleans.push(this);
 }
 
 BooleanPredicate::~BooleanPredicate() {

@@ -2,9 +2,9 @@
 #include "boolean.h"
 #include "csolver.h"
 
-void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
-	if (This->constraints.contains(bexpr)) {
-		This->constraints.remove(bexpr);
+void CSolver::replaceBooleanWithTrue(Boolean *bexpr) {
+	if (constraints.contains(bexpr)) {
+		constraints.remove(bexpr);
 	}
 
 	uint size = bexpr->parents.getSize();
@@ -13,28 +13,28 @@ void replaceBooleanWithTrue(CSolver * This, Boolean *bexpr) {
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case L_AND:
-			handleANDTrue(This, logicop, bexpr);
+			handleANDTrue(logicop, bexpr);
 			break;
 		case L_OR:
-			replaceBooleanWithTrue(This, parent);
+			replaceBooleanWithTrue(parent);
 			break;
 		case L_NOT:
-			replaceBooleanWithFalse(This, parent);
+			replaceBooleanWithFalse(parent);
 			break;
 		case L_XOR:
 			handleXORTrue(logicop, bexpr);
 			break;
 		case L_IMPLIES:
-			handleIMPLIESTrue(This, logicop, bexpr);
+			handleIMPLIESTrue(logicop, bexpr);
 			break;
 		}
 	}
 }
 
-void replaceBooleanWithBoolean(CSolver * This, Boolean *oldb, Boolean *newb) {
-	if (This->constraints.contains(oldb)) {
-		This->constraints.remove(oldb);
-		This->constraints.add(newb);
+void CSolver::replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb) {
+	if (constraints.contains(oldb)) {
+		constraints.remove(oldb);
+		constraints.add(newb);
 	}
 
 	uint size = oldb->parents.getSize();
@@ -62,31 +62,31 @@ void handleXORTrue(BooleanLogic *bexpr, Boolean *child) {
 	bexpr->op = L_NOT;
 }
 
-void handleXORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleXORFalse(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 	Boolean *b = bexpr->inputs.get(0);
 	uint otherindex = (b == child) ? 1 : 0;
-	replaceBooleanWithBoolean(This, (Boolean *)bexpr, bexpr->inputs.get(otherindex));
+	replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(otherindex));
 }
 
-void handleIMPLIESTrue(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 	Boolean *b = bexpr->inputs.get(0);
 	if (b == child) {
 		//Replace with other term
-		replaceBooleanWithBoolean(This, (Boolean *)bexpr, bexpr->inputs.get(1));
+		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(1));
 	} else {
 		//Statement is true...
-		replaceBooleanWithTrue(This, (Boolean *)bexpr);
+		replaceBooleanWithTrue(bexpr);
 	}
 }
 
-void handleIMPLIESFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 	Boolean *b = bexpr->inputs.get(0);
 	if (b == child) {
 		//Statement is true...
-		replaceBooleanWithTrue(This, (Boolean *)bexpr);
+		replaceBooleanWithTrue(bexpr);
 	} else {
 		//Make into negation of first term
 		bexpr->inputs.get(1);
@@ -94,11 +94,11 @@ void handleIMPLIESFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
 	}
 }
 
-void handleANDTrue(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleANDTrue(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 
 	if (size == 1) {
-		replaceBooleanWithTrue(This, (Boolean *)bexpr);
+		replaceBooleanWithTrue(bexpr);
 		return;
 	}
 
@@ -110,15 +110,15 @@ void handleANDTrue(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
 	}
 
 	if (size == 2) {
-		replaceBooleanWithBoolean(This, (Boolean *)bexpr, bexpr->inputs.get(0));
+		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(0));
 	}
 }
 
-void handleORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleORFalse(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 
 	if (size == 1) {
-		replaceBooleanWithFalse(This, (Boolean *) bexpr);
+		replaceBooleanWithFalse(bexpr);
 	}
 
 	for (uint i = 0; i < size; i++) {
@@ -129,14 +129,14 @@ void handleORFalse(CSolver * This, BooleanLogic *bexpr, Boolean *child) {
 	}
 
 	if (size == 2) {
-		replaceBooleanWithBoolean(This, (Boolean *)bexpr, bexpr->inputs.get(0));
+		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(0));
 	}
 }
 
-void replaceBooleanWithFalse(CSolver * This, Boolean *bexpr) {
-	if (This->constraints.contains(bexpr)) {
-		This->unsat=true;
-		This->constraints.remove(bexpr);
+void CSolver::replaceBooleanWithFalse(Boolean *bexpr) {
+	if (constraints.contains(bexpr)) {
+		setUnSAT();
+		constraints.remove(bexpr);
 	}
 	
 	uint size = bexpr->parents.getSize();
@@ -145,19 +145,19 @@ void replaceBooleanWithFalse(CSolver * This, Boolean *bexpr) {
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case L_AND:
-			replaceBooleanWithFalse(This, parent);
+			replaceBooleanWithFalse(parent);
 			break;
 		case L_OR:
-			handleORFalse(This, logicop, bexpr);
+			handleORFalse(logicop, bexpr);
 			break;
 		case L_NOT:
-			replaceBooleanWithTrue(This, parent);
+			replaceBooleanWithTrue(parent);
 			break;
 		case L_XOR:
-			handleXORFalse(This, logicop, bexpr);
+			handleXORFalse(logicop, bexpr);
 			break;
 		case L_IMPLIES:
-			handleIMPLIESFalse(This, logicop, bexpr);
+			handleIMPLIESFalse(logicop, bexpr);
 			break;
 		}
 	}

@@ -21,6 +21,7 @@ class OrderEdge {
 	unsigned int mustPos : 1;
 	unsigned int mustNeg : 1;
 	unsigned int pseudoPos : 1;
+	MEMALLOC;
 };
 
 #endif/* ORDEREDGE_H */

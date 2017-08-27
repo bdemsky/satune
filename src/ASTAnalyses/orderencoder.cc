@@ -10,7 +10,7 @@
 #include "tunable.h"
 
 void DFS(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
-	HSIteratorOrderNode *iterator = graph->nodes->iterator();
+	HSIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
 		if (node->status == NOTVISITED) {
@@ -65,7 +65,7 @@ void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReve
 }
 
 void resetNodeInfoStatusSCC(OrderGraph *graph) {
-	HSIteratorOrderNode *iterator = graph->nodes->iterator();
+	HSIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
 		iterator->next()->status = NOTVISITED;
 	}
@@ -114,7 +114,7 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
 			newEdge->mustPos = true;
 			newEdge->polPos = true;
 			if (newEdge->mustNeg)
-				This->unsat = true;
+				This->setUnSAT();
 			srcNode->outEdges.add(newEdge);
 			sinkNode->inEdges.add(newEdge);
 		}
@@ -124,7 +124,7 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
 }
 
 void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
-	HSIteratorOrderNode* iterator = graph->nodes->iterator();
+	HSIteratorOrderNode* iterator = graph->getNodes();
 	while(iterator->hasNext()) {
 		OrderNode* node = iterator->next();
 		if(isMustBeTrueNode(node)){
@@ -211,7 +211,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 }
 
 void DFSMust(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
-	HSIteratorOrderNode *iterator = graph->nodes->iterator();
+	HSIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
 		if (node->status == NOTVISITED) {
@@ -256,7 +256,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				newedge->mustPos = true;
 				newedge->polPos = true;
 				if (newedge->mustNeg)
-					solver->unsat = true;
+					solver->setUnSAT();
 				srcnode->outEdges.add(newedge);
 				node->inEdges.add(newedge);
 			}
@@ -272,7 +272,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 					edge->mustPos = true;
 					edge->polPos = true;
 					if (edge->mustNeg)
-						solver->unsat = true;
+						solver->setUnSAT();
 				}
 			}
 			delete iterator;
@@ -287,7 +287,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 					edge->mustNeg = true;
 					edge->polNeg = true;
 					if (edge->mustPos)
-						solver->unsat = true;
+						solver->setUnSAT();
 				}
 			}
 			delete iterator;
@@ -318,7 +318,7 @@ void reachMustAnalysis(CSolver * solver, OrderGraph *graph, bool computeTransiti
    had one). */
 
 void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
-	HSIteratorOrderEdge *iterator = graph->edges->iterator();
+	HSIteratorOrderEdge *iterator = graph->getEdges();
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
 		if (edge->mustPos) {
@@ -327,7 +327,7 @@ void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
 				if (!invEdge->mustPos) {
 					invEdge->polPos = false;
 				} else {
-					solver->unsat = true;
+					solver->setUnSAT();
 				}
 				invEdge->mustNeg = true;
 				invEdge->polNeg = true;
@@ -343,21 +343,22 @@ void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
     polarity. */
 
 void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
-	HSIteratorOrderEdge *iterator = graph->edges->iterator();
+	HSIteratorOrderEdge *iterator = graph->getEdges();
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
 		if (edge->mustPos) {
 			if (!edge->mustNeg) {
 				edge->polNeg = false;
 			} else
-				solver->unsat = true;
+				solver->setUnSAT();
 
 			OrderEdge *invEdge = graph->getInverseOrderEdge(edge);
 			if (invEdge != NULL) {
 				if (!invEdge->mustPos)
 					invEdge->polPos = false;
 				else
-					solver->unsat = true;
+					solver->setUnSAT();
+
 				invEdge->mustNeg = true;
 				invEdge->polNeg = true;
 			}

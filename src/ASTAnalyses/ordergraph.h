@@ -24,6 +24,12 @@ class OrderGraph {
 	void addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	void addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	OrderEdge *getInverseOrderEdge(OrderEdge *edge);
+	Order *getOrder() {return order;}
+	HSIteratorOrderNode * getNodes() {return nodes->iterator();}
+	HSIteratorOrderEdge * getEdges() {return edges->iterator();}
+	
+	MEMALLOC;
+ private:
 	HashSetOrderNode *nodes;
 	HashSetOrderEdge *edges;
 	Order *order;

@@ -79,7 +79,7 @@ Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
 		boolOrder->order->initializeOrderHashTable();
-		bool doOptOrderStructure=GETVARTUNABLE(This->solver->tuner, boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
+		bool doOptOrderStructure=GETVARTUNABLE(This->solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
 			reachMustAnalysis(This->solver, boolOrder->order->graph, true);

@@ -29,7 +29,7 @@ void deleteSATEncoder(SATEncoder *This) {
 }
 
 void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This) {
-	HSIteratorBoolean *iterator=csolver->constraints.iterator();
+	HSIteratorBoolean *iterator=csolver->getConstraints();
 	while(iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
 		model_print("Encoding All ...\n\n");
