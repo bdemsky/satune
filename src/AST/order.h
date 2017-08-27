@@ -17,7 +17,7 @@ public:
 	HashTableOrderPair *orderPairTable;
 	HashSetOrderElement *elementTable;
 	OrderGraph *graph;
-	Order * clone(CloneMap *map);
+	Order *clone(CSolver *solver, CloneMap *map);
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding order;
 	void initializeOrderHashTable();

@@ -46,15 +46,15 @@ Set::~Set() {
 		delete members;
 }
 
-Set * Set::clone(CSolver * solver, CloneMap *map) {
-	Set * s=map->set.get(this);
+Set *Set::clone(CSolver *solver, CloneMap *map) {
+	Set *s = (Set *) map->get(this);
 	if (s != NULL)
 		return s;
 	if (isRange) {
-		s=solver->createRangeSet(type, low, high);
+		s = solver->createRangeSet(type, low, high);
 	} else {
-		s=solver->createSet(type, members->expose(), members->getSize());
+		s = solver->createSet(type, members->expose(), members->getSize());
 	}
-	map->set.put(this, s);
+	map->put(this, s);
 	return s;
 }

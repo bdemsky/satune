@@ -2,6 +2,7 @@
 #include "boolean.h"
 #include "set.h"
 #include "table.h"
+#include "csolver.h"
 
 PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED), op(_op), domains(domain, numDomain) {
 }
@@ -24,4 +25,28 @@ bool PredicateOperator::evalPredicateOperator(uint64_t *inputs) {
 	}
 	ASSERT(0);
 	return false;
+}
+
+Predicate *PredicateOperator::clone(CSolver *solver, CloneMap *map) {
+	Predicate *p = (Predicate *) map->get(this);
+	if (p != NULL)
+		return p;
+
+	Set *array[domains.getSize()];
+	for (uint i = 0; i < domains.getSize(); i++)
+		array[i] = domains.get(i)->clone(solver, map);
+
+	p = solver->createPredicateOperator(op, array, domains.getSize());
+	map->put(this, p);
+	return p;
+}
+
+Predicate *PredicateTable::clone(CSolver *solver, CloneMap *map) {
+	Predicate *p = (Predicate *) map->get(this);
+	if (p != NULL)
+		return p;
+
+	p = solver->createPredicateTable(table->clone(solver, map), undefinedbehavior);
+	map->put(this, p);
+	return p;
 }

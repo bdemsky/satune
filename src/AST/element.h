@@ -16,7 +16,7 @@ public:
 	virtual ~Element() {}
 	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
-	virtual Element * clone(CSolver * solver, CloneMap * map);
+	virtual Element *clone(CSolver *solver, CloneMap *map);
 	MEMALLOC;
 };
 
@@ -25,7 +25,7 @@ public:
 	ElementConst(uint64_t value, VarType type, Set *_set);
 	Set *set;
 	uint64_t value;
-	Element * clone(CSolver * solver, CloneMap * map);
+	Element *clone(CSolver *solver, CloneMap *map);
 	MEMALLOC;
 };
 
@@ -33,7 +33,7 @@ class ElementSet : public Element {
 public:
 	ElementSet(Set *s);
 	Set *set;
-	Element * clone(CSolver * solver, CloneMap * map);
+	Element *clone(CSolver *solver, CloneMap *map);
 	MEMALLOC;
 };
 
@@ -44,7 +44,7 @@ public:
 	Array<Element *> inputs;
 	Boolean *overflowstatus;
 	FunctionEncoding functionencoding;
-	Element * clone(CSolver * solver, CloneMap * map);
+	Element *clone(CSolver *solver, CloneMap *map);
 	MEMALLOC;
 };
 

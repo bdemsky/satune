@@ -21,8 +21,8 @@ public:
 	bool exists(uint64_t element);
 	uint getSize();
 	uint64_t getElement(uint index);
-	virtual Set * clone(CSolver * solver, CloneMap *map);
-	
+	virtual Set *clone(CSolver *solver, CloneMap *map);
+
 	VarType type;
 	bool isRange;
 	uint64_t low;//also used to count unique items

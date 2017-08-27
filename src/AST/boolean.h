@@ -21,7 +21,7 @@ class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
-	virtual Boolean * clone(CSolver * solver, CloneMap *map);
+	virtual Boolean *clone(CSolver *solver, CloneMap *map);
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
@@ -31,8 +31,8 @@ public:
 class BooleanVar : public Boolean {
 public:
 	BooleanVar(VarType t);
-	Boolean * clone(CSolver * solver, CloneMap *map);
-	
+	Boolean *clone(CSolver *solver, CloneMap *map);
+
 	VarType vtype;
 	Edge var;
 	MEMALLOC;
@@ -41,8 +41,8 @@ public:
 class BooleanOrder : public Boolean {
 public:
 	BooleanOrder(Order *_order, uint64_t _first, uint64_t _second);
-	Boolean * clone(CSolver * solver, CloneMap *map);
-	
+	Boolean *clone(CSolver *solver, CloneMap *map);
+
 	Order *order;
 	uint64_t first;
 	uint64_t second;
@@ -52,8 +52,8 @@ public:
 class BooleanPredicate : public Boolean {
 public:
 	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, Boolean *_undefinedStatus);
-	Boolean * clone(CSolver * solver, CloneMap *map);
-	
+	Boolean *clone(CSolver *solver, CloneMap *map);
+
 	Predicate *predicate;
 	FunctionEncoding encoding;
 	Array<Element *> inputs;
@@ -65,7 +65,7 @@ public:
 class BooleanLogic : public Boolean {
 public:
 	BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint asize);
-	Boolean * clone(CSolver * solver, CloneMap *map);
+	Boolean *clone(CSolver *solver, CloneMap *map);
 
 	LogicOp op;
 	Array<Boolean *> inputs;

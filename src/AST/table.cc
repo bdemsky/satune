@@ -4,6 +4,7 @@
 #include "tableentry.h"
 #include "set.h"
 #include "mutableset.h"
+#include "csolver.h"
 
 Table::Table(Set **_domains, uint numDomain, Set *_range) :
 	domains(_domains, numDomain),
@@ -26,6 +27,26 @@ TableEntry *Table::getTableEntry(uint64_t *inputs, uint inputSize) {
 	TableEntry *result = entries->get(temp);
 	deleteTableEntry(temp);
 	return result;
+}
+
+Table *Table::clone(CSolver *solver, CloneMap *map) {
+	Table *t = (Table *) map->get(this);
+	if (t != NULL)
+		return t;
+	Set *array[domains.getSize()];
+	for (uint i = 0; i < domains.getSize(); i++) {
+		array[i] = domains.get(i)->clone(solver, map);
+	}
+	Set *rcopy = range != NULL ? range->clone(solver, map) : NULL;
+	t = solver->createTable(array, domains.getSize(), rcopy);
+	HSIteratorTableEntry *entryit = entries->iterator();
+	while (entryit->hasNext()) {
+		TableEntry *te = entryit->next();
+		solver->addTableEntry(t, &te->inputs[0], te->inputSize, te->output);
+	}
+	delete entryit;
+	map->put(this, t);
+	return t;
 }
 
 Table::~Table() {

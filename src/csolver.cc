@@ -60,12 +60,12 @@ CSolver::~CSolver() {
 	delete tuner;
 }
 
-CSolver * CSolver::clone() {
-	CSolver * copy=new CSolver();
+CSolver *CSolver::clone() {
+	CSolver *copy = new CSolver();
 	CloneMap map;
-	HSIteratorBoolean * it=getConstraints();
-	while(it->hasNext()) {
-		Boolean *b=it->next();
+	HSIteratorBoolean *it = getConstraints();
+	while (it->hasNext()) {
+		Boolean *b = it->next();
 		b->clone(copy, &map);
 	}
 	delete it;
@@ -108,7 +108,7 @@ Element *CSolver::getElementVar(Set *set) {
 
 Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	uint64_t array[] = {value};
-	Set * set = new Set(type, array, 1);
+	Set *set = new Set(type, array, 1);
 	allSets.push(set);
 	Element *element = new ElementConst(value, type, set);
 	allElements.push(element);
