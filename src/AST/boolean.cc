@@ -3,6 +3,7 @@
 #include "csolver.h"
 #include "element.h"
 #include "order.h"
+#include "predicate.h"
 
 Boolean::Boolean(ASTNodeType _type) :
 	ASTNode(_type),
@@ -42,5 +43,36 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint a
 	inputs(array, asize) {
 }
 
-BooleanPredicate::~BooleanPredicate() {
+Boolean * BooleanVar::clone(CSolver *solver, CloneMap *map) {
+	if (map->boolean.contains(this)) {
+		return map->boolean.get(this);
+	} else {
+		Boolean * bvar=solver->getBooleanVar(type);
+		map->boolean.put(this, bvar);
+		return bvar;
+	}
+}
+
+Boolean * BooleanOrder::clone(CSolver * solver, CloneMap *map) {
+	Order * ordercopy=order->clone(map);
+	return solver->orderConstraint(ordercopy, first, second);
+}
+
+Boolean * BooleanLogic::clone(CSolver * solver, CloneMap *map) {
+	Boolean * array[inputs.getSize()];
+	for(uint i=0;i<inputs.getSize();i++) {
+		array[i]=inputs.get(i)->clone(solver, map);
+	}
+	return solver->applyLogicalOperation(op, array, inputs.getSize());
+}
+
+Boolean * BooleanPredicate::clone(CSolver * solver, CloneMap *map) {
+	Element * array[inputs.getSize()];
+	for(uint i=0;i<inputs.getSize();i++) {
+		array[i]=inputs.get(i)->clone(solver, map);
+	}
+	Predicate * pred=predicate->clone(map);
+	Boolean * defstatus=(undefStatus != NULL) ? undefStatus->clone(solver, map) : NULL;
+	
+	return solver->applyPredicateTable(pred, array, inputs.getSize(), defstatus);
 }

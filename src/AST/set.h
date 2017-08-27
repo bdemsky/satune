@@ -17,11 +17,12 @@ public:
 	Set(VarType t);
 	Set(VarType t, uint64_t *elements, uint num);
 	Set(VarType t, uint64_t lowrange, uint64_t highrange);
-	~Set();
+	virtual ~Set();
 	bool exists(uint64_t element);
 	uint getSize();
 	uint64_t getElement(uint index);
-
+	virtual Set * clone(CSolver * solver, CloneMap *map);
+	
 	VarType type;
 	bool isRange;
 	uint64_t low;//also used to count unique items

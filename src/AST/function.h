@@ -11,8 +11,9 @@ class Function {
 public:
 	Function(FunctionType _type) : type(_type) {}
 	FunctionType type;
-	MEMALLOC;
 	virtual ~Function() {}
+	virtual Function * clone(CSolver * solver, CloneMap *map);
+	MEMALLOC;
 };
 
 class FunctionOperator : public Function {
@@ -24,6 +25,7 @@ public:
 	FunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range, OverFlowBehavior overflowbehavior);
 	uint64_t applyFunctionOperator(uint numVals, uint64_t *values);
 	bool isInRangeFunction(uint64_t val);
+	Function * clone(CSolver * solver, CloneMap *map);
 	MEMALLOC;
 };
 
@@ -32,6 +34,7 @@ public:
 	Table *table;
 	UndefinedBehavior undefBehavior;
 	FunctionTable (Table *table, UndefinedBehavior behavior);
+	Function * clone(CSolver * solver, CloneMap *map);
 	MEMALLOC;
 };
 

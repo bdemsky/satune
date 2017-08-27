@@ -116,7 +116,7 @@ public:
 	void replaceBooleanWithTrue(Boolean *bexpr);
 	void replaceBooleanWithFalse(Boolean *bexpr);
 	void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
-
+	CSolver * clone();
 
 	MEMALLOC;
 

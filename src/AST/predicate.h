@@ -11,6 +11,7 @@ class Predicate {
 public:
 	Predicate(PredicateType _type) : type(_type) {}
 	virtual ~Predicate() {}
+	virtual Predicate * clone(CloneMap *map);
 	PredicateType type;
 	MEMALLOC;
 };
@@ -19,6 +20,7 @@ class PredicateOperator : public Predicate {
 public:
 	PredicateOperator(CompOp op, Set **domain, uint numDomain);
 	bool evalPredicateOperator(uint64_t *inputs);
+	Predicate * clone(CloneMap *map);
 	CompOp op;
 	Array<Set *> domains;
 	MEMALLOC;
@@ -27,6 +29,7 @@ public:
 class PredicateTable : public Predicate {
 public:
 	PredicateTable(Table *table, UndefinedBehavior undefBehavior);
+	Predicate * clone(CloneMap *map);
 	Table *table;
 	UndefinedBehavior undefinedbehavior;
 	MEMALLOC;

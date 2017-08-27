@@ -24,10 +24,22 @@ typedef HashSet<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_
 typedef HashSet<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashSetOrderElement;
 typedef HashTable<OrderNode *, HashSetOrderNode *, uintptr_t, 4> HashTableNodeToNodeSet;
 typedef HashTable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashTableOrderPair;
+typedef HashTable<Order *, Order *, uintptr_t, 4> OrderMap;
+typedef HashTable<Boolean *, Boolean *, uintptr_t, 4> BooleanMap;
+typedef HashTable<Element *, Element *, uintptr_t, 4> ElementMap;
+typedef HashTable<Set *, Set *, uintptr_t, 4> SetMap;
+
+typedef struct CloneMap {
+	OrderMap order;
+	BooleanMap boolean;
+	ElementMap element;
+	SetMap set;
+} CloneMap;
 
 typedef HSIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HSIteratorTableEntry;
 typedef HSIterator<Boolean *, uintptr_t, 4> HSIteratorBoolean;
 typedef HSIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HSIteratorOrderEdge;
 typedef HSIterator<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HSIteratorOrderNode;
+
 
 #endif
