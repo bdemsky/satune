@@ -14,9 +14,7 @@
 #include <inttypes.h>
 
 class CSolver;
-struct SATEncoder;
-typedef struct SATEncoder SATEncoder;
-
+class SATEncoder;
 class Boolean;
 class BooleanOrder;
 class BooleanVar;
@@ -58,9 +56,6 @@ typedef struct IncrementalSolver IncrementalSolver;
 
 struct TableEntry;
 typedef struct TableEntry TableEntry;
-
-struct OrderEncoder;
-typedef struct OrderEncoder OrderEncoder;
 
 class Tuner;
 class TunableDesc;

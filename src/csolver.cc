@@ -15,7 +15,7 @@
 
 CSolver::CSolver() : unsat(false) {
 	tuner = new Tuner();
-	satEncoder = allocSATEncoder(this);
+	satEncoder = new SATEncoder(this);
 }
 
 /** This function tears down the solver and the entire AST */
@@ -56,7 +56,7 @@ CSolver::~CSolver() {
 		delete allFunctions.get(i);
 	}
 
-	deleteSATEncoder(satEncoder);
+	delete satEncoder;
 	delete tuner;
 }
 
@@ -201,7 +201,7 @@ int CSolver::startEncoding() {
 	computePolarities(this);
 	orderAnalysis(this);
 	naiveEncodingDecision(this);
-	encodeAllSATEncoder(this, satEncoder);
+	satEncoder->encodeAllSATEncoder(this);
 	int result = solveCNF(satEncoder->cnf);
 	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
 	for (int i = 1; i <= satEncoder->cnf->solver->solutionsize; i++) {

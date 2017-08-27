@@ -15,42 +15,39 @@
 
 //TODO: Should handle sharing of AST Nodes without recoding them a second time
 
-SATEncoder *allocSATEncoder(CSolver *solver) {
-	SATEncoder *This = (SATEncoder *)ourmalloc(sizeof (SATEncoder));
-	This->solver = solver;
-	This->varcount = 1;
-	This->cnf = createCNF();
-	return This;
+SATEncoder::SATEncoder(CSolver * _solver) :
+	varcount(1),
+	cnf(createCNF()),
+	solver(_solver) {
 }
 
-void deleteSATEncoder(SATEncoder *This) {
-	deleteCNF(This->cnf);
-	ourfree(This);
+SATEncoder::~SATEncoder() {
+	deleteCNF(cnf);
 }
 
-void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This) {
+void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	HSIteratorBoolean *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
 		model_print("Encoding All ...\n\n");
-		Edge c = encodeConstraintSATEncoder(This, constraint);
+		Edge c = encodeConstraintSATEncoder(constraint);
 		model_print("Returned Constraint in EncodingAll:\n");
 		ASSERT( !equalsEdge(c, E_BOGUS));
-		addConstraintCNF(This->cnf, c);
+		addConstraintCNF(cnf, c);
 	}
 	delete iterator;
 }
 
-Edge encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
+Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
 	switch (GETBOOLEANTYPE(constraint)) {
 	case ORDERCONST:
-		return encodeOrderSATEncoder(This, (BooleanOrder *) constraint);
+		return encodeOrderSATEncoder(this, (BooleanOrder *) constraint);
 	case BOOLEANVAR:
-		return encodeVarSATEncoder(This, (BooleanVar *) constraint);
+		return encodeVarSATEncoder(this, (BooleanVar *) constraint);
 	case LOGICOP:
-		return encodeLogicSATEncoder(This, (BooleanLogic *) constraint);
+		return encodeLogicSATEncoder(this, (BooleanLogic *) constraint);
 	case PREDICATEOP:
-		return encodePredicateSATEncoder(This, (BooleanPredicate *) constraint);
+		return encodePredicateSATEncoder(this, (BooleanPredicate *) constraint);
 	default:
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
 		exit(-1);
@@ -76,7 +73,7 @@ Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar *constraint) {
 Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic *constraint) {
 	Edge array[constraint->inputs.getSize()];
 	for (uint i = 0; i < constraint->inputs.getSize(); i++)
-		array[i] = encodeConstraintSATEncoder(This, constraint->inputs.get(i));
+		array[i] = This->encodeConstraintSATEncoder(constraint->inputs.get(i));
 
 	switch (constraint->op) {
 	case L_AND:

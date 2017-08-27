@@ -21,7 +21,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	uint size = table->entries->getSize();
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
-	Edge undefConst = encodeConstraintSATEncoder(This, constraint->undefStatus);
+	Edge undefConst = This->encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
 	HSIteratorTableEntry *iterator = table->entries->iterator();
@@ -101,7 +101,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 		vals[i] = set->getElement(indices[i]);
 	}
 	bool hasOverflow = false;
-	Edge undefConstraint = encodeConstraintSATEncoder (This, constraint->undefStatus);
+	Edge undefConstraint = This->encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConstraint);
 	bool notfinished = true;
 	while (notfinished) {
@@ -202,7 +202,7 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction 
 			break;
 		}
 		case FLAGFORCEUNDEFINED: {
-			Edge undefConst = encodeConstraintSATEncoder(This, func->overflowstatus);
+			Edge undefConst = This->encodeConstraintSATEncoder(func->overflowstatus);
 			row = constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray), constraintAND2(This->cnf, output, constraintNegate(undefConst)));
 			break;
 		}
@@ -250,7 +250,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		vals[i] = set->getElement(indices[i]);
 	}
 
-	Edge undefConstraint = encodeConstraintSATEncoder(This, elemFunc->overflowstatus);
+	Edge undefConstraint = This->encodeConstraintSATEncoder(elemFunc->overflowstatus);
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains + 1];
