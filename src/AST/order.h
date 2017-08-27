@@ -15,7 +15,6 @@ public:
 	OrderType type;
 	Set *set;
 	HashTableOrderPair *orderPairTable;
-	HashSetOrderElement *elementTable;
 	OrderGraph *graph;
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding order;

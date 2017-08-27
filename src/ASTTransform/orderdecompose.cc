@@ -11,9 +11,11 @@
 #include "csolver.h"
 #include "orderencoder.h"
 #include "tunable.h"
-#include "integerencoding.h"
+#include "transform.h"
+#include "element.h"
 
 void orderAnalysis(CSolver *This) {
+	Transform* transform = new Transform();
 	Vector<Order *> *orders = This->getOrders();
 	uint size = orders->getSize();
 	for (uint i = 0; i < size; i++) {
@@ -57,18 +59,17 @@ void orderAnalysis(CSolver *This) {
 		decomposeOrder(This, order, graph);
 		delete graph;
 
-		/*
-		   OrderIntegerEncodingSATEncoder wants a private field that it really shoukldn't need...
-
-		   bool doIntegerEncoding = GETVARTUNABLE(This->getTuner(), order->order.type, ORDERINTEGERENCODING, &offon );
-		   if(!doIntegerEncoding)
-		   continue;
-		   uint size = order->constraints.getSize();
-		   for(uint i=0; i<size; i++){
-		   orderIntegerEncodingSATEncoder(This->satEncoder, order->constraints.get(i));
-		   }*/
+		
+		bool doIntegerEncoding = GETVARTUNABLE(This->getTuner(), order->order.type, ORDERINTEGERENCODING, &offon );
+		if(!doIntegerEncoding)
+		continue;
+		uint size = order->constraints.getSize();
+		for(uint i=0; i<size; i++){
+			transform->orderIntegerEncodingSATEncoder(This, order->constraints.get(i));
+		}
 
 	}
+	delete transform;
 }
 
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
