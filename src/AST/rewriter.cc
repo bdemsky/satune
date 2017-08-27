@@ -138,7 +138,7 @@ void CSolver::replaceBooleanWithFalse(Boolean *bexpr) {
 		setUnSAT();
 		constraints.remove(bexpr);
 	}
-	
+
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = bexpr->parents.get(i);

@@ -42,7 +42,7 @@ int main(int numargs, char **argv) {
 	solver->addTableEntry(t1, row6, 3, true);
 	Predicate *p1 = solver->createPredicateTable(t1, FLAGIFFUNDEFINED);
 	Boolean *undef = solver->getBooleanVar(2);
-	Element * tmparray[] = {e1, e2, e3};
+	Element *tmparray[] = {e1, e2, e3};
 	Boolean *b1 = solver->applyPredicateTable(p1, tmparray, 3, undef);
 	solver->addConstraint(b1);
 
@@ -54,7 +54,7 @@ int main(int numargs, char **argv) {
 
 	Set *d1[] = {s1, s2};
 	Predicate *eq = solver->createPredicateOperator(EQUALS, d1, 2);
-	Element * tmparray2[] = {e1, e2};
+	Element *tmparray2[] = {e1, e2};
 	Boolean *pred2 = solver->applyPredicate(eq, tmparray2, 2);
 	solver->addConstraint(pred2);
 

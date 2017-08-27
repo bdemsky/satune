@@ -14,14 +14,14 @@
 #include "integerencoding.h"
 
 void orderAnalysis(CSolver *This) {
-	Vector<Order *> * orders=This->getOrders();
+	Vector<Order *> *orders = This->getOrders();
 	uint size = orders->getSize();
 	for (uint i = 0; i < size; i++) {
 		Order *order = orders->get(i);
-		bool doDecompose=GETVARTUNABLE(This->getTuner(), order->type, DECOMPOSEORDER, &onoff);
+		bool doDecompose = GETVARTUNABLE(This->getTuner(), order->type, DECOMPOSEORDER, &onoff);
 		if (!doDecompose)
 			continue;
-		
+
 		OrderGraph *graph = buildOrderGraph(order);
 		if (order->type == PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
@@ -31,13 +31,13 @@ void orderAnalysis(CSolver *This) {
 		}
 
 
-		bool mustReachGlobal=GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
+		bool mustReachGlobal = GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
 
 		if (mustReachGlobal)
 			reachMustAnalysis(This, graph, false);
 
-		bool mustReachLocal=GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
-		
+		bool mustReachLocal = GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
+
 		if (mustReachLocal) {
 			//This pair of analysis is also optional
 			if (order->type == PARTIAL) {
@@ -47,26 +47,26 @@ void orderAnalysis(CSolver *This) {
 			}
 		}
 
-		bool mustReachPrune=GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
-		
+		bool mustReachPrune = GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
+
 		if (mustReachPrune)
 			removeMustBeTrueNodes(This, graph);
-		
+
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
 		decomposeOrder(This, order, graph);
 		delete graph;
-		
-		/*
-			OrderIntegerEncodingSATEncoder wants a private field that it really shoukldn't need...
 
-		bool doIntegerEncoding = GETVARTUNABLE(This->getTuner(), order->order.type, ORDERINTEGERENCODING, &offon );
-		if(!doIntegerEncoding)
-			continue;
-		uint size = order->constraints.getSize();
-		for(uint i=0; i<size; i++){
-			orderIntegerEncodingSATEncoder(This->satEncoder, order->constraints.get(i));
-			}*/
+		/*
+		   OrderIntegerEncodingSATEncoder wants a private field that it really shoukldn't need...
+
+		   bool doIntegerEncoding = GETVARTUNABLE(This->getTuner(), order->order.type, ORDERINTEGERENCODING, &offon );
+		   if(!doIntegerEncoding)
+		   continue;
+		   uint size = order->constraints.getSize();
+		   for(uint i=0; i<size; i++){
+		   orderIntegerEncodingSATEncoder(This->satEncoder, order->constraints.get(i));
+		   }*/
 
 	}
 }
@@ -81,7 +81,7 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		OrderNode *to = graph->getOrderNodeFromOrderGraph(orderconstraint->second);
 		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
 		if (from->sccNum != to->sccNum) {
-			OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);			
+			OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);
 			if (edge->polPos) {
 				This->replaceBooleanWithTrue(orderconstraint);
 			} else if (edge->polNeg) {
@@ -122,10 +122,10 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		}
 	}
 
-	uint pcvsize=partialcandidatevec.getSize();
-	for(uint i=0;i<pcvsize;i++) {
-		Order * neworder=partialcandidatevec.get(i);
-		if (neworder != NULL){
+	uint pcvsize = partialcandidatevec.getSize();
+	for (uint i = 0; i < pcvsize; i++) {
+		Order *neworder = partialcandidatevec.get(i);
+		if (neworder != NULL) {
 			neworder->type = TOTAL;
 			model_print("i=%u\t", i);
 		}

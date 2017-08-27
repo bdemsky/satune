@@ -41,11 +41,11 @@ bool order_edge_equals(OrderEdge *key1, OrderEdge *key2) {
 	return key1->sink == key2->sink && key1->source == key2->source;
 }
 
-unsigned int order_element_hash_function(OrderElement* This) {
+unsigned int order_element_hash_function(OrderElement *This) {
 	return (uint)This->item;
 }
 
-bool order_element_equals(OrderElement* key1, OrderElement* key2) {
+bool order_element_equals(OrderElement *key1, OrderElement *key2) {
 	return key1->item == key2->item;
 }
 

@@ -46,8 +46,8 @@ void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReve
 			if (!edge->mustPos)
 				continue;
 		} else
-			if (!edge->polPos && !edge->pseudoPos)//Ignore edges that do not have positive polarity
-				continue;
+		if (!edge->polPos && !edge->pseudoPos)	//Ignore edges that do not have positive polarity
+			continue;
 
 		OrderNode *child = isReverse ? edge->source : edge->sink;
 
@@ -80,34 +80,34 @@ void computeStronglyConnectedComponentGraph(OrderGraph *graph) {
 	resetNodeInfoStatusSCC(graph);
 }
 
-bool isMustBeTrueNode(OrderNode* node){
-	HSIteratorOrderEdge* iterator = node->inEdges.iterator();
-	while(iterator->hasNext()){
-		OrderEdge* edge = iterator->next();
-		if(!edge->mustPos)
+bool isMustBeTrueNode(OrderNode *node) {
+	HSIteratorOrderEdge *iterator = node->inEdges.iterator();
+	while (iterator->hasNext()) {
+		OrderEdge *edge = iterator->next();
+		if (!edge->mustPos)
 			return false;
 	}
 	delete iterator;
 	iterator = node->outEdges.iterator();
-	while(iterator->hasNext()){
-		OrderEdge* edge = iterator->next();
-		if(!edge->mustPos)
+	while (iterator->hasNext()) {
+		OrderEdge *edge = iterator->next();
+		if (!edge->mustPos)
 			return false;
 	}
 	delete iterator;
 	return true;
 }
 
-void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
-	HSIteratorOrderEdge* iterin = node->inEdges.iterator();
-	while(iterin->hasNext()){
-		OrderEdge* inEdge = iterin->next();
-		OrderNode* srcNode = inEdge->source;
+void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node) {
+	HSIteratorOrderEdge *iterin = node->inEdges.iterator();
+	while (iterin->hasNext()) {
+		OrderEdge *inEdge = iterin->next();
+		OrderNode *srcNode = inEdge->source;
 		srcNode->outEdges.remove(inEdge);
-		HSIteratorOrderEdge* iterout = node->outEdges.iterator();
-		while(iterout->hasNext()){
-			OrderEdge* outEdge = iterout->next();
-			OrderNode* sinkNode = outEdge->sink;
+		HSIteratorOrderEdge *iterout = node->outEdges.iterator();
+		while (iterout->hasNext()) {
+			OrderEdge *outEdge = iterout->next();
+			OrderNode *sinkNode = outEdge->sink;
 			sinkNode->inEdges.remove(outEdge);
 			//Adding new edge to new sink and src nodes ...
 			OrderEdge *newEdge = graph->getOrderEdgeFromOrderGraph(srcNode, sinkNode);
@@ -124,10 +124,10 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph* graph, OrderNode* node){
 }
 
 void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
-	HSIteratorOrderNode* iterator = graph->getNodes();
-	while(iterator->hasNext()) {
-		OrderNode* node = iterator->next();
-		if(isMustBeTrueNode(node)){
+	HSIteratorOrderNode *iterator = graph->getNodes();
+	while (iterator->hasNext()) {
+		OrderNode *node = iterator->next();
+		if (isMustBeTrueNode(node)) {
 			bypassMustBeTrueNode(This, graph, node);
 		}
 	}
@@ -135,9 +135,9 @@ void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
 }
 
 /** This function computes a source set for every nodes, the set of
-		nodes that can reach that node via pospolarity edges.  It then
-		looks for negative polarity edges from nodes in the the source set
-		to determine whether we need to generate pseudoPos edges. */
+    nodes that can reach that node via pospolarity edges.  It then
+    looks for negative polarity edges from nodes in the the source set
+    to determine whether we need to generate pseudoPos edges. */
 
 void completePartialOrderGraph(OrderGraph *graph) {
 	Vector<OrderNode *> finishNodes;
@@ -146,14 +146,14 @@ void completePartialOrderGraph(OrderGraph *graph) {
 	HashTableNodeToNodeSet *table = new HashTableNodeToNodeSet(128, 0.25);
 
 	Vector<OrderNode *> sccNodes;
-	
+
 	uint size = finishNodes.getSize();
 	uint sccNum = 1;
 	for (int i = size - 1; i >= 0; i--) {
 		OrderNode *node = finishNodes.get(i);
 		HashSetOrderNode *sources = new HashSetOrderNode(4, 0.25);
 		table->put(node, sources);
-		
+
 		if (node->status == NOTVISITED) {
 			//Need to do reverse traversal here...
 			node->status = VISITED;
@@ -180,10 +180,10 @@ void completePartialOrderGraph(OrderGraph *graph) {
 				}
 				delete iterator;
 			}
-			for (uint j=0; j < rSize; j++) {
+			for (uint j = 0; j < rSize; j++) {
 				//Copy in set of entire SCC
 				OrderNode *rnode = sccNodes.get(j);
-				HashSetOrderNode * set = (j==0) ? sources : sources->copy();
+				HashSetOrderNode *set = (j == 0) ? sources : sources->copy();
 				table->put(rnode, set);
 
 				//Use source sets to compute pseudoPos edges
@@ -200,7 +200,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 				}
 				delete iterator;
 			}
-			
+
 			sccNodes.clear();
 		}
 	}
@@ -264,7 +264,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 		}
 		{
 			//Use source sets to compute mustPos edges
-			HSIteratorOrderEdge *iterator =node->inEdges.iterator();
+			HSIteratorOrderEdge *iterator = node->inEdges.iterator();
 			while (iterator->hasNext()) {
 				OrderEdge *edge = iterator->next();
 				OrderNode *parent = edge->source;
@@ -303,7 +303,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
    must be true because of transitivity from other must be true
    edges. */
 
-void reachMustAnalysis(CSolver * solver, OrderGraph *graph, bool computeTransitiveClosure) {
+void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiveClosure) {
 	Vector<OrderNode *> finishNodes;
 	//Topologically sort the mustPos edge graph
 	DFSMust(graph, &finishNodes);

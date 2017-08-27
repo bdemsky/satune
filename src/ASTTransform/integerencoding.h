@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   integerencoding.h
  * Author: hamed
  *
@@ -16,9 +16,9 @@
 #include "classlist.h"
 #include "structs.h"
 
-Element* getOrderIntegerElement(SATEncoder* This,Order *order, uint64_t item);
+Element *getOrderIntegerElement(SATEncoder *This,Order *order, uint64_t item);
 void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder);
 
 
-#endif /* INTEGERENCODING_H */
+#endif/* INTEGERENCODING_H */
 

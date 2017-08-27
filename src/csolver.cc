@@ -161,7 +161,7 @@ Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, ui
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
-	Boolean * boolean=new BooleanLogic(this, op, array, asize);
+	Boolean *boolean = new BooleanLogic(this, op, array, asize);
 	allBooleans.push(boolean);
 	return boolean;
 }

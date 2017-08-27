@@ -49,7 +49,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains];
-		
+
 		if (predicate->evalPredicateOperator(vals) != generateNegation) {
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
@@ -206,14 +206,14 @@ Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate *c
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
 	switch (predicate->op) {
-		case EQUALS:
-			return generateEquivNVConstraint(This->cnf, numVars, ee0->variables, ee1->variables);
-		case LT:
-			return generateLTConstraint(This->cnf, numVars, ee0->variables, ee1->variables);
-		case GT:
-			return generateLTConstraint(This->cnf, numVars, ee1->variables, ee0->variables);
-		default:
-			ASSERT(0);
+	case EQUALS:
+		return generateEquivNVConstraint(This->cnf, numVars, ee0->variables, ee1->variables);
+	case LT:
+		return generateLTConstraint(This->cnf, numVars, ee0->variables, ee1->variables);
+	case GT:
+		return generateLTConstraint(This->cnf, numVars, ee1->variables, ee0->variables);
+	default:
+		ASSERT(0);
 	}
 	exit(-1);
 }

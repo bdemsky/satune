@@ -6,80 +6,80 @@
 
 template<typename type>
 class Vector {
- public:
- Vector(uint _capacity = VECTOR_DEFCAP) :
-	size(0),
+public:
+	Vector(uint _capacity = VECTOR_DEFCAP) :
+		size(0),
 		capacity(_capacity),
 		array((type *) ourmalloc(sizeof(type) * _capacity)) {
-	}                                                                     
-
- Vector(uint _capacity, type * _array)	:
-	size(_capacity),
-		capacity(_capacity),
-		array((type *) ourmalloc(sizeof(type) * _capacity)) {
-		memcpy(array, _array, capacity * sizeof(type));                 
 	}
-	
+
+	Vector(uint _capacity, type *_array)  :
+		size(_capacity),
+		capacity(_capacity),
+		array((type *) ourmalloc(sizeof(type) * _capacity)) {
+		memcpy(array, _array, capacity * sizeof(type));
+	}
+
 	void pop() {
 		size--;
-	}                                                                     
+	}
 
 	type last() {
-		return array[size - 1];                               
+		return array[size - 1];
 	}
-	
-	void setSize(uint _size) {       
-		if (_size <= size) {                                         
-			size = _size;                                                
-			return;                                                           
-		} else if (_size > capacity) {                               
-			array = (type *)ourrealloc(array, _size * sizeof(type)); 
-			capacity = _size;                                            
-		}                                                                   
-		bzero(&array[size], (_size - size) * sizeof(type)); 
-		size = _size;
-	}                                                                     
 
-	void push(type item) {          
-		if (size >= capacity) {                             
-			uint newcap = capacity << 1;                                
-			array = (type *)ourrealloc(array, newcap * sizeof(type)); 
-			capacity = newcap;                                          
-		}                                                                   
-		array[size++] = item;                               
+	void setSize(uint _size) {
+		if (_size <= size) {
+			size = _size;
+			return;
+		} else if (_size > capacity) {
+			array = (type *)ourrealloc(array, _size * sizeof(type));
+			capacity = _size;
+		}
+		bzero(&array[size], (_size - size) * sizeof(type));
+		size = _size;
 	}
-	
-	type get(uint index) {         
-		return array[index];                                        
+
+	void push(type item) {
+		if (size >= capacity) {
+			uint newcap = capacity << 1;
+			array = (type *)ourrealloc(array, newcap * sizeof(type));
+			capacity = newcap;
+		}
+		array[size++] = item;
 	}
-	
-	void setExpand(uint index, type item) { 
-		if (index >= size)                                            
-			setSize(index + 1);                         
-		set(index, item);                             
+
+	type get(uint index) {
+		return array[index];
 	}
-	
-	void set(uint index, type item) { 
-		array[index] = item;                                          
+
+	void setExpand(uint index, type item) {
+		if (index >= size)
+			setSize(index + 1);
+		set(index, item);
 	}
-	
+
+	void set(uint index, type item) {
+		array[index] = item;
+	}
+
 	uint getSize() {
-		return size;                                                
+		return size;
 	}
-	
+
 	~Vector() {
-		ourfree(array);                                             
+		ourfree(array);
 	}
-	
+
 	void clear() {
-		size = 0;                                                     
+		size = 0;
 	}
-	
+
 	type *expose() {
-		return array;                                               
-	}                                                                     
-	
- private:
+		return array;
+	}
+
+private:
 	uint size;
 	uint capacity;
 	type *array;

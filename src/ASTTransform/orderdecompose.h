@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   orderdecompose.h
  * Author: hamed
  *
@@ -19,5 +19,5 @@
 void orderAnalysis(CSolver *This);
 void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph);
 
-#endif /* ORDERDECOMPOSE_H */
+#endif/* ORDERDECOMPOSE_H */
 

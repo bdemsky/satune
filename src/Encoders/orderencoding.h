@@ -9,7 +9,7 @@ enum OrderEncodingType {
 typedef enum OrderEncodingType OrderEncodingType;
 
 class OrderEncoding {
- public:
+public:
 	OrderEncoding(Order *order);
 
 	OrderEncodingType type;

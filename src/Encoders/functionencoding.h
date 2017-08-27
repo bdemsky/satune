@@ -16,7 +16,7 @@ union ElementPredicate {
 typedef union ElementPredicate ElementPredicate;
 
 class FunctionEncoding {
- public:
+public:
 	FunctionEncodingType type;
 	bool isFunction;//true for function, false for predicate
 	ElementPredicate op;

@@ -26,7 +26,7 @@ ElementFunction::ElementFunction(Function *_function, Element **array, uint numA
 }
 
 ElementConst::ElementConst(uint64_t _value, VarType _type) : Element(ELEMCONST), value(_value) {
-	uint64_t array[]={value};
+	uint64_t array[] = {value};
 	set = new Set(_type, array, 1);
 }
 

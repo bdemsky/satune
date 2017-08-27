@@ -3,49 +3,49 @@
 
 template<typename type>
 class Array {
- public:
- Array(uint _size) :
-	array((type *)ourcalloc(1, sizeof(type) * _size)),
+public:
+	Array(uint _size) :
+		array((type *)ourcalloc(1, sizeof(type) * _size)),
 		size(_size)
-		{
-		}
-  
- Array(type * _array, uint _size) :
-	array((type *)ourcalloc(1, sizeof(type) * _size)),
+	{
+	}
+
+	Array(type *_array, uint _size) :
+		array((type *)ourcalloc(1, sizeof(type) * _size)),
 		size(_size) {
-    memcpy(array, _array, _size * sizeof(type));
-  }
+		memcpy(array, _array, _size * sizeof(type));
+	}
 
-  ~Array() {
-    ourfree(array);
-  }
+	~Array() {
+		ourfree(array);
+	}
 
-  void remove(uint index) {
-    size--;
-    for (; index < size; index++) {
-      array[index] = array[index + 1];
-    }
-  }
-  
-  type get(uint index) {
-    return array[index];
-  }
+	void remove(uint index) {
+		size--;
+		for (; index < size; index++) {
+			array[index] = array[index + 1];
+		}
+	}
 
-  void set(uint index, type item) {
-    array[index] = item;
-  }
-  
-  uint getSize() {
-    return size;
-  }
+	type get(uint index) {
+		return array[index];
+	}
 
-  type *expose() {
-    return array;
-  }
+	void set(uint index, type item) {
+		array[index] = item;
+	}
 
- private:
-  type *array;
-  uint size;
+	uint getSize() {
+		return size;
+	}
+
+	type *expose() {
+		return array;
+	}
+
+private:
+	type *array;
+	uint size;
 };
 
 

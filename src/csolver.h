@@ -5,19 +5,19 @@
 #include "structs.h"
 
 class CSolver {
- public:
+public:
 	CSolver();
 	~CSolver();
-	
+
 	/** This function creates a set containing the elements passed in the array. */
 	Set *createSet(VarType type, uint64_t *elements, uint num);
 
 	/** This function creates a set from lowrange to highrange (inclusive). */
 
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
-	
+
 	/** This function creates a mutable set. */
-	
+
 	MutableSet *createMutableSet(VarType type);
 
 	/** This function adds a new item to a set. */
@@ -25,9 +25,9 @@ class CSolver {
 	void addItem(MutableSet *set, uint64_t element);
 
 	/** This function adds a new unique item to the set and returns it.
-			This function cannot be used in conjunction with manually adding
-			items to the set. */
-	
+	    This function cannot be used in conjunction with manually adding
+	    items to the set. */
+
 	uint64_t createUniqueItem(MutableSet *set);
 
 	/** This function creates an element variable over a set. */
@@ -80,7 +80,7 @@ class CSolver {
 	Boolean *applyLogicalOperation(LogicOp op, Boolean **array, uint asize);
 
 	/** This function adds a boolean constraint to the set of constraints
-			to be satisfied */
+	    to be satisfied */
 
 	void addConstraint(Boolean *constraint);
 
@@ -105,22 +105,22 @@ class CSolver {
 
 	bool isUnSAT() { return unsat; }
 
-	Vector<Order *> * getOrders() { return & allOrders;}
+	Vector<Order *> *getOrders() { return &allOrders;}
 
-	Tuner * getTuner() { return tuner; }
+	Tuner *getTuner() { return tuner; }
 
-	HSIteratorBoolean * getConstraints() { return constraints.iterator(); }
+	HSIteratorBoolean *getConstraints() { return constraints.iterator(); }
 
-	SATEncoder * getSATEncoder() {return satEncoder;}
+	SATEncoder *getSATEncoder() {return satEncoder;}
 
 	void replaceBooleanWithTrue(Boolean *bexpr);
 	void replaceBooleanWithFalse(Boolean *bexpr);
 	void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
 
-	
+
 	MEMALLOC;
 
- private:
+private:
 	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);
 	void handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child);
 	void handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child);

@@ -885,26 +885,26 @@ Edge generateEquivNVConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2) {
 	return constraintAND(cnf, numvars, array);
 }
 
-Edge generateLTConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2){
-	if(numvars == 0 )
+Edge generateLTConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2) {
+	if (numvars == 0 )
 		return E_False;
-	Edge result =constraintAND2(cnf, constraintNegate( var1[0]), var2[0]);
+	Edge result = constraintAND2(cnf, constraintNegate( var1[0]), var2[0]);
 	for (uint i = 1; i < numvars; i++) {
 		Edge lt = constraintAND2(cnf, constraintNegate( var1[i]), var2[i]);
-		Edge eq	= constraintAND2(cnf, constraintIFF(cnf, var1[i], var2[i]), result); 
-		result = constraintOR2(cnf, lt, eq); 
+		Edge eq = constraintAND2(cnf, constraintIFF(cnf, var1[i], var2[i]), result);
+		result = constraintOR2(cnf, lt, eq);
 	}
 	return result;
 }
 
-Edge generateLTEConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2){
-	if(numvars == 0 )
+Edge generateLTEConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2) {
+	if (numvars == 0 )
 		return E_True;
-	Edge result =constraintIMPLIES(cnf, var1[0], var2[0]);
+	Edge result = constraintIMPLIES(cnf, var1[0], var2[0]);
 	for (uint i = 1; i < numvars; i++) {
 		Edge lt = constraintAND2(cnf, constraintNegate( var1[i]), var2[i]);
-		Edge eq	= constraintAND2(cnf, constraintIFF(cnf, var1[i], var2[i]), result); 
-		result = constraintOR2(cnf, lt, eq); 
+		Edge eq = constraintAND2(cnf, constraintIFF(cnf, var1[i], var2[i]), result);
+		result = constraintOR2(cnf, lt, eq);
 	}
 	return result;
 }

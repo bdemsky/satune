@@ -18,7 +18,7 @@ enum NodeStatus {NOTVISITED, VISITED, FINISHED, ADDEDTOSET};
 typedef enum NodeStatus NodeStatus;
 
 class OrderNode {
- public:
+public:
 	OrderNode(uint64_t id);
 	void addNewIncomingEdge(OrderEdge *edge);
 	void addNewOutgoingEdge(OrderEdge *edge);

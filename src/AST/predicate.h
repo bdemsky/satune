@@ -8,15 +8,15 @@
 #define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
 
 class Predicate {
- public:
-  Predicate(PredicateType _type) : type(_type) {}
+public:
+	Predicate(PredicateType _type) : type(_type) {}
 	virtual ~Predicate() {}
 	PredicateType type;
 	MEMALLOC;
 };
 
 class PredicateOperator : public Predicate {
- public:
+public:
 	PredicateOperator(CompOp op, Set **domain, uint numDomain);
 	bool evalPredicateOperator(uint64_t *inputs);
 	CompOp op;
@@ -25,7 +25,7 @@ class PredicateOperator : public Predicate {
 };
 
 class PredicateTable : public Predicate {
- public:
+public:
 	PredicateTable(Table *table, UndefinedBehavior undefBehavior);
 	Table *table;
 	UndefinedBehavior undefinedbehavior;

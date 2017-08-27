@@ -13,10 +13,10 @@
 #include "constraint.h"
 
 class OrderElement {
- public:
-	OrderElement(uint64_t item, Element* elem);
+public:
+	OrderElement(uint64_t item, Element *elem);
 	uint64_t item;
-	Element* elem;
+	Element *elem;
 	MEMALLOC;
 };
 

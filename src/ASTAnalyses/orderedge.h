@@ -11,7 +11,7 @@
 #include "mymemory.h"
 
 class OrderEdge {
- public:
+public:
 	OrderEdge(OrderNode *begin, OrderNode *end);
 
 	OrderNode *source;
