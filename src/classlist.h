@@ -51,6 +51,8 @@ class OrderNode;
 class OrderEdge;
 
 class AutoTuner;
+class SearchTuner;
+class TunableSetting;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
