@@ -16,9 +16,8 @@
 #include "classlist.h"
 #include "structs.h"
 
-Element *getOrderIntegerElement(SATEncoder *This,Order *order, uint64_t item);
-void orderIntegerEncodingSATEncoder(SATEncoder *This, BooleanOrder *boolOrder);
-
+Element *getOrderIntegerElement(CSolver *solver, Order *order, uint64_t item);
+void orderIntegerEncodingSATEncoder(CSolver *solver, BooleanOrder *boolOrder);
 
 #endif/* INTEGERENCODING_H */
 

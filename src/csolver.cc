@@ -12,9 +12,13 @@
 #include "tunable.h"
 #include "polarityassignment.h"
 #include "orderdecompose.h"
+#include "autotuner.h"
 
-CSolver::CSolver() : unsat(false) {
-	tuner = new Tuner();
+CSolver::CSolver() :
+	unsat(false),
+	tuner(new DefaultTuner()),
+	elapsedTime(0)
+{
 	satEncoder = new SATEncoder(this);
 }
 
@@ -198,16 +202,14 @@ Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second)
 }
 
 int CSolver::startEncoding() {
+	long long startTime = getTimeNano();
 	computePolarities(this);
 	orderAnalysis(this);
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
-	int result = solveCNF(satEncoder->cnf);
-	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
-	for (int i = 1; i <= satEncoder->cnf->solver->solutionsize; i++) {
-		model_print("%d, ", satEncoder->cnf->solver->solution[i]);
-	}
-	model_print("\n");
+	int result = satEncoder->solve();
+	long long finishTime = getTimeNano();
+	elapsedTime = finishTime - startTime;
 	return result;
 }
 
@@ -237,3 +239,11 @@ HappenedBefore CSolver::getOrderConstraintValue(Order *order, uint64_t first, ui
 	return getOrderConstraintValueSATTranslator(this, order, first, second);
 }
 
+long long CSolver::getEncodeTime() { return satEncoder->getEncodeTime(); }
+
+long long CSolver::getSolveTime() { return satEncoder->getSolveTime(); }
+
+void CSolver::autoTune() {
+	AutoTuner * autotuner=new AutoTuner();
+	autotuner->tune(this);
+}

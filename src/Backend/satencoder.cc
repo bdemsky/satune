@@ -16,13 +16,16 @@
 //TODO: Should handle sharing of AST Nodes without recoding them a second time
 
 SATEncoder::SATEncoder(CSolver * _solver) :
-	varcount(1),
 	cnf(createCNF()),
 	solver(_solver) {
 }
 
 SATEncoder::~SATEncoder() {
 	deleteCNF(cnf);
+}
+
+int SATEncoder::solve() {
+	return solveCNF(cnf);
 }
 
 void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
@@ -60,7 +63,7 @@ void getArrayNewVarsSATEncoder(SATEncoder *encoder, uint num, Edge *carray) {
 }
 
 Edge getNewVarSATEncoder(SATEncoder *This) {
-	return constraintNewVar(This->cnf);
+	return constraintNewVar(This->getCNF());
 }
 
 Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar *constraint) {
@@ -77,15 +80,15 @@ Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic *constraint) {
 
 	switch (constraint->op) {
 	case L_AND:
-		return constraintAND(This->cnf, constraint->inputs.getSize(), array);
+		return constraintAND(This->getCNF(), constraint->inputs.getSize(), array);
 	case L_OR:
-		return constraintOR(This->cnf, constraint->inputs.getSize(), array);
+		return constraintOR(This->getCNF(), constraint->inputs.getSize(), array);
 	case L_NOT:
 		return constraintNegate(array[0]);
 	case L_XOR:
-		return constraintXOR(This->cnf, array[0], array[1]);
+		return constraintXOR(This->getCNF(), array[0], array[1]);
 	case L_IMPLIES:
-		return constraintIMPLIES(This->cnf, array[0], array[1]);
+		return constraintIMPLIES(This->getCNF(), array[0], array[1]);
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
 		exit(-1);

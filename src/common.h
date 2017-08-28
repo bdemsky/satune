@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include "config.h"
+#include "time.h"
 
 /*
    extern int model_out;
@@ -65,4 +66,10 @@ void assert_hook(void);
 #define error_msg(...) fprintf(stderr, "Error: " __VA_ARGS__)
 
 void print_trace(void);
+
+static inline long long getTimeNano() {
+	struct timespec time;
+	clock_gettime(CLOCK_REALTIME, & time);
+	return time.tv_sec * 1000000000 + time.tv_nsec;
+}
 #endif/* __COMMON_H__ */

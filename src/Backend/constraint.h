@@ -63,6 +63,8 @@ struct CNF {
 	IncrementalSolver *solver;
 	VectorEdge constraints;
 	VectorEdge args;
+	long long solveTime;
+	long long encodeTime;
 };
 
 typedef struct CNF CNF;

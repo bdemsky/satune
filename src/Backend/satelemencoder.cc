@@ -32,7 +32,7 @@ Edge getElementValueBinaryIndexConstraint(SATEncoder *This, Element *elem, uint6
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
 		if (elemEnc->isinUseElement(i) && elemEnc->encodingArray[i] == value) {
-			return (elemEnc->numVars == 0) ? E_True : generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, i);
+			return (elemEnc->numVars == 0) ? E_True : generateBinaryConstraint(This->getCNF(), elemEnc->numVars, elemEnc->variables, i);
 		}
 	}
 	return E_False;
@@ -63,7 +63,7 @@ Edge getElementValueUnaryConstraint(SATEncoder *This, Element *elem, uint64_t va
 			else if ((i + 1) == elemEnc->encArraySize)
 				return elemEnc->variables[i - 1];
 			else
-				return constraintAND2(This->cnf, elemEnc->variables[i - 1], constraintNegate(elemEnc->variables[i]));
+				return constraintAND2(This->getCNF(), elemEnc->variables[i - 1], constraintNegate(elemEnc->variables[i]));
 		}
 	}
 	return E_False;
@@ -83,7 +83,7 @@ Edge getElementValueBinaryValueConstraint(SATEncoder *This, Element *element, ui
 	}
 
 	uint64_t valueminusoffset = value - elemEnc->offset;
-	return generateBinaryConstraint(This->cnf, elemEnc->numVars, elemEnc->variables, valueminusoffset);
+	return generateBinaryConstraint(This->getCNF(), elemEnc->numVars, elemEnc->variables, valueminusoffset);
 }
 
 void allocElementConstraintVariables(ElementEncoding *This, uint numVars) {
@@ -108,10 +108,10 @@ void generateOneHotEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
 	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
 	for (uint i = 0; i < encoding->numVars; i++) {
 		for (uint j = i + 1; j < encoding->numVars; j++) {
-			addConstraintCNF(This->cnf, constraintNegate(constraintAND2(This->cnf, encoding->variables[i], encoding->variables[j])));
+			addConstraintCNF(This->getCNF(), constraintNegate(constraintAND2(This->getCNF(), encoding->variables[i], encoding->variables[j])));
 		}
 	}
-	addConstraintCNF(This->cnf, constraintOR(This->cnf, encoding->numVars, encoding->variables));
+	addConstraintCNF(This->getCNF(), constraintOR(This->getCNF(), encoding->numVars, encoding->variables));
 }
 
 void generateUnaryEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
@@ -119,7 +119,7 @@ void generateUnaryEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
 	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
 	//Add unary constraint
 	for (uint i = 1; i < encoding->numVars; i++) {
-		addConstraintCNF(This->cnf, constraintOR2(This->cnf, encoding->variables[i - 1], constraintNegate(encoding->variables[i])));
+		addConstraintCNF(This->getCNF(), constraintOR2(This->getCNF(), encoding->variables[i - 1], constraintNegate(encoding->variables[i])));
 	}
 }
 

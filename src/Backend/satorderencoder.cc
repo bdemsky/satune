@@ -79,10 +79,10 @@ Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
 		boolOrder->order->initializeOrderHashTable();
-		bool doOptOrderStructure = GETVARTUNABLE(This->solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
+		bool doOptOrderStructure = GETVARTUNABLE(This->getSolver()->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
-			reachMustAnalysis(This->solver, boolOrder->order->graph, true);
+			reachMustAnalysis(This->getSolver(), boolOrder->order->graph, true);
 		}
 		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
 	}
@@ -111,7 +111,7 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order) {
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPairConstraint(This, order, &pairIK);
 				Edge constJK = getPairConstraint(This, order, &pairJK);
-				addConstraintCNF(This->cnf, generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK));
+				addConstraintCNF(This->getCNF(), generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK));
 			}
 		}
 	}
@@ -137,10 +137,10 @@ Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair) {
 
 Edge generateTransOrderConstraintSATEncoder(SATEncoder *This, Edge constIJ,Edge constJK,Edge constIK) {
 	Edge carray[] = {constIJ, constJK, constraintNegate(constIK)};
-	Edge loop1 = constraintOR(This->cnf, 3, carray);
+	Edge loop1 = constraintOR(This->getCNF(), 3, carray);
 	Edge carray2[] = {constraintNegate(constIJ), constraintNegate(constJK), constIK};
-	Edge loop2 = constraintOR(This->cnf, 3, carray2 );
-	return constraintAND2(This->cnf, loop1, loop2);
+	Edge loop2 = constraintOR(This->getCNF(), 3, carray2 );
+	return constraintAND2(This->getCNF(), loop1, loop2);
 }
 
 Edge encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {

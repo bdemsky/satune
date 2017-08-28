@@ -1,11 +1,11 @@
 #include "tunable.h"
 
-Tuner::Tuner() {
+DefaultTuner::DefaultTuner() {
 }
 
-int Tuner::getTunable(TunableParam param, TunableDesc *descriptor) {
+int DefaultTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
 	return descriptor->defaultValue;
 }
-int Tuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor) {
+int DefaultTuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor) {
 	return descriptor->defaultValue;
 }

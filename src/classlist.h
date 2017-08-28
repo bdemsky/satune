@@ -50,6 +50,7 @@ class OrderGraph;
 class OrderNode;
 class OrderEdge;
 
+class AutoTuner;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;

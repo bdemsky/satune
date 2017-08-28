@@ -5,11 +5,21 @@
 
 class Tuner {
 public:
-	Tuner();
+	virtual int getTunable(TunableParam param, TunableDesc *descriptor);
+	virtual int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
+	virtual ~Tuner();
+	MEMALLOC;
+};
+
+class DefaultTuner : public Tuner {
+public:
+	DefaultTuner();
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
 	MEMALLOC;
 };
+
+
 
 class TunableDesc {
 public:
