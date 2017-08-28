@@ -6,7 +6,7 @@
 #include "orderpair.h"
 #include "set.h"
 #include "tunable.h"
-#include "orderencoder.h"
+#include "orderanalysis.h"
 #include "ordergraph.h"
 #include "orderedge.h"
 #include "element.h"

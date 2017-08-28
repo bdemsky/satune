@@ -9,7 +9,7 @@
 #include "mutableset.h"
 #include "ops.h"
 #include "csolver.h"
-#include "orderencoder.h"
+#include "orderanalysis.h"
 #include "tunable.h"
 #include "integerencoding.h"
 
