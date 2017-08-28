@@ -212,7 +212,7 @@ int CSolver::startEncoding() {
 	orderAnalysis(this);
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
-	int result = satEncoder->solve();
+	int result = unsat ? IS_UNSAT : satEncoder->solve();
 	long long finishTime = getTimeNano();
 	elapsedTime = finishTime - startTime;
 	if (deleteTuner) {
