@@ -50,7 +50,6 @@ Boolean *BooleanVar::clone(CSolver *solver, CloneMap *map) {
 	Boolean *bvar = solver->getBooleanVar(type);
 	map->put(this, bvar);
 	return bvar;
-
 }
 
 Boolean *BooleanOrder::clone(CSolver *solver, CloneMap *map) {

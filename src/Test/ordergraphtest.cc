@@ -16,24 +16,41 @@ int main(int numargs, char **argv) {
 	Boolean *o58 =  solver->orderConstraint(order, 5, 8);
 	Boolean *o81 =  solver->orderConstraint(order, 8, 1);
 
-	/* Not Valid c++...Let Hamed fix...
-	   addConstraint(solver, applyLogicalOperation(solver, L_OR,(Boolean *[]) {o12, o13, o24, o34}, 4) );
-	   Boolean *b1 = applyLogicalOperation(solver, L_XOR, (Boolean *[]) {o41, o57}, 2);
-	   Boolean *o34n = applyLogicalOperation(solver, L_NOT, (Boolean *[]) {o34}, 1);
-	   Boolean *o24n = applyLogicalOperation(solver, L_NOT, (Boolean *[]) {o24}, 1);
-	   Boolean *b2 = applyLogicalOperation(solver, L_OR, (Boolean *[]) {o34n, o24n}, 2);
-	   addConstraint(solver, applyLogicalOperation(solver, L_IMPLIES,(Boolean *[]) {b1, b2}, 2) );
-	   addConstraint(solver, applyLogicalOperation(solver, L_AND,(Boolean *[]) {o12, o13}, 2) );
-	   addConstraint(solver, applyLogicalOperation(solver, L_OR,(Boolean *[]) {o76, o65}, 2) );
-	   Boolean* b3= applyLogicalOperation(solver, L_AND,(Boolean *[]) {o76, o65}, 2) ;
-	   Boolean* o57n= applyLogicalOperation(solver, L_NOT,(Boolean *[]) {o57}, 1);
-	   addConstraint(solver, applyLogicalOperation(solver, L_IMPLIES,(Boolean *[]) {b3, o57n}, 2) );
-	   addConstraint(solver, applyLogicalOperation(solver, L_AND,(Boolean *[]) {o58, o81}, 2) );
+	Boolean * array1[]={o12, o13, o24, o34};
+	solver->addConstraint(solver->applyLogicalOperation(L_OR, array1, 4) );
+	Boolean * array2[]={o41, o57};
+	
+	Boolean *b1 = solver->applyLogicalOperation(L_XOR, array2, 2);
+	Boolean * array3[]={o34};
+	Boolean *o34n = solver->applyLogicalOperation(L_NOT, array3, 1);
+	Boolean * array4[]={o24};
+	Boolean *o24n = solver->applyLogicalOperation(L_NOT, array4, 1);
+	Boolean * array5[]={o34n, o24n};
+	Boolean *b2 = solver->applyLogicalOperation(L_OR, array5, 2);
+	Boolean * array6[] = {b1, b2};
+	solver->addConstraint(solver->applyLogicalOperation(L_IMPLIES, array6, 2) );
 
-	   if (solver->startEncoding() == 1)
-	   printf("SAT\n");
-	   else
-	   printf("UNSAT\n");
-	 */
+	Boolean * array7[] = {o12, o13};
+	solver->addConstraint(solver->applyLogicalOperation(L_AND, array7, 2) );
+
+	Boolean * array8[] = {o76, o65};
+	solver->addConstraint(solver->applyLogicalOperation(L_OR, array8, 2) );
+
+	Boolean * array9[] = {o76, o65};
+	Boolean* b3= solver->applyLogicalOperation(L_AND, array9, 2) ;
+	Boolean * array10[] = {o57};
+	Boolean* o57n= solver->applyLogicalOperation(L_NOT, array10, 1);
+	Boolean * array11[] = {b3, o57n};
+	solver->addConstraint(solver->applyLogicalOperation(L_IMPLIES, array11, 2));
+
+	Boolean * array12[] = {o58, o81};
+	solver->addConstraint(solver->applyLogicalOperation(L_AND, array12, 2) );
+	
+	/*	if (solver->startEncoding() == 1)
+		printf("SAT\n");
+	else
+	printf("UNSAT\n");*/
+	
+	solver->autoTune(100);
 	delete solver;
 }

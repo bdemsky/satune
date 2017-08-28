@@ -180,7 +180,7 @@ bool first = true;
 void flushBufferSolver(IncrementalSolver *This) {
 	ssize_t bytestowrite = sizeof(int) * This->offset;
 	ssize_t byteswritten = 0;
-	//DEBUGGING CODE STARTS
+#ifdef CONFIG_DEBUG
 	for (uint i = 0; i < This->offset; i++) {
 		if (first)
 			printf("(");
@@ -194,7 +194,7 @@ void flushBufferSolver(IncrementalSolver *This) {
 			printf("%d", This->buffer[i]);
 		}
 	}
-	//DEBUGGING CODE ENDS
+#endif
 	do {
 		ssize_t n = write(This->to_solver_fd, &((char *)This->buffer)[byteswritten], bytestowrite);
 		if (n == -1) {

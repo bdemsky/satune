@@ -16,7 +16,7 @@
 
 CSolver::CSolver() :
 	unsat(false),
-	tuner(new DefaultTuner()),
+	tuner(NULL),
 	elapsedTime(0)
 {
 	satEncoder = new SATEncoder(this);
@@ -61,7 +61,6 @@ CSolver::~CSolver() {
 	}
 
 	delete satEncoder;
-	delete tuner;
 }
 
 CSolver *CSolver::clone() {
@@ -70,7 +69,7 @@ CSolver *CSolver::clone() {
 	HSIteratorBoolean *it = getConstraints();
 	while (it->hasNext()) {
 		Boolean *b = it->next();
-		b->clone(copy, &map);
+		copy->addConstraint(b->clone(copy, &map));
 	}
 	delete it;
 	return copy;
@@ -202,6 +201,12 @@ Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second)
 }
 
 int CSolver::startEncoding() {
+	bool deleteTuner = false;
+	if (tuner == NULL) {
+		tuner = new DefaultTuner();
+		deleteTuner = true;
+	}
+		
 	long long startTime = getTimeNano();
 	computePolarities(this);
 	orderAnalysis(this);
@@ -210,6 +215,10 @@ int CSolver::startEncoding() {
 	int result = satEncoder->solve();
 	long long finishTime = getTimeNano();
 	elapsedTime = finishTime - startTime;
+	if (deleteTuner) {
+		delete tuner;
+		tuner = NULL;
+	}
 	return result;
 }
 
@@ -247,4 +256,5 @@ void CSolver::autoTune(uint budget) {
 	AutoTuner * autotuner=new AutoTuner(budget);
 	autotuner->addProblem(this);
 	autotuner->tune();
+	delete autotuner;
 }

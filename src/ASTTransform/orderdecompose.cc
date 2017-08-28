@@ -79,7 +79,6 @@ void decomposeOrder(CSolver *This, Order *order, OrderGraph *graph) {
 		BooleanOrder *orderconstraint = order->constraints.get(i);
 		OrderNode *from = graph->getOrderNodeFromOrderGraph(orderconstraint->first);
 		OrderNode *to = graph->getOrderNodeFromOrderGraph(orderconstraint->second);
-		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
 		if (from->sccNum != to->sccNum) {
 			OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);
 			if (edge->polPos) {

@@ -12,7 +12,7 @@ public:
 	Function(FunctionType _type) : type(_type) {}
 	FunctionType type;
 	virtual ~Function() {}
-	virtual Function *clone(CSolver *solver, CloneMap *map);
+	virtual Function *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
 	MEMALLOC;
 };
 

@@ -21,7 +21,7 @@ class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
-	virtual Boolean *clone(CSolver *solver, CloneMap *map);
+	virtual Boolean *clone(CSolver *solver, CloneMap *map) { ASSERT(0); return NULL; }
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;

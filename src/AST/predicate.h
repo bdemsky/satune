@@ -4,6 +4,7 @@
 #include "mymemory.h"
 #include "ops.h"
 #include "structs.h"
+#include "common.h"
 
 #define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
 
@@ -11,7 +12,7 @@ class Predicate {
 public:
 	Predicate(PredicateType _type) : type(_type) {}
 	virtual ~Predicate() {}
-	virtual Predicate *clone(CSolver *solver, CloneMap *map);
+	virtual Predicate *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
 	PredicateType type;
 	MEMALLOC;
 };

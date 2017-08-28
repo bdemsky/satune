@@ -25,7 +25,7 @@ Edge SATEncoder::encodeOrderSATEncoder(BooleanOrder *constraint) {
 	return E_BOGUS;
 }
 
-Edge inferOrderConstraintFromGraph(Order *order, uint64_t _first, uint64_t _second) {
+Edge SATEncoder::inferOrderConstraintFromGraph(Order *order, uint64_t _first, uint64_t _second) {
 	if (order->graph != NULL) {
 		OrderGraph *graph = order->graph;
 		OrderNode *first = graph->lookupOrderNodeFromOrderGraph(_first);
@@ -93,7 +93,7 @@ Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 
 
 void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
-#ifdef TRACE_DEBUG
+#ifdef CONFIG_DEBUG
 	model_print("in total order ...\n");
 #endif
 	ASSERT(order->type == TOTAL);

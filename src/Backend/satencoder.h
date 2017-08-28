@@ -33,7 +33,6 @@ class SATEncoder {
 	Edge getElementValueBinaryIndexConstraint(Element *element, uint64_t value);
 	Edge getElementValueBinaryValueConstraint(Element *element, uint64_t value);
 	Edge getElementValueConstraint(Element *element, uint64_t value);
-	void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
 	void generateOneHotEncodingVars(ElementEncoding *encoding);
 	void generateUnaryEncodingVars(ElementEncoding *encoding);
 	void generateBinaryIndexEncodingVars(ElementEncoding *encoding);
@@ -60,5 +59,6 @@ class SATEncoder {
 	CSolver *solver;
 };
 
+void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
 Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair);
 #endif

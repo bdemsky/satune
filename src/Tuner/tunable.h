@@ -1,13 +1,13 @@
 #ifndef TUNABLE_H
 #define TUNABLE_H
 #include "classlist.h"
-
+#include "common.h"
 
 class Tuner {
 public:
-	virtual int getTunable(TunableParam param, TunableDesc *descriptor);
-	virtual int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
-	virtual ~Tuner();
+	virtual int getTunable(TunableParam param, TunableDesc *descriptor) {ASSERT(0); return 0;}
+	virtual int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor) {ASSERT(0); return 0;}
+	virtual ~Tuner() {}
 	MEMALLOC;
 };
 

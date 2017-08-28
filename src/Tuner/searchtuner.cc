@@ -32,7 +32,7 @@ void TunableSetting::setDecision(int _low, int _high, int _default, int _selecti
 
 void TunableSetting::print() {
 	if (hasVar) {
-		model_print("Type %llu, ", type);
+		model_print("Type %" PRIu64 ", ", type);
 	}
 	model_print("Param %u = %u\n", param, selectedValue);
 }
@@ -105,8 +105,8 @@ int SearchTuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc 
 
 void SearchTuner::randomMutate() {
 	TunableSetting * randomSetting = settings.getRandomElement();
-	uint range=randomSetting->highValue-randomSetting->lowValue;
-	uint randomchoice=(random() % range) + randomSetting->lowValue;
+	int range=randomSetting->highValue-randomSetting->lowValue;
+	int randomchoice=(random() % range) + randomSetting->lowValue;
 	if (randomchoice < randomSetting->selectedValue)
 		randomSetting->selectedValue = randomchoice;
 	else

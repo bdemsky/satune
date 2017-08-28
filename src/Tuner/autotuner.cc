@@ -21,6 +21,9 @@ long long AutoTuner::evaluate(CSolver * problem, SearchTuner *tuner) {
 	long long encodeTime=copy->getEncodeTime();
 	long long solveTime=copy->getSolveTime();
 	long long metric=elapsedTime;
+	model_print("Elapsed Time: %llu\n", elapsedTime);
+	model_print("Encode Time: %llu\n", encodeTime);
+	model_print("Solve Time: %llu\n", solveTime);
 	delete copy;
 	return metric;
 }
@@ -61,8 +64,12 @@ void AutoTuner::tune() {
 	for (uint i=0;i<budget;i++) {
 		SearchTuner *newTuner=mutateTuner(oldTuner, i);
 		double newScore=evaluateAll(newTuner);
+		newTuner->printUsed();
+		model_print("Received score %f\n", newScore);
 		double scoreDiff=newScore - oldScore; //smaller is better
 		if (newScore < bestScore) {
+			if (bestTuner != NULL)
+				delete bestTuner;
 			bestScore = newScore;
 			bestTuner = newTuner->copyUsed();
 		}
@@ -76,10 +83,17 @@ void AutoTuner::tune() {
 		}
 		double ran = ((double)random()) / RAND_MAX;
 		if (ran <= acceptanceP) {
+			delete oldTuner;
 			oldScore = newScore;
 			oldTuner = newTuner;
 		} else {
 			delete newTuner;
 		}
 	}
+	model_print("Best tuner:\n");
+	bestTuner->print();
+	model_print("Received score %f\n", bestScore);
+	if (bestTuner != NULL)
+		delete bestTuner;
+	delete oldTuner;
 }

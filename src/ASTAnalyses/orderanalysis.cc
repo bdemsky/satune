@@ -84,15 +84,19 @@ bool isMustBeTrueNode(OrderNode *node) {
 	HSIteratorOrderEdge *iterator = node->inEdges.iterator();
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
-		if (!edge->mustPos)
+		if (!edge->mustPos) {
+			delete iterator;
 			return false;
+		}
 	}
 	delete iterator;
 	iterator = node->outEdges.iterator();
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
-		if (!edge->mustPos)
+		if (!edge->mustPos) {
+			delete iterator;
 			return false;
+		}
 	}
 	delete iterator;
 	return true;

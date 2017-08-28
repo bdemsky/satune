@@ -31,9 +31,13 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	HSIteratorBoolean *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
+#ifdef CONFIG_DEBUG
 		model_print("Encoding All ...\n\n");
+#endif
 		Edge c = encodeConstraintSATEncoder(constraint);
+#ifdef CONFIG_DEBUG
 		model_print("Returned Constraint in EncodingAll:\n");
+#endif
 		ASSERT( !equalsEdge(c, E_BOGUS));
 		addConstraintCNF(cnf, c);
 	}

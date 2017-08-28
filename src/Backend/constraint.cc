@@ -316,9 +316,11 @@ Edge constraintITE(CNF *cnf, Edge cond, Edge thenedge, Edge elseedge) {
 
 void addConstraintCNF(CNF *cnf, Edge constraint) {
 	pushVectorEdge(&cnf->constraints, constraint);
+#ifdef CONFIG_DEBUG
 	model_print("****ADDING NEW Constraint*****\n");
 	printCNF(constraint);
 	model_print("\n******************************\n");
+#endif
 }
 
 Edge constraintNewVar(CNF *cnf) {
