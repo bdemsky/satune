@@ -5,11 +5,16 @@
 
 class AutoTuner {
  public:
-	AutoTuner();
+	AutoTuner(uint budget);
 	void addProblem(CSolver *solver);
 	void tune();
 	MEMALLOC;
  private:
-	Vector<CSolver *> solvers;
+	long long evaluate(CSolver *problem, SearchTuner *tuner);
+	double evaluateAll(SearchTuner *tuner);
+	SearchTuner * mutateTuner(SearchTuner * oldTuner, uint k);
+
+	Vector<CSolver *> solvers;	
+	uint budget;
 };
 #endif

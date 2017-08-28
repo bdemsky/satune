@@ -8,6 +8,7 @@ class TunableSetting {
  public:
 	TunableSetting(VarType type, TunableParam param);	
 	TunableSetting(TunableParam param);
+	TunableSetting(TunableSetting * ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
 	MEMALLOC;
  private:
@@ -35,10 +36,17 @@ class SearchTuner : public Tuner {
 	~SearchTuner();
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
+	SearchTuner * copyUsed();
+	void randomMutate();
+	uint getSize() { return usedSettings.getSize();}
+	
 	MEMALLOC;
  private:
+	/** Used Settings keeps track of settings that were actually used by
+		 the example. Mutating settings may cause the Constraint Compiler
+		 not to query other settings.*/
 	HashSetTunableSetting usedSettings;
+	/** Settings contains all settings. */
 	HashSetTunableSetting settings;
 };
-
 #endif

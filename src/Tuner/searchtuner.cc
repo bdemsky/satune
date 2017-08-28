@@ -12,6 +12,17 @@ TunableSetting::TunableSetting(TunableParam _param) :
 	param(_param) {
 }
 
+TunableSetting::TunableSetting(TunableSetting * ts) :
+	hasVar(ts->hasVar),
+	type(ts->type),
+	param(ts->param),
+  lowValue(ts->lowValue),
+	highValue(ts->highValue),
+	defaultValue(ts->defaultValue),
+	selectedValue(ts->selectedValue)
+{
+}
+
 void TunableSetting::setDecision(int _low, int _high, int _default, int _selection) {
 	lowValue = _low;
 	highValue = _high;
@@ -32,6 +43,18 @@ bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
 SearchTuner::SearchTuner() {
 }
 
+SearchTuner * SearchTuner::copyUsed() {
+	SearchTuner * tuner = new SearchTuner();
+	HSIteratorTunableSetting *iterator=usedSettings.iterator();
+	while(iterator->hasNext()) {
+		TunableSetting *setting=iterator->next();
+		TunableSetting *copy=new TunableSetting(setting);
+		tuner->settings.add(copy);
+	}
+	delete iterator;
+	return tuner;
+}
+
 SearchTuner::~SearchTuner() {
 	HSIteratorTunableSetting *iterator=settings.iterator();
 	while(iterator->hasNext()) {
@@ -48,7 +71,8 @@ int SearchTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
 		result = settings.get(&setting);
 		if ( result == NULL) {
 			result=new TunableSetting(param);
-			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, descriptor->defaultValue);
+			uint value = descriptor->lowValue + (random() % (1+ descriptor->highValue - descriptor->lowValue));
+			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
 			settings.add(result);
 		}
 		usedSettings.add(result);
@@ -63,10 +87,21 @@ int SearchTuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc 
 		result = settings.get(&setting);
 		if ( result == NULL) {
 			result=new TunableSetting(vartype, param);
-			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, descriptor->defaultValue);
+			uint value = descriptor->lowValue + (random() % (1+ descriptor->highValue - descriptor->lowValue));
+			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
 			settings.add(result);
 		}
 		usedSettings.add(result);
 	}
 	return result->selectedValue;
+}
+
+void SearchTuner::randomMutate() {
+	TunableSetting * randomSetting = settings.getRandomElement();
+	uint range=randomSetting->highValue-randomSetting->lowValue;
+	uint randomchoice=(random() % range) + randomSetting->lowValue;
+	if (randomchoice < randomSetting->selectedValue)
+		randomSetting->selectedValue = randomchoice;
+	else
+		randomSetting->selectedValue = randomchoice + 1;
 }
