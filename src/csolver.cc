@@ -245,5 +245,6 @@ long long CSolver::getSolveTime() { return satEncoder->getSolveTime(); }
 
 void CSolver::autoTune() {
 	AutoTuner * autotuner=new AutoTuner();
-	autotuner->tune(this);
+	autotuner->addProblem(this);
+	autotuner->tune();
 }
