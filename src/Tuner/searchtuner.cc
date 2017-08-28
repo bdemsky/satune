@@ -30,6 +30,13 @@ void TunableSetting::setDecision(int _low, int _high, int _default, int _selecti
 	selectedValue = _selection;
 }
 
+void TunableSetting::print() {
+	if (hasVar) {
+		model_print("Type %llu, ", type);
+	}
+	model_print("Param %u = %u\n", param, selectedValue);
+}
+
 unsigned int tunableSettingHash(TunableSetting *setting) {
 	return setting->hasVar ^ setting->type ^ setting->param;
 }
@@ -104,4 +111,23 @@ void SearchTuner::randomMutate() {
 		randomSetting->selectedValue = randomchoice;
 	else
 		randomSetting->selectedValue = randomchoice + 1;
+}
+
+void SearchTuner::print() {
+	HSIteratorTunableSetting *iterator=settings.iterator();
+	while(iterator->hasNext()) {
+		TunableSetting *setting=iterator->next();
+		setting->print();
+	}
+	delete iterator;
+
+}
+
+void SearchTuner::printUsed() {
+	HSIteratorTunableSetting *iterator=usedSettings.iterator();
+	while(iterator->hasNext()) {
+		TunableSetting *setting=iterator->next();
+		setting->print();
+	}
+	delete iterator;
 }

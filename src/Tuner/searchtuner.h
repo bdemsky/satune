@@ -10,6 +10,7 @@ class TunableSetting {
 	TunableSetting(TunableParam param);
 	TunableSetting(TunableSetting * ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
+	void print();
 	MEMALLOC;
  private:
 	bool hasVar;
@@ -39,7 +40,9 @@ class SearchTuner : public Tuner {
 	SearchTuner * copyUsed();
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}
-	
+	void print();
+	void printUsed();
+
 	MEMALLOC;
  private:
 	/** Used Settings keeps track of settings that were actually used by

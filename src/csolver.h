@@ -117,7 +117,7 @@ public:
 	void replaceBooleanWithFalse(Boolean *bexpr);
 	void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
 	CSolver *clone();
-	void autoTune();
+	void autoTune(uint budget);
 
 	void setTuner(Tuner * _tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }

@@ -243,8 +243,8 @@ long long CSolver::getEncodeTime() { return satEncoder->getEncodeTime(); }
 
 long long CSolver::getSolveTime() { return satEncoder->getSolveTime(); }
 
-void CSolver::autoTune() {
-	AutoTuner * autotuner=new AutoTuner();
+void CSolver::autoTune(uint budget) {
+	AutoTuner * autotuner=new AutoTuner(budget);
 	autotuner->addProblem(this);
 	autotuner->tune();
 }
