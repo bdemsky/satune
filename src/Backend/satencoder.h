@@ -5,10 +5,6 @@
 #include "structs.h"
 #include "inc_solver.h"
 #include "constraint.h"
-#include "satelemencoder.h"
-#include "satorderencoder.h"
-#include "satfunctableencoder.h"
-
 
 class SATEncoder {
  public:
@@ -18,24 +14,51 @@ class SATEncoder {
 	void encodeAllSATEncoder(CSolver *csolver);
 	Edge encodeConstraintSATEncoder(Boolean *constraint);
 	CNF * getCNF() { return cnf;}
-	CSolver * getSolver() { return solver; }
 	long long getSolveTime() { return cnf->solveTime; }
 	long long getEncodeTime() { return cnf->encodeTime; }
 	
 	MEMALLOC;
  private:
+	Edge getNewVarSATEncoder();
+	void getArrayNewVarsSATEncoder(uint num, Edge *carray);
+	Edge encodeVarSATEncoder(BooleanVar *constraint);
+	Edge encodeLogicSATEncoder(BooleanLogic *constraint);
+	Edge encodePredicateSATEncoder(BooleanPredicate *constraint);
+	Edge encodeTablePredicateSATEncoder(BooleanPredicate *constraint);
+	void encodeElementSATEncoder(Element *element);
+	void encodeElementFunctionSATEncoder(ElementFunction *function);
+	void encodeTableElementFunctionSATEncoder(ElementFunction *This);
+	Edge getElementValueOneHotConstraint(Element *elem, uint64_t value);
+	Edge getElementValueUnaryConstraint(Element *elem, uint64_t value);
+	Edge getElementValueBinaryIndexConstraint(Element *element, uint64_t value);
+	Edge getElementValueBinaryValueConstraint(Element *element, uint64_t value);
+	Edge getElementValueConstraint(Element *element, uint64_t value);
+	void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
+	void generateOneHotEncodingVars(ElementEncoding *encoding);
+	void generateUnaryEncodingVars(ElementEncoding *encoding);
+	void generateBinaryIndexEncodingVars(ElementEncoding *encoding);
+	void generateBinaryValueEncodingVars(ElementEncoding *encoding);
+	void generateElementEncoding(Element *element);
+	Edge encodeOperatorPredicateSATEncoder(BooleanPredicate *constraint);
+	Edge encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constraint);
+	void encodeOperatorElementFunctionSATEncoder(ElementFunction *This);
+	Edge encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constraint);
+	Edge encodeOrderSATEncoder(BooleanOrder *constraint);
+	Edge inferOrderConstraintFromGraph(Order *order, uint64_t _first, uint64_t _second);
+	Edge getPairConstraint(Order *order, OrderPair *pair);
+	Edge encodeTotalOrderSATEncoder(BooleanOrder *constraint);
+	Edge encodePartialOrderSATEncoder(BooleanOrder *constraint);
+	void createAllTotalOrderConstraintsSATEncoder(Order *order);
+	Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair);
+	Edge generateTransOrderConstraintSATEncoder(Edge constIJ, Edge constJK, Edge constIK);
+	Edge encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint);
+	Edge encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint);
+	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
+	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
+	
 	CNF *cnf;
 	CSolver *solver;
 };
 
-Edge getNewVarSATEncoder(SATEncoder *This);
-void getArrayNewVarsSATEncoder(SATEncoder *encoder, uint num, Edge *carray);
-
-Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar *constraint);
-Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic *constraint);
-Edge encodePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint);
-Edge encodeTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint);
-void encodeElementSATEncoder(SATEncoder *encoder, Element *This);
-void encodeElementFunctionSATEncoder(SATEncoder *encoder, ElementFunction *This);
-void encodeTableElementFunctionSATEncoder(SATEncoder *encoder, ElementFunction *This);
+Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair);
 #endif

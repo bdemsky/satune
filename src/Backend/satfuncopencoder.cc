@@ -9,21 +9,20 @@
 #include "set.h"
 #include "element.h"
 #include "common.h"
-#include "satfuncopencoder.h"
 
-Edge encodeOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
+Edge SATEncoder::encodeOperatorPredicateSATEncoder(BooleanPredicate *constraint) {
 	switch (constraint->encoding.type) {
 	case ENUMERATEIMPLICATIONS:
-		return encodeEnumOperatorPredicateSATEncoder(This, constraint);
+		return encodeEnumOperatorPredicateSATEncoder(constraint);
 	case CIRCUIT:
-		return encodeCircuitOperatorPredicateEncoder(This, constraint);
+		return encodeCircuitOperatorPredicateEncoder(constraint);
 	default:
 		ASSERT(0);
 	}
 	exit(-1);
 }
 
-Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
+Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *)constraint->predicate;
 	uint numDomains = predicate->domains.getSize();
 
@@ -33,7 +32,7 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 	/* Call base encoders for children */
 	for (uint i = 0; i < numDomains; i++) {
 		Element *elem = constraint->inputs.get(i);
-		encodeElementSATEncoder(This, elem);
+		encodeElementSATEncoder(elem);
 	}
 	VectorEdge *clauses = allocDefVectorEdge();	// Setup array of clauses
 
@@ -54,9 +53,9 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
 				Element *elem = constraint->inputs.get(i);
-				carray[i] = getElementValueConstraint(This, elem, vals[i]);
+				carray[i] = getElementValueConstraint(elem, vals[i]);
 			}
-			Edge term = constraintAND(This->getCNF(), numDomains, carray);
+			Edge term = constraintAND(cnf, numDomains, carray);
 			pushVectorEdge(clauses, term);
 		}
 
@@ -79,13 +78,13 @@ Edge encodeEnumOperatorPredicateSATEncoder(SATEncoder *This, BooleanPredicate *c
 		deleteVectorEdge(clauses);
 		return E_False;
 	}
-	Edge cor = constraintOR(This->getCNF(), getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	Edge cor = constraintOR(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	deleteVectorEdge(clauses);
 	return generateNegation ? constraintNegate(cor) : cor;
 }
 
 
-void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *func) {
+void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) {
 #ifdef TRACE_DEBUG
 	model_print("Operator Function ...\n");
 #endif
@@ -95,7 +94,7 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 	/* Call base encoders for children */
 	for (uint i = 0; i < numDomains; i++) {
 		Element *elem = func->inputs.get(i);
-		encodeElementSATEncoder(This, elem);
+		encodeElementSATEncoder(elem);
 	}
 
 	VectorEdge *clauses = allocDefVectorEdge();	// Setup array of clauses
@@ -126,10 +125,10 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
 				Element *elem = func->inputs.get(i);
-				carray[i] = getElementValueConstraint(This, elem, vals[i]);
+				carray[i] = getElementValueConstraint(elem, vals[i]);
 			}
 			if (isInRange) {
-				carray[numDomains] = getElementValueConstraint(This, func, result);
+				carray[numDomains] = getElementValueConstraint(func, result);
 			}
 
 			Edge clause;
@@ -137,26 +136,26 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 			case IGNORE:
 			case NOOVERFLOW:
 			case WRAPAROUND: {
-				clause = constraintIMPLIES(This->getCNF(),constraintAND(This->getCNF(), numDomains, carray), carray[numDomains]);
+				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				break;
 			}
 			case FLAGFORCESOVERFLOW: {
-				clause = constraintIMPLIES(This->getCNF(),constraintAND(This->getCNF(), numDomains, carray), constraintAND2(This->getCNF(), carray[numDomains], constraintNegate(overFlowConstraint)));
+				clause = constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				break;
 			}
 			case OVERFLOWSETSFLAG: {
 				if (isInRange) {
-					clause = constraintIMPLIES(This->getCNF(),constraintAND(This->getCNF(), numDomains, carray), carray[numDomains]);
+					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				} else {
-					clause = constraintIMPLIES(This->getCNF(),constraintAND(This->getCNF(), numDomains, carray), overFlowConstraint);
+					clause = constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), overFlowConstraint);
 				}
 				break;
 			}
 			case FLAGIFFOVERFLOW: {
 				if (isInRange) {
-					clause = constraintIMPLIES(This->getCNF(),constraintAND(This->getCNF(), numDomains, carray), constraintAND2(This->getCNF(), carray[numDomains], constraintNegate(overFlowConstraint)));
+					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				} else {
-					clause = constraintIMPLIES(This->getCNF(),constraintAND(This->getCNF(), numDomains, carray), overFlowConstraint);
+					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), overFlowConstraint);
 				}
 				break;
 			}
@@ -190,28 +189,28 @@ void encodeOperatorElementFunctionSATEncoder(SATEncoder *This, ElementFunction *
 		deleteVectorEdge(clauses);
 		return;
 	}
-	Edge cor = constraintAND(This->getCNF(), getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
-	addConstraintCNF(This->getCNF(), cor);
+	Edge cor = constraintAND(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	addConstraintCNF(cnf, cor);
 	deleteVectorEdge(clauses);
 }
 
-Edge encodeCircuitOperatorPredicateEncoder(SATEncoder *This, BooleanPredicate *constraint) {
+Edge SATEncoder::encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
 	Element *elem0 = constraint->inputs.get(0);
-	encodeElementSATEncoder(This, elem0);
+	encodeElementSATEncoder(elem0);
 	Element *elem1 = constraint->inputs.get(1);
-	encodeElementSATEncoder(This, elem1);
+	encodeElementSATEncoder(elem1);
 	ElementEncoding *ee0 = getElementEncoding(elem0);
 	ElementEncoding *ee1 = getElementEncoding(elem1);
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
 	switch (predicate->op) {
 	case EQUALS:
-		return generateEquivNVConstraint(This->getCNF(), numVars, ee0->variables, ee1->variables);
+		return generateEquivNVConstraint(cnf, numVars, ee0->variables, ee1->variables);
 	case LT:
-		return generateLTConstraint(This->getCNF(), numVars, ee0->variables, ee1->variables);
+		return generateLTConstraint(cnf, numVars, ee0->variables, ee1->variables);
 	case GT:
-		return generateLTConstraint(This->getCNF(), numVars, ee1->variables, ee0->variables);
+		return generateLTConstraint(cnf, numVars, ee1->variables, ee0->variables);
 	default:
 		ASSERT(0);
 	}

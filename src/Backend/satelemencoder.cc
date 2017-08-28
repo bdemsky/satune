@@ -5,19 +5,19 @@
 #include "element.h"
 #include "set.h"
 
-Edge getElementValueConstraint(SATEncoder *This, Element *elem, uint64_t value) {
+Edge SATEncoder::getElementValueConstraint(Element *elem, uint64_t value) {
 	switch (getElementEncoding(elem)->type) {
 	case ONEHOT:
-		return getElementValueOneHotConstraint(This, elem, value);
+		return getElementValueOneHotConstraint(elem, value);
 	case UNARY:
-		return getElementValueUnaryConstraint(This, elem, value);
+		return getElementValueUnaryConstraint(elem, value);
 	case BINARYINDEX:
-		return getElementValueBinaryIndexConstraint(This, elem, value);
+		return getElementValueBinaryIndexConstraint(elem, value);
 	case ONEHOTBINARY:
 		ASSERT(0);
 		break;
 	case BINARYVAL:
-		return getElementValueBinaryValueConstraint(This, elem, value);
+		return getElementValueBinaryValueConstraint(elem, value);
 		break;
 	default:
 		ASSERT(0);
@@ -26,19 +26,19 @@ Edge getElementValueConstraint(SATEncoder *This, Element *elem, uint64_t value) 
 	return E_BOGUS;
 }
 
-Edge getElementValueBinaryIndexConstraint(SATEncoder *This, Element *elem, uint64_t value) {
+Edge SATEncoder::getElementValueBinaryIndexConstraint(Element *elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
 		if (elemEnc->isinUseElement(i) && elemEnc->encodingArray[i] == value) {
-			return (elemEnc->numVars == 0) ? E_True : generateBinaryConstraint(This->getCNF(), elemEnc->numVars, elemEnc->variables, i);
+			return (elemEnc->numVars == 0) ? E_True : generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, i);
 		}
 	}
 	return E_False;
 }
 
-Edge getElementValueOneHotConstraint(SATEncoder *This, Element *elem, uint64_t value) {
+Edge SATEncoder::getElementValueOneHotConstraint(Element *elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
@@ -50,7 +50,7 @@ Edge getElementValueOneHotConstraint(SATEncoder *This, Element *elem, uint64_t v
 	return E_False;
 }
 
-Edge getElementValueUnaryConstraint(SATEncoder *This, Element *elem, uint64_t value) {
+Edge SATEncoder::getElementValueUnaryConstraint(Element *elem, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(elem);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
@@ -63,13 +63,13 @@ Edge getElementValueUnaryConstraint(SATEncoder *This, Element *elem, uint64_t va
 			else if ((i + 1) == elemEnc->encArraySize)
 				return elemEnc->variables[i - 1];
 			else
-				return constraintAND2(This->getCNF(), elemEnc->variables[i - 1], constraintNegate(elemEnc->variables[i]));
+				return constraintAND2(cnf, elemEnc->variables[i - 1], constraintNegate(elemEnc->variables[i]));
 		}
 	}
 	return E_False;
 }
 
-Edge getElementValueBinaryValueConstraint(SATEncoder *This, Element *element, uint64_t value) {
+Edge SATEncoder::getElementValueBinaryValueConstraint(Element *element, uint64_t value) {
 	ASTNodeType type = GETELEMENTTYPE(element);
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
 	ElementEncoding *elemEnc = getElementEncoding(element);
@@ -83,7 +83,7 @@ Edge getElementValueBinaryValueConstraint(SATEncoder *This, Element *element, ui
 	}
 
 	uint64_t valueminusoffset = value - elemEnc->offset;
-	return generateBinaryConstraint(This->getCNF(), elemEnc->numVars, elemEnc->variables, valueminusoffset);
+	return generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, valueminusoffset);
 }
 
 void allocElementConstraintVariables(ElementEncoding *This, uint numVars) {
@@ -91,57 +91,57 @@ void allocElementConstraintVariables(ElementEncoding *This, uint numVars) {
 	This->variables = (Edge *)ourmalloc(sizeof(Edge) * numVars);
 }
 
-void generateBinaryValueEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
+void SATEncoder::generateBinaryValueEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYVAL);
 	allocElementConstraintVariables(encoding, encoding->numBits);
-	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
+	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
 }
 
-void generateBinaryIndexEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
+void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));
-	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
+	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
 }
 
-void generateOneHotEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
+void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
 	allocElementConstraintVariables(encoding, encoding->encArraySize);
-	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
+	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
 	for (uint i = 0; i < encoding->numVars; i++) {
 		for (uint j = i + 1; j < encoding->numVars; j++) {
-			addConstraintCNF(This->getCNF(), constraintNegate(constraintAND2(This->getCNF(), encoding->variables[i], encoding->variables[j])));
+			addConstraintCNF(cnf, constraintNegate(constraintAND2(cnf, encoding->variables[i], encoding->variables[j])));
 		}
 	}
-	addConstraintCNF(This->getCNF(), constraintOR(This->getCNF(), encoding->numVars, encoding->variables));
+	addConstraintCNF(cnf, constraintOR(cnf, encoding->numVars, encoding->variables));
 }
 
-void generateUnaryEncodingVars(SATEncoder *This, ElementEncoding *encoding) {
+void SATEncoder::generateUnaryEncodingVars(ElementEncoding *encoding) {
 	allocElementConstraintVariables(encoding, encoding->encArraySize - 1);
-	getArrayNewVarsSATEncoder(This, encoding->numVars, encoding->variables);
+	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
 	//Add unary constraint
 	for (uint i = 1; i < encoding->numVars; i++) {
-		addConstraintCNF(This->getCNF(), constraintOR2(This->getCNF(), encoding->variables[i - 1], constraintNegate(encoding->variables[i])));
+		addConstraintCNF(cnf, constraintOR2(cnf, encoding->variables[i - 1], constraintNegate(encoding->variables[i])));
 	}
 }
 
-void generateElementEncoding(SATEncoder *This, Element *element) {
+void SATEncoder::generateElementEncoding(Element *element) {
 	ElementEncoding *encoding = getElementEncoding(element);
 	ASSERT(encoding->type != ELEM_UNASSIGNED);
 	if (encoding->variables != NULL)
 		return;
 	switch (encoding->type) {
 	case ONEHOT:
-		generateOneHotEncodingVars(This, encoding);
+		generateOneHotEncodingVars(encoding);
 		return;
 	case BINARYINDEX:
-		generateBinaryIndexEncodingVars(This, encoding);
+		generateBinaryIndexEncodingVars(encoding);
 		return;
 	case UNARY:
-		generateUnaryEncodingVars(This, encoding);
+		generateUnaryEncodingVars(encoding);
 		return;
 	case ONEHOTBINARY:
 		return;
 	case BINARYVAL:
-		generateBinaryValueEncodingVars(This, encoding);
+		generateBinaryValueEncodingVars(encoding);
 		return;
 	default:
 		ASSERT(0);

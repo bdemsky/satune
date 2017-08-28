@@ -13,12 +13,12 @@
 #include "predicate.h"
 #include "orderelement.h"
 
-Edge encodeOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
+Edge SATEncoder::encodeOrderSATEncoder(BooleanOrder *constraint) {
 	switch ( constraint->order->type) {
 	case PARTIAL:
-		return encodePartialOrderSATEncoder(This, constraint);
+		return encodePartialOrderSATEncoder(constraint);
 	case TOTAL:
-		return encodeTotalOrderSATEncoder(This, constraint);
+		return encodeTotalOrderSATEncoder(constraint);
 	default:
 		ASSERT(0);
 	}
@@ -50,7 +50,7 @@ Edge inferOrderConstraintFromGraph(Order *order, uint64_t _first, uint64_t _seco
 	return E_NULL;
 }
 
-Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
+Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 	Edge gvalue = inferOrderConstraintFromGraph(order, pair->first, pair->second);
 	if (!edgeIsNull(gvalue))
 		return gvalue;
@@ -66,7 +66,7 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 	}
 	Edge constraint;
 	if (!(table->contains(pair))) {
-		constraint = getNewVarSATEncoder(This);
+		constraint = getNewVarSATEncoder();
 		OrderPair *paircopy = new OrderPair(pair->first, pair->second, constraint);
 		table->put(paircopy, paircopy);
 	} else
@@ -75,24 +75,24 @@ Edge getPairConstraint(SATEncoder *This, Order *order, OrderPair *pair) {
 	return negate ? constraintNegate(constraint) : constraint;
 }
 
-Edge encodeTotalOrderSATEncoder(SATEncoder *This, BooleanOrder *boolOrder) {
+Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
 		boolOrder->order->initializeOrderHashTable();
-		bool doOptOrderStructure = GETVARTUNABLE(This->getSolver()->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
+		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
-			reachMustAnalysis(This->getSolver(), boolOrder->order->graph, true);
+			reachMustAnalysis(solver, boolOrder->order->graph, true);
 		}
-		createAllTotalOrderConstraintsSATEncoder(This, boolOrder->order);
+		createAllTotalOrderConstraintsSATEncoder(boolOrder->order);
 	}
 	OrderPair pair(boolOrder->first, boolOrder->second, E_NULL);
-	Edge constraint = getPairConstraint(This, boolOrder->order, &pair);
+	Edge constraint = getPairConstraint(boolOrder->order, &pair);
 	return constraint;
 }
 
 
-void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order) {
+void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 #ifdef TRACE_DEBUG
 	model_print("in total order ...\n");
 #endif
@@ -104,14 +104,14 @@ void createAllTotalOrderConstraintsSATEncoder(SATEncoder *This, Order *order) {
 		for (uint j = i + 1; j < size; j++) {
 			uint64_t valueJ = mems->get(j);
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
-			Edge constIJ = getPairConstraint(This, order, &pairIJ);
+			Edge constIJ = getPairConstraint(order, &pairIJ);
 			for (uint k = j + 1; k < size; k++) {
 				uint64_t valueK = mems->get(k);
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
-				Edge constIK = getPairConstraint(This, order, &pairIK);
-				Edge constJK = getPairConstraint(This, order, &pairJK);
-				addConstraintCNF(This->getCNF(), generateTransOrderConstraintSATEncoder(This, constIJ, constJK, constIK));
+				Edge constIK = getPairConstraint(order, &pairIK);
+				Edge constJK = getPairConstraint(order, &pairJK);
+				addConstraintCNF(cnf, generateTransOrderConstraintSATEncoder(constIJ, constJK, constIK));
 			}
 		}
 	}
@@ -135,15 +135,15 @@ Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair) {
 	return negate ? constraintNegate(constraint) : constraint;
 }
 
-Edge generateTransOrderConstraintSATEncoder(SATEncoder *This, Edge constIJ,Edge constJK,Edge constIK) {
+Edge SATEncoder::generateTransOrderConstraintSATEncoder(Edge constIJ,Edge constJK,Edge constIK) {
 	Edge carray[] = {constIJ, constJK, constraintNegate(constIK)};
-	Edge loop1 = constraintOR(This->getCNF(), 3, carray);
+	Edge loop1 = constraintOR(cnf, 3, carray);
 	Edge carray2[] = {constraintNegate(constIJ), constraintNegate(constJK), constIK};
-	Edge loop2 = constraintOR(This->getCNF(), 3, carray2 );
-	return constraintAND2(This->getCNF(), loop1, loop2);
+	Edge loop2 = constraintOR(cnf, 3, carray2 );
+	return constraintAND2(cnf, loop1, loop2);
 }
 
-Edge encodePartialOrderSATEncoder(SATEncoder *This, BooleanOrder *constraint) {
+Edge SATEncoder::encodePartialOrderSATEncoder(BooleanOrder *constraint) {
 	ASSERT(constraint->order->type == PARTIAL);
 	return E_BOGUS;
 }
