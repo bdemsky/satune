@@ -10,5 +10,4 @@ Pass::Pass(Tunables _tunable, TunableDesc* _desc):
 }
 
 Pass::~Pass(){
-	
 }

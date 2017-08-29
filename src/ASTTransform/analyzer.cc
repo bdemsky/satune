@@ -22,8 +22,10 @@ void orderAnalysis(CSolver *This) {
 	for (uint i = 0; i < size; i++) {
 		Order *order = orders->get(i);
 		DecomposeOrderTransform* decompose = new DecomposeOrderTransform(This, order, DECOMPOSEORDER, &onoff);
-		if (!decompose->canExecuteTransform())
+		if (!decompose->canExecuteTransform()){
 			continue;
+			delete decompose;
+		}
 
 		OrderGraph *graph = buildOrderGraph(order);
 		if (order->type == PARTIAL) {
@@ -64,8 +66,10 @@ void orderAnalysis(CSolver *This) {
 
 		
 		IntegerEncodingTransform* integerEncoding = new IntegerEncodingTransform(This, order, ORDERINTEGERENCODING, &offon);
-		if(!integerEncoding->canExecuteTransform())
+		if(!integerEncoding->canExecuteTransform()){
 			continue;
+			delete integerEncoding;
+		}
 		integerEncoding->doTransform();
 		delete integerEncoding;
 	}

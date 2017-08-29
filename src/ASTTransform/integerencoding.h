@@ -17,7 +17,7 @@ public:
 	void orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder);
 	void doTransform();
 	bool canExecuteTransform();
-	~IntegerEncodingTransform();
+	virtual ~IntegerEncodingTransform();
 private:
 	Order* order;
 	// In future we can use a singleton class instead of static variable for keeping data that needed
