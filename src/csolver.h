@@ -127,6 +127,8 @@ public:
 	MEMALLOC;
 
 private:
+	void assignID(Boolean * b);
+	void assignID(Element * e);
 	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);
 	void handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child);
 	void handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child);
@@ -160,7 +162,9 @@ private:
 	SATEncoder *satEncoder;
 	bool unsat;
 	Tuner *tuner;
-
+	uint booleanID;
+	uint elementID;
+	
 	long long elapsedTime;
 };
 #endif

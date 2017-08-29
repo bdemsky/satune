@@ -118,10 +118,10 @@ Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	return element;
 }
 
-Boolean *CSolver::getBooleanVar(VarType type) {
-	Boolean *boolean = new BooleanVar(type);
-	allBooleans.push(boolean);
-	return boolean;
+Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
+	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
+	allElements.push(element);
+	return element;
 }
 
 Function *CSolver::createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
@@ -162,10 +162,10 @@ Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 	return function;
 }
 
-Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
-	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
-	allElements.push(element);
-	return element;
+Boolean *CSolver::getBooleanVar(VarType type) {
+	Boolean *boolean = new BooleanVar(type);
+	allBooleans.push(boolean);
+	return boolean;
 }
 
 Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
@@ -184,6 +184,12 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 	return boolean;
 }
 
+Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
+	Boolean *constraint = new BooleanOrder(order, first, second);
+	allBooleans.push(constraint);
+	return constraint;
+}
+
 void CSolver::addConstraint(Boolean *constraint) {
 	constraints.add(constraint);
 }
@@ -192,12 +198,6 @@ Order *CSolver::createOrder(OrderType type, Set *set) {
 	Order *order = new Order(type, set);
 	allOrders.push(order);
 	return order;
-}
-
-Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
-	Boolean *constraint = new BooleanOrder(order, first, second);
-	allBooleans.push(constraint);
-	return constraint;
 }
 
 int CSolver::startEncoding() {

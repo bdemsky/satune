@@ -16,6 +16,7 @@ public:
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
+
 	MEMALLOC;
 };
 

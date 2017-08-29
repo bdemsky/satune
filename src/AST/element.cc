@@ -8,7 +8,8 @@
 
 Element::Element(ASTNodeType _type) :
 	ASTNode(_type),
-	encoding(this) {
+	encoding(this),
+	idNumber(0) {
 }
 
 ElementSet::ElementSet(Set *s) :

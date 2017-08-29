@@ -15,6 +15,7 @@ public:
 	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
+	
 	MEMALLOC;
 };
 

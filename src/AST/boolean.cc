@@ -9,7 +9,8 @@ Boolean::Boolean(ASTNodeType _type) :
 	ASTNode(_type),
 	polarity(P_UNDEFINED),
 	boolVal(BV_UNDEFINED),
-	parents() {
+	parents(),
+	idNumber(0) {
 }
 
 BooleanVar::BooleanVar(VarType t) :
