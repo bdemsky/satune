@@ -11,7 +11,7 @@
 #include "common.h"
 
 Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint) {
-	ASSERT(GETPREDICATETYPE(constraint->predicate) == TABLEPRED);
+	ASSERT(constraint->predicate->type == TABLEPRED);
 	UndefinedBehavior undefStatus = ((PredicateTable *)constraint->predicate)->undefinedbehavior;
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Table *table = ((PredicateTable *)constraint->predicate)->table;
@@ -71,7 +71,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 #ifdef TRACE_DEBUG
 	model_print("Enumeration Table Predicate ...\n");
 #endif
-	ASSERT(GETPREDICATETYPE(constraint->predicate) == TABLEPRED);
+	ASSERT(constraint->predicate->type == TABLEPRED);
 	//First encode children
 	Array<Element *> *inputs = &constraint->inputs;
 	uint inputNum = inputs->getSize();
@@ -220,7 +220,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 #ifdef TRACE_DEBUG
 	model_print("Enumeration Table functions ...\n");
 #endif
-	ASSERT(GETFUNCTIONTYPE(elemFunc->function) == TABLEFUNC);
+	ASSERT(elemFunc->function->type == TABLEFUNC);
 	//First encode children
 	Array<Element *> *elements = &elemFunc->inputs;
 	for (uint i = 0; i < elements->getSize(); i++) {

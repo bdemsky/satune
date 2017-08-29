@@ -21,7 +21,7 @@ void updateMustValue(Boolean *This, BooleanValue value) {
 }
 
 void computePolarityAndBooleanValue(Boolean *This) {
-	switch (GETBOOLEANTYPE(This)) {
+	switch (This->type) {
 	case BOOLEANVAR:
 	case ORDERCONST:
 		return;
@@ -79,7 +79,7 @@ BooleanValue negateBooleanValue(BooleanValue This) {
 }
 
 void computeLogicOpPolarity(BooleanLogic *This) {
-	Polarity parentpolarity = GETBOOLEANPOLARITY(This);
+	Polarity parentpolarity = This->polarity;
 	switch (This->op) {
 	case L_AND:
 	case L_OR: {
@@ -113,7 +113,7 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 }
 
 void computeLogicOpBooleanValue(BooleanLogic *This) {
-	BooleanValue parentbv = GETBOOLEANVALUE(This);
+	BooleanValue parentbv = This->boolVal;
 	switch (This->op) {
 	case L_AND: {
 		if (parentbv == BV_MUSTBETRUE || parentbv == BV_UNSAT) {

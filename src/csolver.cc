@@ -223,7 +223,7 @@ int CSolver::startEncoding() {
 }
 
 uint64_t CSolver::getElementValue(Element *element) {
-	switch (GETELEMENTTYPE(element)) {
+	switch (element->type) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
@@ -235,7 +235,7 @@ uint64_t CSolver::getElementValue(Element *element) {
 }
 
 bool CSolver::getBooleanValue(Boolean *boolean) {
-	switch (GETBOOLEANTYPE(boolean)) {
+	switch (boolean->type) {
 	case BOOLEANVAR:
 		return getBooleanVariableValueSATTranslator(this, boolean);
 	default:

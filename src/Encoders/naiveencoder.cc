@@ -23,7 +23,7 @@ void naiveEncodingDecision(CSolver *This) {
 }
 
 void naiveEncodingConstraint(Boolean *This) {
-	switch (GETBOOLEANTYPE(This)) {
+	switch (This->type) {
 	case BOOLEANVAR: {
 		return;
 	}
@@ -68,7 +68,7 @@ void naiveEncodingElement(Element *This) {
 		encoding->encodingArrayInitialization();
 	}
 
-	if (GETELEMENTTYPE(This) == ELEMFUNCRETURN) {
+	if (This->type == ELEMFUNCRETURN) {
 		ElementFunction *function = (ElementFunction *) This;
 		for (uint i = 0; i < function->inputs.getSize(); i++) {
 			Element *element = function->inputs.get(i);

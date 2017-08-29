@@ -6,8 +6,6 @@
 #include "structs.h"
 #include "common.h"
 
-#define GETPREDICATETYPE(o) (((Predicate *)(o))->type)
-
 class Predicate {
 public:
 	Predicate(PredicateType _type) : type(_type) {}

@@ -8,8 +8,6 @@
 #include "elementencoding.h"
 #include "boolean.h"
 
-#define GETELEMENTTYPE(o) (o->type)
-#define GETELEMENTPARENTS(o) (&((Element *)o)->parents)
 class Element : public ASTNode {
 public:
 	Element(ASTNodeType type);

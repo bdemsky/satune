@@ -33,7 +33,7 @@ BooleanPredicate::BooleanPredicate(Predicate *_predicate, Element **_inputs, uin
 	inputs(_inputs, _numInputs),
 	undefStatus(_undefinedStatus) {
 	for (uint i = 0; i < _numInputs; i++) {
-		GETELEMENTPARENTS(_inputs[i])->push(this);
+		_inputs[i]->parents.push(this);
 	}
 }
 

@@ -5,8 +5,6 @@
 #include "ops.h"
 #include "structs.h"
 
-#define GETFUNCTIONTYPE(o) (((Function *)o)->type)
-
 class Function {
 public:
 	Function(FunctionType _type) : type(_type) {}

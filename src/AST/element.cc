@@ -23,7 +23,7 @@ ElementFunction::ElementFunction(Function *_function, Element **array, uint numA
 	overflowstatus(_overflowstatus),
 	functionencoding(this) {
 	for (uint i = 0; i < numArrays; i++)
-		GETELEMENTPARENTS(array[i])->push(this);
+		array[i]->parents.push(this);
 }
 
 ElementConst::ElementConst(uint64_t _value, VarType _type, Set *_set) :
@@ -33,14 +33,14 @@ ElementConst::ElementConst(uint64_t _value, VarType _type, Set *_set) :
 }
 
 Set *getElementSet(Element *This) {
-	switch (GETELEMENTTYPE(This)) {
+	switch (This->type) {
 	case ELEMSET:
 		return ((ElementSet *)This)->set;
 	case ELEMCONST:
 		return ((ElementConst *)This)->set;
 	case ELEMFUNCRETURN: {
 		Function *func = ((ElementFunction *)This)->function;
-		switch (GETFUNCTIONTYPE(func)) {
+		switch (func->type) {
 		case TABLEFUNC:
 			return ((FunctionTable *)func)->table->range;
 		case OPERATORFUNC:

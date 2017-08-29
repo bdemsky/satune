@@ -45,7 +45,7 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 }
 
 Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
-	switch (GETBOOLEANTYPE(constraint)) {
+	switch (constraint->type) {
 	case ORDERCONST:
 		return encodeOrderSATEncoder((BooleanOrder *) constraint);
 	case BOOLEANVAR:
@@ -55,7 +55,7 @@ Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
 	case PREDICATEOP:
 		return encodePredicateSATEncoder((BooleanPredicate *) constraint);
 	default:
-		model_print("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
+		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
 		exit(-1);
 	}
 }
@@ -99,7 +99,7 @@ Edge SATEncoder::encodeLogicSATEncoder(BooleanLogic *constraint) {
 }
 
 Edge SATEncoder::encodePredicateSATEncoder(BooleanPredicate *constraint) {
-	switch (GETPREDICATETYPE(constraint->predicate) ) {
+	switch (constraint->predicate->type) {
 	case TABLEPRED:
 		return encodeTablePredicateSATEncoder(constraint);
 	case OPERATORPRED:
@@ -125,7 +125,7 @@ Edge SATEncoder::encodeTablePredicateSATEncoder(BooleanPredicate *constraint) {
 }
 
 void SATEncoder::encodeElementSATEncoder(Element *element) {
-	switch ( GETELEMENTTYPE(element) ) {
+	switch ( element->type) {
 	case ELEMFUNCRETURN:
 		generateElementEncoding(element);
 		encodeElementFunctionSATEncoder((ElementFunction *) element);
@@ -141,7 +141,7 @@ void SATEncoder::encodeElementSATEncoder(Element *element) {
 }
 
 void SATEncoder::encodeElementFunctionSATEncoder(ElementFunction *function) {
-	switch (GETFUNCTIONTYPE(function->function)) {
+	switch (function->function->type) {
 	case TABLEFUNC:
 		encodeTableElementFunctionSATEncoder(function);
 		break;

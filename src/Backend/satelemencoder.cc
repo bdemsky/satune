@@ -27,7 +27,7 @@ Edge SATEncoder::getElementValueConstraint(Element *elem, uint64_t value) {
 }
 
 Edge SATEncoder::getElementValueBinaryIndexConstraint(Element *elem, uint64_t value) {
-	ASTNodeType type = GETELEMENTTYPE(elem);
+	ASTNodeType type = elem->type;
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
@@ -39,7 +39,7 @@ Edge SATEncoder::getElementValueBinaryIndexConstraint(Element *elem, uint64_t va
 }
 
 Edge SATEncoder::getElementValueOneHotConstraint(Element *elem, uint64_t value) {
-	ASTNodeType type = GETELEMENTTYPE(elem);
+	ASTNodeType type = elem->type;
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
@@ -51,7 +51,7 @@ Edge SATEncoder::getElementValueOneHotConstraint(Element *elem, uint64_t value) 
 }
 
 Edge SATEncoder::getElementValueUnaryConstraint(Element *elem, uint64_t value) {
-	ASTNodeType type = GETELEMENTTYPE(elem);
+	ASTNodeType type = elem->type;
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN || type == ELEMCONST);
 	ElementEncoding *elemEnc = getElementEncoding(elem);
 	for (uint i = 0; i < elemEnc->encArraySize; i++) {
@@ -70,7 +70,7 @@ Edge SATEncoder::getElementValueUnaryConstraint(Element *elem, uint64_t value) {
 }
 
 Edge SATEncoder::getElementValueBinaryValueConstraint(Element *element, uint64_t value) {
-	ASTNodeType type = GETELEMENTTYPE(element);
+	ASTNodeType type = element->type;
 	ASSERT(type == ELEMSET || type == ELEMFUNCRETURN);
 	ElementEncoding *elemEnc = getElementEncoding(element);
 	if (elemEnc->low <= elemEnc->high) {

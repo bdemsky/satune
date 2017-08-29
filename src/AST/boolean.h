@@ -8,15 +8,6 @@
 #include "functionencoding.h"
 #include "constraint.h"
 
-/**
-    This is a little sketchy, but apparently legit.
-    https://www.python.org/dev/peps/pep-3123/ */
-
-#define GETBOOLEANTYPE(o) (o->type)
-#define GETBOOLEANPARENTS(o) (&(o->parents))
-#define GETBOOLEANPOLARITY(b) (b->polarity)
-#define GETBOOLEANVALUE(b) (b->boolVal)
-
 class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
