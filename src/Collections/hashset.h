@@ -148,6 +148,23 @@ public:
 			return false;
 	}
 
+  /** @brief Return random key from set. */
+
+  _Key getRandomElement() {
+		if (getSize() == 0)
+			return NULL;
+		else if (getSize() < 6) {
+			uint count = random() % getSize();
+			LinkNode<_Key> *ptr=list;
+			while(count > 0) {
+				ptr = ptr->next;
+				count--;
+			}
+			return ptr->key;
+		} else
+			return table->getRandomValue()->key;
+	}
+
 	/** @brief Gets the original key corresponding to this one from the
 	 *  hashset.  Returns NULL if not present. */
 

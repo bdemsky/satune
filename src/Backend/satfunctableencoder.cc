@@ -10,8 +10,8 @@
 #include "element.h"
 #include "common.h"
 
-Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
-	ASSERT(GETPREDICATETYPE(constraint->predicate) == TABLEPRED);
+Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint) {
+	ASSERT(constraint->predicate->type == TABLEPRED);
 	UndefinedBehavior undefStatus = ((PredicateTable *)constraint->predicate)->undefinedbehavior;
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Table *table = ((PredicateTable *)constraint->predicate)->table;
@@ -21,7 +21,7 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	uint size = table->entries->getSize();
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
-	Edge undefConst = encodeConstraintSATEncoder(This, constraint->undefStatus);
+	Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
 	HSIteratorTableEntry *iterator = table->entries->iterator();
@@ -35,21 +35,21 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 		Edge carray[inputNum];
 		for (uint j = 0; j < inputNum; j++) {
 			Element *el = inputs->get(j);
-			carray[j] = getElementValueConstraint(This, el, entry->inputs[j]);
+			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
 			printCNF(carray[j]);
 			model_print("\n");
 		}
 		Edge row;
 		switch (undefStatus) {
 		case IGNOREBEHAVIOR:
-			row = constraintAND(This->cnf, inputNum, carray);
+			row = constraintAND(cnf, inputNum, carray);
 			break;
 		case FLAGFORCEUNDEFINED: {
-			addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray),  constraintNegate(undefConst)));
+			addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, inputNum, carray),  constraintNegate(undefConst)));
 			if (generateNegation == (entry->output != 0)) {
 				continue;
 			}
-			row = constraintAND(This->cnf, inputNum, carray);
+			row = constraintAND(cnf, inputNum, carray);
 			break;
 		}
 		default:
@@ -62,28 +62,28 @@ Edge encodeEnumEntriesTablePredicateSATEncoder(SATEncoder *This, BooleanPredicat
 	}
 	delete iterator;
 	ASSERT(i != 0);
-	Edge result = generateNegation ? constraintNegate(constraintOR(This->cnf, i, constraints))
-								: constraintOR(This->cnf, i, constraints);
+	Edge result = generateNegation ? constraintNegate(constraintOR(cnf, i, constraints))
+								: constraintOR(cnf, i, constraints);
 	printCNF(result);
 	return result;
 }
-Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
+Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint) {
 #ifdef TRACE_DEBUG
 	model_print("Enumeration Table Predicate ...\n");
 #endif
-	ASSERT(GETPREDICATETYPE(constraint->predicate) == TABLEPRED);
+	ASSERT(constraint->predicate->type == TABLEPRED);
 	//First encode children
 	Array<Element *> *inputs = &constraint->inputs;
 	uint inputNum = inputs->getSize();
 	//Encode all the inputs first ...
 	for (uint i = 0; i < inputNum; i++) {
-		encodeElementSATEncoder(This, inputs->get(i));
+		encodeElementSATEncoder(inputs->get(i));
 	}
 	PredicateTable *predicate = (PredicateTable *)constraint->predicate;
 	switch (predicate->undefinedbehavior) {
 	case IGNOREBEHAVIOR:
 	case FLAGFORCEUNDEFINED:
-		return encodeEnumEntriesTablePredicateSATEncoder(This, constraint);
+		return encodeEnumEntriesTablePredicateSATEncoder(constraint);
 	default:
 		break;
 	}
@@ -101,7 +101,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 		vals[i] = set->getElement(indices[i]);
 	}
 	bool hasOverflow = false;
-	Edge undefConstraint = encodeConstraintSATEncoder (This, constraint->undefStatus);
+	Edge undefConstraint = encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConstraint);
 	bool notfinished = true;
 	while (notfinished) {
@@ -114,23 +114,23 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 		Edge clause;
 		for (uint i = 0; i < numDomains; i++) {
 			Element *elem = constraint->inputs.get(i);
-			carray[i] = getElementValueConstraint(This, elem, vals[i]);
+			carray[i] = getElementValueConstraint(elem, vals[i]);
 		}
 
 		switch (predicate->undefinedbehavior) {
 		case UNDEFINEDSETSFLAG:
 			if (isInRange) {
-				clause = constraintAND(This->cnf, numDomains, carray);
+				clause = constraintAND(cnf, numDomains, carray);
 			} else {
-				addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint) );
+				addConstraintCNF(cnf, constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), undefConstraint) );
 			}
 			break;
 		case FLAGIFFUNDEFINED:
 			if (isInRange) {
-				clause = constraintAND(This->cnf, numDomains, carray);
-				addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), constraintNegate(undefConstraint)));
+				clause = constraintAND(cnf, numDomains, carray);
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintNegate(undefConstraint)));
 			} else {
-				addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint) );
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), undefConstraint) );
 			}
 			break;
 
@@ -164,9 +164,9 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 	}
 	Edge result = E_NULL;
 	ASSERT(getSizeVectorEdge(clauses) != 0);
-	result = constraintOR(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	result = constraintOR(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
 	if (hasOverflow) {
-		result = constraintOR2(This->cnf, result, undefConstraint);
+		result = constraintOR2(cnf, result, undefConstraint);
 	}
 	if (generateNegation) {
 		ASSERT(!hasOverflow);
@@ -176,7 +176,7 @@ Edge encodeEnumTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *cons
 	return result;
 }
 
-void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction *func) {
+void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func) {
 	UndefinedBehavior undefStatus = ((FunctionTable *) func->function)->undefBehavior;
 	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Array<Element *> *elements = &func->inputs;
@@ -192,18 +192,18 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction 
 		Edge carray[inputNum];
 		for (uint j = 0; j < inputNum; j++) {
 			Element *el = elements->get(j);
-			carray[j] = getElementValueConstraint(This, el, entry->inputs[j]);
+			carray[j] = getElementValueConstraint(el, entry->inputs[j]);
 		}
-		Edge output = getElementValueConstraint(This, (Element *)func, entry->output);
+		Edge output = getElementValueConstraint(func, entry->output);
 		Edge row;
 		switch (undefStatus ) {
 		case IGNOREBEHAVIOR: {
-			row = constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray), output);
+			row = constraintIMPLIES(cnf,constraintAND(cnf, inputNum, carray), output);
 			break;
 		}
 		case FLAGFORCEUNDEFINED: {
-			Edge undefConst = encodeConstraintSATEncoder(This, func->overflowstatus);
-			row = constraintIMPLIES(This->cnf,constraintAND(This->cnf, inputNum, carray), constraintAND2(This->cnf, output, constraintNegate(undefConst)));
+			Edge undefConst = encodeConstraintSATEncoder(func->overflowstatus);
+			row = constraintIMPLIES(cnf, constraintAND(cnf, inputNum, carray), constraintAND2(cnf, output, constraintNegate(undefConst)));
 			break;
 		}
 		default:
@@ -213,26 +213,26 @@ void encodeEnumEntriesTableElemFuncSATEncoder(SATEncoder *This, ElementFunction 
 		constraints[i++] = row;
 	}
 	delete iterator;
-	addConstraintCNF(This->cnf, constraintAND(This->cnf, size, constraints));
+	addConstraintCNF(cnf, constraintAND(cnf, size, constraints));
 }
 
-void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *elemFunc) {
+void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc) {
 #ifdef TRACE_DEBUG
 	model_print("Enumeration Table functions ...\n");
 #endif
-	ASSERT(GETFUNCTIONTYPE(elemFunc->function) == TABLEFUNC);
+	ASSERT(elemFunc->function->type == TABLEFUNC);
 	//First encode children
 	Array<Element *> *elements = &elemFunc->inputs;
 	for (uint i = 0; i < elements->getSize(); i++) {
 		Element *elem = elements->get(i);
-		encodeElementSATEncoder(This, elem);
+		encodeElementSATEncoder(elem);
 	}
 
 	FunctionTable *function = (FunctionTable *)elemFunc->function;
 	switch (function->undefBehavior) {
 	case IGNOREBEHAVIOR:
 	case FLAGFORCEUNDEFINED:
-		return encodeEnumEntriesTableElemFuncSATEncoder(This, elemFunc);
+		return encodeEnumEntriesTableElemFuncSATEncoder(elemFunc);
 	default:
 		break;
 	}
@@ -250,7 +250,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		vals[i] = set->getElement(indices[i]);
 	}
 
-	Edge undefConstraint = encodeConstraintSATEncoder(This, elemFunc->overflowstatus);
+	Edge undefConstraint = encodeConstraintSATEncoder(elemFunc->overflowstatus);
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains + 1];
@@ -259,10 +259,10 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		ASSERT(function->undefBehavior == UNDEFINEDSETSFLAG || function->undefBehavior == FLAGIFFUNDEFINED);
 		for (uint i = 0; i < numDomains; i++) {
 			Element *elem = elemFunc->inputs.get(i);
-			carray[i] = getElementValueConstraint(This, elem, vals[i]);
+			carray[i] = getElementValueConstraint(elem, vals[i]);
 		}
 		if (isInRange) {
-			carray[numDomains] = getElementValueConstraint(This, (Element *)elemFunc, tableEntry->output);
+			carray[numDomains] = getElementValueConstraint(elemFunc, tableEntry->output);
 		}
 
 		Edge clause;
@@ -270,18 +270,18 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		case UNDEFINEDSETSFLAG: {
 			if (isInRange) {
 				//FIXME: Talk to Brian, It should be IFF not only IMPLY. --HG
-				clause = constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), carray[numDomains]);
+				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 			} else {
-				addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), undefConstraint));
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), undefConstraint));
 			}
 			break;
 		}
 		case FLAGIFFUNDEFINED: {
 			if (isInRange) {
-				clause = constraintIMPLIES(This->cnf,constraintAND(This->cnf, numDomains, carray), carray[numDomains]);
-				addConstraintCNF(This->cnf, constraintIMPLIES(This->cnf, constraintAND(This->cnf, numDomains, carray), constraintNegate(undefConstraint) ));
+				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintNegate(undefConstraint) ));
 			} else {
-				addConstraintCNF(This->cnf,constraintIMPLIES(This->cnf, constraintAND(This->cnf, numDomains, carray), undefConstraint));
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), undefConstraint));
 			}
 			break;
 		}
@@ -316,7 +316,7 @@ void encodeEnumTableElemFunctionSATEncoder(SATEncoder *This, ElementFunction *el
 		deleteVectorEdge(clauses);
 		return;
 	}
-	Edge cor = constraintAND(This->cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
-	addConstraintCNF(This->cnf, cor);
+	Edge cor = constraintAND(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	addConstraintCNF(cnf, cor);
 	deleteVectorEdge(clauses);
 }

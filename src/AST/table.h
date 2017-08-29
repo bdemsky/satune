@@ -9,6 +9,7 @@ public:
 	Table(Set **domains, uint numDomain, Set *range);
 	void addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result);
 	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);
+	Table *clone(CSolver *solver, CloneMap *map);
 	~Table();
 	Array<Set *> domains;
 	Set *range;

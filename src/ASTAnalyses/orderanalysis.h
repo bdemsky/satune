@@ -1,12 +1,5 @@
-/*
- * File:   orderencoder.h
- * Author: hamed
- *
- * Created on August 8, 2017, 6:36 PM
- */
-
-#ifndef ORDERGRAPHBUILDER_H
-#define ORDERGRAPHBUILDER_H
+#ifndef ORDERANALYSIS_H
+#define ORDERANALYSIS_H
 #include "classlist.h"
 #include "structs.h"
 #include "mymemory.h"
@@ -28,5 +21,5 @@ void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiv
 void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph);
 void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph);
 
-#endif/* ORDERGRAPHBUILDER_H */
+#endif
 

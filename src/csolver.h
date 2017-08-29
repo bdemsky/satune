@@ -3,6 +3,7 @@
 #include "classlist.h"
 #include "ops.h"
 #include "structs.h"
+#include "asthash.h"
 
 class CSolver {
 public:
@@ -108,7 +109,7 @@ public:
 	Vector<Order *> *getOrders() { return &allOrders;}
 
 	Tuner *getTuner() { return tuner; }
-
+	
 	HSIteratorBoolean *getConstraints() { return constraints.iterator(); }
 
 	SATEncoder *getSATEncoder() {return satEncoder;}
@@ -116,8 +117,14 @@ public:
 	void replaceBooleanWithTrue(Boolean *bexpr);
 	void replaceBooleanWithFalse(Boolean *bexpr);
 	void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
+	CSolver *clone();
+	void autoTune(uint budget);
 
-
+	void setTuner(Tuner * _tuner) { tuner = _tuner; }
+	long long getElapsedTime() { return elapsedTime; }
+	long long getEncodeTime();
+	long long getSolveTime();
+	
 	MEMALLOC;
 
 private:
@@ -151,8 +158,14 @@ private:
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 
+	/** These two tables are used for deduplicating entries. */
+	BooleanMatchMap boolMap;
+	ElementMatchMap elemMap;
+	
 	SATEncoder *satEncoder;
 	bool unsat;
 	Tuner *tuner;
+	
+	long long elapsedTime;
 };
 #endif

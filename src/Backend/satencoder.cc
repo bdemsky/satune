@@ -11,107 +11,113 @@
 #include "order.h"
 #include "predicate.h"
 #include "set.h"
-#include "satfuncopencoder.h"
 
-//TODO: Should handle sharing of AST Nodes without recoding them a second time
-
-SATEncoder *allocSATEncoder(CSolver *solver) {
-	SATEncoder *This = (SATEncoder *)ourmalloc(sizeof (SATEncoder));
-	This->solver = solver;
-	This->varcount = 1;
-	This->cnf = createCNF();
-	return This;
+SATEncoder::SATEncoder(CSolver * _solver) :
+	cnf(createCNF()),
+	solver(_solver) {
 }
 
-void deleteSATEncoder(SATEncoder *This) {
-	deleteCNF(This->cnf);
-	ourfree(This);
+SATEncoder::~SATEncoder() {
+	deleteCNF(cnf);
 }
 
-void encodeAllSATEncoder(CSolver *csolver, SATEncoder *This) {
+int SATEncoder::solve() {
+	return solveCNF(cnf);
+}
+
+void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	HSIteratorBoolean *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
-		model_print("Encoding All ...\n\n");
-		Edge c = encodeConstraintSATEncoder(This, constraint);
-		model_print("Returned Constraint in EncodingAll:\n");
-		ASSERT( !equalsEdge(c, E_BOGUS));
-		addConstraintCNF(This->cnf, c);
+		Edge c = encodeConstraintSATEncoder(constraint);
+		addConstraintCNF(cnf, c);
 	}
 	delete iterator;
 }
 
-Edge encodeConstraintSATEncoder(SATEncoder *This, Boolean *constraint) {
-	switch (GETBOOLEANTYPE(constraint)) {
+Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
+	Edge result;
+	if (booledgeMap.contains(constraint)) {
+		Edge e={(Node *) booledgeMap.get(constraint)};
+		return e;
+	}
+	
+	switch (constraint->type) {
 	case ORDERCONST:
-		return encodeOrderSATEncoder(This, (BooleanOrder *) constraint);
+		result=encodeOrderSATEncoder((BooleanOrder *) constraint);
+		break;
 	case BOOLEANVAR:
-		return encodeVarSATEncoder(This, (BooleanVar *) constraint);
+		result=encodeVarSATEncoder((BooleanVar *) constraint);
+		break;
 	case LOGICOP:
-		return encodeLogicSATEncoder(This, (BooleanLogic *) constraint);
+		result=encodeLogicSATEncoder((BooleanLogic *) constraint);
+		break;
 	case PREDICATEOP:
-		return encodePredicateSATEncoder(This, (BooleanPredicate *) constraint);
+		result=encodePredicateSATEncoder((BooleanPredicate *) constraint);
+		break;
 	default:
-		model_print("Unhandled case in encodeConstraintSATEncoder %u", GETBOOLEANTYPE(constraint));
+		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
 		exit(-1);
 	}
+	booledgeMap.put(constraint, result.node_ptr);
+	return result;
 }
 
-void getArrayNewVarsSATEncoder(SATEncoder *encoder, uint num, Edge *carray) {
+void SATEncoder::getArrayNewVarsSATEncoder(uint num, Edge *carray) {
 	for (uint i = 0; i < num; i++)
-		carray[i] = getNewVarSATEncoder(encoder);
+		carray[i] = getNewVarSATEncoder();
 }
 
-Edge getNewVarSATEncoder(SATEncoder *This) {
-	return constraintNewVar(This->cnf);
+Edge SATEncoder::getNewVarSATEncoder() {
+	return constraintNewVar(cnf);
 }
 
-Edge encodeVarSATEncoder(SATEncoder *This, BooleanVar *constraint) {
+Edge SATEncoder::encodeVarSATEncoder(BooleanVar *constraint) {
 	if (edgeIsNull(constraint->var)) {
-		constraint->var = getNewVarSATEncoder(This);
+		constraint->var = getNewVarSATEncoder();
 	}
 	return constraint->var;
 }
 
-Edge encodeLogicSATEncoder(SATEncoder *This, BooleanLogic *constraint) {
+Edge SATEncoder::encodeLogicSATEncoder(BooleanLogic *constraint) {
 	Edge array[constraint->inputs.getSize()];
 	for (uint i = 0; i < constraint->inputs.getSize(); i++)
-		array[i] = encodeConstraintSATEncoder(This, constraint->inputs.get(i));
+		array[i] = encodeConstraintSATEncoder(constraint->inputs.get(i));
 
 	switch (constraint->op) {
 	case L_AND:
-		return constraintAND(This->cnf, constraint->inputs.getSize(), array);
+		return constraintAND(cnf, constraint->inputs.getSize(), array);
 	case L_OR:
-		return constraintOR(This->cnf, constraint->inputs.getSize(), array);
+		return constraintOR(cnf, constraint->inputs.getSize(), array);
 	case L_NOT:
 		return constraintNegate(array[0]);
 	case L_XOR:
-		return constraintXOR(This->cnf, array[0], array[1]);
+		return constraintXOR(cnf, array[0], array[1]);
 	case L_IMPLIES:
-		return constraintIMPLIES(This->cnf, array[0], array[1]);
+		return constraintIMPLIES(cnf, array[0], array[1]);
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
 		exit(-1);
 	}
 }
 
-Edge encodePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
-	switch (GETPREDICATETYPE(constraint->predicate) ) {
+Edge SATEncoder::encodePredicateSATEncoder(BooleanPredicate *constraint) {
+	switch (constraint->predicate->type) {
 	case TABLEPRED:
-		return encodeTablePredicateSATEncoder(This, constraint);
+		return encodeTablePredicateSATEncoder(constraint);
 	case OPERATORPRED:
-		return encodeOperatorPredicateSATEncoder(This, constraint);
+		return encodeOperatorPredicateSATEncoder(constraint);
 	default:
 		ASSERT(0);
 	}
 	return E_BOGUS;
 }
 
-Edge encodeTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constraint) {
+Edge SATEncoder::encodeTablePredicateSATEncoder(BooleanPredicate *constraint) {
 	switch (constraint->encoding.type) {
 	case ENUMERATEIMPLICATIONS:
 	case ENUMERATEIMPLICATIONSNEGATE:
-		return encodeEnumTablePredicateSATEncoder(This, constraint);
+		return encodeEnumTablePredicateSATEncoder(constraint);
 	case CIRCUIT:
 		ASSERT(0);
 		break;
@@ -121,14 +127,19 @@ Edge encodeTablePredicateSATEncoder(SATEncoder *This, BooleanPredicate *constrai
 	return E_BOGUS;
 }
 
-void encodeElementSATEncoder(SATEncoder *encoder, Element *This) {
-	switch ( GETELEMENTTYPE(This) ) {
+void SATEncoder::encodeElementSATEncoder(Element *element) {
+	/* Check to see if we have already encoded this element. */
+	if (getElementEncoding(element)->variables != NULL)
+		return;
+	
+	/* Need to encode. */
+	switch ( element->type) {
 	case ELEMFUNCRETURN:
-		generateElementEncoding(encoder, This);
-		encodeElementFunctionSATEncoder(encoder, (ElementFunction *) This);
+		generateElementEncoding(element);
+		encodeElementFunctionSATEncoder((ElementFunction *) element);
 		break;
 	case ELEMSET:
-		generateElementEncoding(encoder, This);
+		generateElementEncoding(element);
 		return;
 	case ELEMCONST:
 		return;
@@ -137,23 +148,23 @@ void encodeElementSATEncoder(SATEncoder *encoder, Element *This) {
 	}
 }
 
-void encodeElementFunctionSATEncoder(SATEncoder *encoder, ElementFunction *This) {
-	switch (GETFUNCTIONTYPE(This->function)) {
+void SATEncoder::encodeElementFunctionSATEncoder(ElementFunction *function) {
+	switch (function->function->type) {
 	case TABLEFUNC:
-		encodeTableElementFunctionSATEncoder(encoder, This);
+		encodeTableElementFunctionSATEncoder(function);
 		break;
 	case OPERATORFUNC:
-		encodeOperatorElementFunctionSATEncoder(encoder, This);
+		encodeOperatorElementFunctionSATEncoder(function);
 		break;
 	default:
 		ASSERT(0);
 	}
 }
 
-void encodeTableElementFunctionSATEncoder(SATEncoder *encoder, ElementFunction *This) {
-	switch (getElementFunctionEncoding(This)->type) {
+void SATEncoder::encodeTableElementFunctionSATEncoder(ElementFunction *function) {
+	switch (getElementFunctionEncoding(function)->type) {
 	case ENUMERATEIMPLICATIONS:
-		encodeEnumTableElemFunctionSATEncoder(encoder, This);
+		encodeEnumTableElemFunctionSATEncoder(function);
 		break;
 	case CIRCUIT:
 		ASSERT(0);

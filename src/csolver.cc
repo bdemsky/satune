@@ -12,10 +12,14 @@
 #include "tunable.h"
 #include "polarityassignment.h"
 #include "analyzer.h"
+#include "autotuner.h"
 
-CSolver::CSolver() : unsat(false) {
-	tuner = new Tuner();
-	satEncoder = allocSATEncoder(this);
+CSolver::CSolver() :
+	unsat(false),
+	tuner(NULL),
+	elapsedTime(0)
+{
+	satEncoder = new SATEncoder(this);
 }
 
 /** This function tears down the solver and the entire AST */
@@ -56,8 +60,19 @@ CSolver::~CSolver() {
 		delete allFunctions.get(i);
 	}
 
-	deleteSATEncoder(satEncoder);
-	delete tuner;
+	delete satEncoder;
+}
+
+CSolver *CSolver::clone() {
+	CSolver *copy = new CSolver();
+	CloneMap map;
+	HSIteratorBoolean *it = getConstraints();
+	while (it->hasNext()) {
+		Boolean *b = it->next();
+		copy->addConstraint(b->clone(copy, &map));
+	}
+	delete it;
+	return copy;
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
@@ -95,15 +110,33 @@ Element *CSolver::getElementVar(Set *set) {
 }
 
 Element *CSolver::getElementConst(VarType type, uint64_t value) {
-	Element *element = new ElementConst(value, type);
-	allElements.push(element);
-	return element;
+	uint64_t array[] = {value};
+	Set *set = new Set(type, array, 1);
+	Element *element = new ElementConst(value, type, set);
+	Element *e = elemMap.get(element);
+	if (e == NULL) {
+		allSets.push(set);
+		allElements.push(element);
+		elemMap.put(element, element);
+		return element;
+	} else {
+		delete set;
+		delete element;
+		return e;
+	}
 }
 
-Boolean *CSolver::getBooleanVar(VarType type) {
-	Boolean *boolean = new BooleanVar(type);
-	allBooleans.push(boolean);
-	return boolean;
+Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
+	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
+	Element *e = elemMap.get(element);
+	if (e == NULL) {
+		allElements.push(element);
+		elemMap.put(element, element);
+		return element;
+	} else {
+		delete element;
+		return e;
+	}
 }
 
 Function *CSolver::createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
@@ -144,10 +177,10 @@ Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 	return function;
 }
 
-Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
-	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
-	allElements.push(element);
-	return element;
+Boolean *CSolver::getBooleanVar(VarType type) {
+	Boolean *boolean = new BooleanVar(type);
+	allBooleans.push(boolean);
+	return boolean;
 }
 
 Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
@@ -156,14 +189,34 @@ Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint nu
 
 Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
 	BooleanPredicate *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
-	allBooleans.push(boolean);
-	return boolean;
+	Boolean * b = boolMap.get(boolean);
+	if (b == NULL) {
+		boolMap.put(boolean, boolean);
+		allBooleans.push(boolean);
+		return boolean;
+	} else {
+		delete boolean;
+		return b;
+	}
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
-	allBooleans.push(boolean);
-	return boolean;
+	Boolean *b = boolMap.get(boolean);
+	if (b == NULL) {
+		boolMap.put(boolean, boolean);
+		allBooleans.push(boolean);
+		return boolean;		
+	} else {
+		delete boolean;
+		return b;
+	}
+}
+
+Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
+	Boolean *constraint = new BooleanOrder(order, first, second);
+	allBooleans.push(constraint);
+	return constraint;
 }
 
 void CSolver::addConstraint(Boolean *constraint) {
@@ -176,28 +229,30 @@ Order *CSolver::createOrder(OrderType type, Set *set) {
 	return order;
 }
 
-Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
-	Boolean *constraint = new BooleanOrder(order, first, second);
-	allBooleans.push(constraint);
-	return constraint;
-}
-
 int CSolver::startEncoding() {
+	bool deleteTuner = false;
+	if (tuner == NULL) {
+		tuner = new DefaultTuner();
+		deleteTuner = true;
+	}
+		
+	long long startTime = getTimeNano();
 	computePolarities(this);
 	orderAnalysis(this);
 	naiveEncodingDecision(this);
-	encodeAllSATEncoder(this, satEncoder);
-	int result = solveCNF(satEncoder->cnf);
-	model_print("sat_solver's result:%d\tsolutionSize=%d\n", result, satEncoder->cnf->solver->solutionsize);
-	for (int i = 1; i <= satEncoder->cnf->solver->solutionsize; i++) {
-		model_print("%d, ", satEncoder->cnf->solver->solution[i]);
+	satEncoder->encodeAllSATEncoder(this);
+	int result = unsat ? IS_UNSAT : satEncoder->solve();
+	long long finishTime = getTimeNano();
+	elapsedTime = finishTime - startTime;
+	if (deleteTuner) {
+		delete tuner;
+		tuner = NULL;
 	}
-	model_print("\n");
 	return result;
 }
 
 uint64_t CSolver::getElementValue(Element *element) {
-	switch (GETELEMENTTYPE(element)) {
+	switch (element->type) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
@@ -209,7 +264,7 @@ uint64_t CSolver::getElementValue(Element *element) {
 }
 
 bool CSolver::getBooleanValue(Boolean *boolean) {
-	switch (GETBOOLEANTYPE(boolean)) {
+	switch (boolean->type) {
 	case BOOLEANVAR:
 		return getBooleanVariableValueSATTranslator(this, boolean);
 	default:
@@ -222,3 +277,13 @@ HappenedBefore CSolver::getOrderConstraintValue(Order *order, uint64_t first, ui
 	return getOrderConstraintValueSATTranslator(this, order, first, second);
 }
 
+long long CSolver::getEncodeTime() { return satEncoder->getEncodeTime(); }
+
+long long CSolver::getSolveTime() { return satEncoder->getSolveTime(); }
+
+void CSolver::autoTune(uint budget) {
+	AutoTuner * autotuner=new AutoTuner(budget);
+	autotuner->addProblem(this);
+	autotuner->tune();
+	delete autotuner;
+}

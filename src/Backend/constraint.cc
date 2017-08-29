@@ -316,9 +316,11 @@ Edge constraintITE(CNF *cnf, Edge cond, Edge thenedge, Edge elseedge) {
 
 void addConstraintCNF(CNF *cnf, Edge constraint) {
 	pushVectorEdge(&cnf->constraints, constraint);
+#ifdef CONFIG_DEBUG
 	model_print("****ADDING NEW Constraint*****\n");
 	printCNF(constraint);
 	model_print("\n******************************\n");
+#endif
 }
 
 Edge constraintNewVar(CNF *cnf) {
@@ -328,10 +330,16 @@ Edge constraintNewVar(CNF *cnf) {
 }
 
 int solveCNF(CNF *cnf) {
+	long long startTime=getTimeNano();
 	countPass(cnf);
 	convertPass(cnf, false);
 	finishedClauses(cnf->solver);
-	return solve(cnf->solver);
+	long long startSolve=getTimeNano();
+	int result = solve(cnf->solver);
+	long long finishTime=getTimeNano();
+	cnf->encodeTime=startSolve-startTime;
+	cnf->solveTime=finishTime-startSolve;
+	return result;
 }
 
 bool getValueCNF(CNF *cnf, Edge var) {

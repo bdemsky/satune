@@ -4,6 +4,7 @@
 #include "constraint.h"
 #include "function.h"
 #include "table.h"
+#include "csolver.h"
 
 Element::Element(ASTNodeType _type) :
 	ASTNode(_type),
@@ -22,23 +23,24 @@ ElementFunction::ElementFunction(Function *_function, Element **array, uint numA
 	overflowstatus(_overflowstatus),
 	functionencoding(this) {
 	for (uint i = 0; i < numArrays; i++)
-		GETELEMENTPARENTS(array[i])->push(this);
+		array[i]->parents.push(this);
 }
 
-ElementConst::ElementConst(uint64_t _value, VarType _type) : Element(ELEMCONST), value(_value) {
-	uint64_t array[] = {value};
-	set = new Set(_type, array, 1);
+ElementConst::ElementConst(uint64_t _value, VarType _type, Set *_set) :
+	Element(ELEMCONST),
+	set(_set),
+	value(_value) {
 }
 
 Set *getElementSet(Element *This) {
-	switch (GETELEMENTTYPE(This)) {
+	switch (This->type) {
 	case ELEMSET:
 		return ((ElementSet *)This)->set;
 	case ELEMCONST:
 		return ((ElementConst *)This)->set;
 	case ELEMFUNCRETURN: {
 		Function *func = ((ElementFunction *)This)->function;
-		switch (GETFUNCTIONTYPE(func)) {
+		switch (func->type) {
 		case TABLEFUNC:
 			return ((FunctionTable *)func)->table->range;
 		case OPERATORFUNC:
@@ -54,12 +56,24 @@ Set *getElementSet(Element *This) {
 	return NULL;
 }
 
-ElementFunction::~ElementFunction() {
+Element *ElementConst::clone(CSolver *solver, CloneMap *map) {
+	return solver->getElementConst(type, value);
 }
 
-ElementConst::~ElementConst() {
-	delete set;
+Element *ElementSet::clone(CSolver *solver, CloneMap *map) {
+	Element *e = (Element *) map->get(this);
+	if (e != NULL)
+		return e;
+	e = solver->getElementVar(set->clone(solver, map));
+	map->put(e, e);
+	return e;
 }
 
-Element::~Element() {
+Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
+	Element *array[inputs.getSize()];
+	for (uint i = 0; i < inputs.getSize(); i++) {
+		array[i] = inputs.get(i)->clone(solver, map);
+	}
+	Element *e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), overflowstatus->clone(solver, map));
+	return e;
 }

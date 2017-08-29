@@ -115,6 +115,17 @@ public:
 		size = 0;
 	}
 
+  /** Doesn't work with zero value */
+  _Val getRandomValue() {
+		while(true) {
+			unsigned int index=random() & capacitymask;
+			struct hashlistnode<_Key, _Val> *bin = &table[index];
+			if (bin->key != NULL && bin->val != NULL) {
+				return bin->val;
+			}
+		}
+	}
+
 	void resetanddelete() {
 		for (unsigned int i = 0; i < capacity; i++) {
 			struct hashlistnode<_Key, _Val> *bin = &table[i];

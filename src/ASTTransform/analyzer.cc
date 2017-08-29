@@ -9,7 +9,7 @@
 #include "mutableset.h"
 #include "ops.h"
 #include "csolver.h"
-#include "orderencoder.h"
+#include "orderanalysis.h"
 #include "tunable.h"
 #include "transform.h"
 #include "element.h"
@@ -64,15 +64,15 @@ void orderAnalysis(CSolver *This) {
 		delete decompose;
 		delete graph;
 
-		
+		/*
 		IntegerEncodingTransform* integerEncoding = new IntegerEncodingTransform(This, order, ORDERINTEGERENCODING, &offon);
 		if(!integerEncoding->canExecuteTransform()){
 			continue;
 			delete integerEncoding;
 		}
 		integerEncoding->doTransform();
-		delete integerEncoding;
-	}
+		delete integerEncoding; */
+ 	}
 }
 
 

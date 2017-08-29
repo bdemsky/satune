@@ -1,5 +1,6 @@
 #include "set.h"
 #include <stddef.h>
+#include "csolver.h"
 
 Set::Set(VarType t) : type(t), isRange(false), low(0), high(0) {
 	members = new Vector<uint64_t>();
@@ -43,4 +44,17 @@ uint Set::getSize() {
 Set::~Set() {
 	if (!isRange)
 		delete members;
+}
+
+Set *Set::clone(CSolver *solver, CloneMap *map) {
+	Set *s = (Set *) map->get(this);
+	if (s != NULL)
+		return s;
+	if (isRange) {
+		s = solver->createRangeSet(type, low, high);
+	} else {
+		s = solver->createSet(type, members->expose(), members->getSize());
+	}
+	map->put(this, s);
+	return s;
 }

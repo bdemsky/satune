@@ -10,7 +10,7 @@ uint64_t getElementValueBinaryIndexSATTranslator(CSolver *This, ElementEncoding 
 	uint index = 0;
 	for (int i = elemEnc->numVars - 1; i >= 0; i--) {
 		index = index << 1;
-		if (getValueSolver(This->getSATEncoder()->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
+		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] )))
 			index |= 1;
 	}
 	if (elemEnc->encArraySize <= index || !elemEnc->isinUseElement(index))
@@ -22,11 +22,11 @@ uint64_t getElementValueBinaryValueSATTranslator(CSolver *This, ElementEncoding 
 	uint64_t value = 0;
 	for (int i = elemEnc->numVars - 1; i >= 0; i--) {
 		value = value << 1;
-		if (getValueSolver(This->getSATEncoder()->cnf->solver, getEdgeVar( elemEnc->variables[i] )) )
+		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] )) )
 			value |= 1;
 	}
 	if (elemEnc->isBinaryValSigned &&
-			This->getSATEncoder()->cnf->solver->solution[ getEdgeVar( elemEnc->variables[elemEnc->numVars - 1])]) {
+			This->getSATEncoder()->getCNF()->solver->solution[ getEdgeVar( elemEnc->variables[elemEnc->numVars - 1])]) {
 		//Do sign extension of negative number
 		uint64_t highbits = 0xffffffffffffffff - ((1 << (elemEnc->numVars)) - 1);
 		value += highbits;
@@ -38,7 +38,7 @@ uint64_t getElementValueBinaryValueSATTranslator(CSolver *This, ElementEncoding 
 uint64_t getElementValueOneHotSATTranslator(CSolver *This, ElementEncoding *elemEnc) {
 	uint index = 0;
 	for (uint i = 0; i < elemEnc->numVars; i++) {
-		if (getValueSolver(This->getSATEncoder()->cnf->solver, getEdgeVar( elemEnc->variables[i] )))
+		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] )))
 			index = i;
 	}
 	ASSERT(elemEnc->encArraySize > index && elemEnc->isinUseElement(index));
@@ -48,7 +48,7 @@ uint64_t getElementValueOneHotSATTranslator(CSolver *This, ElementEncoding *elem
 uint64_t getElementValueUnarySATTranslator(CSolver *This, ElementEncoding *elemEnc) {
 	uint i;
 	for (i = 0; i < elemEnc->numVars; i++) {
-		if (!getValueSolver(This->getSATEncoder()->cnf->solver, getEdgeVar( elemEnc->variables[i] )) ) {
+		if (!getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] )) ) {
 			break;
 		}
 	}
@@ -82,7 +82,7 @@ uint64_t getElementValueSATTranslator(CSolver *This, Element *element) {
 
 bool getBooleanVariableValueSATTranslator( CSolver *This, Boolean *boolean) {
 	int index = getEdgeVar( ((BooleanVar *) boolean)->var );
-	return getValueSolver(This->getSATEncoder()->cnf->solver, index);
+	return getValueSolver(This->getSATEncoder()->getCNF()->solver, index);
 }
 
 HappenedBefore getOrderConstraintValueSATTranslator(CSolver *This, Order *order, uint64_t first, uint64_t second) {
@@ -91,6 +91,6 @@ HappenedBefore getOrderConstraintValueSATTranslator(CSolver *This, Order *order,
 	Edge var = getOrderConstraint(order->orderPairTable, &pair);
 	if (edgeIsNull(var))
 		return UNORDERED;
-	return getValueCNF(This->getSATEncoder()->cnf, var) ? FIRST : SECOND;
+	return getValueCNF(This->getSATEncoder()->getCNF(), var) ? FIRST : SECOND;
 }
 
