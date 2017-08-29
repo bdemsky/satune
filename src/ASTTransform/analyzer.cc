@@ -57,6 +57,7 @@ void orderAnalysis(CSolver *This) {
 
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
+		decompose->setOrderGraph(graph);
 		decompose->doTransform();
 		delete decompose;
 		delete graph;
