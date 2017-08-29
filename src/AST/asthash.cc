@@ -97,8 +97,47 @@ bool compareBoolean(Boolean *b1, Boolean *b2) {
 	}
 }
 
-uint hashElement(Element *element) {
+uint hashElement(Element *e) {
+	switch(e->type) {
+	case ELEMSET: {
+		return (uint)(uintptr_t) e;
+	}
+	case ELEMFUNCRETURN: {
+		ElementFunction * ef=(ElementFunction *) e;
+		return ((uint)(uintptr_t) ef->function) ^
+			((uint)(uintptr_t) ef->overflowstatus) ^
+			hashArray(&ef->inputs);
+	}
+	case ELEMCONST: {
+		ElementConst * ec=(ElementConst *) e;
+		return ((uint)(uintptr_t) ec->set) ^ ((uint) ec->value);
+	}
+	default:
+		ASSERT(0);
+	}
 }
 
 bool compareElement(Element *e1, Element *e2) {
+	if (e1->type != e2->type)
+		return false;
+	switch(e1->type) {
+	case ELEMSET: {
+		return e1 == e2;
+	}
+	case ELEMFUNCRETURN: {
+		ElementFunction * ef1=(ElementFunction *) e1;
+		ElementFunction * ef2=(ElementFunction *) e2;
+		return (ef1->function == ef2->function) &&
+			(ef1->overflowstatus == ef2->overflowstatus) &&
+			compareArray(&ef1->inputs, &ef2->inputs);
+	}
+	case ELEMCONST: {
+		ElementConst * ec1=(ElementConst *) e1;
+		ElementConst * ec2=(ElementConst *) e2;
+		return (ec1->set == ec2->set) &&
+			(ec1->value == ec2->value);
+	}
+	default:
+		ASSERT(0);
+	}
 }
