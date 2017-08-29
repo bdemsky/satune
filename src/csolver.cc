@@ -112,16 +112,31 @@ Element *CSolver::getElementVar(Set *set) {
 Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	uint64_t array[] = {value};
 	Set *set = new Set(type, array, 1);
-	allSets.push(set);
 	Element *element = new ElementConst(value, type, set);
-	allElements.push(element);
-	return element;
+	Element *e = elemMap.get(element);
+	if (e == NULL) {
+		allSets.push(set);
+		allElements.push(element);
+		elemMap.put(element, element);
+		return element;
+	} else {
+		delete set;
+		delete element;
+		return e;
+	}
 }
 
 Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
-	allElements.push(element);
-	return element;
+	Element *e = elemMap.get(element);
+	if (e == NULL) {
+		allElements.push(element);
+		elemMap.put(element, element);
+		return element;
+	} else {
+		delete element;
+		return e;
+	}
 }
 
 Function *CSolver::createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
@@ -174,14 +189,28 @@ Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint nu
 
 Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
 	BooleanPredicate *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
-	allBooleans.push(boolean);
-	return boolean;
+	Boolean * b = boolMap.get(boolean);
+	if (b == NULL) {
+		boolMap.put(boolean, boolean);
+		allBooleans.push(boolean);
+		return boolean;
+	} else {
+		delete boolean;
+		return b;
+	}
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
-	allBooleans.push(boolean);
-	return boolean;
+	Boolean *b = boolMap.get(boolean);
+	if (b == NULL) {
+		boolMap.put(boolean, boolean);
+		allBooleans.push(boolean);
+		return boolean;		
+	} else {
+		delete boolean;
+		return b;
+	}
 }
 
 Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {

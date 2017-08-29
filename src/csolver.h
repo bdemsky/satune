@@ -3,6 +3,7 @@
 #include "classlist.h"
 #include "ops.h"
 #include "structs.h"
+#include "asthash.h"
 
 class CSolver {
 public:
@@ -127,8 +128,6 @@ public:
 	MEMALLOC;
 
 private:
-	void assignID(Boolean * b);
-	void assignID(Element * e);
 	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);
 	void handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child);
 	void handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child);
@@ -159,11 +158,13 @@ private:
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 
+	/** These two tables are used for deduplicating entries. */
+	BooleanMatchMap boolMap;
+	ElementMatchMap elemMap;
+	
 	SATEncoder *satEncoder;
 	bool unsat;
 	Tuner *tuner;
-	uint booleanID;
-	uint elementID;
 	
 	long long elapsedTime;
 };

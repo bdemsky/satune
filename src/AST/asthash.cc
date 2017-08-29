@@ -110,7 +110,7 @@ uint hashElement(Element *e) {
 	}
 	case ELEMCONST: {
 		ElementConst * ec=(ElementConst *) e;
-		return ((uint)(uintptr_t) ec->set) ^ ((uint) ec->value);
+		return ((uint) ec->value);
 	}
 	default:
 		ASSERT(0);
@@ -134,8 +134,7 @@ bool compareElement(Element *e1, Element *e2) {
 	case ELEMCONST: {
 		ElementConst * ec1=(ElementConst *) e1;
 		ElementConst * ec2=(ElementConst *) e2;
-		return (ec1->set == ec2->set) &&
-			(ec1->value == ec2->value);
+		return (ec1->value == ec2->value);
 	}
 	default:
 		ASSERT(0);
