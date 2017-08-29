@@ -6,6 +6,8 @@
 #include "inc_solver.h"
 #include "constraint.h"
 
+typedef HashTable<Boolean *, Node *, uintptr_t, 4> BooleanToEdgeMap;
+
 class SATEncoder {
  public:
 	int solve();
@@ -57,6 +59,8 @@ class SATEncoder {
 	
 	CNF *cnf;
 	CSolver *solver;
+	BooleanToEdgeMap booledgeMap;
+
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);

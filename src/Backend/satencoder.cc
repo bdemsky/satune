@@ -12,8 +12,6 @@
 #include "predicate.h"
 #include "set.h"
 
-//TODO: Should handle sharing of AST Nodes without recoding them a second time
-
 SATEncoder::SATEncoder(CSolver * _solver) :
 	cnf(createCNF()),
 	solver(_solver) {
@@ -31,33 +29,38 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	HSIteratorBoolean *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
-#ifdef CONFIG_DEBUG
-		model_print("Encoding All ...\n\n");
-#endif
 		Edge c = encodeConstraintSATEncoder(constraint);
-#ifdef CONFIG_DEBUG
-		model_print("Returned Constraint in EncodingAll:\n");
-#endif
-		ASSERT( !equalsEdge(c, E_BOGUS));
 		addConstraintCNF(cnf, c);
 	}
 	delete iterator;
 }
 
 Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
+	Edge result;
+	if (booledgeMap.contains(constraint)) {
+		Edge e={(Node *) booledgeMap.get(constraint)};
+		return e;
+	}
+	
 	switch (constraint->type) {
 	case ORDERCONST:
-		return encodeOrderSATEncoder((BooleanOrder *) constraint);
+		result=encodeOrderSATEncoder((BooleanOrder *) constraint);
+		break;
 	case BOOLEANVAR:
-		return encodeVarSATEncoder((BooleanVar *) constraint);
+		result=encodeVarSATEncoder((BooleanVar *) constraint);
+		break;
 	case LOGICOP:
-		return encodeLogicSATEncoder((BooleanLogic *) constraint);
+		result=encodeLogicSATEncoder((BooleanLogic *) constraint);
+		break;
 	case PREDICATEOP:
-		return encodePredicateSATEncoder((BooleanPredicate *) constraint);
+		result=encodePredicateSATEncoder((BooleanPredicate *) constraint);
+		break;
 	default:
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
 		exit(-1);
 	}
+	booledgeMap.put(constraint, result.node_ptr);
+	return result;
 }
 
 void SATEncoder::getArrayNewVarsSATEncoder(uint num, Edge *carray) {
@@ -125,6 +128,11 @@ Edge SATEncoder::encodeTablePredicateSATEncoder(BooleanPredicate *constraint) {
 }
 
 void SATEncoder::encodeElementSATEncoder(Element *element) {
+	/* Check to see if we have already encoded this element. */
+	if (getElementEncoding(element)->variables != NULL)
+		return;
+	
+	/* Need to encode. */
 	switch ( element->type) {
 	case ELEMFUNCRETURN:
 		generateElementEncoding(element);
