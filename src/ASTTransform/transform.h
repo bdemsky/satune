@@ -11,15 +11,17 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "structs.h"
+#include "pass.h"
 
-class Transform {
+class Transform : public Pass{
 public:
-	Transform();
-	~Transform();
-	void orderIntegerEncodingSATEncoder(CSolver *This, BooleanOrder *boolOrder);
-	MEMALLOC;
-private:
-	HashTableOrderIntegerEncoding* orderIntegerEncoding;
+	Transform(CSolver* _solver,Tunables _tunable, TunableDesc* _desc);
+	virtual ~Transform();
+	virtual bool canExecuteTransform() = 0;
+	virtual void doTransform() = 0;
+protected:
+	// Need solver for translating back the result ...
+	CSolver* solver;
 };
 
 #endif /* TRANSFORM_H */

@@ -54,6 +54,8 @@ class OrderGraph;
 class OrderNode;
 class OrderEdge;
 
+class Pass;
+class Transform;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
