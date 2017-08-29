@@ -7,8 +7,7 @@
 
 #include "transform.h"
 
-Transform::Transform(CSolver* _solver, Tunables _tunable, TunableDesc* _desc):
-	Pass(_tunable, _desc)
+Transform::Transform(CSolver* _solver)
 {
 	solver = _solver;
 }

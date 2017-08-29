@@ -15,15 +15,13 @@
 
 class Pass{
 public:
-	Pass(Tunables _tunable, TunableDesc* _desc);
-	virtual ~Pass();
-	virtual inline bool canExecutePass(CSolver* This, uint type=0){
-		return GETVARTUNABLE(This->getTuner(), type, tunable, tunableDesc);
+	Pass(){};
+	virtual ~Pass(){};
+	virtual inline bool canExecutePass(CSolver* This, uint type, Tunables tunable, TunableDesc* desc){
+		return GETVARTUNABLE(This->getTuner(), type, tunable, desc);
 	}
 	MEMALLOC;
-protected:
-	Tunables tunable;
-	TunableDesc* tunableDesc;
+
 };
 
 

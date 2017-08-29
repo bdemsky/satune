@@ -15,8 +15,8 @@
 #include "csolver.h"
 
 
-DecomposeOrderTransform::DecomposeOrderTransform(CSolver* _solver, Order* _order, Tunables _tunable, TunableDesc* _desc)
-	:Transform(_solver, _tunable, _desc),
+DecomposeOrderTransform::DecomposeOrderTransform(CSolver* _solver, Order* _order)
+	:Transform(_solver),
 	order(_order)
 {
 }
@@ -25,7 +25,7 @@ DecomposeOrderTransform::~DecomposeOrderTransform() {
 }
 
 bool DecomposeOrderTransform::canExecuteTransform(){
-	return canExecutePass(solver, order->type);
+	return canExecutePass(solver, order->type, DECOMPOSEORDER, &onoff);
 }
 
 void DecomposeOrderTransform::doTransform(){

@@ -15,7 +15,7 @@
 
 class Transform : public Pass{
 public:
-	Transform(CSolver* _solver,Tunables _tunable, TunableDesc* _desc);
+	Transform(CSolver* _solver);
 	virtual ~Transform();
 	virtual bool canExecuteTransform() = 0;
 	virtual void doTransform() = 0;

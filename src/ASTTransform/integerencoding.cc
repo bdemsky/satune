@@ -8,8 +8,8 @@
 
 HashTableOrderIntegerEncoding* IntegerEncodingTransform::orderIntegerEncoding = new HashTableOrderIntegerEncoding();
 
-IntegerEncodingTransform::IntegerEncodingTransform(CSolver* _solver, Order* _order, Tunables _tunable, TunableDesc* _desc) 
-	:Transform(_solver, _tunable, _desc),
+IntegerEncodingTransform::IntegerEncodingTransform(CSolver* _solver, Order* _order) 
+	:Transform(_solver),
 	order(_order)
 	
 {	
@@ -19,7 +19,7 @@ IntegerEncodingTransform::~IntegerEncodingTransform(){
 }
 
 bool IntegerEncodingTransform::canExecuteTransform(){
-	return canExecutePass(solver, order->type);
+	return canExecutePass(solver, order->type, ORDERINTEGERENCODING, &offon);
 }
 
 void IntegerEncodingTransform::doTransform(){

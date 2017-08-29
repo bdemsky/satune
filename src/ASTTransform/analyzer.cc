@@ -21,10 +21,10 @@ void orderAnalysis(CSolver *This) {
 	uint size = orders->getSize();
 	for (uint i = 0; i < size; i++) {
 		Order *order = orders->get(i);
-		DecomposeOrderTransform* decompose = new DecomposeOrderTransform(This, order, DECOMPOSEORDER, &onoff);
+		DecomposeOrderTransform* decompose = new DecomposeOrderTransform(This, order);
 		if (!decompose->canExecuteTransform()){
-			continue;
 			delete decompose;
+			continue;
 		}
 
 		OrderGraph *graph = buildOrderGraph(order);
@@ -65,13 +65,13 @@ void orderAnalysis(CSolver *This) {
 		delete graph;
 
 		/*
-		IntegerEncodingTransform* integerEncoding = new IntegerEncodingTransform(This, order, ORDERINTEGERENCODING, &offon);
+		IntegerEncodingTransform* integerEncoding = new IntegerEncodingTransform(This, order);
 		if(!integerEncoding->canExecuteTransform()){
-			continue;
 			delete integerEncoding;
+			continue;
 		}
 		integerEncoding->doTransform();
-		delete integerEncoding; */
+		delete integerEncoding;*/
  	}
 }
 

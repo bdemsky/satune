@@ -13,7 +13,7 @@
 
 class IntegerEncodingTransform : public Transform{
 public:
-	IntegerEncodingTransform(CSolver* solver, Order* order, Tunables _tunable, TunableDesc* _desc);
+	IntegerEncodingTransform(CSolver* solver, Order* order);
 	void orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder);
 	void doTransform();
 	bool canExecuteTransform();

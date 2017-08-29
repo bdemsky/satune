@@ -13,7 +13,7 @@
 
 class DecomposeOrderTransform : public Transform {
 public:
-	DecomposeOrderTransform(CSolver* _solver, Order* order, Tunables _tunable, TunableDesc* _desc);
+	DecomposeOrderTransform(CSolver* _solver, Order* order);
 	virtual ~DecomposeOrderTransform();
 	void doTransform();
 	void setOrderGraph(OrderGraph* _graph){

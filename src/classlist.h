@@ -43,6 +43,7 @@ class OrderPair;
 class OrderElement;
 class IntegerEncodingRecord;
 class Transform;
+class Pass;
 
 class ElementEncoding;
 class FunctionEncoding;
@@ -55,8 +56,6 @@ class OrderEdge;
 class AutoTuner;
 class SearchTuner;
 class TunableSetting;
-class Pass;
-class Transform;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
