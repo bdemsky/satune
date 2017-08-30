@@ -20,15 +20,19 @@ public:
 	virtual ~Set();
 	bool exists(uint64_t element);
 	uint getSize();
+	VarType getType(){return type;}
+	uint64_t getNewUniqueItem(){return low++;}
+	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
 	virtual Set *clone(CSolver *solver, CloneMap *map);
-
+	MEMALLOC;
+protected:
 	VarType type;
 	bool isRange;
 	uint64_t low;//also used to count unique items
 	uint64_t high;
 	Vector<uint64_t> *members;
-	MEMALLOC;
+	
 };
 
 #endif/* SET_H */

@@ -40,13 +40,12 @@ void ElementEncoding::setElementEncodingType(ElementEncodingType _type) {
 
 void ElementEncoding::encodingArrayInitialization() {
 	Set *set = getElementSet(element);
-	ASSERT(!set->isRange);
-	uint size = set->members->getSize();
+	uint size = set->getSize();
 	uint encSize = getSizeEncodingArray(size);
 	allocEncodingArrayElement(encSize);
 	allocInUseArrayElement(encSize);
 	for (uint i = 0; i < size; i++) {
-		encodingArray[i] = set->members->get(i);
+		encodingArray[i] = set->getMemberAt(i);
 		setInUseElement(i);
 	}
 }

@@ -97,16 +97,16 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 	model_print("in total order ...\n");
 #endif
 	ASSERT(order->type == TOTAL);
-	Vector<uint64_t> *mems = order->set->members;
-	uint size = mems->getSize();
+	Set *set = order->set;
+	uint size = order->set->getSize();
 	for (uint i = 0; i < size; i++) {
-		uint64_t valueI = mems->get(i);
+		uint64_t valueI = set->getMemberAt(i);
 		for (uint j = i + 1; j < size; j++) {
-			uint64_t valueJ = mems->get(j);
+			uint64_t valueJ = set->getMemberAt(j);
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			Edge constIJ = getPairConstraint(order, &pairIJ);
 			for (uint k = j + 1; k < size; k++) {
-				uint64_t valueK = mems->get(k);
+				uint64_t valueK = set->getMemberAt(k);
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPairConstraint(order, &pairIK);

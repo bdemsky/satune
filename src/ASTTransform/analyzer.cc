@@ -64,14 +64,13 @@ void orderAnalysis(CSolver *This) {
 		delete decompose;
 		delete graph;
 
-		/*
 		IntegerEncodingTransform* integerEncoding = new IntegerEncodingTransform(This, order);
 		if(!integerEncoding->canExecuteTransform()){
 			delete integerEncoding;
 			continue;
 		}
 		integerEncoding->doTransform();
-		delete integerEncoding;*/
+		delete integerEncoding;
  	}
 }
 

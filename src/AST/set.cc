@@ -41,6 +41,14 @@ uint Set::getSize() {
 	}
 }
 
+uint64_t Set::getMemberAt(uint index){
+	if(isRange){
+		return low+index;
+	}else {
+		return members->get(index);
+	}
+}
+
 Set::~Set() {
 	if (!isRange)
 		delete members;
