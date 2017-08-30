@@ -45,7 +45,7 @@ int main(int numargs, char **argv) {
 	Element *e3 = solver->applyFunction(f1, tmparray, 2, overflow);
 
 	Set *deq[] = {s3,s2};
-	Predicate *lte = solver->createPredicateOperator(LTE, deq, 2);
+	Predicate *lte = solver->createPredicateOperator(SATC_LTE, deq, 2);
 	Element *inputs2 [] = {e4, e3};
 	Boolean *pred = solver->applyPredicate(lte, inputs2, 2);
 	solver->addConstraint(pred);

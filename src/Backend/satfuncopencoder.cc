@@ -133,9 +133,9 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 
 			Edge clause;
 			switch (function->overflowbehavior) {
-			case IGNORE:
+			case SATC_IGNORE:
 			case NOOVERFLOW:
-			case WRAPAROUND: {
+			case SATC_WRAPAROUND: {
 				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				break;
 			}
@@ -205,11 +205,11 @@ Edge SATEncoder::encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constra
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
 	switch (predicate->op) {
-	case EQUALS:
+	case SATC_EQUALS:
 		return generateEquivNVConstraint(cnf, numVars, ee0->variables, ee1->variables);
-	case LT:
+	case SATC_LT:
 		return generateLTConstraint(cnf, numVars, ee0->variables, ee1->variables);
-	case GT:
+	case SATC_GT:
 		return generateLTConstraint(cnf, numVars, ee1->variables, ee0->variables);
 	default:
 		ASSERT(0);

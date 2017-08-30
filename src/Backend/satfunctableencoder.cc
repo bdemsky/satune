@@ -13,7 +13,7 @@
 Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint) {
 	ASSERT(constraint->predicate->type == TABLEPRED);
 	UndefinedBehavior undefStatus = ((PredicateTable *)constraint->predicate)->undefinedbehavior;
-	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
+	ASSERT(undefStatus == SATC_IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Table *table = ((PredicateTable *)constraint->predicate)->table;
 	FunctionEncodingType encType = constraint->encoding.type;
 	Array<Element *> *inputs = &constraint->inputs;
@@ -28,7 +28,7 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();
-		if (generateNegation == (entry->output != 0) && undefStatus == IGNOREBEHAVIOR) {
+		if (generateNegation == (entry->output != 0) && undefStatus == SATC_IGNOREBEHAVIOR) {
 			//Skip the irrelevant entries
 			continue;
 		}
@@ -41,7 +41,7 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 		}
 		Edge row;
 		switch (undefStatus) {
-		case IGNOREBEHAVIOR:
+		case SATC_IGNOREBEHAVIOR:
 			row = constraintAND(cnf, inputNum, carray);
 			break;
 		case FLAGFORCEUNDEFINED: {
@@ -81,7 +81,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 	}
 	PredicateTable *predicate = (PredicateTable *)constraint->predicate;
 	switch (predicate->undefinedbehavior) {
-	case IGNOREBEHAVIOR:
+	case SATC_IGNOREBEHAVIOR:
 	case FLAGFORCEUNDEFINED:
 		return encodeEnumEntriesTablePredicateSATEncoder(constraint);
 	default:
@@ -178,7 +178,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 
 void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func) {
 	UndefinedBehavior undefStatus = ((FunctionTable *) func->function)->undefBehavior;
-	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
+	ASSERT(undefStatus == SATC_IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
 	Array<Element *> *elements = &func->inputs;
 	Table *table = ((FunctionTable *) (func->function))->table;
 	uint size = table->entries->getSize();
@@ -197,7 +197,7 @@ void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func)
 		Edge output = getElementValueConstraint(func, entry->output);
 		Edge row;
 		switch (undefStatus ) {
-		case IGNOREBEHAVIOR: {
+		case SATC_IGNOREBEHAVIOR: {
 			row = constraintIMPLIES(cnf,constraintAND(cnf, inputNum, carray), output);
 			break;
 		}
@@ -230,7 +230,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 
 	FunctionTable *function = (FunctionTable *)elemFunc->function;
 	switch (function->undefBehavior) {
-	case IGNOREBEHAVIOR:
+	case SATC_IGNOREBEHAVIOR:
 	case FLAGFORCEUNDEFINED:
 		return encodeEnumEntriesTableElemFuncSATEncoder(elemFunc);
 	default:

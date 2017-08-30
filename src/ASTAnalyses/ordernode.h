@@ -14,7 +14,7 @@
 #include "structs.h"
 #include "orderedge.h"
 
-enum NodeStatus {NOTVISITED, VISITED, FINISHED, ADDEDTOSET};
+enum NodeStatus {NOTVISITED, VISITED, FINISHED, SATC_ADDEDTOSET};
 typedef enum NodeStatus NodeStatus;
 
 class OrderNode {

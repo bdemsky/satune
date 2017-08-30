@@ -34,7 +34,7 @@ int main(int numargs, char **argv) {
 	Boolean *overflow = solver->getBooleanVar(2);
 	Set *d1[] = {s1, s2};
 	//change the overflow flag
-	Function *f1 = solver->createFunctionOperator(SUB, d1, 2, s2, IGNORE);
+	Function *f1 = solver->createFunctionOperator(SATC_SUB, d1, 2, s2, SATC_IGNORE);
 	Element *in1[] = {e1, e2};
 	Element *e3 = solver->applyFunction(f1, in1, 2, overflow);
 	Table *t1 = solver->createTable(d1, 2, s3);
@@ -42,7 +42,7 @@ int main(int numargs, char **argv) {
 	uint64_t row2[] = {6, 4};
 	solver->addTableEntry(t1, row1, 2, 3);
 	solver->addTableEntry(t1, row2, 2, 1);
-	Function *f2 = solver->completeTable(t1, IGNOREBEHAVIOR);
+	Function *f2 = solver->completeTable(t1, SATC_IGNOREBEHAVIOR);
 	Element *e4 = solver->applyFunction(f2, in1, 2, overflow);
 
 	Set *d2[] = {s1};
@@ -50,7 +50,7 @@ int main(int numargs, char **argv) {
 	Table *t2 = solver->createTable(d2, 1, s1);
 	uint64_t row3[] = {6};
 	solver->addTableEntry(t2, row3, 1, 6);
-	Function *f3 = solver->completeTable(t2, IGNOREBEHAVIOR);
+	Function *f3 = solver->completeTable(t2, SATC_IGNOREBEHAVIOR);
 	Element *e5 = solver->applyFunction(f3, in2, 1, overflow);
 
 	Set *d3[] = {s2, s3, s1};
@@ -64,11 +64,11 @@ int main(int numargs, char **argv) {
 	solver->addTableEntry(t3, row5, 3, 1);
 	solver->addTableEntry(t3, row6, 3, 2);
 	solver->addTableEntry(t3, row7, 3, 1);
-	Function *f4 = solver->completeTable(t3, IGNOREBEHAVIOR);
+	Function *f4 = solver->completeTable(t3, SATC_IGNOREBEHAVIOR);
 	Element *e6 = solver->applyFunction(f4, in3, 3, overflow);
 
 	Set *deq[] = {s5,s4};
-	Predicate *gt = solver->createPredicateOperator(GT, deq, 2);
+	Predicate *gt = solver->createPredicateOperator(SATC_GT, deq, 2);
 	Element *inputs2 [] = {e7, e6};
 	Boolean *pred = solver->applyPredicate(gt, inputs2, 2);
 	solver->addConstraint(pred);

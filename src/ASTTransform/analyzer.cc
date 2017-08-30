@@ -28,7 +28,7 @@ void orderAnalysis(CSolver *This) {
 		}
 
 		OrderGraph *graph = buildOrderGraph(order);
-		if (order->type == PARTIAL) {
+		if (order->type == SATC_PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
 			//makes sure we don't incorrectly optimize graphs with negative
 			//polarity edges
@@ -45,7 +45,7 @@ void orderAnalysis(CSolver *This) {
 
 		if (mustReachLocal) {
 			//This pair of analysis is also optional
-			if (order->type == PARTIAL) {
+			if (order->type == SATC_PARTIAL) {
 				localMustAnalysisPartial(This, graph);
 			} else {
 				localMustAnalysisTotal(This, graph);

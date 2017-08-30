@@ -20,7 +20,7 @@ int main(int numargs, char **argv) {
 	Element *e1 = solver->getElementVar(s1);
 	Element *e2 = solver->getElementVar(s2);
 	Set *domain[] = {s1, s2};
-	Predicate *equals = solver->createPredicateOperator(EQUALS, domain, 2);
+	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS, domain, 2);
 	Element *inputs[] = {e1, e2};
 	Boolean *b = solver->applyPredicate(equals, inputs, 2);
 	solver->addConstraint(b);

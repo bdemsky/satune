@@ -85,15 +85,15 @@ Edge SATEncoder::encodeLogicSATEncoder(BooleanLogic *constraint) {
 		array[i] = encodeConstraintSATEncoder(constraint->inputs.get(i));
 
 	switch (constraint->op) {
-	case L_AND:
+	case SATC_AND:
 		return constraintAND(cnf, constraint->inputs.getSize(), array);
-	case L_OR:
+	case SATC_OR:
 		return constraintOR(cnf, constraint->inputs.getSize(), array);
-	case L_NOT:
+	case SATC_NOT:
 		return constraintNegate(array[0]);
-	case L_XOR:
+	case SATC_XOR:
 		return constraintXOR(cnf, array[0], array[1]);
-	case L_IMPLIES:
+	case SATC_IMPLIES:
 		return constraintIMPLIES(cnf, array[0], array[1]);
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);

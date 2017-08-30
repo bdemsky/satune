@@ -36,11 +36,11 @@ void IntegerEncodingTransform::doTransform(){
 
 void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder) {
 	IntegerEncodingRecord* ierec = orderIntegerEncoding->get(order);
-	//getting two elements and using LT predicate ...
+	//getting two elements and using SATC_LT predicate ...
 	Element *elem1 = ierec->getOrderIntegerElement(solver, boolOrder->first);
 	Element *elem2 = ierec->getOrderIntegerElement(solver, boolOrder->second);
 	Set *sarray[] = {ierec->set, ierec->set};
-	Predicate *predicate = solver->createPredicateOperator(LT, sarray, 2);
+	Predicate *predicate = solver->createPredicateOperator(SATC_LT, sarray, 2);
 	Element *parray[] = {elem1, elem2};
 	Boolean *boolean = solver->applyPredicate(predicate, parray, 2);
 	solver->addConstraint(boolean);

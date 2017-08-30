@@ -1,32 +1,32 @@
 #ifndef OPS_H
 #define OPS_H
-enum LogicOp {L_AND, L_OR, L_NOT, L_XOR, L_IMPLIES};
+enum LogicOp {SATC_AND, SATC_OR, SATC_NOT, SATC_XOR, SATC_IMPLIES};
 typedef enum LogicOp LogicOp;
 
-enum ArithOp {ADD, SUB};
+enum ArithOp {SATC_ADD, SATC_SUB};
 typedef enum ArithOp ArithOp;
 
-enum CompOp {EQUALS, LT, GT, LTE, GTE};
+enum CompOp {SATC_EQUALS, SATC_LT, SATC_GT, SATC_LTE, SATC_GTE};
 typedef enum CompOp CompOp;
 
-enum OrderType {PARTIAL, TOTAL};
+enum OrderType {SATC_PARTIAL, SATC_TOTAL};
 typedef enum OrderType OrderType;
 
-enum HappenedBefore {FIRST, SECOND, UNORDERED};
+enum HappenedBefore {SATC_FIRST, SATC_SECOND, SATC_UNORDERED};
 typedef enum HappenedBefore HappenedBefore;
 
 /**
  *    FLAGFORCESOVERFLOW forces the operation to overflow if the boolean flag is true
  *  OVERFLOWSETSFLAG -- sets the flag if the operation overflows
  *  FLAGIFFOVERFLOW -- flag is set iff the operation overflows
- *  IGNORE -- doesn't constrain output if the result cannot be represented
- *  WRAPAROUND -- wraps around like stand integer arithmetic
+ *  SATC_IGNORE -- doesn't constrain output if the result cannot be represented
+ *  SATC_WRAPAROUND -- wraps around like stand integer arithmetic
  *  NOOVERFLOW -- client has ensured that overflow is impossible
  */
-enum OverFlowBehavior {IGNORE, WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW, NOOVERFLOW};
+enum OverFlowBehavior {SATC_IGNORE, SATC_WRAPAROUND, FLAGFORCESOVERFLOW, OVERFLOWSETSFLAG, FLAGIFFOVERFLOW, NOOVERFLOW};
 typedef enum OverFlowBehavior OverFlowBehavior;
 
-enum UndefinedBehavior {IGNOREBEHAVIOR, FLAGFORCEUNDEFINED, UNDEFINEDSETSFLAG, FLAGIFFUNDEFINED};
+enum UndefinedBehavior {SATC_IGNOREBEHAVIOR, FLAGFORCEUNDEFINED, UNDEFINEDSETSFLAG, FLAGIFFUNDEFINED};
 typedef enum UndefinedBehavior UndefinedBehavior;
 
 enum FunctionType {TABLEFUNC, OPERATORFUNC};
