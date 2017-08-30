@@ -53,7 +53,7 @@ void DecomposeOrderTransform::doTransform(){
 			if (ordervec.getSize() > from->sccNum)
 				neworder = ordervec.get(from->sccNum);
 			if (neworder == NULL) {
-				MutableSet *set = solver->createMutableSet(order->set->type);
+				MutableSet *set = solver->createMutableSet(order->set->getType());
 				neworder = solver->createOrder(order->type, set);
 				ordervec.setExpand(from->sccNum, neworder);
 				if (order->type == PARTIAL)

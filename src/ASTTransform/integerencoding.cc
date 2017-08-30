@@ -25,7 +25,7 @@ bool IntegerEncodingTransform::canExecuteTransform(){
 void IntegerEncodingTransform::doTransform(){
 	if (!orderIntegerEncoding->contains(order)) {
 		orderIntegerEncoding->put(order, new IntegerEncodingRecord(
-		solver->createRangeSet(order->set->type, 0, (uint64_t) order->set->getSize()-1)));
+		solver->createRangeSet(order->set->getType(), 0, (uint64_t) order->set->getSize()-1)));
 	}
 	uint size = order->constraints.getSize();
 	for(uint i=0; i<size; i++){

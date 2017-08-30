@@ -98,7 +98,7 @@ void CSolver::addItem(MutableSet *set, uint64_t element) {
 }
 
 uint64_t CSolver::createUniqueItem(MutableSet *set) {
-	uint64_t element = set->low++;
+	uint64_t element = set->getNewUniqueItem();
 	set->addElementMSet(element);
 	return element;
 }
