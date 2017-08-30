@@ -23,7 +23,7 @@ public:
 	void initializeOrderElementsHashTable();
 	void addOrderConstraint(BooleanOrder *constraint);
 	void setOrderEncodingType(OrderEncodingType type);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 #endif

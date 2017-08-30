@@ -28,7 +28,7 @@ public:
 	HSIteratorOrderNode *getNodes() {return nodes->iterator();}
 	HSIteratorOrderEdge *getEdges() {return edges->iterator();}
 
-	MEMALLOC;
+	CMEMALLOC;
 private:
 	HashSetOrderNode *nodes;
 	HashSetOrderEdge *edges;

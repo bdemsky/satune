@@ -17,7 +17,7 @@ public:
 	IntegerEncodingRecord(Set* set);
 	~IntegerEncodingRecord();
 	Element* getOrderIntegerElement(CSolver *This, uint64_t item);
-	MEMALLOC;
+	CMEMALLOC;
 	
 private:
 	HashSetOrderElement *elementTable;

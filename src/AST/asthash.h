@@ -1,6 +1,6 @@
 #ifndef ASTHASH_H
 #define ASTHASH_H
-#include "classlist.h"
+#include "classes.h"
 #include "hashtable.h"
 
 uint hashBoolean(Boolean * boolean);

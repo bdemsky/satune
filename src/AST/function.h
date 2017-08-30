@@ -12,7 +12,7 @@ public:
 	FunctionType type;
 	virtual ~Function() {}
 	virtual Function *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class FunctionOperator : public Function {
@@ -25,7 +25,7 @@ public:
 	uint64_t applyFunctionOperator(uint numVals, uint64_t *values);
 	bool isInRangeFunction(uint64_t val);
 	Function *clone(CSolver *solver, CloneMap *map);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class FunctionTable : public Function {
@@ -34,7 +34,7 @@ public:
 	UndefinedBehavior undefBehavior;
 	FunctionTable (Table *table, UndefinedBehavior behavior);
 	Function *clone(CSolver *solver, CloneMap *map);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 #endif

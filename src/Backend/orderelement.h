@@ -17,7 +17,7 @@ public:
 	OrderElement(uint64_t item, Element *elem);
 	uint64_t item;
 	Element *elem;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 

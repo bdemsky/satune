@@ -28,7 +28,7 @@ public:
 	uint sccNum;
 	HashSetOrderEdge inEdges;
 	HashSetOrderEdge outEdges;
-	MEMALLOC;
+	CMEMALLOC;
 };
 #endif/* ORDERNODE_H */
 

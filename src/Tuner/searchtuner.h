@@ -11,7 +11,7 @@ class TunableSetting {
 	TunableSetting(TunableSetting * ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
 	void print();
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	bool hasVar;
 	VarType type;
@@ -43,7 +43,7 @@ class SearchTuner : public Tuner {
 	void print();
 	void printUsed();
 
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	/** Used Settings keeps track of settings that were actually used by
 		 the example. Mutating settings may cause the Constraint Compiler

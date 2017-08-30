@@ -20,7 +20,7 @@ public:
 	virtual inline bool canExecutePass(CSolver* This, uint type, Tunables tunable, TunableDesc* desc){
 		return GETVARTUNABLE(This->getTuner(), type, tunable, desc);
 	}
-	MEMALLOC;
+	CMEMALLOC;
 
 };
 

@@ -1,8 +1,8 @@
 #ifndef CSOLVER_H
 #define CSOLVER_H
-#include "classlist.h"
+#include "classes.h"
 #include "ops.h"
-#include "structs.h"
+#include "corestructs.h"
 #include "asthash.h"
 
 class CSolver {
@@ -129,7 +129,7 @@ public:
 	long long getEncodeTime();
 	long long getSolveTime();
 	
-	MEMALLOC;
+	CMEMALLOC;
 
 private:
 	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);

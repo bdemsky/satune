@@ -14,7 +14,7 @@ public:
 	Array<Set *> domains;
 	Set *range;
 	HashSetTableEntry *entries;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 #endif

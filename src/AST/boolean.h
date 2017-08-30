@@ -18,7 +18,7 @@ public:
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
 
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanConst : public Boolean {
@@ -26,7 +26,7 @@ class BooleanConst : public Boolean {
 	BooleanConst(bool isTrue);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	bool isTrue;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanVar : public Boolean {
@@ -36,7 +36,7 @@ public:
 
 	VarType vtype;
 	Edge var;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanOrder : public Boolean {
@@ -47,7 +47,7 @@ public:
 	Order *order;
 	uint64_t first;
 	uint64_t second;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanPredicate : public Boolean {
@@ -60,7 +60,7 @@ public:
 	Array<Element *> inputs;
 	Boolean *undefStatus;
 	FunctionEncoding *getFunctionEncoding() {return &encoding;}
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanLogic : public Boolean {
@@ -70,6 +70,6 @@ public:
 
 	LogicOp op;
 	Array<Boolean *> inputs;
-	MEMALLOC;
+	CMEMALLOC;
 };
 #endif

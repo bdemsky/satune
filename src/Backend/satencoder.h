@@ -19,7 +19,7 @@ class SATEncoder {
 	long long getSolveTime() { return cnf->solveTime; }
 	long long getEncodeTime() { return cnf->encodeTime; }
 	
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	Edge getNewVarSATEncoder();
 	void getArrayNewVarsSATEncoder(uint num, Edge *carray);

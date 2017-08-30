@@ -14,6 +14,7 @@
 #include "analyzer.h"
 #include "autotuner.h"
 #include "astops.h"
+#include "structs.h"
 
 CSolver::CSolver() :
 	boolTrue(new BooleanConst(true)),

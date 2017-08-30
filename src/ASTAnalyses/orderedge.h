@@ -21,7 +21,7 @@ public:
 	unsigned int mustPos : 1;
 	unsigned int mustNeg : 1;
 	unsigned int pseudoPos : 1;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 #endif/* ORDEREDGE_H */

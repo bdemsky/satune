@@ -8,7 +8,7 @@ public:
 	virtual int getTunable(TunableParam param, TunableDesc *descriptor) {ASSERT(0); return 0;}
 	virtual int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor) {ASSERT(0); return 0;}
 	virtual ~Tuner() {}
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class DefaultTuner : public Tuner {
@@ -16,7 +16,7 @@ public:
 	DefaultTuner();
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 
@@ -27,7 +27,7 @@ public:
 	int lowValue;
 	int highValue;
 	int defaultValue;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 

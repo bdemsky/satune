@@ -16,7 +16,7 @@ public:
 	ElementEncoding encoding;
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
 	
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class ElementConst : public Element {
@@ -25,7 +25,7 @@ public:
 	Set *set;
 	uint64_t value;
 	Element *clone(CSolver *solver, CloneMap *map);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class ElementSet : public Element {
@@ -33,7 +33,7 @@ public:
 	ElementSet(Set *s);
 	Set *set;
 	Element *clone(CSolver *solver, CloneMap *map);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class ElementFunction : public Element {
@@ -44,7 +44,7 @@ public:
 	Boolean *overflowstatus;
 	FunctionEncoding functionencoding;
 	Element *clone(CSolver *solver, CloneMap *map);
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 Set *getElementSet(Element *This);
