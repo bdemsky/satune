@@ -11,7 +11,7 @@
 #include "sattranslator.h"
 #include "tunable.h"
 #include "polarityassignment.h"
-#include "orderdecompose.h"
+#include "analyzer.h"
 #include "autotuner.h"
 
 CSolver::CSolver() :

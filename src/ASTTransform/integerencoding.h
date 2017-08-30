@@ -1,23 +1,30 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
+/* 
  * File:   integerencoding.h
  * Author: hamed
  *
- * Created on August 24, 2017, 5:31 PM
+ * Created on August 27, 2017, 4:36 PM
  */
 
 #ifndef INTEGERENCODING_H
 #define INTEGERENCODING_H
 #include "classlist.h"
-#include "structs.h"
+#include "transform.h"
+#include "order.h"
 
-Element *getOrderIntegerElement(CSolver *solver, Order *order, uint64_t item);
-void orderIntegerEncodingSATEncoder(CSolver *solver, BooleanOrder *boolOrder);
+class IntegerEncodingTransform : public Transform{
+public:
+	IntegerEncodingTransform(CSolver* solver, Order* order);
+	void orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder);
+	void doTransform();
+	bool canExecuteTransform();
+	virtual ~IntegerEncodingTransform();
+private:
+	Order* order;
+	// In future we can use a singleton class instead of static variable for keeping data that needed
+	// for translating back result
+	static HashTableOrderIntegerEncoding* orderIntegerEncoding;
+};
 
-#endif/* INTEGERENCODING_H */
+
+#endif /* INTEGERENCODING_H */
 

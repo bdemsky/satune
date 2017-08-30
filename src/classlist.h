@@ -41,6 +41,9 @@ class Order;
 class OrderPair;
 
 class OrderElement;
+class IntegerEncodingRecord;
+class Transform;
+class Pass;
 
 class ElementEncoding;
 class FunctionEncoding;

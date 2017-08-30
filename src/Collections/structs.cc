@@ -57,3 +57,11 @@ bool order_pair_equals(OrderPair *key1, OrderPair *key2) {
 	return key1->first == key2->first && key1->second == key2->second;
 }
 
+unsigned int order_hash_function(Order *This) {
+	return (uint) This;
+}
+
+bool order_pair_equals(Order *key1, Order *key2) {
+	return key1==key2;
+}
+
