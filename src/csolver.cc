@@ -72,7 +72,7 @@ CSolver::~CSolver() {
 CSolver *CSolver::clone() {
 	CSolver *copy = new CSolver();
 	CloneMap map;
-	HSIteratorBoolean *it = getConstraints();
+	SetIteratorBoolean *it = getConstraints();
 	while (it->hasNext()) {
 		Boolean *b = it->next();
 		copy->addConstraint(b->clone(copy, &map));

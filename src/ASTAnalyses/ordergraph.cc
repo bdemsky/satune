@@ -159,14 +159,14 @@ void OrderGraph::addMustOrderConstraintToOrderGraph(BooleanOrder *bOrder) {
 }
 
 OrderGraph::~OrderGraph() {
-	HSIteratorOrderNode *iterator = nodes->iterator();
+	SetIteratorOrderNode *iterator = nodes->iterator();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
 		delete node;
 	}
 	delete iterator;
 
-	HSIteratorOrderEdge *eiterator = edges->iterator();
+	SetIteratorOrderEdge *eiterator = edges->iterator();
 	while (eiterator->hasNext()) {
 		OrderEdge *edge = eiterator->next();
 		delete edge;

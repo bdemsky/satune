@@ -14,7 +14,7 @@
 #include <strings.h>
 
 void naiveEncodingDecision(CSolver *This) {
-	HSIteratorBoolean *iterator = This->getConstraints();
+	SetIteratorBoolean *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *boolean = iterator->next();
 		naiveEncodingConstraint(boolean);

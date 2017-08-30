@@ -24,7 +24,7 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 	Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
-	HSIteratorTableEntry *iterator = table->entries->iterator();
+	SetIteratorTableEntry *iterator = table->entries->iterator();
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();
@@ -183,7 +183,7 @@ void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func)
 	Table *table = ((FunctionTable *) (func->function))->table;
 	uint size = table->entries->getSize();
 	Edge constraints[size];
-	HSIteratorTableEntry *iterator = table->entries->iterator();
+	SetIteratorTableEntry *iterator = table->entries->iterator();
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();

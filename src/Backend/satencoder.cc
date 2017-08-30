@@ -26,7 +26,7 @@ int SATEncoder::solve() {
 }
 
 void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
-	HSIteratorBoolean *iterator = csolver->getConstraints();
+	SetIteratorBoolean *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *constraint = iterator->next();
 		Edge c = encodeConstraintSATEncoder(constraint);

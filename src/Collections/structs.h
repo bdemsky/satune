@@ -29,9 +29,9 @@ typedef HashTable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_functi
 typedef HashTable<void *, void *, uintptr_t, 4> CloneMap;
 typedef HashTable<Order* , IntegerEncodingRecord*, uintptr_t, 4> HashTableOrderIntegerEncoding; 
 
-typedef HSIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HSIteratorTableEntry;
-typedef HSIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HSIteratorOrderEdge;
-typedef HSIterator<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HSIteratorOrderNode;
+typedef SetIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> SetIteratorTableEntry;
+typedef SetIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> SetIteratorOrderEdge;
+typedef SetIterator<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> SetIteratorOrderNode;
 
 
 #endif

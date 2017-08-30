@@ -29,7 +29,7 @@ unsigned int tunableSettingHash(TunableSetting *setting);
 bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 
 typedef HashSet<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashSetTunableSetting;
-typedef HSIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HSIteratorTunableSetting;
+typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> SetIteratorTunableSetting;
 
 class SearchTuner : public Tuner {
  public:

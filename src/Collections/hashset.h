@@ -22,9 +22,9 @@ template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_functi
 class HashSet;
 
 template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
-class HSIterator {
+class SetIterator {
 public:
-	HSIterator(LinkNode<_Key> *_curr, HashSet <_Key, _KeyInt, _Shift, hash_function, equals> *_set) :
+	SetIterator(LinkNode<_Key> *_curr, HashSet <_Key, _KeyInt, _Shift, hash_function, equals> *_set) :
 		curr(_curr),
 		set(_set)
 	{
@@ -99,7 +99,7 @@ public:
 
 	HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy() {
 		HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy = new HashSet<_Key, _KeyInt, _Shift, hash_function, equals>(table->getCapacity(), table->getLoadFactor());
-		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
+		SetIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
 		while (it->hasNext())
 			copy->add(it->next());
 		delete it;
@@ -121,7 +121,7 @@ public:
 	 *  is already present. */
 
 	void addAll(HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *table) {
-		HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
+		SetIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
 		while (it->hasNext())
 			add(it->next());
 		delete it;
@@ -213,8 +213,8 @@ public:
 		return getSize() == 0;
 	}
 
-	HSIterator<_Key, _KeyInt, _Shift, hash_function, equals> *iterator() {
-		return new HSIterator<_Key, _KeyInt, _Shift, hash_function, equals>(list, this);
+	SetIterator<_Key, _KeyInt, _Shift, hash_function, equals> *iterator() {
+		return new SetIterator<_Key, _KeyInt, _Shift, hash_function, equals>(list, this);
 	}
 
 	/** Override: new operator */

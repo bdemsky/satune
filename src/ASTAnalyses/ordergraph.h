@@ -25,8 +25,8 @@ public:
 	void addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	OrderEdge *getInverseOrderEdge(OrderEdge *edge);
 	Order *getOrder() {return order;}
-	HSIteratorOrderNode *getNodes() {return nodes->iterator();}
-	HSIteratorOrderEdge *getEdges() {return edges->iterator();}
+	SetIteratorOrderNode *getNodes() {return nodes->iterator();}
+	SetIteratorOrderEdge *getEdges() {return edges->iterator();}
 
 	CMEMALLOC;
 private:

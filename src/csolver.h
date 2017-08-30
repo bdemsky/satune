@@ -114,7 +114,7 @@ public:
 
 	Tuner *getTuner() { return tuner; }
 	
-	HSIteratorBoolean *getConstraints() { return constraints.iterator(); }
+	SetIteratorBoolean *getConstraints() { return constraints.iterator(); }
 
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
