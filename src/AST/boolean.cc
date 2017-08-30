@@ -12,6 +12,11 @@ Boolean::Boolean(ASTNodeType _type) :
 	parents() {
 }
 
+BooleanConst::BooleanConst(bool _isTrue) :
+	Boolean(BOOLCONST),
+	isTrue(_isTrue) {
+}
+
 BooleanVar::BooleanVar(VarType t) :
 	Boolean(BOOLEANVAR),
 	vtype(t),
@@ -41,6 +46,13 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint a
 	Boolean(LOGICOP),
 	op(_op),
 	inputs(array, asize) {
+}
+
+Boolean *BooleanConst::clone(CSolver *solver, CloneMap *map) {
+	if (isTrue)
+		return solver->getBooleanTrue();
+	else
+		return solver->getBooleanFalse();
 }
 
 Boolean *BooleanVar::clone(CSolver *solver, CloneMap *map) {

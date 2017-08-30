@@ -15,6 +15,8 @@
 #include "autotuner.h"
 
 CSolver::CSolver() :
+	boolTrue(new BooleanConst(true)),
+	boolFalse(new BooleanConst(false)),
 	unsat(false),
 	tuner(NULL),
 	elapsedTime(0)
@@ -60,6 +62,8 @@ CSolver::~CSolver() {
 		delete allFunctions.get(i);
 	}
 
+	delete boolTrue;
+	delete boolFalse;
 	delete satEncoder;
 }
 
@@ -183,6 +187,14 @@ Boolean *CSolver::getBooleanVar(VarType type) {
 	return boolean;
 }
 
+Boolean *CSolver::getBooleanTrue() {
+	return boolTrue;
+}
+
+Boolean *CSolver::getBooleanFalse() {
+	return boolFalse;
+}
+
 Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
 	return applyPredicateTable(predicate, inputs, numInputs, NULL);
 }
@@ -201,6 +213,106 @@ Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, ui
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
+	Boolean * newarray[asize];
+	switch(op) {
+	case L_NOT: {
+		if (array[0]->type == LOGICOP && ((BooleanLogic *)array[0])->op==L_NOT) {
+			return ((BooleanLogic *) array[0])->inputs.get(0);
+		} else if (array[0]->type == BOOLCONST) {
+			bool isTrue = ((BooleanConst *) array[0])->isTrue;
+			return isTrue ? boolFalse : boolTrue;
+		}
+		break;
+	}
+	case L_XOR: {
+		for(uint i=0;i<2;i++) {
+			if (array[i]->type == BOOLCONST) {
+				bool isTrue = ((BooleanConst *) array[i])->isTrue;
+				if (isTrue) {
+					newarray[0]=array[1-i];
+					return applyLogicalOperation(L_NOT, newarray, 1);
+				} else
+					return array[1-i];
+			}
+		}
+		break;
+	}
+	case L_OR: {
+		uint newindex=0;
+		for(uint i=0;i<asize;i++) {
+			Boolean *b=array[i];
+			if (b->type == BOOLCONST) {
+				bool isTrue = ((BooleanConst *) b)->isTrue;
+				if (isTrue)
+					return b;
+				else
+					continue;
+			} else
+				newarray[newindex++]=b;
+		}
+		if (newindex==1)
+			return newarray[0];
+		else if (newindex == 2) {
+			bool isNot0 = (newarray[0]->type==BOOLCONST) && ((BooleanLogic *)newarray[0])->op == L_NOT;
+			bool isNot1 = (newarray[1]->type==BOOLCONST) && ((BooleanLogic *)newarray[1])->op == L_NOT;
+
+			if (isNot0 != isNot1) {
+				if (isNot0) {
+					newarray[0] = ((BooleanLogic *) newarray[0])->inputs.get(0);
+				} else {
+					Boolean *tmp =  ((BooleanLogic *) array[1])->inputs.get(0);
+					array[1] = array[0];
+					array[0] = tmp;
+				}
+				return applyLogicalOperation(L_IMPLIES, newarray, 2);
+			}
+		} else {
+			array = newarray;
+			asize = newindex;
+		}
+		break;
+	}
+	case L_AND: {
+		uint newindex=0;
+		for(uint i=0;i<asize;i++) {
+			Boolean *b=array[i];
+			if (b->type == BOOLCONST) {
+				bool isTrue = ((BooleanConst *) b)->isTrue;
+				if (isTrue)
+					continue;
+				else
+					return b;
+			} else
+				newarray[newindex++]=b;
+		}
+		if(newindex==1) {
+			return newarray[0];
+		} else {
+			array = newarray;
+			asize = newindex;
+		}
+		break;
+	}
+	case L_IMPLIES: {
+		if (array[0]->type == BOOLCONST) {
+			BooleanConst *b=(BooleanConst *) array[0];
+			if (b->isTrue) {
+				return array[1];
+			} else {
+				return boolTrue;
+			}
+		} else if (array[1]->type == BOOLCONST) {
+			BooleanConst *b=(BooleanConst *) array[0];
+			if (b->isTrue) {
+				return b;
+			} else {
+				return applyLogicalOperation(L_NOT, array, 1);
+			}
+		}
+		break;
+	}
+	}
+	
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
 	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
@@ -220,7 +332,12 @@ Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second)
 }
 
 void CSolver::addConstraint(Boolean *constraint) {
-	constraints.add(constraint);
+	if (constraint == boolTrue)
+		return;
+	else if (constraint == boolFalse)
+		setUnSAT();
+	else
+		constraints.add(constraint);
 }
 
 Order *CSolver::createOrder(OrderType type, Set *set) {

@@ -38,6 +38,10 @@ public:
 	/** This function creates an element constrant. */
 	Element *getElementConst(VarType type, uint64_t value);
 
+	Boolean *getBooleanTrue();
+
+	Boolean *getBooleanFalse();
+	
 	/** This function creates a boolean variable. */
 
 	Boolean *getBooleanVar(VarType type);
@@ -158,6 +162,9 @@ private:
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 
+	Boolean * boolTrue;
+	Boolean * boolFalse;
+	
 	/** These two tables are used for deduplicating entries. */
 	BooleanMatchMap boolMap;
 	ElementMatchMap elemMap;

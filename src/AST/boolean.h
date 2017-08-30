@@ -20,6 +20,14 @@ public:
 	MEMALLOC;
 };
 
+class BooleanConst : public Boolean {
+ public:
+	BooleanConst(bool isTrue);
+	Boolean *clone(CSolver *solver, CloneMap *map);
+	bool isTrue;
+	MEMALLOC;
+};
+
 class BooleanVar : public Boolean {
 public:
 	BooleanVar(VarType t);
