@@ -117,7 +117,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		uint64_t result = function->applyFunctionOperator(numDomains, vals);
 		bool isInRange = ((FunctionOperator *)func->function)->isInRangeFunction(result);
 		bool needClause = isInRange;
-		if (function->overflowbehavior == OVERFLOWSETSFLAG || function->overflowbehavior == FLAGIFFOVERFLOW) {
+		if (function->overflowbehavior == SATC_OVERFLOWSETSFLAG || function->overflowbehavior == SATC_FLAGIFFOVERFLOW) {
 			needClause = true;
 		}
 
@@ -134,16 +134,16 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 			Edge clause;
 			switch (function->overflowbehavior) {
 			case SATC_IGNORE:
-			case NOOVERFLOW:
+			case SATC_NOOVERFLOW:
 			case SATC_WRAPAROUND: {
 				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				break;
 			}
-			case FLAGFORCESOVERFLOW: {
+			case SATC_FLAGFORCESOVERFLOW: {
 				clause = constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				break;
 			}
-			case OVERFLOWSETSFLAG: {
+			case SATC_OVERFLOWSETSFLAG: {
 				if (isInRange) {
 					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				} else {
@@ -151,7 +151,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 				}
 				break;
 			}
-			case FLAGIFFOVERFLOW: {
+			case SATC_FLAGIFFOVERFLOW: {
 				if (isInRange) {
 					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				} else {

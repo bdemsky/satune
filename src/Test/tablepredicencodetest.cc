@@ -40,7 +40,7 @@ int main(int numargs, char **argv) {
 	solver->addTableEntry(t1, row4, 3, false);
 	solver->addTableEntry(t1, row5, 3, false);
 	solver->addTableEntry(t1, row6, 3, true);
-	Predicate *p1 = solver->createPredicateTable(t1, FLAGIFFUNDEFINED);
+	Predicate *p1 = solver->createPredicateTable(t1, SATC_FLAGIFFUNDEFINED);
 	Boolean *undef = solver->getBooleanVar(2);
 	Element *tmparray[] = {e1, e2, e3};
 	Boolean *b1 = solver->applyPredicateTable(p1, tmparray, 3, undef);

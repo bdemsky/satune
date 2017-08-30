@@ -3,6 +3,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "ops.h"
+#include "astops.h"
 #include "structs.h"
 #include "common.h"
 

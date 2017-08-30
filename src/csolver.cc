@@ -13,6 +13,7 @@
 #include "polarityassignment.h"
 #include "analyzer.h"
 #include "autotuner.h"
+#include "astops.h"
 
 CSolver::CSolver() :
 	boolTrue(new BooleanConst(true)),

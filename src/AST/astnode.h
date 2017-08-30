@@ -2,6 +2,7 @@
 #define ASTNODE_H
 #include "classlist.h"
 #include "ops.h"
+#include "astops.h"
 
 class ASTNode {
 public:

@@ -40,7 +40,7 @@ int main(int numargs, char **argv) {
 	solver->addTableEntry(t1, row4, 2, 5);
 	solver->addTableEntry(t1, row5, 2, 3);
 	solver->addTableEntry(t1, row6, 2, 5);
-	Function *f1 = solver->completeTable(t1, FLAGIFFUNDEFINED);
+	Function *f1 = solver->completeTable(t1, SATC_FLAGIFFUNDEFINED);
 	Element *tmparray[] = {e1, e2};
 	Element *e3 = solver->applyFunction(f1, tmparray, 2, overflow);
 
