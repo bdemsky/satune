@@ -21,6 +21,9 @@ void CSolver::replaceBooleanWithTrue(Boolean *bexpr) {
 		case SATC_NOT:
 			replaceBooleanWithFalse(parent);
 			break;
+		case SATC_IFF:
+			handleXORFalse(logicop, bexpr);
+			break;
 		case SATC_XOR:
 			handleXORTrue(logicop, bexpr);
 			break;
@@ -152,6 +155,9 @@ void CSolver::replaceBooleanWithFalse(Boolean *bexpr) {
 			break;
 		case SATC_NOT:
 			replaceBooleanWithTrue(parent);
+			break;
+		case SATC_IFF:
+			handleXORTrue(logicop, bexpr);
 			break;
 		case SATC_XOR:
 			handleXORFalse(logicop, bexpr);

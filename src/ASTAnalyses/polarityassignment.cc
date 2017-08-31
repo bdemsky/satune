@@ -95,6 +95,7 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 		updatePolarity(tmp, negatePolarity(parentpolarity));
 		break;
 	}
+	case SATC_IFF:
 	case SATC_XOR: {
 		updatePolarity(This->inputs.get(0), P_BOTHTRUEFALSE);
 		updatePolarity(This->inputs.get(1), P_BOTHTRUEFALSE);
@@ -144,6 +145,7 @@ void computeLogicOpBooleanValue(BooleanLogic *This) {
 			updateMustValue(This->inputs.get(1), parentbv);
 		}
 		return;
+	case SATC_IFF:
 	case SATC_XOR:
 		return;
 	default:

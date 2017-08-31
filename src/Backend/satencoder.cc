@@ -93,6 +93,8 @@ Edge SATEncoder::encodeLogicSATEncoder(BooleanLogic *constraint) {
 		return constraintNegate(array[0]);
 	case SATC_XOR:
 		return constraintXOR(cnf, array[0], array[1]);
+	case SATC_IFF:
+		return constraintIFF(cnf, array[0], array[1]);
 	case SATC_IMPLIES:
 		return constraintIMPLIES(cnf, array[0], array[1]);
 	default:

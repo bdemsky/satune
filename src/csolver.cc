@@ -249,6 +249,19 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		}
 		break;
 	}
+	case SATC_IFF: {
+		for(uint i=0;i<2;i++) {
+			if (array[i]->type == BOOLCONST) {
+				if (array[i]->isTrue()) {
+					return array[1-i];
+				} else {
+					newarray[0]=array[1-i];
+					return applyLogicalOperation(SATC_NOT, newarray, 1);
+				}
+			}
+		}
+		break;
+	}
 	case SATC_XOR: {
 		for(uint i=0;i<2;i++) {
 			if (array[i]->type == BOOLCONST) {

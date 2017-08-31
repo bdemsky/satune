@@ -1,6 +1,6 @@
 #ifndef OPS_H
 #define OPS_H
-enum LogicOp {SATC_AND, SATC_OR, SATC_NOT, SATC_XOR, SATC_IMPLIES};
+enum LogicOp {SATC_AND, SATC_OR, SATC_NOT, SATC_XOR, SATC_IFF, SATC_IMPLIES};
 typedef enum LogicOp LogicOp;
 
 enum ArithOp {SATC_ADD, SATC_SUB};

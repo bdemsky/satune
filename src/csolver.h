@@ -4,6 +4,7 @@
 #include "ops.h"
 #include "corestructs.h"
 #include "asthash.h"
+#include "solver_interface.h"
 
 class CSolver {
 public:
