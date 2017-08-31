@@ -17,6 +17,8 @@ public:
 
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
 
+	Element *createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange);
+		
 	/** This function creates a mutable set. */
 
 	MutableSet *createMutableSet(VarType type);
@@ -106,6 +108,9 @@ public:
 
 	HappenedBefore getOrderConstraintValue(Order *order, uint64_t first, uint64_t second);
 
+	bool isTrue(Boolean *b);
+	bool isFalse(Boolean *b);
+	
 	void setUnSAT() { unsat = true; }
 
 	bool isUnSAT() { return unsat; }

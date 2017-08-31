@@ -93,6 +93,11 @@ Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange
 	return set;
 }
 
+Element *CSolver::createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange) {
+	Set *s = createRangeSet(type, lowrange, highrange);
+	return getElementVar(s);
+}
+
 MutableSet *CSolver::createMutableSet(VarType type) {
 	MutableSet *set = new MutableSet(type);
 	allSets.push(set);
@@ -212,6 +217,14 @@ Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, ui
 		delete boolean;
 		return b;
 	}
+}
+
+bool CSolver::isTrue(Boolean *b) {
+	return b->isTrue();
+}
+
+bool CSolver::isFalse(Boolean *b) {
+	return b->isFalse();
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
