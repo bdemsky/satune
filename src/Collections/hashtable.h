@@ -11,8 +11,8 @@
  *  @brief Hashtable.  Standard chained bucket variety.
  */
 
-#ifndef __HASHTABLE_H__
-#define __HASHTABLE_H__
+#ifndef HASHTABLE_H__
+#define HASHTABLE_H__
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,24 +21,24 @@
 #include "common.h"
 
 /**
- * @brief HashTable node
+ * @brief Hashtable node
  *
  * @tparam _Key    Type name for the key
  * @tparam _Val    Type name for the values to be stored
  */
 template<typename _Key, typename _Val>
-struct hashlistnode {
+struct Hashlistnode {
 	_Key key;
 	_Val val;
 };
 
 template<typename _Key, int _Shift, typename _KeyInt>
-inline unsigned int default_hash_function(_Key hash) {
+inline unsigned int defaultHashFunction(_Key hash) {
 	return (unsigned int)(((_KeyInt)hash) >> _Shift);
 }
 
 template<typename _Key>
-inline bool default_equals(_Key key1, _Key key2) {
+inline bool defaultEquals(_Key key1, _Key key2) {
 	return key1 == key2;
 }
 
@@ -56,8 +56,8 @@ inline bool default_equals(_Key key1, _Key key2) {
  *                 manipulation and storage.
  * @tparam _Shift  Logical shift to apply to all keys. Default 0.
  */
-template<typename _Key, typename _Val, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
-class HashTable {
+template<typename _Key, typename _Val, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
+class Hashtable {
 public:
 	/**
 	 * @brief Hash table constructor
@@ -66,9 +66,9 @@ public:
 	 * @param factor Sets the percentage full before the hashtable is
 	 * resized. Default ratio 0.5.
 	 */
-	HashTable(unsigned int initialcapacity = 1024, double factor = 0.5) {
+	Hashtable(unsigned int initialcapacity = 1024, double factor = 0.5) {
 		// Allocate space for the hash table
-		table = (struct hashlistnode<_Key, _Val> *)ourcalloc(initialcapacity, sizeof(struct hashlistnode<_Key, _Val>));
+		table = (struct Hashlistnode<_Key, _Val> *)ourcalloc(initialcapacity, sizeof(struct Hashlistnode<_Key, _Val>));
 		zero = NULL;
 		loadfactor = factor;
 		capacity = initialcapacity;
@@ -79,7 +79,7 @@ public:
 	}
 
 	/** @brief Hash table destructor */
-	~HashTable() {
+	~Hashtable() {
 		ourfree(table);
 		if (zero)
 			ourfree(zero);
@@ -107,7 +107,7 @@ public:
 
 	/** @brief Reset the table to its initial state. */
 	void reset() {
-		memset(table, 0, capacity * sizeof(struct hashlistnode<_Key, _Val>));
+		memset(table, 0, capacity * sizeof(struct Hashlistnode<_Key, _Val>));
 		if (zero) {
 			ourfree(zero);
 			zero = NULL;
@@ -119,7 +119,7 @@ public:
   _Val getRandomValue() {
 		while(true) {
 			unsigned int index=random() & capacitymask;
-			struct hashlistnode<_Key, _Val> *bin = &table[index];
+			struct Hashlistnode<_Key, _Val> *bin = &table[index];
 			if (bin->key != NULL && bin->val != NULL) {
 				return bin->val;
 			}
@@ -128,7 +128,7 @@ public:
 
 	void resetanddelete() {
 		for (unsigned int i = 0; i < capacity; i++) {
-			struct hashlistnode<_Key, _Val> *bin = &table[i];
+			struct Hashlistnode<_Key, _Val> *bin = &table[i];
 			if (bin->key != NULL) {
 				bin->key = NULL;
 				if (bin->val != NULL) {
@@ -148,7 +148,7 @@ public:
 
 	void resetandfree() {
 		for (unsigned int i = 0; i < capacity; i++) {
-			struct hashlistnode<_Key, _Val> *bin = &table[i];
+			struct Hashlistnode<_Key, _Val> *bin = &table[i];
 			if (bin->key != NULL) {
 				bin->key = NULL;
 				if (bin->val != NULL) {
@@ -172,10 +172,10 @@ public:
 	 * @param val The value to store in the table
 	 */
 	void put(_Key key, _Val val) {
-		/* HashTable cannot handle 0 as a key */
+		/* Hashtable cannot handle 0 as a key */
 		if (!key) {
 			if (!zero) {
-				zero = (struct hashlistnode<_Key, _Val> *)ourmalloc(sizeof(struct hashlistnode<_Key, _Val>));
+				zero = (struct Hashlistnode<_Key, _Val> *)ourmalloc(sizeof(struct Hashlistnode<_Key, _Val>));
 				size++;
 			}
 			zero->key = key;
@@ -186,7 +186,7 @@ public:
 		if (size > threshold)
 			resize(capacity << 1);
 
-		struct hashlistnode<_Key, _Val> *search;
+		struct Hashlistnode<_Key, _Val> *search;
 
 		unsigned int index = hash_function(key);
 		do {
@@ -214,9 +214,9 @@ public:
 	 * @return The value in the table, if the key is found; otherwise 0
 	 */
 	_Val get(_Key key) const {
-		struct hashlistnode<_Key, _Val> *search;
+		struct Hashlistnode<_Key, _Val> *search;
 
-		/* HashTable cannot handle 0 as a key */
+		/* Hashtable cannot handle 0 as a key */
 		if (!key) {
 			if (zero)
 				return zero->val;
@@ -248,9 +248,9 @@ public:
 	 * @return The value in the table, if the key is found; otherwise 0
 	 */
 	_Val remove(_Key key) {
-		struct hashlistnode<_Key, _Val> *search;
+		struct Hashlistnode<_Key, _Val> *search;
 
-		/* HashTable cannot handle 0 as a key */
+		/* Hashtable cannot handle 0 as a key */
 		if (!key) {
 			if (!zero) {
 				return (_Val)0;
@@ -296,9 +296,9 @@ public:
 	 * @return True, if the key is found; false otherwise
 	 */
 	bool contains(_Key key) const {
-		struct hashlistnode<_Key, _Val> *search;
+		struct Hashlistnode<_Key, _Val> *search;
 
-		/* HashTable cannot handle 0 as a key */
+		/* Hashtable cannot handle 0 as a key */
 		if (!key) {
 			return zero != NULL;
 		}
@@ -323,11 +323,11 @@ public:
 	 * @param newsize The new size of the table
 	 */
 	void resize(unsigned int newsize) {
-		struct hashlistnode<_Key, _Val> *oldtable = table;
-		struct hashlistnode<_Key, _Val> *newtable;
+		struct Hashlistnode<_Key, _Val> *oldtable = table;
+		struct Hashlistnode<_Key, _Val> *newtable;
 		unsigned int oldcapacity = capacity;
 
-		if ((newtable = (struct hashlistnode<_Key, _Val> *)ourcalloc(newsize, sizeof(struct hashlistnode<_Key, _Val>))) == NULL) {
+		if ((newtable = (struct Hashlistnode<_Key, _Val> *)ourcalloc(newsize, sizeof(struct Hashlistnode<_Key, _Val>))) == NULL) {
 			model_print("calloc error %s %d\n", __FILE__, __LINE__);
 			exit(EXIT_FAILURE);
 		}
@@ -338,12 +338,12 @@ public:
 
 		threshold = (unsigned int)(newsize * loadfactor);
 
-		struct hashlistnode<_Key, _Val> *bin = &oldtable[0];
-		struct hashlistnode<_Key, _Val> *lastbin = &oldtable[oldcapacity];
+		struct Hashlistnode<_Key, _Val> *bin = &oldtable[0];
+		struct Hashlistnode<_Key, _Val> *lastbin = &oldtable[oldcapacity];
 		for (; bin < lastbin; bin++) {
 			_Key key = bin->key;
 
-			struct hashlistnode<_Key, _Val> *search;
+			struct Hashlistnode<_Key, _Val> *search;
 			if (!key)
 				continue;
 
@@ -362,8 +362,8 @@ public:
 	}
 	double getLoadFactor() {return loadfactor;}
 	unsigned int getCapacity() {return capacity;}
-	struct hashlistnode<_Key, _Val> *table;
-	struct hashlistnode<_Key, _Val> *zero;
+	struct Hashlistnode<_Key, _Val> *table;
+	struct Hashlistnode<_Key, _Val> *zero;
 	unsigned int capacity;
 	unsigned int size;
 private:

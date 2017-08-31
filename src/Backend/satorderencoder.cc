@@ -55,7 +55,7 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 	if (!edgeIsNull(gvalue))
 		return gvalue;
 
-	HashTableOrderPair *table = order->orderPairTable;
+	HashtableOrderPair *table = order->orderPairTable;
 	bool negate = false;
 	OrderPair flipped;
 	if (pair->first < pair->second) {
@@ -78,7 +78,7 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == SATC_TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
-		boolOrder->order->initializeOrderHashTable();
+		boolOrder->order->initializeOrderHashtable();
 		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
@@ -117,7 +117,7 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 	}
 }
 
-Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair) {
+Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair) {
 	ASSERT(pair->first != pair->second);
 	bool negate = false;
 	OrderPair flipped;

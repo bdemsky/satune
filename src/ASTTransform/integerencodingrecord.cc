@@ -12,7 +12,7 @@
 IntegerEncodingRecord::IntegerEncodingRecord(Set* _set):
 	set(_set)
 {
-	elementTable = new HashSetOrderElement();
+	elementTable = new HashsetOrderElement();
 }
 
 IntegerEncodingRecord::~IntegerEncodingRecord(){

@@ -26,8 +26,8 @@ public:
 	uint64_t id;
 	NodeStatus status;
 	uint sccNum;
-	HashSetOrderEdge inEdges;
-	HashSetOrderEdge outEdges;
+	HashsetOrderEdge inEdges;
+	HashsetOrderEdge outEdges;
 	CMEMALLOC;
 };
 #endif/* ORDERNODE_H */

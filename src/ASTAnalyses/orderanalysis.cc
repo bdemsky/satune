@@ -147,7 +147,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 	Vector<OrderNode *> finishNodes;
 	DFS(graph, &finishNodes);
 	resetNodeInfoStatusSCC(graph);
-	HashTableNodeToNodeSet *table = new HashTableNodeToNodeSet(128, 0.25);
+	HashtableNodeToNodeSet *table = new HashtableNodeToNodeSet(128, 0.25);
 
 	Vector<OrderNode *> sccNodes;
 
@@ -155,7 +155,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 	uint sccNum = 1;
 	for (int i = size - 1; i >= 0; i--) {
 		OrderNode *node = finishNodes.get(i);
-		HashSetOrderNode *sources = new HashSetOrderNode(4, 0.25);
+		HashsetOrderNode *sources = new HashsetOrderNode(4, 0.25);
 		table->put(node, sources);
 
 		if (node->status == NOTVISITED) {
@@ -178,7 +178,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 					OrderNode *parent = edge->source;
 					if (edge->polPos) {
 						sources->add(parent);
-						HashSetOrderNode *parent_srcs = (HashSetOrderNode *)table->get(parent);
+						HashsetOrderNode *parent_srcs = (HashsetOrderNode *)table->get(parent);
 						sources->addAll(parent_srcs);
 					}
 				}
@@ -187,7 +187,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 			for (uint j = 0; j < rSize; j++) {
 				//Copy in set of entire SCC
 				OrderNode *rnode = sccNodes.get(j);
-				HashSetOrderNode *set = (j == 0) ? sources : sources->copy();
+				HashsetOrderNode *set = (j == 0) ? sources : sources->copy();
 				table->put(rnode, set);
 
 				//Use source sets to compute pseudoPos edges
@@ -230,11 +230,11 @@ void DFSMust(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
 
 void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode *> *finishNodes, bool computeTransitiveClosure) {
 	uint size = finishNodes->getSize();
-	HashTableNodeToNodeSet *table = new HashTableNodeToNodeSet(128, 0.25);
+	HashtableNodeToNodeSet *table = new HashtableNodeToNodeSet(128, 0.25);
 
 	for (int i = size - 1; i >= 0; i--) {
 		OrderNode *node = finishNodes->get(i);
-		HashSetOrderNode *sources = new HashSetOrderNode(4, 0.25);
+		HashsetOrderNode *sources = new HashsetOrderNode(4, 0.25);
 		table->put(node, sources);
 
 		{
@@ -245,7 +245,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				OrderNode *parent = edge->source;
 				if (edge->mustPos) {
 					sources->add(parent);
-					HashSetOrderNode *parent_srcs = (HashSetOrderNode *) table->get(parent);
+					HashsetOrderNode *parent_srcs = (HashsetOrderNode *) table->get(parent);
 					sources->addAll(parent_srcs);
 				}
 			}

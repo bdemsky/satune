@@ -6,7 +6,7 @@
 #include "csolver.h"
 #include "integerencodingrecord.h"
 
-HashTableOrderIntegerEncoding* IntegerEncodingTransform::orderIntegerEncoding = new HashTableOrderIntegerEncoding();
+HashtableOrderIntegerEncoding* IntegerEncodingTransform::orderIntegerEncoding = new HashtableOrderIntegerEncoding();
 
 IntegerEncodingTransform::IntegerEncodingTransform(CSolver* _solver, Order* _order) 
 	:Transform(_solver),

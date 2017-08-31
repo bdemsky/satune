@@ -9,7 +9,7 @@
 Table::Table(Set **_domains, uint numDomain, Set *_range) :
 	domains(_domains, numDomain),
 	range(_range) {
-	entries = new HashSetTableEntry();
+	entries = new HashsetTableEntry();
 }
 
 void Table::addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result) {

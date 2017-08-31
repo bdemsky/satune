@@ -20,14 +20,14 @@ bool order_pair_equals(OrderPair *key1, OrderPair *key2);
 
 
 
-typedef HashSet<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HashSetTableEntry;
-typedef HashSet<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HashSetOrderNode;
-typedef HashSet<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HashSetOrderEdge;
-typedef HashSet<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashSetOrderElement;
-typedef HashTable<OrderNode *, HashSetOrderNode *, uintptr_t, 4> HashTableNodeToNodeSet;
-typedef HashTable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashTableOrderPair;
-typedef HashTable<void *, void *, uintptr_t, 4> CloneMap;
-typedef HashTable<Order* , IntegerEncodingRecord*, uintptr_t, 4> HashTableOrderIntegerEncoding; 
+typedef Hashset<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HashsetTableEntry;
+typedef Hashset<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HashsetOrderNode;
+typedef Hashset<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HashsetOrderEdge;
+typedef Hashset<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashsetOrderElement;
+typedef Hashtable<OrderNode *, HashsetOrderNode *, uintptr_t, 4> HashtableNodeToNodeSet;
+typedef Hashtable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashtableOrderPair;
+typedef Hashtable<void *, void *, uintptr_t, 4> CloneMap;
+typedef Hashtable<Order* , IntegerEncodingRecord*, uintptr_t, 4> HashtableOrderIntegerEncoding; 
 
 typedef SetIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> SetIteratorTableEntry;
 typedef SetIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> SetIteratorOrderEdge;

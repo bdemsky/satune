@@ -28,7 +28,7 @@ class TunableSetting {
 unsigned int tunableSettingHash(TunableSetting *setting);
 bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 
-typedef HashSet<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashSetTunableSetting;
+typedef Hashset<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashsetTunableSetting;
 typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> SetIteratorTunableSetting;
 
 class SearchTuner : public Tuner {
@@ -48,8 +48,8 @@ class SearchTuner : public Tuner {
 	/** Used Settings keeps track of settings that were actually used by
 		 the example. Mutating settings may cause the Constraint Compiler
 		 not to query other settings.*/
-	HashSetTunableSetting usedSettings;
+	HashsetTunableSetting usedSettings;
 	/** Settings contains all settings. */
-	HashSetTunableSetting settings;
+	HashsetTunableSetting settings;
 };
 #endif

@@ -13,7 +13,7 @@ public:
 	~Table();
 	Array<Set *> domains;
 	Set *range;
-	HashSetTableEntry *entries;
+	HashsetTableEntry *entries;
 	CMEMALLOC;
 };
 

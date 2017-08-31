@@ -22,7 +22,7 @@ private:
 	Order* order;
 	// In future we can use a singleton class instead of static variable for keeping data that needed
 	// for translating back result
-	static HashTableOrderIntegerEncoding* orderIntegerEncoding;
+	static HashtableOrderIntegerEncoding* orderIntegerEncoding;
 };
 
 

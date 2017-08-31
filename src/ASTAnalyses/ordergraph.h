@@ -30,8 +30,8 @@ public:
 
 	CMEMALLOC;
 private:
-	HashSetOrderNode *nodes;
-	HashSetOrderEdge *edges;
+	HashsetOrderNode *nodes;
+	HashsetOrderEdge *edges;
 	Order *order;
 };
 

@@ -6,8 +6,8 @@
 #include "order.h"
 
 OrderGraph::OrderGraph(Order *_order) :
-	nodes(new HashSetOrderNode()),
-	edges(new HashSetOrderEdge()),
+	nodes(new HashsetOrderNode()),
+	edges(new HashsetOrderEdge()),
 	order(_order) {
 }
 

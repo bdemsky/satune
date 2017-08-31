@@ -20,7 +20,7 @@ public:
 	CMEMALLOC;
 	
 private:
-	HashSetOrderElement *elementTable;
+	HashsetOrderElement *elementTable;
 };
 
 #endif /* INTEGERENCODINGRECORD_H */

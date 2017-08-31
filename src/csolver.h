@@ -139,7 +139,7 @@ private:
 	void handleORFalse(BooleanLogic *bexpr, Boolean *child);
 
 	/** This is a vector of constraints that must be satisfied. */
-	HashSetBoolean constraints;
+	HashsetBoolean constraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
 	Vector<Boolean *> allBooleans;

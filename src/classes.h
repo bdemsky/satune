@@ -26,5 +26,6 @@ class Tuner;
 class Set;
 class BooleanLogic;
 typedef uint64_t VarType;
+typedef unsigned int uint;
 
 #endif

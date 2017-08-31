@@ -59,12 +59,8 @@ class TunableDesc;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
-
 struct TableEntry;
 typedef struct TableEntry TableEntry;
-
 typedef int TunableParam;
-typedef unsigned int uint;
-typedef long int int64;
 
 #endif

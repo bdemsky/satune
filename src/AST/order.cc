@@ -14,8 +14,8 @@ Order::Order(OrderType _type, Set *_set) :
 {
 }
 
-void Order::initializeOrderHashTable() {
-	orderPairTable = new HashTableOrderPair();
+void Order::initializeOrderHashtable() {
+	orderPairTable = new HashtableOrderPair();
 }
 
 

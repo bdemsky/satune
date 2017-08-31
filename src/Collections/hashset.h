@@ -7,24 +7,24 @@
  *      version 2 as published by the Free Software Foundation.
  */
 
-#ifndef HASH_SET_H
-#define HASH_SET_H
+#ifndef HASHSET_H
+#define HASHSET_H
 #include "hashtable.h"
 
 template<typename _Key>
-struct LinkNode {
+struct Linknode {
 	_Key key;
-	LinkNode<_Key> *prev;
-	LinkNode<_Key> *next;
+	Linknode<_Key> *prev;
+	Linknode<_Key> *next;
 };
 
 template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key), bool (*equals)(_Key, _Key)>
-class HashSet;
+class Hashset;
 
-template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
+template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
 class SetIterator {
 public:
-	SetIterator(LinkNode<_Key> *_curr, HashSet <_Key, _KeyInt, _Shift, hash_function, equals> *_set) :
+	SetIterator(Linknode<_Key> *_curr, Hashset <_Key, _KeyInt, _Shift, hash_function, equals> *_set) :
 		curr(_curr),
 		set(_set)
 	{
@@ -71,34 +71,34 @@ public:
 	}
 
 private:
-	LinkNode<_Key> *curr;
-	LinkNode<_Key> *last;
-	HashSet <_Key, _KeyInt, _Shift, hash_function, equals> *set;
+	Linknode<_Key> *curr;
+	Linknode<_Key> *last;
+	Hashset <_Key, _KeyInt, _Shift, hash_function, equals> *set;
 };
 
-template<typename _Key, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = default_hash_function<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = default_equals<_Key> >
-class HashSet {
+template<typename _Key, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
+class Hashset {
 public:
-	HashSet(unsigned int initialcapacity = 16, double factor = 0.5) :
-		table(new HashTable<_Key, LinkNode<_Key> *, _KeyInt, _Shift, hash_function, equals>(initialcapacity, factor)),
+	Hashset(unsigned int initialcapacity = 16, double factor = 0.5) :
+		table(new Hashtable<_Key, Linknode<_Key> *, _KeyInt, _Shift, hash_function, equals>(initialcapacity, factor)),
 		list(NULL),
 		tail(NULL)
 	{
 	}
 
 	/** @brief Hashset destructor */
-	~HashSet() {
-		LinkNode<_Key> *tmp = list;
+	~Hashset() {
+		Linknode<_Key> *tmp = list;
 		while (tmp != NULL) {
-			LinkNode<_Key> *tmpnext = tmp->next;
+			Linknode<_Key> *tmpnext = tmp->next;
 			ourfree(tmp);
 			tmp = tmpnext;
 		}
 		delete table;
 	}
 
-	HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy() {
-		HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *copy = new HashSet<_Key, _KeyInt, _Shift, hash_function, equals>(table->getCapacity(), table->getLoadFactor());
+	Hashset<_Key, _KeyInt, _Shift, hash_function, equals> *copy() {
+		Hashset<_Key, _KeyInt, _Shift, hash_function, equals> *copy = new Hashset<_Key, _KeyInt, _Shift, hash_function, equals>(table->getCapacity(), table->getLoadFactor());
 		SetIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
 		while (it->hasNext())
 			copy->add(it->next());
@@ -107,9 +107,9 @@ public:
 	}
 
 	void reset() {
-		LinkNode<_Key> *tmp = list;
+		Linknode<_Key> *tmp = list;
 		while (tmp != NULL) {
-			LinkNode<_Key> *tmpnext = tmp->next;
+			Linknode<_Key> *tmpnext = tmp->next;
 			ourfree(tmp);
 			tmp = tmpnext;
 		}
@@ -120,7 +120,7 @@ public:
 	/** @brief Adds a new key to the hashset.  Returns false if the key
 	 *  is already present. */
 
-	void addAll(HashSet<_Key, _KeyInt, _Shift, hash_function, equals> *table) {
+	void addAll(Hashset<_Key, _KeyInt, _Shift, hash_function, equals> *table) {
 		SetIterator<_Key, _KeyInt, _Shift, hash_function, equals> *it = iterator();
 		while (it->hasNext())
 			add(it->next());
@@ -131,9 +131,9 @@ public:
 	 *  is already present. */
 
 	bool add(_Key key) {
-		LinkNode<_Key> *val = table->get(key);
+		Linknode<_Key> *val = table->get(key);
 		if (val == NULL) {
-			LinkNode<_Key> *newnode = (LinkNode<_Key> *)ourmalloc(sizeof(struct LinkNode<_Key>));
+			Linknode<_Key> *newnode = (Linknode<_Key> *)ourmalloc(sizeof(struct Linknode<_Key>));
 			newnode->prev = tail;
 			newnode->next = NULL;
 			newnode->key = key;
@@ -155,7 +155,7 @@ public:
 			return NULL;
 		else if (getSize() < 6) {
 			uint count = random() % getSize();
-			LinkNode<_Key> *ptr=list;
+			Linknode<_Key> *ptr=list;
 			while(count > 0) {
 				ptr = ptr->next;
 				count--;
@@ -169,7 +169,7 @@ public:
 	 *  hashset.  Returns NULL if not present. */
 
 	_Key get(_Key key) {
-		LinkNode<_Key> *val = table->get(key);
+		Linknode<_Key> *val = table->get(key);
 		if (val != NULL)
 			return val->key;
 		else
@@ -185,7 +185,7 @@ public:
 	}
 
 	bool remove(_Key key) {
-		LinkNode<_Key> *oldlinknode;
+		Linknode<_Key> *oldlinknode;
 		oldlinknode = table->get(key);
 		if (oldlinknode == NULL) {
 			return false;
@@ -237,8 +237,8 @@ public:
 		ourfree(p);
 	}
 private:
-	HashTable<_Key, LinkNode<_Key> *, _KeyInt, _Shift, hash_function, equals> *table;
-	LinkNode<_Key> *list;
-	LinkNode<_Key> *tail;
+	Hashtable<_Key, Linknode<_Key> *, _KeyInt, _Shift, hash_function, equals> *table;
+	Linknode<_Key> *list;
+	Linknode<_Key> *tail;
 };
 #endif
