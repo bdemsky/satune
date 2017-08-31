@@ -10,6 +10,7 @@
 IntegerEncodingTransform::IntegerEncodingTransform(CSolver* _solver) 
 	:Transform(_solver)
 {	
+	orderIntEncoding = new HashTableOrderIntEncoding();
 }
 
 IntegerEncodingTransform::~IntegerEncodingTransform(){
