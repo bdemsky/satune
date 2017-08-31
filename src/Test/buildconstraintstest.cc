@@ -51,7 +51,7 @@ int main(int numargs, char **argv) {
 	Boolean *pred = solver->applyPredicate(equal2, inputs2, 2);
 	solver->addConstraint(pred);
 
-	if (solver->startEncoding() == 1)
+	if (solver->solve() == 1)
 		printf("e1=%" PRIu64 " e2=%" PRIu64 " \n", solver->getElementValue(e1), solver->getElementValue(e2));
 	else
 		printf("UNSAT\n");

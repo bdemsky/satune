@@ -16,7 +16,7 @@ void AutoTuner::addProblem(CSolver *solver) {
 long long AutoTuner::evaluate(CSolver * problem, SearchTuner *tuner) {
 	CSolver * copy=problem->clone();
 	copy->setTuner(tuner);
-	int result = copy->startEncoding();
+	int result = copy->solve();
 	long long elapsedTime=copy->getElapsedTime();
 	long long encodeTime=copy->getEncodeTime();
 	long long solveTime=copy->getSolveTime();

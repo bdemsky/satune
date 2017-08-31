@@ -106,7 +106,7 @@ public:
 	Boolean *orderConstraint(Order *order, uint64_t first, uint64_t second);
 
 	/** When everything is done, the client calls this function and then csolver starts to encode*/
-	int startEncoding();
+	int solve();
 
 	/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 	uint64_t getElementValue(Element *element);

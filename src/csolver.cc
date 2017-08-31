@@ -366,7 +366,7 @@ Order *CSolver::createOrder(OrderType type, Set *set) {
 	return order;
 }
 
-int CSolver::startEncoding() {
+int CSolver::solve() {
 	bool deleteTuner = false;
 	if (tuner == NULL) {
 		tuner = new DefaultTuner();
