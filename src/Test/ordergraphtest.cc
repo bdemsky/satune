@@ -46,7 +46,7 @@ int main(int numargs, char **argv) {
 	Boolean * array12[] = {o58, o81};
 	solver->addConstraint(solver->applyLogicalOperation(SATC_AND, array12, 2) );
 	
-	/*	if (solver->startEncoding() == 1)
+	/*	if (solver->solve() == 1)
 		printf("SAT\n");
 	else
 	printf("UNSAT\n");*/

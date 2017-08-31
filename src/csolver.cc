@@ -95,6 +95,11 @@ Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange
 	return set;
 }
 
+Element *CSolver::createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange) {
+	Set *s = createRangeSet(type, lowrange, highrange);
+	return getElementVar(s);
+}
+
 MutableSet *CSolver::createMutableSet(VarType type) {
 	MutableSet *set = new MutableSet(type);
 	allSets.push(set);
@@ -216,6 +221,25 @@ Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, ui
 	}
 }
 
+bool CSolver::isTrue(Boolean *b) {
+	return b->isTrue();
+}
+
+bool CSolver::isFalse(Boolean *b) {
+	return b->isFalse();
+}
+
+Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean * arg1, Boolean * arg2) {
+	Boolean * array[] = {arg1, arg2};
+	return applyLogicalOperation(op, array, 2);
+}
+
+Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg) {
+	Boolean * array[] = {arg};
+	return applyLogicalOperation(op, array, 1);
+}
+
+
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
 	Boolean * newarray[asize];
 	switch(op) {
@@ -223,16 +247,14 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		if (array[0]->type == LOGICOP && ((BooleanLogic *)array[0])->op==SATC_NOT) {
 			return ((BooleanLogic *) array[0])->inputs.get(0);
 		} else if (array[0]->type == BOOLCONST) {
-			bool isTrue = ((BooleanConst *) array[0])->isTrue;
-			return isTrue ? boolFalse : boolTrue;
+			return array[0]->isTrue() ? boolFalse : boolTrue;
 		}
 		break;
 	}
 	case SATC_XOR: {
 		for(uint i=0;i<2;i++) {
 			if (array[i]->type == BOOLCONST) {
-				bool isTrue = ((BooleanConst *) array[i])->isTrue;
-				if (isTrue) {
+				if (array[i]->isTrue()) {
 					newarray[0]=array[1-i];
 					return applyLogicalOperation(SATC_NOT, newarray, 1);
 				} else
@@ -246,8 +268,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		for(uint i=0;i<asize;i++) {
 			Boolean *b=array[i];
 			if (b->type == BOOLCONST) {
-				bool isTrue = ((BooleanConst *) b)->isTrue;
-				if (isTrue)
+				if (b->isTrue())
 					return b;
 				else
 					continue;
@@ -281,8 +302,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		for(uint i=0;i<asize;i++) {
 			Boolean *b=array[i];
 			if (b->type == BOOLCONST) {
-				bool isTrue = ((BooleanConst *) b)->isTrue;
-				if (isTrue)
+				if (b->isTrue())
 					continue;
 				else
 					return b;
@@ -299,16 +319,14 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 	}
 	case SATC_IMPLIES: {
 		if (array[0]->type == BOOLCONST) {
-			BooleanConst *b=(BooleanConst *) array[0];
-			if (b->isTrue) {
+			if (array[0]->isTrue()) {
 				return array[1];
 			} else {
 				return boolTrue;
 			}
 		} else if (array[1]->type == BOOLCONST) {
-			BooleanConst *b=(BooleanConst *) array[0];
-			if (b->isTrue) {
-				return b;
+			if (array[1]->isTrue()) {
+				return array[1];
 			} else {
 				return applyLogicalOperation(SATC_NOT, array, 1);
 			}
@@ -350,7 +368,7 @@ Order *CSolver::createOrder(OrderType type, Set *set) {
 	return order;
 }
 
-int CSolver::startEncoding() {
+int CSolver::solve() {
 	bool deleteTuner = false;
 	if (tuner == NULL) {
 		tuner = new DefaultTuner();

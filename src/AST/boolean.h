@@ -13,7 +13,9 @@ class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
-	virtual Boolean *clone(CSolver *solver, CloneMap *map) { ASSERT(0); return NULL; }
+	virtual Boolean *clone(CSolver *solver, CloneMap *map) = 0;
+	virtual bool isTrue() {return false;}
+	virtual bool isFalse() {return false;}
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
@@ -25,7 +27,9 @@ class BooleanConst : public Boolean {
  public:
 	BooleanConst(bool isTrue);
 	Boolean *clone(CSolver *solver, CloneMap *map);
-	bool isTrue;
+	bool isTrue() {return istrue;}
+	bool isFalse() {return !istrue;}
+	bool istrue;
 	CMEMALLOC;
 };
 

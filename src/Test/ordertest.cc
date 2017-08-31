@@ -15,7 +15,7 @@ int main(int numargs, char **argv) {
 	Boolean *b2 =  solver->orderConstraint(order, 1, 4);
 	solver->addConstraint(b1);
 	solver->addConstraint(b2);
-	if (solver->startEncoding() == 1)
+	if (solver->solve() == 1)
 		printf("SAT\n");
 	else
 		printf("UNSAT\n");

@@ -24,7 +24,7 @@ int main(int numargs, char **argv) {
 	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, barray4, 2));
 	Boolean *barray5[] = {b1, b4};
 	solver->addConstraint(solver->applyLogicalOperation(SATC_XOR, barray5, 2));
-	if (solver->startEncoding() == 1)
+	if (solver->solve() == 1)
 		printf("b1=%d b2=%d b3=%d b4=%d\n",
 					 solver->getBooleanValue(b1), solver->getBooleanValue(b2),
 					 solver->getBooleanValue(b3), solver->getBooleanValue(b4));

@@ -17,6 +17,8 @@ public:
 
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
 
+	Element *createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange);
+		
 	/** This function creates a mutable set. */
 
 	MutableSet *createMutableSet(VarType type);
@@ -84,6 +86,14 @@ public:
 
 	Boolean *applyLogicalOperation(LogicOp op, Boolean **array, uint asize);
 
+		/** This function applies a logical operation to the Booleans in its input. */
+
+	Boolean *applyLogicalOperation(LogicOp op, Boolean * arg1, Boolean * arg2);
+
+	/** This function applies a logical operation to the Booleans in its input. */
+
+	Boolean *applyLogicalOperation(LogicOp op, Boolean *arg);
+
 	/** This function adds a boolean constraint to the set of constraints
 	    to be satisfied */
 
@@ -96,7 +106,7 @@ public:
 	Boolean *orderConstraint(Order *order, uint64_t first, uint64_t second);
 
 	/** When everything is done, the client calls this function and then csolver starts to encode*/
-	int startEncoding();
+	int solve();
 
 	/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 	uint64_t getElementValue(Element *element);
@@ -106,6 +116,9 @@ public:
 
 	HappenedBefore getOrderConstraintValue(Order *order, uint64_t first, uint64_t second);
 
+	bool isTrue(Boolean *b);
+	bool isFalse(Boolean *b);
+	
 	void setUnSAT() { unsat = true; }
 
 	bool isUnSAT() { return unsat; }
