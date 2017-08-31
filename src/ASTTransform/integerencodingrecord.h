@@ -13,13 +13,14 @@
 
 class IntegerEncodingRecord {
 public:
-	Set* set;
 	IntegerEncodingRecord(Set* set);
 	~IntegerEncodingRecord();
 	Element* getOrderIntegerElement(CSolver *This, uint64_t item);
+	inline Set* getSecondarySet() { return secondarySet; }
 	CMEMALLOC;
 	
 private:
+	Set* secondarySet;
 	HashsetOrderElement *elementTable;
 };
 

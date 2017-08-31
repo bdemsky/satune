@@ -10,7 +10,7 @@
 #include "orderelement.h"
 
 IntegerEncodingRecord::IntegerEncodingRecord(Set* _set):
-	set(_set)
+	secondarySet(_set)
 {
 	elementTable = new HashsetOrderElement();
 }
@@ -24,10 +24,10 @@ IntegerEncodingRecord::~IntegerEncodingRecord(){
 Element * IntegerEncodingRecord::getOrderIntegerElement(CSolver *This, uint64_t item) {
 	OrderElement oelement(item, NULL);
 	if ( !elementTable->contains(&oelement)) {
-		Element *elem = This->getElementVar(set);
+		Element *elem = This->getElementVar(secondarySet);
 		elementTable->add(new OrderElement(item, elem));
 		return elem;
 	} else
-		return elementTable->get(&oelement)->elem;
+		return elementTable->get(&oelement)->getElement();
 }
 

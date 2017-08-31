@@ -13,16 +13,15 @@
 
 class IntegerEncodingTransform : public Transform{
 public:
-	IntegerEncodingTransform(CSolver* solver, Order* order);
+	IntegerEncodingTransform(CSolver* solver);
 	void orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder);
+	void setCurrentOrder(Order* _curr) {currOrder = _curr;}
 	void doTransform();
 	bool canExecuteTransform();
 	virtual ~IntegerEncodingTransform();
 private:
-	Order* order;
-	// In future we can use a singleton class instead of static variable for keeping data that needed
-	// for translating back result
-	static HashtableOrderIntegerEncoding* orderIntegerEncoding;
+	Order* currOrder;
+	HashTableOrderIntEncoding* orderIntEncoding;
 };
 
 

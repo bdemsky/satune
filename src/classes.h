@@ -23,6 +23,7 @@ class Order;
 class MutableSet;
 class Function;
 class Tuner;
+class Transformer;
 class Set;
 class BooleanLogic;
 typedef uint64_t VarType;

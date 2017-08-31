@@ -1,4 +1,4 @@
-#include "analyzer.h"
+#include "transformer.h"
 #include "common.h"
 #include "order.h"
 #include "boolean.h"
@@ -16,12 +16,22 @@
 #include "integerencoding.h"
 #include "decomposeordertransform.h"
 
-void orderAnalysis(CSolver *This) {
-	Vector<Order *> *orders = This->getOrders();
+Transformer::Transformer(CSolver *_solver):
+	integerEncoding(new IntegerEncodingTransform(_solver)),
+	solver(_solver)
+{
+}
+
+Transformer::~Transformer(){
+	delete integerEncoding;
+}
+
+void Transformer::orderAnalysis() {
+	Vector<Order *> *orders = solver->getOrders();
 	uint size = orders->getSize();
 	for (uint i = 0; i < size; i++) {
 		Order *order = orders->get(i);
-		DecomposeOrderTransform* decompose = new DecomposeOrderTransform(This, order);
+		DecomposeOrderTransform* decompose = new DecomposeOrderTransform(solver, order);
 		if (!decompose->canExecuteTransform()){
 			delete decompose;
 			continue;
@@ -36,26 +46,26 @@ void orderAnalysis(CSolver *This) {
 		}
 
 
-		bool mustReachGlobal = GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
+		bool mustReachGlobal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
 
 		if (mustReachGlobal)
-			reachMustAnalysis(This, graph, false);
+			reachMustAnalysis(solver, graph, false);
 
-		bool mustReachLocal = GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
+		bool mustReachLocal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
 
 		if (mustReachLocal) {
 			//This pair of analysis is also optional
 			if (order->type == SATC_PARTIAL) {
-				localMustAnalysisPartial(This, graph);
+				localMustAnalysisPartial(solver, graph);
 			} else {
-				localMustAnalysisTotal(This, graph);
+				localMustAnalysisTotal(solver, graph);
 			}
 		}
 
-		bool mustReachPrune = GETVARTUNABLE(This->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
+		bool mustReachPrune = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
 
 		if (mustReachPrune)
-			removeMustBeTrueNodes(This, graph);
+			removeMustBeTrueNodes(solver, graph);
 
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
@@ -64,13 +74,11 @@ void orderAnalysis(CSolver *This) {
 		delete decompose;
 		delete graph;
 
-		IntegerEncodingTransform* integerEncoding = new IntegerEncodingTransform(This, order);
+		integerEncoding->setCurrentOrder(order);
 		if(!integerEncoding->canExecuteTransform()){
-			delete integerEncoding;
 			continue;
 		}
 		integerEncoding->doTransform();
-		delete integerEncoding;
  	}
 }
 
