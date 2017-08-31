@@ -15,9 +15,8 @@
 #include "csolver.h"
 
 
-DecomposeOrderTransform::DecomposeOrderTransform(CSolver* _solver, Order* _order)
-	:Transform(_solver),
-	order(_order)
+DecomposeOrderTransform::DecomposeOrderTransform(CSolver* _solver)
+	:Transform(_solver)
 {
 }
 
@@ -25,20 +24,20 @@ DecomposeOrderTransform::~DecomposeOrderTransform() {
 }
 
 bool DecomposeOrderTransform::canExecuteTransform(){
-	return canExecutePass(solver, order->type, DECOMPOSEORDER, &onoff);
+	return canExecutePass(solver, currOrder->type, DECOMPOSEORDER, &onoff);
 }
 
 void DecomposeOrderTransform::doTransform(){
 	Vector<Order *> ordervec;
 	Vector<Order *> partialcandidatevec;
-	uint size = order->constraints.getSize();
+	uint size = currOrder->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
-		BooleanOrder *orderconstraint = order->constraints.get(i);
-		OrderNode *from = graph->getOrderNodeFromOrderGraph(orderconstraint->first);
-		OrderNode *to = graph->getOrderNodeFromOrderGraph(orderconstraint->second);
+		BooleanOrder *orderconstraint = currOrder->constraints.get(i);
+		OrderNode *from = currGraph->getOrderNodeFromOrderGraph(orderconstraint->first);
+		OrderNode *to = currGraph->getOrderNodeFromOrderGraph(orderconstraint->second);
 		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
 		if (from->sccNum != to->sccNum) {
-			OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);
+			OrderEdge *edge = currGraph->getOrderEdgeFromOrderGraph(from, to);
 			if (edge->polPos) {
 				solver->replaceBooleanWithTrue(orderconstraint);
 			} else if (edge->polNeg) {
@@ -53,10 +52,10 @@ void DecomposeOrderTransform::doTransform(){
 			if (ordervec.getSize() > from->sccNum)
 				neworder = ordervec.get(from->sccNum);
 			if (neworder == NULL) {
-				MutableSet *set = solver->createMutableSet(order->set->getType());
-				neworder = solver->createOrder(order->type, set);
+				MutableSet *set = solver->createMutableSet(currOrder->set->getType());
+				neworder = solver->createOrder(currOrder->type, set);
 				ordervec.setExpand(from->sccNum, neworder);
-				if (order->type == SATC_PARTIAL)
+				if (currOrder->type == SATC_PARTIAL)
 					partialcandidatevec.setExpand(from->sccNum, neworder);
 				else
 					partialcandidatevec.setExpand(from->sccNum, NULL);
@@ -69,8 +68,8 @@ void DecomposeOrderTransform::doTransform(){
 				to->status = SATC_ADDEDTOSET;
 				((MutableSet *)neworder->set)->addElementMSet(to->id);
 			}
-			if (order->type == SATC_PARTIAL) {
-				OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);
+			if (currOrder->type == SATC_PARTIAL) {
+				OrderEdge *edge = currGraph->getOrderEdgeFromOrderGraph(from, to);
 				if (edge->polNeg)
 					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}

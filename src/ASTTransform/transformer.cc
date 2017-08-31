@@ -18,12 +18,14 @@
 
 Transformer::Transformer(CSolver *_solver):
 	integerEncoding(new IntegerEncodingTransform(_solver)),
+	decomposeOrder(new DecomposeOrderTransform(_solver)),
 	solver(_solver)
 {
 }
 
 Transformer::~Transformer(){
 	delete integerEncoding;
+	delete decomposeOrder;
 }
 
 void Transformer::orderAnalysis() {
@@ -31,9 +33,8 @@ void Transformer::orderAnalysis() {
 	uint size = orders->getSize();
 	for (uint i = 0; i < size; i++) {
 		Order *order = orders->get(i);
-		DecomposeOrderTransform* decompose = new DecomposeOrderTransform(solver, order);
-		if (!decompose->canExecuteTransform()){
-			delete decompose;
+		decomposeOrder->setCurrentOrder(order);
+		if (!decomposeOrder->canExecuteTransform()){
 			continue;
 		}
 
@@ -69,9 +70,8 @@ void Transformer::orderAnalysis() {
 
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
-		decompose->setOrderGraph(graph);
-		decompose->doTransform();
-		delete decompose;
+		decomposeOrder->setOrderGraph(graph);
+		decomposeOrder->doTransform();
 		delete graph;
 
 		integerEncoding->setCurrentOrder(order);

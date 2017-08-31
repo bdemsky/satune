@@ -13,16 +13,17 @@
 
 class DecomposeOrderTransform : public Transform {
 public:
-	DecomposeOrderTransform(CSolver* _solver, Order* order);
+	DecomposeOrderTransform(CSolver* _solver);
 	virtual ~DecomposeOrderTransform();
 	void doTransform();
 	void setOrderGraph(OrderGraph* _graph){
-		graph = _graph;
+		currGraph = _graph;
 	}
+	void setCurrentOrder(Order* _current) { currOrder = _current;}
 	bool canExecuteTransform();
 private:
-	Order* order;
-	OrderGraph* graph;
+	Order* currOrder;
+	OrderGraph* currGraph;
 };
 
 #endif /* ORDERTRANSFORM_H */

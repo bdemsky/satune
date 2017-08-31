@@ -11,6 +11,7 @@
 #include "structs.h"
 #include "transform.h"
 #include "integerencoding.h"
+#include "decomposeordertransform.h"
 
 class Transformer{
 public:
@@ -21,7 +22,7 @@ public:
 private:
 	//For now we can just add transforms here, but in future we may want take a smarter approach.
 	IntegerEncodingTransform* integerEncoding;
-	
+	DecomposeOrderTransform* decomposeOrder;
 	
 	CSolver* solver;
 };
