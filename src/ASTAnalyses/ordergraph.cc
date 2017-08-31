@@ -6,8 +6,8 @@
 #include "order.h"
 
 OrderGraph::OrderGraph(Order *_order) :
-	nodes(new HashSetOrderNode()),
-	edges(new HashSetOrderEdge()),
+	nodes(new HashsetOrderNode()),
+	edges(new HashsetOrderEdge()),
 	order(_order) {
 }
 
@@ -46,7 +46,7 @@ void OrderGraph::addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *
 			break;
 	}
 	case P_FALSE: {
-		if (order->type == TOTAL) {
+		if (order->type == SATC_TOTAL) {
 			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph( node2, node1);
 			if (mustval == BV_MUSTBEFALSE || mustval == BV_UNSAT)
 				_2to1->mustPos = true;
@@ -83,7 +83,7 @@ void OrderGraph::addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrd
 			break;
 	}
 	case BV_MUSTBEFALSE: {
-		if (order->type == TOTAL) {
+		if (order->type == SATC_TOTAL) {
 			OrderEdge *_2to1 = getOrderEdgeFromOrderGraph(node2, node1);
 			_2to1->mustPos = true;
 			_2to1->polPos = true;
@@ -159,14 +159,14 @@ void OrderGraph::addMustOrderConstraintToOrderGraph(BooleanOrder *bOrder) {
 }
 
 OrderGraph::~OrderGraph() {
-	HSIteratorOrderNode *iterator = nodes->iterator();
+	SetIteratorOrderNode *iterator = nodes->iterator();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
 		delete node;
 	}
 	delete iterator;
 
-	HSIteratorOrderEdge *eiterator = edges->iterator();
+	SetIteratorOrderEdge *eiterator = edges->iterator();
 	while (eiterator->hasNext()) {
 		OrderEdge *edge = eiterator->next();
 		delete edge;

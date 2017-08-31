@@ -12,10 +12,10 @@ FunctionTable::FunctionTable (Table *_table, UndefinedBehavior _undefBehavior) :
 uint64_t FunctionOperator::applyFunctionOperator(uint numVals, uint64_t *values) {
 	ASSERT(numVals == 2);
 	switch (op) {
-	case ADD:
+	case SATC_ADD:
 		return values[0] + values[1];
 		break;
-	case SUB:
+	case SATC_SUB:
 		return values[0] - values[1];
 		break;
 	default:

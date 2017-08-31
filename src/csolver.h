@@ -1,8 +1,8 @@
 #ifndef CSOLVER_H
 #define CSOLVER_H
-#include "classlist.h"
+#include "classes.h"
 #include "ops.h"
-#include "structs.h"
+#include "corestructs.h"
 #include "asthash.h"
 
 class CSolver {
@@ -38,6 +38,10 @@ public:
 	/** This function creates an element constrant. */
 	Element *getElementConst(VarType type, uint64_t value);
 
+	Boolean *getBooleanTrue();
+
+	Boolean *getBooleanFalse();
+	
 	/** This function creates a boolean variable. */
 
 	Boolean *getBooleanVar(VarType type);
@@ -111,7 +115,7 @@ public:
 	Tuner *getTuner() { return tuner; }
 	Transformer* getTransformer() {return transformer;}
 	
-	HSIteratorBoolean *getConstraints() { return constraints.iterator(); }
+	SetIteratorBoolean *getConstraints() { return constraints.iterator(); }
 
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
@@ -121,13 +125,13 @@ public:
 	CSolver *clone();
 	void autoTune(uint budget);
 
-	void setTuner(Transformer * _transformer) {  transformer = _transformer; }
+	void setTransformer(Transformer * _transformer) {  transformer = _transformer; }
 	void setTuner(Tuner * _tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();
 	long long getSolveTime();
 	
-	MEMALLOC;
+	CMEMALLOC;
 
 private:
 	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);
@@ -137,7 +141,7 @@ private:
 	void handleORFalse(BooleanLogic *bexpr, Boolean *child);
 
 	/** This is a vector of constraints that must be satisfied. */
-	HashSetBoolean constraints;
+	HashsetBoolean constraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
 	Vector<Boolean *> allBooleans;
@@ -160,6 +164,9 @@ private:
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 
+	Boolean * boolTrue;
+	Boolean * boolFalse;
+	
 	/** These two tables are used for deduplicating entries. */
 	BooleanMatchMap boolMap;
 	ElementMatchMap elemMap;

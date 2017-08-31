@@ -24,7 +24,7 @@ public:
 	FunctionEncoding(Boolean *predicate);
 	void setFunctionEncodingType(FunctionEncodingType type);
 	FunctionEncodingType getFunctionEncodingType() {return type;}
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 

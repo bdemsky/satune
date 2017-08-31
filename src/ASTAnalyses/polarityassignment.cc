@@ -2,7 +2,7 @@
 #include "csolver.h"
 
 void computePolarities(CSolver *This) {
-	HSIteratorBoolean *iterator = This->getConstraints();
+	SetIteratorBoolean *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
 		Boolean *boolean = iterator->next();
 		updatePolarity(boolean, P_TRUE);
@@ -81,8 +81,8 @@ BooleanValue negateBooleanValue(BooleanValue This) {
 void computeLogicOpPolarity(BooleanLogic *This) {
 	Polarity parentpolarity = This->polarity;
 	switch (This->op) {
-	case L_AND:
-	case L_OR: {
+	case SATC_AND:
+	case SATC_OR: {
 		uint size = This->inputs.getSize();
 		for (uint i = 0; i < size; i++) {
 			Boolean *tmp = This->inputs.get(i);
@@ -90,17 +90,17 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 		}
 		break;
 	}
-	case L_NOT: {
+	case SATC_NOT: {
 		Boolean *tmp = This->inputs.get(0);
 		updatePolarity(tmp, negatePolarity(parentpolarity));
 		break;
 	}
-	case L_XOR: {
+	case SATC_XOR: {
 		updatePolarity(This->inputs.get(0), P_BOTHTRUEFALSE);
 		updatePolarity(This->inputs.get(1), P_BOTHTRUEFALSE);
 		break;
 	}
-	case L_IMPLIES: {
+	case SATC_IMPLIES: {
 		Boolean *left = This->inputs.get(0);
 		updatePolarity(left, negatePolarity( parentpolarity));
 		Boolean *right = This->inputs.get(1);
@@ -115,7 +115,7 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 void computeLogicOpBooleanValue(BooleanLogic *This) {
 	BooleanValue parentbv = This->boolVal;
 	switch (This->op) {
-	case L_AND: {
+	case SATC_AND: {
 		if (parentbv == BV_MUSTBETRUE || parentbv == BV_UNSAT) {
 			uint size = This->inputs.getSize();
 			for (uint i = 0; i < size; i++) {
@@ -124,7 +124,7 @@ void computeLogicOpBooleanValue(BooleanLogic *This) {
 		}
 		return;
 	}
-	case L_OR: {
+	case SATC_OR: {
 		if (parentbv == BV_MUSTBEFALSE || parentbv == BV_UNSAT) {
 			uint size = This->inputs.getSize();
 			for (uint i = 0; i < size; i++) {
@@ -133,10 +133,10 @@ void computeLogicOpBooleanValue(BooleanLogic *This) {
 		}
 		return;
 	}
-	case L_NOT:
+	case SATC_NOT:
 		updateMustValue(This->inputs.get(0), negateBooleanValue(parentbv));
 		return;
-	case L_IMPLIES:
+	case SATC_IMPLIES:
 		//implies is really an or with the first term negated
 		if (parentbv == BV_MUSTBEFALSE || parentbv == BV_UNSAT) {
 			uint size = This->inputs.getSize();
@@ -144,7 +144,7 @@ void computeLogicOpBooleanValue(BooleanLogic *This) {
 			updateMustValue(This->inputs.get(1), parentbv);
 		}
 		return;
-	case L_XOR:
+	case SATC_XOR:
 		return;
 	default:
 		ASSERT(0);

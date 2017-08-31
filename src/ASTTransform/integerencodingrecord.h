@@ -17,10 +17,11 @@ public:
 	~IntegerEncodingRecord();
 	Element* getOrderIntegerElement(CSolver *This, uint64_t item);
 	inline Set* getSecondarySet() { return secondarySet; }
-	MEMALLOC;
+	CMEMALLOC;
+	
 private:
 	Set* secondarySet;
-	HashSetOrderElement *elementTable;
+	HashsetOrderElement *elementTable;
 };
 
 #endif /* INTEGERENCODINGRECORD_H */

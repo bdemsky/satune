@@ -3,6 +3,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "ops.h"
+#include "astops.h"
 #include "structs.h"
 #include "astnode.h"
 #include "functionencoding.h"
@@ -17,7 +18,15 @@ public:
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
 
-	MEMALLOC;
+	CMEMALLOC;
+};
+
+class BooleanConst : public Boolean {
+ public:
+	BooleanConst(bool isTrue);
+	Boolean *clone(CSolver *solver, CloneMap *map);
+	bool isTrue;
+	CMEMALLOC;
 };
 
 class BooleanVar : public Boolean {
@@ -27,7 +36,7 @@ public:
 
 	VarType vtype;
 	Edge var;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanOrder : public Boolean {
@@ -38,7 +47,7 @@ public:
 	Order *order;
 	uint64_t first;
 	uint64_t second;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanPredicate : public Boolean {
@@ -51,7 +60,7 @@ public:
 	Array<Element *> inputs;
 	Boolean *undefStatus;
 	FunctionEncoding *getFunctionEncoding() {return &encoding;}
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class BooleanLogic : public Boolean {
@@ -61,6 +70,6 @@ public:
 
 	LogicOp op;
 	Array<Boolean *> inputs;
-	MEMALLOC;
+	CMEMALLOC;
 };
 #endif

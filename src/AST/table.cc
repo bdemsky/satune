@@ -9,7 +9,7 @@
 Table::Table(Set **_domains, uint numDomain, Set *_range) :
 	domains(_domains, numDomain),
 	range(_range) {
-	entries = new HashSetTableEntry();
+	entries = new HashsetTableEntry();
 }
 
 void Table::addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result) {
@@ -39,7 +39,7 @@ Table *Table::clone(CSolver *solver, CloneMap *map) {
 	}
 	Set *rcopy = range != NULL ? range->clone(solver, map) : NULL;
 	t = solver->createTable(array, domains.getSize(), rcopy);
-	HSIteratorTableEntry *entryit = entries->iterator();
+	SetIteratorTableEntry *entryit = entries->iterator();
 	while (entryit->hasNext()) {
 		TableEntry *te = entryit->next();
 		solver->addTableEntry(t, &te->inputs[0], te->inputSize, te->output);
@@ -50,7 +50,7 @@ Table *Table::clone(CSolver *solver, CloneMap *map) {
 }
 
 Table::~Table() {
-	HSIteratorTableEntry *iterator = entries->iterator();
+	SetIteratorTableEntry *iterator = entries->iterator();
 	while (iterator->hasNext()) {
 		deleteTableEntry(iterator->next());
 	}

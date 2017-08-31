@@ -52,7 +52,7 @@ SearchTuner::SearchTuner() {
 
 SearchTuner * SearchTuner::copyUsed() {
 	SearchTuner * tuner = new SearchTuner();
-	HSIteratorTunableSetting *iterator=usedSettings.iterator();
+	SetIteratorTunableSetting *iterator=usedSettings.iterator();
 	while(iterator->hasNext()) {
 		TunableSetting *setting=iterator->next();
 		TunableSetting *copy=new TunableSetting(setting);
@@ -63,7 +63,7 @@ SearchTuner * SearchTuner::copyUsed() {
 }
 
 SearchTuner::~SearchTuner() {
-	HSIteratorTunableSetting *iterator=settings.iterator();
+	SetIteratorTunableSetting *iterator=settings.iterator();
 	while(iterator->hasNext()) {
 		TunableSetting *setting=iterator->next();
 		delete setting;
@@ -114,7 +114,7 @@ void SearchTuner::randomMutate() {
 }
 
 void SearchTuner::print() {
-	HSIteratorTunableSetting *iterator=settings.iterator();
+	SetIteratorTunableSetting *iterator=settings.iterator();
 	while(iterator->hasNext()) {
 		TunableSetting *setting=iterator->next();
 		setting->print();
@@ -124,7 +124,7 @@ void SearchTuner::print() {
 }
 
 void SearchTuner::printUsed() {
-	HSIteratorTunableSetting *iterator=usedSettings.iterator();
+	SetIteratorTunableSetting *iterator=usedSettings.iterator();
 	while(iterator->hasNext()) {
 		TunableSetting *setting=iterator->next();
 		setting->print();

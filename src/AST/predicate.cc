@@ -12,15 +12,15 @@ PredicateTable::PredicateTable(Table *_table, UndefinedBehavior _undefBehavior) 
 
 bool PredicateOperator::evalPredicateOperator(uint64_t *inputs) {
 	switch (op) {
-	case EQUALS:
+	case SATC_EQUALS:
 		return inputs[0] == inputs[1];
-	case LT:
+	case SATC_LT:
 		return inputs[0] < inputs[1];
-	case GT:
+	case SATC_GT:
 		return inputs[0] > inputs[1];
-	case LTE:
+	case SATC_LTE:
 		return inputs[0] <= inputs[1];
-	case GTE:
+	case SATC_GTE:
 		return inputs[0] >= inputs[1];
 	}
 	ASSERT(0);

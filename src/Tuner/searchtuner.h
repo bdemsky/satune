@@ -11,7 +11,7 @@ class TunableSetting {
 	TunableSetting(TunableSetting * ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
 	void print();
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	bool hasVar;
 	VarType type;
@@ -28,8 +28,8 @@ class TunableSetting {
 unsigned int tunableSettingHash(TunableSetting *setting);
 bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 
-typedef HashSet<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashSetTunableSetting;
-typedef HSIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HSIteratorTunableSetting;
+typedef Hashset<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashsetTunableSetting;
+typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> SetIteratorTunableSetting;
 
 class SearchTuner : public Tuner {
  public:
@@ -43,13 +43,13 @@ class SearchTuner : public Tuner {
 	void print();
 	void printUsed();
 
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	/** Used Settings keeps track of settings that were actually used by
 		 the example. Mutating settings may cause the Constraint Compiler
 		 not to query other settings.*/
-	HashSetTunableSetting usedSettings;
+	HashsetTunableSetting usedSettings;
 	/** Settings contains all settings. */
-	HashSetTunableSetting settings;
+	HashsetTunableSetting settings;
 };
 #endif

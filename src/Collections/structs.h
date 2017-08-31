@@ -5,6 +5,7 @@
 #include "hashset.h"
 #include "classlist.h"
 #include "array.h"
+#include "corestructs.h"
 
 unsigned int table_entry_hash_function(TableEntry *This);
 bool table_entry_equals(TableEntry *key1, TableEntry *key2);
@@ -16,25 +17,21 @@ unsigned int order_element_hash_function(OrderElement *This);
 bool order_element_equals(OrderElement *key1, OrderElement *key2);
 unsigned int order_pair_hash_function(OrderPair *This);
 bool order_pair_equals(OrderPair *key1, OrderPair *key2);
-unsigned int order_hash_function(Order *This);
-bool order_pair_equals(Order *key1, Order *key2);
 
 
-typedef HashSet<Boolean *, uintptr_t, 4> HashSetBoolean;
-typedef HashSet<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HashSetTableEntry;
-typedef HashSet<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HashSetOrderNode;
-typedef HashSet<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HashSetOrderEdge;
-typedef HashSet<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashSetOrderElement;
+typedef Hashset<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HashsetTableEntry;
+typedef Hashset<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HashsetOrderNode;
+typedef Hashset<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HashsetOrderEdge;
+typedef Hashset<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashsetOrderElement;
 
-typedef HashTable<OrderNode *, HashSetOrderNode *, uintptr_t, 4> HashTableNodeToNodeSet;
-typedef HashTable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashTableOrderPair;
-typedef HashTable<void *, void *, uintptr_t, 4> CloneMap;
-typedef HashTable<Order* , IntegerEncodingRecord*, uintptr_t, 4, order_hash_function, order_pair_equals> HashTableOrderIntEncoding; 
+typedef Hashtable<OrderNode *, HashsetOrderNode *, uintptr_t, 4> HashtableNodeToNodeSet;
+typedef Hashtable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashtableOrderPair;
+typedef Hashtable<void *, void *, uintptr_t, 4> CloneMap;
+typedef Hashtable<Order* , IntegerEncodingRecord*, uintptr_t, 4> HashTableOrderIntEncoding; 
 
-typedef HSIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> HSIteratorTableEntry;
-typedef HSIterator<Boolean *, uintptr_t, 4> HSIteratorBoolean;
-typedef HSIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HSIteratorOrderEdge;
-typedef HSIterator<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> HSIteratorOrderNode;
-typedef HSIterator<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HSIteratorOrderElement;
+typedef SetIterator<TableEntry *, uintptr_t, 4, table_entry_hash_function, table_entry_equals> SetIteratorTableEntry;
+typedef SetIterator<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> SetIteratorOrderEdge;
+typedef SetIterator<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_equals> SetIteratorOrderNode;
+typedef SetIterator<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> SetIteratorOrderElement;
 
 #endif

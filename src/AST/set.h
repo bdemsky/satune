@@ -25,7 +25,7 @@ public:
 	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
 	virtual Set *clone(CSolver *solver, CloneMap *map);
-	MEMALLOC;
+	CMEMALLOC;
 protected:
 	VarType type;
 	bool isRange;

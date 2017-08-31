@@ -38,7 +38,7 @@ void Transformer::orderAnalysis() {
 		}
 
 		OrderGraph *graph = buildOrderGraph(order);
-		if (order->type == PARTIAL) {
+		if (order->type == SATC_PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
 			//makes sure we don't incorrectly optimize graphs with negative
 			//polarity edges
@@ -54,8 +54,8 @@ void Transformer::orderAnalysis() {
 		bool mustReachLocal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
 
 		if (mustReachLocal) {
-			//solver pair of analysis is also optional
-			if (order->type == PARTIAL) {
+			//This pair of analysis is also optional
+			if (order->type == SATC_PARTIAL) {
 				localMustAnalysisPartial(solver, graph);
 			} else {
 				localMustAnalysisTotal(solver, graph);

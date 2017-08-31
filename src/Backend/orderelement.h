@@ -18,7 +18,7 @@ public:
 	inline uint getHash() {return (uint) item;}
 	inline bool equals(OrderElement* oe){ return item == oe->item;}
 	inline Element* getElement() { return elem; }
-	MEMALLOC;
+	CMEMALLOC;
 private:
 	uint64_t item;
 	Element *elem;

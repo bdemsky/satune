@@ -55,7 +55,7 @@ public:
 		};
 	};
 	uint numVars;	/* Number of variables */
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 

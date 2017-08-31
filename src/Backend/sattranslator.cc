@@ -90,7 +90,7 @@ HappenedBefore getOrderConstraintValueSATTranslator(CSolver *This, Order *order,
 	OrderPair pair(first, second, E_NULL);
 	Edge var = getOrderConstraint(order->orderPairTable, &pair);
 	if (edgeIsNull(var))
-		return UNORDERED;
-	return getValueCNF(This->getSATEncoder()->getCNF(), var) ? FIRST : SECOND;
+		return SATC_UNORDERED;
+	return getValueCNF(This->getSATEncoder()->getCNF(), var) ? SATC_FIRST : SATC_SECOND;
 }
 

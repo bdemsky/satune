@@ -117,7 +117,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		uint64_t result = function->applyFunctionOperator(numDomains, vals);
 		bool isInRange = ((FunctionOperator *)func->function)->isInRangeFunction(result);
 		bool needClause = isInRange;
-		if (function->overflowbehavior == OVERFLOWSETSFLAG || function->overflowbehavior == FLAGIFFOVERFLOW) {
+		if (function->overflowbehavior == SATC_OVERFLOWSETSFLAG || function->overflowbehavior == SATC_FLAGIFFOVERFLOW) {
 			needClause = true;
 		}
 
@@ -133,17 +133,17 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 
 			Edge clause;
 			switch (function->overflowbehavior) {
-			case IGNORE:
-			case NOOVERFLOW:
-			case WRAPAROUND: {
+			case SATC_IGNORE:
+			case SATC_NOOVERFLOW:
+			case SATC_WRAPAROUND: {
 				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				break;
 			}
-			case FLAGFORCESOVERFLOW: {
+			case SATC_FLAGFORCESOVERFLOW: {
 				clause = constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				break;
 			}
-			case OVERFLOWSETSFLAG: {
+			case SATC_OVERFLOWSETSFLAG: {
 				if (isInRange) {
 					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				} else {
@@ -151,7 +151,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 				}
 				break;
 			}
-			case FLAGIFFOVERFLOW: {
+			case SATC_FLAGIFFOVERFLOW: {
 				if (isInRange) {
 					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				} else {
@@ -205,11 +205,11 @@ Edge SATEncoder::encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constra
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
 	switch (predicate->op) {
-	case EQUALS:
+	case SATC_EQUALS:
 		return generateEquivNVConstraint(cnf, numVars, ee0->variables, ee1->variables);
-	case LT:
+	case SATC_LT:
 		return generateLTConstraint(cnf, numVars, ee0->variables, ee1->variables);
-	case GT:
+	case SATC_GT:
 		return generateLTConstraint(cnf, numVars, ee1->variables, ee0->variables);
 	default:
 		ASSERT(0);

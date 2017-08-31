@@ -42,7 +42,7 @@ SearchTuner * AutoTuner::mutateTuner(SearchTuner * oldTuner, uint k) {
 	SearchTuner *newTuner=oldTuner->copyUsed();
 	uint numSettings=oldTuner->getSize();
 	double factor=0.3;//Adjust this factor...
-	uint settingsToMutate=(uint)(factor*(((double)numSettings) * k)/(budget));
+	uint settingsToMutate=(uint)(factor*(((double)numSettings) * (budget - k))/(budget));
 	if (settingsToMutate < 1)
 		settingsToMutate=1;
 	model_print("Mutating %u settings\n", settingsToMutate);

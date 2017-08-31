@@ -14,7 +14,7 @@ public:
 
 	OrderEncodingType type;
 	Order *order;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 #endif

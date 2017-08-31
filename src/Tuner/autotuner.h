@@ -8,7 +8,7 @@ class AutoTuner {
 	AutoTuner(uint budget);
 	void addProblem(CSolver *solver);
 	void tune();
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	long long evaluate(CSolver *problem, SearchTuner *tuner);
 	double evaluateAll(SearchTuner *tuner);

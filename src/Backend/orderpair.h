@@ -19,7 +19,7 @@ public:
 	uint64_t first;
 	uint64_t second;
 	Edge constraint;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 #endif/* ORDERPAIR_H */

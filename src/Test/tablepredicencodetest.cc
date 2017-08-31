@@ -40,20 +40,20 @@ int main(int numargs, char **argv) {
 	solver->addTableEntry(t1, row4, 3, false);
 	solver->addTableEntry(t1, row5, 3, false);
 	solver->addTableEntry(t1, row6, 3, true);
-	Predicate *p1 = solver->createPredicateTable(t1, FLAGIFFUNDEFINED);
+	Predicate *p1 = solver->createPredicateTable(t1, SATC_FLAGIFFUNDEFINED);
 	Boolean *undef = solver->getBooleanVar(2);
 	Element *tmparray[] = {e1, e2, e3};
 	Boolean *b1 = solver->applyPredicateTable(p1, tmparray, 3, undef);
 	solver->addConstraint(b1);
 
 	Set *deq[] = {s3,s2};
-	Predicate *gte = solver->createPredicateOperator(GTE, deq, 2);
+	Predicate *gte = solver->createPredicateOperator(SATC_GTE, deq, 2);
 	Element *inputs2 [] = {e3, e2};
 	Boolean *pred = solver->applyPredicate(gte, inputs2, 2);
 	solver->addConstraint(pred);
 
 	Set *d1[] = {s1, s2};
-	Predicate *eq = solver->createPredicateOperator(EQUALS, d1, 2);
+	Predicate *eq = solver->createPredicateOperator(SATC_EQUALS, d1, 2);
 	Element *tmparray2[] = {e1, e2};
 	Boolean *pred2 = solver->applyPredicate(eq, tmparray2, 2);
 	solver->addConstraint(pred2);

@@ -3,6 +3,7 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "ops.h"
+#include "astops.h"
 #include "structs.h"
 #include "common.h"
 
@@ -12,7 +13,7 @@ public:
 	virtual ~Predicate() {}
 	virtual Predicate *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
 	PredicateType type;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class PredicateOperator : public Predicate {
@@ -22,7 +23,7 @@ public:
 	Predicate *clone(CSolver *solver, CloneMap *map);
 	CompOp op;
 	Array<Set *> domains;
-	MEMALLOC;
+	CMEMALLOC;
 };
 
 class PredicateTable : public Predicate {
@@ -31,6 +32,6 @@ public:
 	Predicate *clone(CSolver *solver, CloneMap *map);
 	Table *table;
 	UndefinedBehavior undefinedbehavior;
-	MEMALLOC;
+	CMEMALLOC;
 };
 #endif

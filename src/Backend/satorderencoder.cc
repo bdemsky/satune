@@ -15,9 +15,9 @@
 
 Edge SATEncoder::encodeOrderSATEncoder(BooleanOrder *constraint) {
 	switch ( constraint->order->type) {
-	case PARTIAL:
+	case SATC_PARTIAL:
 		return encodePartialOrderSATEncoder(constraint);
-	case TOTAL:
+	case SATC_TOTAL:
 		return encodeTotalOrderSATEncoder(constraint);
 	default:
 		ASSERT(0);
@@ -55,7 +55,7 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 	if (!edgeIsNull(gvalue))
 		return gvalue;
 
-	HashTableOrderPair *table = order->orderPairTable;
+	HashtableOrderPair *table = order->orderPairTable;
 	bool negate = false;
 	OrderPair flipped;
 	if (pair->first < pair->second) {
@@ -76,9 +76,9 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 }
 
 Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
-	ASSERT(boolOrder->order->type == TOTAL);
+	ASSERT(boolOrder->order->type == SATC_TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
-		boolOrder->order->initializeOrderHashTable();
+		boolOrder->order->initializeOrderHashtable();
 		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
@@ -96,7 +96,7 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 #ifdef CONFIG_DEBUG
 	model_print("in total order ...\n");
 #endif
-	ASSERT(order->type == TOTAL);
+	ASSERT(order->type == SATC_TOTAL);
 	Set *set = order->set;
 	uint size = order->set->getSize();
 	for (uint i = 0; i < size; i++) {
@@ -117,7 +117,7 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 	}
 }
 
-Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair) {
+Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair) {
 	ASSERT(pair->first != pair->second);
 	bool negate = false;
 	OrderPair flipped;
@@ -144,6 +144,6 @@ Edge SATEncoder::generateTransOrderConstraintSATEncoder(Edge constIJ,Edge constJ
 }
 
 Edge SATEncoder::encodePartialOrderSATEncoder(BooleanOrder *constraint) {
-	ASSERT(constraint->order->type == PARTIAL);
+	ASSERT(constraint->order->type == SATC_PARTIAL);
 	return E_BOGUS;
 }

@@ -12,32 +12,30 @@
 
 #include "mymemory.h"
 #include <inttypes.h>
+#include "classes.h"
 
-class CSolver;
-class SATEncoder;
-class Boolean;
+
 class BooleanOrder;
 class BooleanVar;
-class BooleanLogic;
+
 class BooleanPredicate;
 class ASTNode;
-class Set;
-class MutableSet;
+
+
 
 class ElementFunction;
 class ElementSet;
 class ElementConst;
-class Element;
 
 class FunctionOperator;
 class FunctionTable;
-class Function;
 
-class Predicate;
+
+
 class PredicateTable;
 class PredicateOperator;
-class Table;
-class Order;
+
+
 class OrderPair;
 
 class OrderElement;
@@ -59,18 +57,12 @@ class AutoTuner;
 class SearchTuner;
 class TunableSetting;
 
-struct IncrementalSolver;
-typedef struct IncrementalSolver IncrementalSolver;
-
-struct TableEntry;
-typedef struct TableEntry TableEntry;
-
-class Tuner;
 class TunableDesc;
 
+struct IncrementalSolver;
+typedef struct IncrementalSolver IncrementalSolver;
+struct TableEntry;
+typedef struct TableEntry TableEntry;
 typedef int TunableParam;
 
-typedef unsigned int uint;
-typedef long int int64;
-typedef uint64_t VarType;
 #endif

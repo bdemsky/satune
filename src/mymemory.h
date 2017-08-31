@@ -11,8 +11,8 @@
  *  @brief Memory allocation functions.
  */
 
-#ifndef _MY_MEMORY_H
-#define _MY_MEMORY_H
+#ifndef CSAT_MY_MEMORY_H
+#define CSAT_MY_MEMORY_H
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@ static inline void ourfree(void *ptr) { free(ptr); }
 static inline void *ourcalloc(size_t count, size_t size) { return calloc(count, size); }
 static inline void *ourrealloc(void *ptr, size_t size) { return realloc(ptr, size); }
 
-#define MEMALLOC                           \
+#define CMEMALLOC                           \
 	void *operator new(size_t size) {       \
 		return ourmalloc(size);                \
 	}                                                  \

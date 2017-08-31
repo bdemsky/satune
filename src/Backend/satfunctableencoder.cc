@@ -13,7 +13,7 @@
 Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint) {
 	ASSERT(constraint->predicate->type == TABLEPRED);
 	UndefinedBehavior undefStatus = ((PredicateTable *)constraint->predicate)->undefinedbehavior;
-	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
+	ASSERT(undefStatus == SATC_IGNOREBEHAVIOR || undefStatus == SATC_FLAGFORCEUNDEFINED);
 	Table *table = ((PredicateTable *)constraint->predicate)->table;
 	FunctionEncodingType encType = constraint->encoding.type;
 	Array<Element *> *inputs = &constraint->inputs;
@@ -24,11 +24,11 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 	Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
-	HSIteratorTableEntry *iterator = table->entries->iterator();
+	SetIteratorTableEntry *iterator = table->entries->iterator();
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();
-		if (generateNegation == (entry->output != 0) && undefStatus == IGNOREBEHAVIOR) {
+		if (generateNegation == (entry->output != 0) && undefStatus == SATC_IGNOREBEHAVIOR) {
 			//Skip the irrelevant entries
 			continue;
 		}
@@ -41,10 +41,10 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 		}
 		Edge row;
 		switch (undefStatus) {
-		case IGNOREBEHAVIOR:
+		case SATC_IGNOREBEHAVIOR:
 			row = constraintAND(cnf, inputNum, carray);
 			break;
-		case FLAGFORCEUNDEFINED: {
+		case SATC_FLAGFORCEUNDEFINED: {
 			addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, inputNum, carray),  constraintNegate(undefConst)));
 			if (generateNegation == (entry->output != 0)) {
 				continue;
@@ -81,8 +81,8 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 	}
 	PredicateTable *predicate = (PredicateTable *)constraint->predicate;
 	switch (predicate->undefinedbehavior) {
-	case IGNOREBEHAVIOR:
-	case FLAGFORCEUNDEFINED:
+	case SATC_IGNOREBEHAVIOR:
+	case SATC_FLAGFORCEUNDEFINED:
 		return encodeEnumEntriesTablePredicateSATEncoder(constraint);
 	default:
 		break;
@@ -118,14 +118,14 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 		}
 
 		switch (predicate->undefinedbehavior) {
-		case UNDEFINEDSETSFLAG:
+		case SATC_UNDEFINEDSETSFLAG:
 			if (isInRange) {
 				clause = constraintAND(cnf, numDomains, carray);
 			} else {
 				addConstraintCNF(cnf, constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), undefConstraint) );
 			}
 			break;
-		case FLAGIFFUNDEFINED:
+		case SATC_FLAGIFFUNDEFINED:
 			if (isInRange) {
 				clause = constraintAND(cnf, numDomains, carray);
 				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintNegate(undefConstraint)));
@@ -178,12 +178,12 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 
 void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func) {
 	UndefinedBehavior undefStatus = ((FunctionTable *) func->function)->undefBehavior;
-	ASSERT(undefStatus == IGNOREBEHAVIOR || undefStatus == FLAGFORCEUNDEFINED);
+	ASSERT(undefStatus == SATC_IGNOREBEHAVIOR || undefStatus == SATC_FLAGFORCEUNDEFINED);
 	Array<Element *> *elements = &func->inputs;
 	Table *table = ((FunctionTable *) (func->function))->table;
 	uint size = table->entries->getSize();
 	Edge constraints[size];
-	HSIteratorTableEntry *iterator = table->entries->iterator();
+	SetIteratorTableEntry *iterator = table->entries->iterator();
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();
@@ -197,11 +197,11 @@ void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func)
 		Edge output = getElementValueConstraint(func, entry->output);
 		Edge row;
 		switch (undefStatus ) {
-		case IGNOREBEHAVIOR: {
+		case SATC_IGNOREBEHAVIOR: {
 			row = constraintIMPLIES(cnf,constraintAND(cnf, inputNum, carray), output);
 			break;
 		}
-		case FLAGFORCEUNDEFINED: {
+		case SATC_FLAGFORCEUNDEFINED: {
 			Edge undefConst = encodeConstraintSATEncoder(func->overflowstatus);
 			row = constraintIMPLIES(cnf, constraintAND(cnf, inputNum, carray), constraintAND2(cnf, output, constraintNegate(undefConst)));
 			break;
@@ -230,8 +230,8 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 
 	FunctionTable *function = (FunctionTable *)elemFunc->function;
 	switch (function->undefBehavior) {
-	case IGNOREBEHAVIOR:
-	case FLAGFORCEUNDEFINED:
+	case SATC_IGNOREBEHAVIOR:
+	case SATC_FLAGFORCEUNDEFINED:
 		return encodeEnumEntriesTableElemFuncSATEncoder(elemFunc);
 	default:
 		break;
@@ -256,7 +256,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		Edge carray[numDomains + 1];
 		TableEntry *tableEntry = function->table->getTableEntry(vals, numDomains);
 		bool isInRange = tableEntry != NULL;
-		ASSERT(function->undefBehavior == UNDEFINEDSETSFLAG || function->undefBehavior == FLAGIFFUNDEFINED);
+		ASSERT(function->undefBehavior == SATC_UNDEFINEDSETSFLAG || function->undefBehavior == SATC_FLAGIFFUNDEFINED);
 		for (uint i = 0; i < numDomains; i++) {
 			Element *elem = elemFunc->inputs.get(i);
 			carray[i] = getElementValueConstraint(elem, vals[i]);
@@ -267,7 +267,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 
 		Edge clause;
 		switch (function->undefBehavior) {
-		case UNDEFINEDSETSFLAG: {
+		case SATC_UNDEFINEDSETSFLAG: {
 			if (isInRange) {
 				//FIXME: Talk to Brian, It should be IFF not only IMPLY. --HG
 				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
@@ -276,7 +276,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 			}
 			break;
 		}
-		case FLAGIFFUNDEFINED: {
+		case SATC_FLAGIFFUNDEFINED: {
 			if (isInRange) {
 				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintNegate(undefConstraint) ));

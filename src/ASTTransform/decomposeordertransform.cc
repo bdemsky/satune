@@ -56,20 +56,20 @@ void DecomposeOrderTransform::doTransform(){
 				MutableSet *set = solver->createMutableSet(order->set->getType());
 				neworder = solver->createOrder(order->type, set);
 				ordervec.setExpand(from->sccNum, neworder);
-				if (order->type == PARTIAL)
+				if (order->type == SATC_PARTIAL)
 					partialcandidatevec.setExpand(from->sccNum, neworder);
 				else
 					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}
-			if (from->status != ADDEDTOSET) {
-				from->status = ADDEDTOSET;
+			if (from->status != SATC_ADDEDTOSET) {
+				from->status = SATC_ADDEDTOSET;
 				((MutableSet *)neworder->set)->addElementMSet(from->id);
 			}
-			if (to->status != ADDEDTOSET) {
-				to->status = ADDEDTOSET;
+			if (to->status != SATC_ADDEDTOSET) {
+				to->status = SATC_ADDEDTOSET;
 				((MutableSet *)neworder->set)->addElementMSet(to->id);
 			}
-			if (order->type == PARTIAL) {
+			if (order->type == SATC_PARTIAL) {
 				OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to);
 				if (edge->polNeg)
 					partialcandidatevec.setExpand(from->sccNum, NULL);
@@ -83,7 +83,7 @@ void DecomposeOrderTransform::doTransform(){
 	for (uint i = 0; i < pcvsize; i++) {
 		Order *neworder = partialcandidatevec.get(i);
 		if (neworder != NULL) {
-			neworder->type = TOTAL;
+			neworder->type = SATC_TOTAL;
 			model_print("i=%u\t", i);
 		}
 	}

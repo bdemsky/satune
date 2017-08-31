@@ -6,7 +6,7 @@
 #include "inc_solver.h"
 #include "constraint.h"
 
-typedef HashTable<Boolean *, Node *, uintptr_t, 4> BooleanToEdgeMap;
+typedef Hashtable<Boolean *, Node *, uintptr_t, 4> BooleanToEdgeMap;
 
 class SATEncoder {
  public:
@@ -19,7 +19,7 @@ class SATEncoder {
 	long long getSolveTime() { return cnf->solveTime; }
 	long long getEncodeTime() { return cnf->encodeTime; }
 	
-	MEMALLOC;
+	CMEMALLOC;
  private:
 	Edge getNewVarSATEncoder();
 	void getArrayNewVarsSATEncoder(uint num, Edge *carray);
@@ -50,7 +50,7 @@ class SATEncoder {
 	Edge encodeTotalOrderSATEncoder(BooleanOrder *constraint);
 	Edge encodePartialOrderSATEncoder(BooleanOrder *constraint);
 	void createAllTotalOrderConstraintsSATEncoder(Order *order);
-	Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair);
+	Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair);
 	Edge generateTransOrderConstraintSATEncoder(Edge constIJ, Edge constJK, Edge constIK);
 	Edge encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint);
 	Edge encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint);
@@ -64,5 +64,5 @@ class SATEncoder {
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
-Edge getOrderConstraint(HashTableOrderPair *table, OrderPair *pair);
+Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair);
 #endif
