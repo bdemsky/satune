@@ -44,6 +44,8 @@ class OrderElement;
 class IntegerEncodingRecord;
 class Transform;
 class Pass;
+class Transformer;
+class AnalysisData;
 
 class ElementEncoding;
 class FunctionEncoding;

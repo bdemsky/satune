@@ -109,6 +109,7 @@ public:
 	Vector<Order *> *getOrders() { return &allOrders;}
 
 	Tuner *getTuner() { return tuner; }
+	Transformer* getTransformer() {return transformer;}
 	
 	HSIteratorBoolean *getConstraints() { return constraints.iterator(); }
 
@@ -120,6 +121,7 @@ public:
 	CSolver *clone();
 	void autoTune(uint budget);
 
+	void setTuner(Transformer * _transformer) {  transformer = _transformer; }
 	void setTuner(Tuner * _tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();
@@ -165,7 +167,7 @@ private:
 	SATEncoder *satEncoder;
 	bool unsat;
 	Tuner *tuner;
-	
+	Transformer* transformer;
 	long long elapsedTime;
 };
 #endif

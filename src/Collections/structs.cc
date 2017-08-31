@@ -42,11 +42,11 @@ bool order_edge_equals(OrderEdge *key1, OrderEdge *key2) {
 }
 
 unsigned int order_element_hash_function(OrderElement *This) {
-	return (uint)This->item;
+	return This->getHash();
 }
 
 bool order_element_equals(OrderElement *key1, OrderElement *key2) {
-	return key1->item == key2->item;
+	return key1->equals(key2);
 }
 
 unsigned int order_pair_hash_function(OrderPair *This) {

@@ -11,7 +11,7 @@
 #include "sattranslator.h"
 #include "tunable.h"
 #include "polarityassignment.h"
-#include "analyzer.h"
+#include "transformer.h"
 #include "autotuner.h"
 
 CSolver::CSolver() :
@@ -20,6 +20,7 @@ CSolver::CSolver() :
 	elapsedTime(0)
 {
 	satEncoder = new SATEncoder(this);
+	transformer = new Transformer(this);
 }
 
 /** This function tears down the solver and the entire AST */
@@ -61,6 +62,7 @@ CSolver::~CSolver() {
 	}
 
 	delete satEncoder;
+	delete transformer;
 }
 
 CSolver *CSolver::clone() {
@@ -238,7 +240,7 @@ int CSolver::startEncoding() {
 		
 	long long startTime = getTimeNano();
 	computePolarities(this);
-	orderAnalysis(this);
+	transformer->orderAnalysis();
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
