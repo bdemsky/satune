@@ -227,6 +227,17 @@ bool CSolver::isFalse(Boolean *b) {
 	return b->isFalse();
 }
 
+Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean * arg1, Boolean * arg2) {
+	Boolean * array[] = {arg1, arg2};
+	return applyLogicalOperation(op, array, 2);
+}
+
+Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg) {
+	Boolean * array[] = {arg};
+	return applyLogicalOperation(op, array, 1);
+}
+
+
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
 	Boolean * newarray[asize];
 	switch(op) {

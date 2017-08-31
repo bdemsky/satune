@@ -86,6 +86,14 @@ public:
 
 	Boolean *applyLogicalOperation(LogicOp op, Boolean **array, uint asize);
 
+		/** This function applies a logical operation to the Booleans in its input. */
+
+	Boolean *applyLogicalOperation(LogicOp op, Boolean * arg1, Boolean * arg2);
+
+	/** This function applies a logical operation to the Booleans in its input. */
+
+	Boolean *applyLogicalOperation(LogicOp op, Boolean *arg);
+
 	/** This function adds a boolean constraint to the set of constraints
 	    to be satisfied */
 
