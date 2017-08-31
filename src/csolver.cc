@@ -282,13 +282,15 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 			Boolean *b=array[i];
 			if (b->type == BOOLCONST) {
 				if (b->isTrue())
-					return b;
+					return boolTrue;
 				else
 					continue;
 			} else
 				newarray[newindex++]=b;
 		}
-		if (newindex==1)
+		if (newindex==0) {
+			return boolFalse;
+		} else if (newindex==1)
 			return newarray[0];
 		else if (newindex == 2) {
 			bool isNot0 = (newarray[0]->type==BOOLCONST) && ((BooleanLogic *)newarray[0])->op == SATC_NOT;
@@ -318,11 +320,13 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 				if (b->isTrue())
 					continue;
 				else
-					return b;
+					return boolFalse;
 			} else
 				newarray[newindex++]=b;
 		}
-		if(newindex==1) {
+		if (newindex==0) {
+			return boolTrue;
+		} else if(newindex==1) {
 			return newarray[0];
 		} else {
 			array = newarray;
@@ -348,6 +352,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 	}
 	}
 	
+	ASSERT(asize != 0);
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
 	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {

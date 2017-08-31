@@ -21,7 +21,8 @@ public:
 	}
 	void setCurrentOrder(Order* _current) { currOrder = _current;}
 	bool canExecuteTransform();
-private:
+	CMEMALLOC;
+ private:
 	Order* currOrder;
 	OrderGraph* currGraph;
 };

@@ -65,7 +65,8 @@ void OrderGraph::addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *
 	}
 	case P_UNDEFINED:
 		//There is an unreachable order constraint if this assert fires
-		ASSERT(0);
+		//Clients can easily do this, so don't do anything.
+		;
 	}
 }
 
