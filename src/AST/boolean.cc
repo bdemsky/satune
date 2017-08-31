@@ -14,7 +14,7 @@ Boolean::Boolean(ASTNodeType _type) :
 
 BooleanConst::BooleanConst(bool _isTrue) :
 	Boolean(BOOLCONST),
-	isTrue(_isTrue) {
+	istrue(_isTrue) {
 }
 
 BooleanVar::BooleanVar(VarType t) :
@@ -49,7 +49,7 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint a
 }
 
 Boolean *BooleanConst::clone(CSolver *solver, CloneMap *map) {
-	if (isTrue)
+	if (istrue)
 		return solver->getBooleanTrue();
 	else
 		return solver->getBooleanFalse();

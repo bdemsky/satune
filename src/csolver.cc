@@ -221,16 +221,14 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		if (array[0]->type == LOGICOP && ((BooleanLogic *)array[0])->op==SATC_NOT) {
 			return ((BooleanLogic *) array[0])->inputs.get(0);
 		} else if (array[0]->type == BOOLCONST) {
-			bool isTrue = ((BooleanConst *) array[0])->isTrue;
-			return isTrue ? boolFalse : boolTrue;
+			return array[0]->isTrue() ? boolFalse : boolTrue;
 		}
 		break;
 	}
 	case SATC_XOR: {
 		for(uint i=0;i<2;i++) {
 			if (array[i]->type == BOOLCONST) {
-				bool isTrue = ((BooleanConst *) array[i])->isTrue;
-				if (isTrue) {
+				if (array[i]->isTrue()) {
 					newarray[0]=array[1-i];
 					return applyLogicalOperation(SATC_NOT, newarray, 1);
 				} else
@@ -244,8 +242,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		for(uint i=0;i<asize;i++) {
 			Boolean *b=array[i];
 			if (b->type == BOOLCONST) {
-				bool isTrue = ((BooleanConst *) b)->isTrue;
-				if (isTrue)
+				if (b->isTrue())
 					return b;
 				else
 					continue;
@@ -279,8 +276,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		for(uint i=0;i<asize;i++) {
 			Boolean *b=array[i];
 			if (b->type == BOOLCONST) {
-				bool isTrue = ((BooleanConst *) b)->isTrue;
-				if (isTrue)
+				if (b->isTrue())
 					continue;
 				else
 					return b;
@@ -297,16 +293,14 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 	}
 	case SATC_IMPLIES: {
 		if (array[0]->type == BOOLCONST) {
-			BooleanConst *b=(BooleanConst *) array[0];
-			if (b->isTrue) {
+			if (array[0]->isTrue()) {
 				return array[1];
 			} else {
 				return boolTrue;
 			}
 		} else if (array[1]->type == BOOLCONST) {
-			BooleanConst *b=(BooleanConst *) array[0];
-			if (b->isTrue) {
-				return b;
+			if (array[1]->isTrue()) {
+				return array[1];
 			} else {
 				return applyLogicalOperation(SATC_NOT, array, 1);
 			}
