@@ -19,7 +19,8 @@ public:
 	~Transformer();
 	IntegerEncodingTransform* getIntegerEncodingTransform(){ return integerEncoding; }
 	void orderAnalysis();
-private:
+	CMEMALLOC;
+ private:
 	//For now we can just add transforms here, but in future we may want take a smarter approach.
 	IntegerEncodingTransform* integerEncoding;
 	DecomposeOrderTransform* decomposeOrder;

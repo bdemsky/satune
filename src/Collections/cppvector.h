@@ -78,7 +78,7 @@ public:
 	type *expose() {
 		return array;
 	}
-
+	CMEMALLOC;
 private:
 	uint size;
 	uint capacity;

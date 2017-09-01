@@ -19,7 +19,8 @@ public:
 	virtual ~Transform();
 	virtual bool canExecuteTransform() = 0;
 	virtual void doTransform() = 0;
-protected:
+	CMEMALLOC;
+ protected:
 	// Need solver for translating back the result ...
 	CSolver* solver;
 };
