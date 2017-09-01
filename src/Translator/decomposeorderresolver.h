@@ -16,12 +16,11 @@
 class DecomposeOrderResolver : public OrderResolver{
 public:
 	DecomposeOrderResolver(OrderGraph* graph, Vector<Order *> & orders);
+	HappenedBefore resolveOrder(uint64_t first, uint64_t second);
 	virtual ~DecomposeOrderResolver();
 private:
 	OrderGraph* graph;
 	Vector<Order*> orders;
-	
-	HappenedBefore getOrder(OrderNode* from, OrderNode* to);
 };
 
 #endif /* DECOMPOSEORDERRESOLVER_H */

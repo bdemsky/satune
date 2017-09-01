@@ -14,13 +14,10 @@
 
 class OrderResolver {
 public:
-	OrderResolver(OrderGraph* _graph);
-	HappenedBefore resolveOrder(uint64_t first, uint64_t second);
-	virtual ~OrderResolver();
+	OrderResolver(){};
+	virtual HappenedBefore resolveOrder(uint64_t first, uint64_t second) = 0;
+	virtual ~OrderResolver(){};
 	CMEMALLOC;
-protected:
-	OrderGraph* graph;
-	virtual HappenedBefore getOrder(OrderNode* from, OrderNode* to) = 0;
 };
 
 #endif /* ORDERRESOLVER_H */
