@@ -14,7 +14,6 @@ void resetNodeInfoStatusSCC(OrderGraph *graph);
 bool isMustBeTrueNode(OrderNode *node);
 void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node);
 void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph);
-void completePartialOrderGraph(OrderGraph *graph);
 void DFSMust(OrderGraph *graph, Vector<OrderNode *> *finishNodes);
 void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode *> *finishNodes, bool computeTransitiveClosure);
 void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiveClosure);
