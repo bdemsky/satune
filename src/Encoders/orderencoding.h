@@ -11,7 +11,8 @@ typedef enum OrderEncodingType OrderEncodingType;
 class OrderEncoding {
 public:
 	OrderEncoding(Order *order);
-
+	
+	OrderResolver* resolver;
 	OrderEncodingType type;
 	Order *order;
 	CMEMALLOC;

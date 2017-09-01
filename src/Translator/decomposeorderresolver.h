@@ -1,0 +1,28 @@
+
+/* 
+ * File:   DecomposeOrderResolver.h
+ * Author: hamed
+ *
+ * Created on September 1, 2017, 10:36 AM
+ */
+
+#ifndef DECOMPOSEORDERRESOLVER_H
+#define DECOMPOSEORDERRESOLVER_H
+#include "classlist.h"
+#include "mymemory.h"
+#include "structs.h"
+#include "orderresolver.h"
+
+class DecomposeOrderResolver : public OrderResolver{
+public:
+	DecomposeOrderResolver(OrderGraph* graph, Vector<Order *> & orders);
+	virtual ~DecomposeOrderResolver();
+private:
+	OrderGraph* graph;
+	Vector<Order*> orders;
+	
+	HappenedBefore getOrder(OrderNode* from, OrderNode* to);
+};
+
+#endif /* DECOMPOSEORDERRESOLVER_H */
+

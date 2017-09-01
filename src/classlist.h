@@ -13,6 +13,7 @@
 #include "mymemory.h"
 #include <inttypes.h>
 #include "classes.h"
+#include "AST/astnode.h"
 
 
 class BooleanOrder;
@@ -58,6 +59,9 @@ class SearchTuner;
 class TunableSetting;
 
 class TunableDesc;
+
+class OrderResolver;
+class DecomposeOrderResolver;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;

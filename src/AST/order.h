@@ -18,7 +18,8 @@ public:
 	OrderGraph *graph;
 	Order *clone(CSolver *solver, CloneMap *map);
 	Vector<BooleanOrder *> constraints;
-	OrderEncoding order;
+	OrderEncoding encoding;
+	void setOrderResolver(OrderResolver* _resolver) { encoding.resolver = _resolver;};
 	void initializeOrderHashtable();
 	void initializeOrderElementsHashtable();
 	void addOrderConstraint(BooleanOrder *constraint);

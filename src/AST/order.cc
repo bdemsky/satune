@@ -10,7 +10,7 @@ Order::Order(OrderType _type, Set *_set) :
 	set(_set),
 	orderPairTable(NULL),
 	graph(NULL),
-	order(this)
+	encoding(this)
 {
 }
 
@@ -24,7 +24,7 @@ void Order::addOrderConstraint(BooleanOrder *constraint) {
 }
 
 void Order::setOrderEncodingType(OrderEncodingType type) {
-	order.type = type;
+	encoding.type = type;
 }
 
 Order *Order::clone(CSolver *solver, CloneMap *map) {

@@ -105,14 +105,17 @@ void OrderGraph::addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrd
 	}
 }
 
-OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id) {
+OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id, bool create) {
 	OrderNode *node = new OrderNode(id);
 	OrderNode *tmp = nodes->get(node);
 	if ( tmp != NULL) {
 		delete node;
 		node = tmp;
-	} else {
+	} else if(create) {
 		nodes->add(node);
+	} else{
+		delete node;
+		return NULL;
 	}
 	return node;
 }
@@ -123,14 +126,17 @@ OrderNode *OrderGraph::lookupOrderNodeFromOrderGraph(uint64_t id) {
 	return tmp;
 }
 
-OrderEdge *OrderGraph::getOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end) {
+OrderEdge *OrderGraph::getOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end, bool create) {
 	OrderEdge *edge = new OrderEdge(begin, end);
 	OrderEdge *tmp = edges->get(edge);
 	if ( tmp != NULL ) {
 		delete edge;
 		edge = tmp;
-	} else {
+	} else if (create) {
 		edges->add(edge);
+	} else {
+		delete edge;
+		return NULL;
 	}
 	return edge;
 }

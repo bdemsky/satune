@@ -13,6 +13,7 @@
 #include "mutableset.h"
 #include "ordergraph.h"
 #include "csolver.h"
+#include "decomposeorderresolver.h"
 
 
 DecomposeOrderTransform::DecomposeOrderTransform(CSolver* _solver)
@@ -77,7 +78,7 @@ void DecomposeOrderTransform::doTransform(){
 			neworder->addOrderConstraint(orderconstraint);
 		}
 	}
-
+	currOrder->setOrderResolver( new DecomposeOrderResolver(currGraph, ordervec) );
 	uint pcvsize = partialcandidatevec.getSize();
 	for (uint i = 0; i < pcvsize; i++) {
 		Order *neworder = partialcandidatevec.get(i);

@@ -4,16 +4,16 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc)
+CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard Translator/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc)
 
-C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
+C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard Translator/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
 
-HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
+HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard Translator/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CFLAGS := -Wall -g -O0
-CFLAGS += -IAST -IASTTransform -IASTAnalyses -ICollections -IBackend -I. -IEncoders -ITuner
+CFLAGS += -IAST -IASTTransform -IASTAnalyses -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner
 LDFLAGS := -ldl -lrt -rdynamic
 SHARED := -shared
 
@@ -34,6 +34,7 @@ ${OBJ_DIR}:
 	${MKDIR_P} ${OBJ_DIR}/AST
 	${MKDIR_P} ${OBJ_DIR}/ASTAnalyses
 	${MKDIR_P} ${OBJ_DIR}/ASTTransform
+	${MKDIR_P} ${OBJ_DIR}/Translator
 	${MKDIR_P} ${OBJ_DIR}/Tuner
 	${MKDIR_P} ${OBJ_DIR}/Collections
 	${MKDIR_P} ${OBJ_DIR}/Backend
