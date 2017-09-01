@@ -18,7 +18,6 @@ DecomposeOrderResolver::DecomposeOrderResolver(OrderGraph* _graph, Vector<Order*
 }
 
 DecomposeOrderResolver::~DecomposeOrderResolver() {
-	delete graph;
 }
 
 HappenedBefore DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second){
@@ -37,10 +36,11 @@ HappenedBefore DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t sec
 		} else if( edge != NULL && edge->mustNeg){
 			return SATC_SECOND;
 		}else {
-			switch(graph->getOrder()->encoding.type){
+			switch(graph->getOrder()->type){
 				case SATC_TOTAL:
 					return from->sccNum < to->sccNum? SATC_FIRST: SATC_SECOND;
 				case SATC_PARTIAL:
+					//Adding support for partial order ...
 				default:
 					ASSERT(0);
 			}	

@@ -15,6 +15,7 @@
 #include "autotuner.h"
 #include "astops.h"
 #include "structs.h"
+#include "orderresolver.h"
 
 CSolver::CSolver() :
 	boolTrue(new BooleanConst(true)),
@@ -431,7 +432,7 @@ bool CSolver::getBooleanValue(Boolean *boolean) {
 }
 
 HappenedBefore CSolver::getOrderConstraintValue(Order *order, uint64_t first, uint64_t second) {
-	return getOrderConstraintValueSATTranslator(this, order, first, second);
+	return  order->encoding.resolver->resolveOrder(first, second);
 }
 
 long long CSolver::getEncodeTime() { return satEncoder->getEncodeTime(); }

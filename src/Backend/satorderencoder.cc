@@ -12,8 +12,11 @@
 #include "element.h"
 #include "predicate.h"
 #include "orderelement.h"
+#include "orderpairresolver.h"
 
 Edge SATEncoder::encodeOrderSATEncoder(BooleanOrder *constraint) {
+	//This is pairwised encoding ...
+	constraint->order->setOrderResolver(new OrderPairResolver(solver, constraint->order));
 	switch ( constraint->order->type) {
 	case SATC_PARTIAL:
 		return encodePartialOrderSATEncoder(constraint);
