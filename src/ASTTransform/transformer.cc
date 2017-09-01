@@ -34,7 +34,8 @@ void Transformer::orderAnalysis() {
 	for (uint i = 0; i < size; i++) {
 		Order *order = orders->get(i);
 		decomposeOrder->setCurrentOrder(order);
-		if (!decomposeOrder->canExecuteTransform()){
+
+		if (true) {
 			continue;
 		}
 

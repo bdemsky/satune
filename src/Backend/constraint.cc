@@ -82,6 +82,8 @@ void resizeCNF(CNF *cnf, uint newCapacity) {
 	uint newMask = newCapacity - 1;
 	for (uint i = 0; i < oldCapacity; i++) {
 		Node *n = old_array[i];
+		if (n == NULL)
+			continue;
 		uint hashCode = n->hashCode;
 		uint newindex = hashCode & newMask;
 		for (;; newindex = (newindex + 1) & newMask) {
@@ -135,6 +137,7 @@ Edge createNode(CNF *cnf, NodeType type, uint numEdges, Edge *edges) {
 		}
 	}
 	*n_ptr = allocNode(type, numEdges, edges, hashvalue);
+	cnf->size++;
 	Edge e = {*n_ptr};
 	return e;
 }
