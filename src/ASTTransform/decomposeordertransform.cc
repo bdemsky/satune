@@ -60,12 +60,12 @@ void DecomposeOrderTransform::doTransform(){
 				else
 					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}
-			if (from->status != SATC_ADDEDTOSET) {
-				from->status = SATC_ADDEDTOSET;
+			if (from->status != ADDEDTOSET) {
+				from->status = ADDEDTOSET;
 				((MutableSet *)neworder->set)->addElementMSet(from->id);
 			}
-			if (to->status != SATC_ADDEDTOSET) {
-				to->status = SATC_ADDEDTOSET;
+			if (to->status != ADDEDTOSET) {
+				to->status = ADDEDTOSET;
 				((MutableSet *)neworder->set)->addElementMSet(to->id);
 			}
 			if (currOrder->type == SATC_PARTIAL) {
