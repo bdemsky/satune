@@ -5,6 +5,7 @@
 #include "satencoder.h"
 #include "csolver.h"
 #include "integerencodingrecord.h"
+#include "integerencorderresolver.h"
 
 
 IntegerEncodingTransform::IntegerEncodingTransform(CSolver* _solver) 
@@ -22,14 +23,19 @@ bool IntegerEncodingTransform::canExecuteTransform(){
 }
 
 void IntegerEncodingTransform::doTransform(){
+	IntegerEncodingRecord* encodingRecord = NULL;
 	if (!orderIntEncoding->contains(currOrder)) {
-		orderIntEncoding->put(currOrder, new IntegerEncodingRecord(
-		solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize()-1)));
+		encodingRecord = new IntegerEncodingRecord(
+			solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize()-1));
+		orderIntEncoding->put(currOrder, encodingRecord);
+	} else {
+		encodingRecord = orderIntEncoding->get(currOrder);
 	}
 	uint size = currOrder->constraints.getSize();
 	for(uint i=0; i<size; i++){
 		orderIntegerEncodingSATEncoder(currOrder->constraints.get(i));
 	}
+	currOrder->setOrderResolver(new IntegerEncOrderResolver(solver, encodingRecord));
 }
 
 

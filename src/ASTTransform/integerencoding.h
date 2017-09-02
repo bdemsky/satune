@@ -21,6 +21,7 @@ public:
 	virtual ~IntegerEncodingTransform();
 private:
 	Order* currOrder;
+	//FIXME:We can remove it, because we don't need it for translating anymore... -HG
 	HashTableOrderIntEncoding* orderIntEncoding;
 };
 

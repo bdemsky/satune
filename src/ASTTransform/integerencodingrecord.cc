@@ -21,13 +21,15 @@ IntegerEncodingRecord::~IntegerEncodingRecord(){
 	}
 }
 
-Element * IntegerEncodingRecord::getOrderIntegerElement(CSolver *This, uint64_t item) {
+Element * IntegerEncodingRecord::getOrderIntegerElement(CSolver *This, uint64_t item, bool create) {
 	OrderElement oelement(item, NULL);
-	if ( !elementTable->contains(&oelement)) {
+	if ( elementTable->contains(&oelement)) {
+		return elementTable->get(&oelement)->getElement();
+	} else if (create) {
 		Element *elem = This->getElementVar(secondarySet);
 		elementTable->add(new OrderElement(item, elem));
 		return elem;
-	} else
-		return elementTable->get(&oelement)->getElement();
+	}
+	return NULL;
 }
 
