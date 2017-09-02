@@ -125,6 +125,7 @@ public:
 	bool isUnSAT() { return unsat; }
 
 	Vector<Order *> *getOrders() { return &allOrders;}
+	HashsetOrder * getActiveOrders() { return &activeOrders;}
 
 	Tuner *getTuner() { return tuner; }
 
@@ -173,6 +174,8 @@ private:
 	/** This is a vector of all order structs that we have allocated. */
 	Vector<Order *> allOrders;
 
+	HashsetOrder activeOrders;
+	
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 

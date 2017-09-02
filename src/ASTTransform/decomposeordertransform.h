@@ -20,8 +20,6 @@ public:
 
 	CMEMALLOC;
 private:
-	Order *currOrder;
-	OrderGraph *currGraph;
 };
 
 #endif/* ORDERTRANSFORM_H */

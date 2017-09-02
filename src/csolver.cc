@@ -383,6 +383,7 @@ void CSolver::addConstraint(Boolean *constraint) {
 Order *CSolver::createOrder(OrderType type, Set *set) {
 	Order *order = new Order(type, set);
 	allOrders.push(order);
+	activeOrders.add(order);
 	return order;
 }
 

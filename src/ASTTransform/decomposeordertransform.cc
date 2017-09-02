@@ -27,10 +27,10 @@ DecomposeOrderTransform::~DecomposeOrderTransform() {
 }
 
 void DecomposeOrderTransform::doTransform() {
-	Vector<Order *> *orders = solver->getOrders();
-	uint size = orders->getSize();
-	for (uint i = 0; i < size; i++) {
-		Order *order = orders->get(i);
+	HashsetOrder *orders = solver->getActiveOrders()->copy();
+	SetIteratorOrder * orderit=orders->iterator();
+	while(orderit->hasNext()) {
+		Order *order = orderit->next();
 
 		if (GETVARTUNABLE(solver->getTuner(), order->type, DECOMPOSEORDER, &onoff) == 0) {
 			continue;
@@ -70,7 +70,10 @@ void DecomposeOrderTransform::doTransform() {
 		decomposeOrder(order, graph);
 		delete graph;
 	}
+	delete orderit;
+	delete orders;
 }
+
 
 void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *currGraph) {
 	Vector<Order *> ordervec;
@@ -122,6 +125,7 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 		}
 	}
 	currOrder->setOrderResolver( new DecomposeOrderResolver(currGraph, ordervec) );
+	solver->getActiveOrders()->remove(currOrder);
 	uint pcvsize = partialcandidatevec.getSize();
 	for (uint i = 0; i < pcvsize; i++) {
 		Order *neworder = partialcandidatevec.get(i);

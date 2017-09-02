@@ -18,13 +18,15 @@ IntegerEncodingTransform::~IntegerEncodingTransform() {
 }
 
 void IntegerEncodingTransform::doTransform() {
-	Vector<Order *> *orders = solver->getOrders();
-	uint size = orders->getSize();
-	for (uint i = 0; i < size; i++) {
-		Order *order = orders->get(i);
+	HashsetOrder *orders = solver->getActiveOrders()->copy();
+	SetIteratorOrder * orderit=orders->iterator();
+	while(orderit->hasNext()) {
+		Order *order = orderit->next();
 		if (GETVARTUNABLE(solver->getTuner(), order->type, ORDERINTEGERENCODING, &onoff))
 			integerEncode(order);
 	}
+	delete orders;
+	delete orderit;
 }
 
 void IntegerEncodingTransform::integerEncode(Order *currOrder) {
@@ -38,13 +40,14 @@ void IntegerEncodingTransform::integerEncode(Order *currOrder) {
 	}
 	uint size = currOrder->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
-		orderIntegerEncodingSATEncoder(currOrder->constraints.get(i));
+		orderIntegerEncodingSATEncoder(currOrder, currOrder->constraints.get(i));
 	}
 	currOrder->setOrderResolver(new IntegerEncOrderResolver(solver, encodingRecord));
+	solver->getActiveOrders()->remove(currOrder);
 }
 
 
-void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder) {
+void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(Order * currOrder, BooleanOrder *boolOrder) {
 	IntegerEncodingRecord *ierec = orderIntEncoding->get(currOrder);
 	//getting two elements and using LT predicate ...
 	Element *elem1 = ierec->getOrderIntegerElement(solver, boolOrder->first);
