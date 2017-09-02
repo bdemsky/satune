@@ -400,8 +400,9 @@ int CSolver::solve() {
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
 
-	IntegerEncodingTransform iet(this);
-	iet.doTransform();
+	//This leaks like crazy
+	//	IntegerEncodingTransform iet(this);
+	//iet.doTransform();
 
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
@@ -437,7 +438,7 @@ bool CSolver::getBooleanValue(Boolean *boolean) {
 	exit(-1);
 }
 
-HappenedBefore CSolver::getOrderConstraintValue(Order *order, uint64_t first, uint64_t second) {
+bool CSolver::getOrderConstraintValue(Order *order, uint64_t first, uint64_t second) {
 	return order->encoding.resolver->resolveOrder(first, second);
 }
 

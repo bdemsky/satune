@@ -15,7 +15,7 @@
 class OrderResolver {
 public:
 	OrderResolver() {};
-	virtual HappenedBefore resolveOrder(uint64_t first, uint64_t second) = 0;
+	virtual bool resolveOrder(uint64_t first, uint64_t second) = 0;
 	virtual ~OrderResolver() {};
 	CMEMALLOC;
 };

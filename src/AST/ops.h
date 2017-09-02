@@ -12,9 +12,6 @@ typedef enum CompOp CompOp;
 enum OrderType {SATC_PARTIAL, SATC_TOTAL};
 typedef enum OrderType OrderType;
 
-enum HappenedBefore {SATC_FIRST, SATC_SECOND, SATC_UNORDERED};
-typedef enum HappenedBefore HappenedBefore;
-
 /**
  *    SATC_FLAGFORCESOVERFLOW forces the operation to overflow if the boolean flag is true
  *  SATC_OVERFLOWSETSFLAG -- sets the flag if the operation overflows

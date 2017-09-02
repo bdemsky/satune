@@ -17,8 +17,8 @@ public:
 	~OrderGraph();
 	void addOrderConstraintToOrderGraph(BooleanOrder *bOrder);
 	void addMustOrderConstraintToOrderGraph(BooleanOrder *bOrder);
-	OrderNode *getOrderNodeFromOrderGraph(uint64_t id, bool create = true);
-	OrderEdge *getOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end, bool create = true);
+	OrderNode *getOrderNodeFromOrderGraph(uint64_t id);
+	OrderEdge *getOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end);
 	OrderNode *lookupOrderNodeFromOrderGraph(uint64_t id);
 	OrderEdge *lookupOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end);
 	void addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);

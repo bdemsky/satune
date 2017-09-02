@@ -115,7 +115,7 @@ public:
 	/** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
 	bool getBooleanValue(Boolean *boolean);
 
-	HappenedBefore getOrderConstraintValue(Order *order, uint64_t first, uint64_t second);
+	bool getOrderConstraintValue(Order *order, uint64_t first, uint64_t second);
 
 	bool isTrue(Boolean *b);
 	bool isFalse(Boolean *b);

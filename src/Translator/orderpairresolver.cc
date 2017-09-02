@@ -23,24 +23,21 @@ OrderPairResolver::OrderPairResolver(CSolver *_solver, Order *_order) :
 OrderPairResolver::~OrderPairResolver() {
 }
 
-HappenedBefore OrderPairResolver::resolveOrder(uint64_t first, uint64_t second) {
+bool OrderPairResolver::resolveOrder(uint64_t first, uint64_t second) {
 	if (order->graph != NULL) {
 		// For the cases that tuning framework decides no to build a graph for order ...
 		OrderGraph *graph = order->graph;
-		OrderNode *from = graph->getOrderNodeFromOrderGraph(first, false /*Don't create new node if doesn't exist*/);
-		if (from == NULL) {
-			return SATC_UNORDERED;
-		}
-		OrderNode *to = graph->getOrderNodeFromOrderGraph(second, false);
-		if (from == NULL) {
-			return SATC_UNORDERED;
-		}
+		OrderNode *from = graph->lookupOrderNodeFromOrderGraph(first);
+		ASSERT(from != NULL);
+		OrderNode *to = graph->lookupOrderNodeFromOrderGraph(second);
+		ASSERT(to != NULL);
 
-		OrderEdge *edge = graph->getOrderEdgeFromOrderGraph(from, to, false	/* Don't create a new edge*/);
+		OrderEdge *edge = graph->lookupOrderEdgeFromOrderGraph(from, to);
+		
 		if (edge != NULL && edge->mustPos) {
-			return SATC_FIRST;
+			return true;
 		} else if ( edge != NULL && edge->mustNeg) {
-			return SATC_SECOND;
+			return false;
 		}
 	}
 
@@ -58,11 +55,11 @@ HappenedBefore OrderPairResolver::resolveOrder(uint64_t first, uint64_t second) 
 }
 
 
-HappenedBefore OrderPairResolver::resolveTotalOrder(uint64_t first, uint64_t second) {
+bool OrderPairResolver::resolveTotalOrder(uint64_t first, uint64_t second) {
 	ASSERT(order->orderPairTable != NULL);
 	OrderPair pair(first, second, E_NULL);
 	Edge var = getOrderConstraint(order->orderPairTable, &pair);
 	if (edgeIsNull(var))
-		return SATC_UNORDERED;
-	return getValueCNF(solver->getSATEncoder()->getCNF(), var) ? SATC_FIRST : SATC_SECOND;
+		return false;
+	return getValueCNF(solver->getSATEncoder()->getCNF(), var);
 }

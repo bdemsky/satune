@@ -14,12 +14,12 @@
 class OrderPairResolver : public OrderResolver {
 public:
 	OrderPairResolver(CSolver *_solver, Order *_order);
-	HappenedBefore resolveOrder(uint64_t first, uint64_t second);
+	bool resolveOrder(uint64_t first, uint64_t second);
 	virtual ~OrderPairResolver();
 private:
 	CSolver *solver;
 	Order *order;
-	HappenedBefore resolveTotalOrder(uint64_t first, uint64_t second);
+	bool resolveTotalOrder(uint64_t first, uint64_t second);
 };
 
 #endif/* ORDERPAIRRESOLVER_H */

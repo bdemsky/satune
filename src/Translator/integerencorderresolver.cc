@@ -20,15 +20,13 @@ IntegerEncOrderResolver::~IntegerEncOrderResolver() {
 }
 
 
-HappenedBefore IntegerEncOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
+bool IntegerEncOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
 	Element *elem1 = ierecord->getOrderIntegerElement(solver, first, false);
-	if (elem1 == NULL)
-		return SATC_UNORDERED;
+	ASSERT (elem1 != NULL);
 	Element *elem2 = ierecord->getOrderIntegerElement(solver, second, false);
-	if (elem2 == NULL)
-		return SATC_UNORDERED;
+	ASSERT (elem2 != NULL);
 
 	uint64_t val1 = getElementValueSATTranslator(solver, elem1);
 	uint64_t val2 = getElementValueSATTranslator(solver, elem2);
-	return val1 < val2 ? SATC_FIRST : val1> val2 ? SATC_SECOND : SATC_UNORDERED;
+	return val1 < val2;
 }

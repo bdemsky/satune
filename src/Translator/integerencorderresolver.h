@@ -13,7 +13,7 @@
 class IntegerEncOrderResolver : public OrderResolver {
 public:
 	IntegerEncOrderResolver(CSolver *_solver, IntegerEncodingRecord *_ierecord);
-	HappenedBefore resolveOrder(uint64_t first, uint64_t second);
+	bool resolveOrder(uint64_t first, uint64_t second);
 	virtual ~IntegerEncOrderResolver();
 private:
 	CSolver *solver;
