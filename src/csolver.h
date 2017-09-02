@@ -147,11 +147,8 @@ public:
 	CMEMALLOC;
 
 private:
-	void handleXORFalse(BooleanLogic *bexpr, Boolean *child);
-	void handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child);
-	void handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child);
+	void handleIFFTrue(BooleanLogic *bexpr, Boolean *child);
 	void handleANDTrue(BooleanLogic *bexpr, Boolean *child);
-	void handleORFalse(BooleanLogic *bexpr, Boolean *child);
 
 	/** This is a vector of constraints that must be satisfied. */
 	HashsetBoolean constraints;

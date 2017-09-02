@@ -2,6 +2,6 @@
 #define REWRITER_H
 #include "classlist.h"
 
-void handleXORTrue(BooleanLogic *bexpr, Boolean *child);
+void handleIFFFalse(BooleanLogic *bexpr, Boolean *child);
 
 #endif

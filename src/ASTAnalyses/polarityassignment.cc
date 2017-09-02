@@ -81,8 +81,7 @@ BooleanValue negateBooleanValue(BooleanValue This) {
 void computeLogicOpPolarity(BooleanLogic *This) {
 	Polarity parentpolarity = This->polarity;
 	switch (This->op) {
-	case SATC_AND:
-	case SATC_OR: {
+	case SATC_AND: {
 		uint size = This->inputs.getSize();
 		for (uint i = 0; i < size; i++) {
 			Boolean *tmp = This->inputs.get(i);
@@ -95,17 +94,9 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 		updatePolarity(tmp, negatePolarity(parentpolarity));
 		break;
 	}
-	case SATC_IFF:
-	case SATC_XOR: {
+	case SATC_IFF: {
 		updatePolarity(This->inputs.get(0), P_BOTHTRUEFALSE);
 		updatePolarity(This->inputs.get(1), P_BOTHTRUEFALSE);
-		break;
-	}
-	case SATC_IMPLIES: {
-		Boolean *left = This->inputs.get(0);
-		updatePolarity(left, negatePolarity( parentpolarity));
-		Boolean *right = This->inputs.get(1);
-		updatePolarity(right, parentpolarity);
 		break;
 	}
 	default:
@@ -125,28 +116,10 @@ void computeLogicOpBooleanValue(BooleanLogic *This) {
 		}
 		return;
 	}
-	case SATC_OR: {
-		if (parentbv == BV_MUSTBEFALSE || parentbv == BV_UNSAT) {
-			uint size = This->inputs.getSize();
-			for (uint i = 0; i < size; i++) {
-				updateMustValue(This->inputs.get(i), parentbv);
-			}
-		}
-		return;
-	}
 	case SATC_NOT:
 		updateMustValue(This->inputs.get(0), negateBooleanValue(parentbv));
 		return;
-	case SATC_IMPLIES:
-		//implies is really an or with the first term negated
-		if (parentbv == BV_MUSTBEFALSE || parentbv == BV_UNSAT) {
-			uint size = This->inputs.getSize();
-			updateMustValue(This->inputs.get(0), negateBooleanValue(parentbv));
-			updateMustValue(This->inputs.get(1), parentbv);
-		}
-		return;
 	case SATC_IFF:
-	case SATC_XOR:
 		return;
 	default:
 		ASSERT(0);

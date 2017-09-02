@@ -17,6 +17,7 @@
 #include "structs.h"
 #include "orderresolver.h"
 #include "integerencoding.h"
+#include <stdlib.h>
 
 CSolver::CSolver() :
 	boolTrue(new BooleanConst(true)),
@@ -239,6 +240,16 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg) {
 	return applyLogicalOperation(op, array, 1);
 }
 
+static int ptrcompares(const void *p1, const void *p2) {
+	uintptr_t b1 = *(uintptr_t const *) p1;
+  uintptr_t b2 = *(uintptr_t const *) p2;
+	if (b1 < b2)
+		return -1;
+	else if (b1 == b2)
+		return 0;
+	else
+		return 1;
+}
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
 	Boolean *newarray[asize];
@@ -264,53 +275,11 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		}
 		break;
 	}
-	case SATC_XOR: {
-		for (uint i = 0; i < 2; i++) {
-			if (array[i]->type == BOOLCONST) {
-				if (array[i]->isTrue()) {
-					newarray[0] = array[1 - i];
-					return applyLogicalOperation(SATC_NOT, newarray, 1);
-				} else
-					return array[1 - i];
-			}
-		}
-		break;
-	}
 	case SATC_OR: {
-		uint newindex = 0;
-		for (uint i = 0; i < asize; i++) {
-			Boolean *b = array[i];
-			if (b->type == BOOLCONST) {
-				if (b->isTrue())
-					return boolTrue;
-				else
-					continue;
-			} else
-				newarray[newindex++] = b;
+		for (uint i =0; i <asize; i++) {
+			newarray[i] = applyLogicalOperation(SATC_NOT, array[i]);
 		}
-		if (newindex == 0) {
-			return boolFalse;
-		} else if (newindex == 1)
-			return newarray[0];
-		else if (newindex == 2) {
-			bool isNot0 = (newarray[0]->type == BOOLCONST) && ((BooleanLogic *)newarray[0])->op == SATC_NOT;
-			bool isNot1 = (newarray[1]->type == BOOLCONST) && ((BooleanLogic *)newarray[1])->op == SATC_NOT;
-
-			if (isNot0 != isNot1) {
-				if (isNot0) {
-					newarray[0] = ((BooleanLogic *) newarray[0])->inputs.get(0);
-				} else {
-					Boolean *tmp =  ((BooleanLogic *) array[1])->inputs.get(0);
-					array[1] = array[0];
-					array[0] = tmp;
-				}
-				return applyLogicalOperation(SATC_IMPLIES, newarray, 2);
-			}
-		} else {
-			array = newarray;
-			asize = newindex;
-		}
-		break;
+		return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_AND, newarray, asize));
 	}
 	case SATC_AND: {
 		uint newindex = 0;
@@ -329,26 +298,19 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
+			qsort(newarray, asize, sizeof(Boolean *), ptrcompares);
 			array = newarray;
 			asize = newindex;
 		}
 		break;
 	}
+	case SATC_XOR: {
+		//handle by translation
+		return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_IFF, array, asize));
+	}
 	case SATC_IMPLIES: {
-		if (array[0]->type == BOOLCONST) {
-			if (array[0]->isTrue()) {
-				return array[1];
-			} else {
-				return boolTrue;
-			}
-		} else if (array[1]->type == BOOLCONST) {
-			if (array[1]->isTrue()) {
-				return array[1];
-			} else {
-				return applyLogicalOperation(SATC_NOT, array, 1);
-			}
-		}
-		break;
+		//handle by translation
+		return applyLogicalOperation(SATC_OR, applyLogicalOperation(SATC_NOT, array[0]), array[1]);
 	}
 	}
 
@@ -376,8 +338,19 @@ void CSolver::addConstraint(Boolean *constraint) {
 		return;
 	else if (constraint == boolFalse)
 		setUnSAT();
-	else
+	else {
+		if (constraint->type == LOGICOP) {
+			BooleanLogic *b=(BooleanLogic *) constraint;
+			if (b->op==SATC_AND) {
+				for(uint i=0;i<b->inputs.getSize();i++) {
+					addConstraint(b->inputs.get(i));
+				}
+				return;
+			}
+		}
+
 		constraints.add(constraint);
+	}
 }
 
 Order *CSolver::createOrder(OrderType type, Set *set) {

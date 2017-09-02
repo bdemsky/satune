@@ -15,21 +15,16 @@ void CSolver::replaceBooleanWithTrue(Boolean *bexpr) {
 		case SATC_AND:
 			handleANDTrue(logicop, bexpr);
 			break;
-		case SATC_OR:
-			replaceBooleanWithTrue(parent);
-			break;
 		case SATC_NOT:
 			replaceBooleanWithFalse(parent);
 			break;
 		case SATC_IFF:
-			handleXORFalse(logicop, bexpr);
+			handleIFFTrue(logicop, bexpr);
 			break;
+		case SATC_OR:
 		case SATC_XOR:
-			handleXORTrue(logicop, bexpr);
-			break;
 		case SATC_IMPLIES:
-			handleIMPLIESTrue(logicop, bexpr);
-			break;
+			ASSERT(0);
 		}
 	}
 }
@@ -57,7 +52,7 @@ void CSolver::replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb) {
 	}
 }
 
-void handleXORTrue(BooleanLogic *bexpr, Boolean *child) {
+void handleIFFFalse(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 	Boolean *b = bexpr->inputs.get(0);
 	uint childindex = (b == child) ? 0 : 1;
@@ -65,36 +60,11 @@ void handleXORTrue(BooleanLogic *bexpr, Boolean *child) {
 	bexpr->op = SATC_NOT;
 }
 
-void CSolver::handleXORFalse(BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleIFFTrue(BooleanLogic *bexpr, Boolean *child) {
 	uint size = bexpr->inputs.getSize();
 	Boolean *b = bexpr->inputs.get(0);
 	uint otherindex = (b == child) ? 1 : 0;
 	replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(otherindex));
-}
-
-void CSolver::handleIMPLIESTrue(BooleanLogic *bexpr, Boolean *child) {
-	uint size = bexpr->inputs.getSize();
-	Boolean *b = bexpr->inputs.get(0);
-	if (b == child) {
-		//Replace with other term
-		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(1));
-	} else {
-		//Statement is true...
-		replaceBooleanWithTrue(bexpr);
-	}
-}
-
-void CSolver::handleIMPLIESFalse(BooleanLogic *bexpr, Boolean *child) {
-	uint size = bexpr->inputs.getSize();
-	Boolean *b = bexpr->inputs.get(0);
-	if (b == child) {
-		//Statement is true...
-		replaceBooleanWithTrue(bexpr);
-	} else {
-		//Make into negation of first term
-		bexpr->inputs.get(1);
-		bexpr->op = SATC_NOT;
-	}
 }
 
 void CSolver::handleANDTrue(BooleanLogic *bexpr, Boolean *child) {
@@ -103,25 +73,6 @@ void CSolver::handleANDTrue(BooleanLogic *bexpr, Boolean *child) {
 	if (size == 1) {
 		replaceBooleanWithTrue(bexpr);
 		return;
-	}
-
-	for (uint i = 0; i < size; i++) {
-		Boolean *b = bexpr->inputs.get(i);
-		if (b == child) {
-			bexpr->inputs.remove(i);
-		}
-	}
-
-	if (size == 2) {
-		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(0));
-	}
-}
-
-void CSolver::handleORFalse(BooleanLogic *bexpr, Boolean *child) {
-	uint size = bexpr->inputs.getSize();
-
-	if (size == 1) {
-		replaceBooleanWithFalse(bexpr);
 	}
 
 	for (uint i = 0; i < size; i++) {
@@ -150,21 +101,16 @@ void CSolver::replaceBooleanWithFalse(Boolean *bexpr) {
 		case SATC_AND:
 			replaceBooleanWithFalse(parent);
 			break;
-		case SATC_OR:
-			handleORFalse(logicop, bexpr);
-			break;
 		case SATC_NOT:
 			replaceBooleanWithTrue(parent);
 			break;
 		case SATC_IFF:
-			handleXORTrue(logicop, bexpr);
+			handleIFFFalse(logicop, bexpr);
 			break;
+		case SATC_OR:
 		case SATC_XOR:
-			handleXORFalse(logicop, bexpr);
-			break;
 		case SATC_IMPLIES:
-			handleIMPLIESFalse(logicop, bexpr);
-			break;
+			ASSERT(0);
 		}
 	}
 }
