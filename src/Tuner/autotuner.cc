@@ -13,14 +13,14 @@ void AutoTuner::addProblem(CSolver *solver) {
 	solvers.push(solver);
 }
 
-long long AutoTuner::evaluate(CSolver * problem, SearchTuner *tuner) {
-	CSolver * copy=problem->clone();
+long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
+	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
 	int result = copy->solve();
-	long long elapsedTime=copy->getElapsedTime();
-	long long encodeTime=copy->getEncodeTime();
-	long long solveTime=copy->getSolveTime();
-	long long metric=elapsedTime;
+	long long elapsedTime = copy->getElapsedTime();
+	long long encodeTime = copy->getEncodeTime();
+	long long solveTime = copy->getSolveTime();
+	long long metric = elapsedTime;
 	model_print("Elapsed Time: %llu\n", elapsedTime);
 	model_print("Encode Time: %llu\n", encodeTime);
 	model_print("Solve Time: %llu\n", solveTime);
@@ -29,24 +29,24 @@ long long AutoTuner::evaluate(CSolver * problem, SearchTuner *tuner) {
 }
 
 double AutoTuner::evaluateAll(SearchTuner *tuner) {
-	double product=1;
-	for(uint i=0;i<solvers.getSize();i++) {
-		CSolver * problem=solvers.get(i);
-		double score=evaluate(problem, tuner);
-		product*=score;
+	double product = 1;
+	for (uint i = 0; i < solvers.getSize(); i++) {
+		CSolver *problem = solvers.get(i);
+		double score = evaluate(problem, tuner);
+		product *= score;
 	}
-	return pow(product, 1/((double)solvers.getSize()));
+	return pow(product, 1 / ((double)solvers.getSize()));
 }
 
-SearchTuner * AutoTuner::mutateTuner(SearchTuner * oldTuner, uint k) {
-	SearchTuner *newTuner=oldTuner->copyUsed();
-	uint numSettings=oldTuner->getSize();
-	double factor=0.3;//Adjust this factor...
-	uint settingsToMutate=(uint)(factor*(((double)numSettings) * (budget - k))/(budget));
+SearchTuner *AutoTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
+	SearchTuner *newTuner = oldTuner->copyUsed();
+	uint numSettings = oldTuner->getSize();
+	double factor = 0.3;//Adjust this factor...
+	uint settingsToMutate = (uint)(factor * (((double)numSettings) * (budget - k)) / (budget));
 	if (settingsToMutate < 1)
-		settingsToMutate=1;
+		settingsToMutate = 1;
 	model_print("Mutating %u settings\n", settingsToMutate);
-	while(settingsToMutate-- != 0) {
+	while (settingsToMutate-- != 0) {
 		newTuner->randomMutate();
 	}
 	return newTuner;
@@ -54,19 +54,19 @@ SearchTuner * AutoTuner::mutateTuner(SearchTuner * oldTuner, uint k) {
 
 
 void AutoTuner::tune() {
-	SearchTuner * bestTuner = NULL;
-	double bestScore=DBL_MAX;
+	SearchTuner *bestTuner = NULL;
+	double bestScore = DBL_MAX;
 
-	SearchTuner * oldTuner=new SearchTuner();
-	double base_temperature=evaluateAll(oldTuner);
-	double oldScore=base_temperature;
+	SearchTuner *oldTuner = new SearchTuner();
+	double base_temperature = evaluateAll(oldTuner);
+	double oldScore = base_temperature;
 
-	for (uint i=0;i<budget;i++) {
-		SearchTuner *newTuner=mutateTuner(oldTuner, i);
-		double newScore=evaluateAll(newTuner);
+	for (uint i = 0; i < budget; i++) {
+		SearchTuner *newTuner = mutateTuner(oldTuner, i);
+		double newScore = evaluateAll(newTuner);
 		newTuner->printUsed();
 		model_print("Received score %f\n", newScore);
-		double scoreDiff=newScore - oldScore; //smaller is better
+		double scoreDiff = newScore - oldScore;	//smaller is better
 		if (newScore < bestScore) {
 			if (bestTuner != NULL)
 				delete bestTuner;
@@ -78,7 +78,7 @@ void AutoTuner::tune() {
 		if (scoreDiff < 0) {
 			acceptanceP = 1;
 		} else {
-			double currTemp=base_temperature * (((double)budget - i) / budget);
+			double currTemp = base_temperature * (((double)budget - i) / budget);
 			acceptanceP = exp(-scoreDiff / currTemp);
 		}
 		double ran = ((double)random()) / RAND_MAX;

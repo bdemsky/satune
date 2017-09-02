@@ -19,7 +19,7 @@ public:
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
 
 	Element *createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange);
-		
+
 	/** This function creates a mutable set. */
 
 	MutableSet *createMutableSet(VarType type);
@@ -44,7 +44,7 @@ public:
 	Boolean *getBooleanTrue();
 
 	Boolean *getBooleanFalse();
-	
+
 	/** This function creates a boolean variable. */
 
 	Boolean *getBooleanVar(VarType type);
@@ -87,9 +87,9 @@ public:
 
 	Boolean *applyLogicalOperation(LogicOp op, Boolean **array, uint asize);
 
-		/** This function applies a logical operation to the Booleans in its input. */
+	/** This function applies a logical operation to the Booleans in its input. */
 
-	Boolean *applyLogicalOperation(LogicOp op, Boolean * arg1, Boolean * arg2);
+	Boolean *applyLogicalOperation(LogicOp op, Boolean *arg1, Boolean *arg2);
 
 	/** This function applies a logical operation to the Booleans in its input. */
 
@@ -119,7 +119,7 @@ public:
 
 	bool isTrue(Boolean *b);
 	bool isFalse(Boolean *b);
-	
+
 	void setUnSAT() { unsat = true; }
 
 	bool isUnSAT() { return unsat; }
@@ -127,8 +127,7 @@ public:
 	Vector<Order *> *getOrders() { return &allOrders;}
 
 	Tuner *getTuner() { return tuner; }
-	Transformer* getTransformer() {return transformer;}
-	
+
 	SetIteratorBoolean *getConstraints() { return constraints.iterator(); }
 
 	SATEncoder *getSATEncoder() {return satEncoder;}
@@ -139,12 +138,11 @@ public:
 	CSolver *clone();
 	void autoTune(uint budget);
 
-	void setTransformer(Transformer * _transformer) {  transformer = _transformer; }
-	void setTuner(Tuner * _tuner) { tuner = _tuner; }
+	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();
 	long long getSolveTime();
-	
+
 	CMEMALLOC;
 
 private:
@@ -178,17 +176,16 @@ private:
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 
-	Boolean * boolTrue;
-	Boolean * boolFalse;
-	
+	Boolean *boolTrue;
+	Boolean *boolFalse;
+
 	/** These two tables are used for deduplicating entries. */
 	BooleanMatchMap boolMap;
 	ElementMatchMap elemMap;
-	
+
 	SATEncoder *satEncoder;
 	bool unsat;
 	Tuner *tuner;
-	Transformer* transformer;
 	long long elapsedTime;
 };
 #endif

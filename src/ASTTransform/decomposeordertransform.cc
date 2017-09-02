@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   ordertransform.cc
  * Author: hamed
- * 
+ *
  * Created on August 28, 2017, 10:35 AM
  */
 
@@ -14,21 +14,65 @@
 #include "ordergraph.h"
 #include "csolver.h"
 #include "decomposeorderresolver.h"
+#include "tunable.h"
+#include "orderanalysis.h"
 
 
-DecomposeOrderTransform::DecomposeOrderTransform(CSolver* _solver)
-	:Transform(_solver)
+DecomposeOrderTransform::DecomposeOrderTransform(CSolver *_solver)
+	: Transform(_solver)
 {
 }
 
 DecomposeOrderTransform::~DecomposeOrderTransform() {
 }
 
-bool DecomposeOrderTransform::canExecuteTransform(){
-	return canExecutePass(solver, currOrder->type, DECOMPOSEORDER, &onoff);
+void DecomposeOrderTransform::doTransform() {
+	Vector<Order *> *orders = solver->getOrders();
+	uint size = orders->getSize();
+	for (uint i = 0; i < size; i++) {
+		Order *order = orders->get(i);
+
+		if (GETVARTUNABLE(solver->getTuner(), order->type, DECOMPOSEORDER, &onoff) == 0) {
+			continue;
+		}
+
+		OrderGraph *graph = buildOrderGraph(order);
+		if (order->type == SATC_PARTIAL) {
+			//Required to do SCC analysis for partial order graphs.  It
+			//makes sure we don't incorrectly optimize graphs with negative
+			//polarity edges
+			completePartialOrderGraph(graph);
+		}
+
+		bool mustReachGlobal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
+
+		if (mustReachGlobal)
+			reachMustAnalysis(solver, graph, false);
+
+		bool mustReachLocal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
+
+		if (mustReachLocal) {
+			//This pair of analysis is also optional
+			if (order->type == SATC_PARTIAL) {
+				localMustAnalysisPartial(solver, graph);
+			} else {
+				localMustAnalysisTotal(solver, graph);
+			}
+		}
+
+		bool mustReachPrune = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
+
+		if (mustReachPrune)
+			removeMustBeTrueNodes(solver, graph);
+
+		//This is needed for splitorder
+		computeStronglyConnectedComponentGraph(graph);
+		decomposeOrder(order, graph);
+		delete graph;
+	}
 }
 
-void DecomposeOrderTransform::doTransform(){
+void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *currGraph) {
 	Vector<Order *> ordervec;
 	Vector<Order *> partialcandidatevec;
 	uint size = currOrder->constraints.getSize();
@@ -36,7 +80,6 @@ void DecomposeOrderTransform::doTransform(){
 		BooleanOrder *orderconstraint = currOrder->constraints.get(i);
 		OrderNode *from = currGraph->getOrderNodeFromOrderGraph(orderconstraint->first);
 		OrderNode *to = currGraph->getOrderNodeFromOrderGraph(orderconstraint->second);
-		model_print("from->sccNum:%u\tto->sccNum:%u\n", from->sccNum, to->sccNum);
 		if (from->sccNum != to->sccNum) {
 			OrderEdge *edge = currGraph->getOrderEdgeFromOrderGraph(from, to);
 			if (edge->polPos) {
@@ -84,7 +127,6 @@ void DecomposeOrderTransform::doTransform(){
 		Order *neworder = partialcandidatevec.get(i);
 		if (neworder != NULL) {
 			neworder->type = SATC_TOTAL;
-			model_print("i=%u\t", i);
 		}
 	}
 }

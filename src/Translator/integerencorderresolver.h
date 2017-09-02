@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   integerencorderresolver.h
  * Author: hamed
  *
@@ -10,15 +10,15 @@
 #define INTEGERENCORDERRESOLVER_H
 #include "orderresolver.h"
 
-class IntegerEncOrderResolver : public OrderResolver{
+class IntegerEncOrderResolver : public OrderResolver {
 public:
-	IntegerEncOrderResolver(CSolver* _solver, IntegerEncodingRecord* _ierecord);
+	IntegerEncOrderResolver(CSolver *_solver, IntegerEncodingRecord *_ierecord);
 	HappenedBefore resolveOrder(uint64_t first, uint64_t second);
 	virtual ~IntegerEncOrderResolver();
 private:
-	CSolver* solver;
-	IntegerEncodingRecord* ierecord;
+	CSolver *solver;
+	IntegerEncodingRecord *ierecord;
 };
 
-#endif /* INTEGERENCORDERRESOLVER_H */
+#endif/* INTEGERENCORDERRESOLVER_H */
 

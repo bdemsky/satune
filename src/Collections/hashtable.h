@@ -115,10 +115,10 @@ public:
 		size = 0;
 	}
 
-  /** Doesn't work with zero value */
-  _Val getRandomValue() {
-		while(true) {
-			unsigned int index=random() & capacitymask;
+	/** Doesn't work with zero value */
+	_Val getRandomValue() {
+		while (true) {
+			unsigned int index = random() & capacitymask;
 			struct Hashlistnode<_Key, _Val> *bin = &table[index];
 			if (bin->key != NULL && bin->val != NULL) {
 				return bin->val;

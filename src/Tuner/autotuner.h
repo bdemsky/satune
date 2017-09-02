@@ -4,17 +4,17 @@
 #include "structs.h"
 
 class AutoTuner {
- public:
+public:
 	AutoTuner(uint budget);
 	void addProblem(CSolver *solver);
 	void tune();
 	CMEMALLOC;
- private:
+private:
 	long long evaluate(CSolver *problem, SearchTuner *tuner);
 	double evaluateAll(SearchTuner *tuner);
-	SearchTuner * mutateTuner(SearchTuner * oldTuner, uint k);
+	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
 
-	Vector<CSolver *> solvers;	
+	Vector<CSolver *> solvers;
 	uint budget;
 };
 #endif

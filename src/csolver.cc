@@ -11,11 +11,12 @@
 #include "sattranslator.h"
 #include "tunable.h"
 #include "polarityassignment.h"
-#include "transformer.h"
+#include "decomposeordertransform.h"
 #include "autotuner.h"
 #include "astops.h"
 #include "structs.h"
 #include "orderresolver.h"
+#include "integerencoding.h"
 
 CSolver::CSolver() :
 	boolTrue(new BooleanConst(true)),
@@ -25,7 +26,6 @@ CSolver::CSolver() :
 	elapsedTime(0)
 {
 	satEncoder = new SATEncoder(this);
-	transformer = new Transformer(this);
 }
 
 /** This function tears down the solver and the entire AST */
@@ -69,7 +69,6 @@ CSolver::~CSolver() {
 	delete boolTrue;
 	delete boolFalse;
 	delete satEncoder;
-	delete transformer;
 }
 
 CSolver *CSolver::clone() {
@@ -211,7 +210,7 @@ Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint nu
 
 Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
 	BooleanPredicate *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
-	Boolean * b = boolMap.get(boolean);
+	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
@@ -230,22 +229,22 @@ bool CSolver::isFalse(Boolean *b) {
 	return b->isFalse();
 }
 
-Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean * arg1, Boolean * arg2) {
-	Boolean * array[] = {arg1, arg2};
+Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg1, Boolean *arg2) {
+	Boolean *array[] = {arg1, arg2};
 	return applyLogicalOperation(op, array, 2);
 }
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg) {
-	Boolean * array[] = {arg};
+	Boolean *array[] = {arg};
 	return applyLogicalOperation(op, array, 1);
 }
 
 
 Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
-	Boolean * newarray[asize];
-	switch(op) {
+	Boolean *newarray[asize];
+	switch (op) {
 	case SATC_NOT: {
-		if (array[0]->type == LOGICOP && ((BooleanLogic *)array[0])->op==SATC_NOT) {
+		if (array[0]->type == LOGICOP && ((BooleanLogic *)array[0])->op == SATC_NOT) {
 			return ((BooleanLogic *) array[0])->inputs.get(0);
 		} else if (array[0]->type == BOOLCONST) {
 			return array[0]->isTrue() ? boolFalse : boolTrue;
@@ -253,12 +252,12 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		break;
 	}
 	case SATC_IFF: {
-		for(uint i=0;i<2;i++) {
+		for (uint i = 0; i < 2; i++) {
 			if (array[i]->type == BOOLCONST) {
 				if (array[i]->isTrue()) {
-					return array[1-i];
+					return array[1 - i];
 				} else {
-					newarray[0]=array[1-i];
+					newarray[0] = array[1 - i];
 					return applyLogicalOperation(SATC_NOT, newarray, 1);
 				}
 			}
@@ -266,36 +265,36 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		break;
 	}
 	case SATC_XOR: {
-		for(uint i=0;i<2;i++) {
+		for (uint i = 0; i < 2; i++) {
 			if (array[i]->type == BOOLCONST) {
 				if (array[i]->isTrue()) {
-					newarray[0]=array[1-i];
+					newarray[0] = array[1 - i];
 					return applyLogicalOperation(SATC_NOT, newarray, 1);
 				} else
-					return array[1-i];
+					return array[1 - i];
 			}
 		}
 		break;
 	}
 	case SATC_OR: {
-		uint newindex=0;
-		for(uint i=0;i<asize;i++) {
-			Boolean *b=array[i];
+		uint newindex = 0;
+		for (uint i = 0; i < asize; i++) {
+			Boolean *b = array[i];
 			if (b->type == BOOLCONST) {
 				if (b->isTrue())
 					return boolTrue;
 				else
 					continue;
 			} else
-				newarray[newindex++]=b;
+				newarray[newindex++] = b;
 		}
-		if (newindex==0) {
+		if (newindex == 0) {
 			return boolFalse;
-		} else if (newindex==1)
+		} else if (newindex == 1)
 			return newarray[0];
 		else if (newindex == 2) {
-			bool isNot0 = (newarray[0]->type==BOOLCONST) && ((BooleanLogic *)newarray[0])->op == SATC_NOT;
-			bool isNot1 = (newarray[1]->type==BOOLCONST) && ((BooleanLogic *)newarray[1])->op == SATC_NOT;
+			bool isNot0 = (newarray[0]->type == BOOLCONST) && ((BooleanLogic *)newarray[0])->op == SATC_NOT;
+			bool isNot1 = (newarray[1]->type == BOOLCONST) && ((BooleanLogic *)newarray[1])->op == SATC_NOT;
 
 			if (isNot0 != isNot1) {
 				if (isNot0) {
@@ -314,20 +313,20 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		break;
 	}
 	case SATC_AND: {
-		uint newindex=0;
-		for(uint i=0;i<asize;i++) {
-			Boolean *b=array[i];
+		uint newindex = 0;
+		for (uint i = 0; i < asize; i++) {
+			Boolean *b = array[i];
 			if (b->type == BOOLCONST) {
 				if (b->isTrue())
 					continue;
 				else
 					return boolFalse;
 			} else
-				newarray[newindex++]=b;
+				newarray[newindex++] = b;
 		}
-		if (newindex==0) {
+		if (newindex == 0) {
 			return boolTrue;
-		} else if(newindex==1) {
+		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
 			array = newarray;
@@ -352,14 +351,14 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		break;
 	}
 	}
-	
+
 	ASSERT(asize != 0);
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
 	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
-		return boolean;		
+		return boolean;
 	} else {
 		delete boolean;
 		return b;
@@ -393,10 +392,16 @@ int CSolver::solve() {
 		tuner = new DefaultTuner();
 		deleteTuner = true;
 	}
-		
+
 	long long startTime = getTimeNano();
 	computePolarities(this);
-	transformer->orderAnalysis();
+
+	DecomposeOrderTransform dot(this);
+	dot.doTransform();
+
+	IntegerEncodingTransform iet(this);
+	iet.doTransform();
+
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
@@ -432,7 +437,7 @@ bool CSolver::getBooleanValue(Boolean *boolean) {
 }
 
 HappenedBefore CSolver::getOrderConstraintValue(Order *order, uint64_t first, uint64_t second) {
-	return  order->encoding.resolver->resolveOrder(first, second);
+	return order->encoding.resolver->resolveOrder(first, second);
 }
 
 long long CSolver::getEncodeTime() { return satEncoder->getEncodeTime(); }
@@ -440,7 +445,7 @@ long long CSolver::getEncodeTime() { return satEncoder->getEncodeTime(); }
 long long CSolver::getSolveTime() { return satEncoder->getSolveTime(); }
 
 void CSolver::autoTune(uint budget) {
-	AutoTuner * autotuner=new AutoTuner(budget);
+	AutoTuner *autotuner = new AutoTuner(budget);
 	autotuner->addProblem(this);
 	autotuner->tune();
 	delete autotuner;

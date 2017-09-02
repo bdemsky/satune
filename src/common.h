@@ -69,7 +69,7 @@ void print_trace(void);
 
 static inline long long getTimeNano() {
 	struct timespec time;
-	clock_gettime(CLOCK_REALTIME, & time);
+	clock_gettime(CLOCK_REALTIME, &time);
 	return time.tv_sec * 1000000000 + time.tv_nsec;
 }
 #endif/* __COMMON_H__ */

@@ -9,18 +9,18 @@
 typedef Hashtable<Boolean *, Node *, uintptr_t, 4> BooleanToEdgeMap;
 
 class SATEncoder {
- public:
+public:
 	int solve();
 	SATEncoder(CSolver *solver);
 	~SATEncoder();
 	void encodeAllSATEncoder(CSolver *csolver);
 	Edge encodeConstraintSATEncoder(Boolean *constraint);
-	CNF * getCNF() { return cnf;}
+	CNF *getCNF() { return cnf;}
 	long long getSolveTime() { return cnf->solveTime; }
 	long long getEncodeTime() { return cnf->encodeTime; }
-	
+
 	CMEMALLOC;
- private:
+private:
 	Edge getNewVarSATEncoder();
 	void getArrayNewVarsSATEncoder(uint num, Edge *carray);
 	Edge encodeVarSATEncoder(BooleanVar *constraint);
@@ -56,7 +56,7 @@ class SATEncoder {
 	Edge encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint);
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
 	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
-	
+
 	CNF *cnf;
 	CSolver *solver;
 	BooleanToEdgeMap booledgeMap;

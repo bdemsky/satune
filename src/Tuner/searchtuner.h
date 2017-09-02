@@ -5,14 +5,14 @@
 #include "structs.h"
 
 class TunableSetting {
- public:
-	TunableSetting(VarType type, TunableParam param);	
+public:
+	TunableSetting(VarType type, TunableParam param);
 	TunableSetting(TunableParam param);
-	TunableSetting(TunableSetting * ts);
+	TunableSetting(TunableSetting *ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
 	void print();
 	CMEMALLOC;
- private:
+private:
 	bool hasVar;
 	VarType type;
 	TunableParam param;
@@ -32,22 +32,22 @@ typedef Hashset<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSetti
 typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> SetIteratorTunableSetting;
 
 class SearchTuner : public Tuner {
- public:
+public:
 	SearchTuner();
 	~SearchTuner();
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
-	SearchTuner * copyUsed();
+	SearchTuner *copyUsed();
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}
 	void print();
 	void printUsed();
 
 	CMEMALLOC;
- private:
+private:
 	/** Used Settings keeps track of settings that were actually used by
-		 the example. Mutating settings may cause the Constraint Compiler
-		 not to query other settings.*/
+	   the example. Mutating settings may cause the Constraint Compiler
+	   not to query other settings.*/
 	HashsetTunableSetting usedSettings;
 	/** Settings contains all settings. */
 	HashsetTunableSetting settings;

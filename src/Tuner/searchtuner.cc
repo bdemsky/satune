@@ -12,11 +12,11 @@ TunableSetting::TunableSetting(TunableParam _param) :
 	param(_param) {
 }
 
-TunableSetting::TunableSetting(TunableSetting * ts) :
+TunableSetting::TunableSetting(TunableSetting *ts) :
 	hasVar(ts->hasVar),
 	type(ts->type),
 	param(ts->param),
-  lowValue(ts->lowValue),
+	lowValue(ts->lowValue),
 	highValue(ts->highValue),
 	defaultValue(ts->defaultValue),
 	selectedValue(ts->selectedValue)
@@ -43,19 +43,19 @@ unsigned int tunableSettingHash(TunableSetting *setting) {
 
 bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
 	return setting1->hasVar == setting2->hasVar &&
-		setting1->type == setting2->type &&
-		setting1->param == setting2->param;
+				 setting1->type == setting2->type &&
+				 setting1->param == setting2->param;
 }
 
 SearchTuner::SearchTuner() {
 }
 
-SearchTuner * SearchTuner::copyUsed() {
-	SearchTuner * tuner = new SearchTuner();
-	SetIteratorTunableSetting *iterator=usedSettings.iterator();
-	while(iterator->hasNext()) {
-		TunableSetting *setting=iterator->next();
-		TunableSetting *copy=new TunableSetting(setting);
+SearchTuner *SearchTuner::copyUsed() {
+	SearchTuner *tuner = new SearchTuner();
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
+		TunableSetting *copy = new TunableSetting(setting);
 		tuner->settings.add(copy);
 	}
 	delete iterator;
@@ -63,9 +63,9 @@ SearchTuner * SearchTuner::copyUsed() {
 }
 
 SearchTuner::~SearchTuner() {
-	SetIteratorTunableSetting *iterator=settings.iterator();
-	while(iterator->hasNext()) {
-		TunableSetting *setting=iterator->next();
+	SetIteratorTunableSetting *iterator = settings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
 		delete setting;
 	}
 	delete iterator;
@@ -73,12 +73,12 @@ SearchTuner::~SearchTuner() {
 
 int SearchTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
 	TunableSetting setting(param);
-	TunableSetting * result = usedSettings.get(&setting);
+	TunableSetting *result = usedSettings.get(&setting);
 	if (result == NULL) {
 		result = settings.get(&setting);
 		if ( result == NULL) {
-			result=new TunableSetting(param);
-			uint value = descriptor->lowValue + (random() % (1+ descriptor->highValue - descriptor->lowValue));
+			result = new TunableSetting(param);
+			uint value = descriptor->lowValue + (random() % (1 + descriptor->highValue - descriptor->lowValue));
 			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
 			settings.add(result);
 		}
@@ -89,12 +89,12 @@ int SearchTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
 
 int SearchTuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor) {
 	TunableSetting setting(vartype, param);
-	TunableSetting * result = usedSettings.get(&setting);
+	TunableSetting *result = usedSettings.get(&setting);
 	if (result == NULL) {
 		result = settings.get(&setting);
 		if ( result == NULL) {
-			result=new TunableSetting(vartype, param);
-			uint value = descriptor->lowValue + (random() % (1+ descriptor->highValue - descriptor->lowValue));
+			result = new TunableSetting(vartype, param);
+			uint value = descriptor->lowValue + (random() % (1 + descriptor->highValue - descriptor->lowValue));
 			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
 			settings.add(result);
 		}
@@ -104,9 +104,9 @@ int SearchTuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc 
 }
 
 void SearchTuner::randomMutate() {
-	TunableSetting * randomSetting = settings.getRandomElement();
-	int range=randomSetting->highValue-randomSetting->lowValue;
-	int randomchoice=(random() % range) + randomSetting->lowValue;
+	TunableSetting *randomSetting = settings.getRandomElement();
+	int range = randomSetting->highValue - randomSetting->lowValue;
+	int randomchoice = (random() % range) + randomSetting->lowValue;
 	if (randomchoice < randomSetting->selectedValue)
 		randomSetting->selectedValue = randomchoice;
 	else
@@ -114,9 +114,9 @@ void SearchTuner::randomMutate() {
 }
 
 void SearchTuner::print() {
-	SetIteratorTunableSetting *iterator=settings.iterator();
-	while(iterator->hasNext()) {
-		TunableSetting *setting=iterator->next();
+	SetIteratorTunableSetting *iterator = settings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
 		setting->print();
 	}
 	delete iterator;
@@ -124,9 +124,9 @@ void SearchTuner::print() {
 }
 
 void SearchTuner::printUsed() {
-	SetIteratorTunableSetting *iterator=usedSettings.iterator();
-	while(iterator->hasNext()) {
-		TunableSetting *setting=iterator->next();
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
 		setting->print();
 	}
 	delete iterator;

@@ -12,7 +12,7 @@
 #include "predicate.h"
 #include "set.h"
 
-SATEncoder::SATEncoder(CSolver * _solver) :
+SATEncoder::SATEncoder(CSolver *_solver) :
 	cnf(createCNF()),
 	solver(_solver) {
 }
@@ -38,22 +38,22 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
 	Edge result;
 	if (booledgeMap.contains(constraint)) {
-		Edge e={(Node *) booledgeMap.get(constraint)};
+		Edge e = {(Node *) booledgeMap.get(constraint)};
 		return e;
 	}
-	
+
 	switch (constraint->type) {
 	case ORDERCONST:
-		result=encodeOrderSATEncoder((BooleanOrder *) constraint);
+		result = encodeOrderSATEncoder((BooleanOrder *) constraint);
 		break;
 	case BOOLEANVAR:
-		result=encodeVarSATEncoder((BooleanVar *) constraint);
+		result = encodeVarSATEncoder((BooleanVar *) constraint);
 		break;
 	case LOGICOP:
-		result=encodeLogicSATEncoder((BooleanLogic *) constraint);
+		result = encodeLogicSATEncoder((BooleanLogic *) constraint);
 		break;
 	case PREDICATEOP:
-		result=encodePredicateSATEncoder((BooleanPredicate *) constraint);
+		result = encodePredicateSATEncoder((BooleanPredicate *) constraint);
 		break;
 	default:
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
@@ -133,7 +133,7 @@ void SATEncoder::encodeElementSATEncoder(Element *element) {
 	/* Check to see if we have already encoded this element. */
 	if (getElementEncoding(element)->variables != NULL)
 		return;
-	
+
 	/* Need to encode. */
 	switch ( element->type) {
 	case ELEMFUNCRETURN:

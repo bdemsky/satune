@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   transform.h
  * Author: hamed
  *
@@ -11,19 +11,17 @@
 #include "classlist.h"
 #include "mymemory.h"
 #include "structs.h"
-#include "pass.h"
 
-class Transform : public Pass{
+class Transform {
 public:
-	Transform(CSolver* _solver);
+	Transform(CSolver *_solver);
 	virtual ~Transform();
-	virtual bool canExecuteTransform() = 0;
 	virtual void doTransform() = 0;
 	CMEMALLOC;
- protected:
+protected:
 	// Need solver for translating back the result ...
-	CSolver* solver;
+	CSolver *solver;
 };
 
-#endif /* TRANSFORM_H */
+#endif/* TRANSFORM_H */
 

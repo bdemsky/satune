@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   integerencodingrecord.h
  * Author: hamed
  *
@@ -13,16 +13,16 @@
 
 class IntegerEncodingRecord {
 public:
-	IntegerEncodingRecord(Set* set);
+	IntegerEncodingRecord(Set *set);
 	~IntegerEncodingRecord();
-	Element* getOrderIntegerElement(CSolver *This, uint64_t item, bool create = true);
-	inline Set* getSecondarySet() { return secondarySet; }
+	Element *getOrderIntegerElement(CSolver *This, uint64_t item, bool create = true);
+	inline Set *getSecondarySet() { return secondarySet; }
 	CMEMALLOC;
-	
+
 private:
-	Set* secondarySet;
+	Set *secondarySet;
 	HashsetOrderElement *elementTable;
 };
 
-#endif /* INTEGERENCODINGRECORD_H */
+#endif/* INTEGERENCODINGRECORD_H */
 

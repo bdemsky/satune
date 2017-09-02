@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   orderresolver.h
  * Author: hamed
  *
@@ -14,11 +14,11 @@
 
 class OrderResolver {
 public:
-	OrderResolver(){};
+	OrderResolver() {};
 	virtual HappenedBefore resolveOrder(uint64_t first, uint64_t second) = 0;
-	virtual ~OrderResolver(){};
+	virtual ~OrderResolver() {};
 	CMEMALLOC;
 };
 
-#endif /* ORDERRESOLVER_H */
+#endif/* ORDERRESOLVER_H */
 

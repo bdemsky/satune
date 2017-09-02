@@ -24,7 +24,7 @@ public:
 };
 
 class BooleanConst : public Boolean {
- public:
+public:
 	BooleanConst(bool isTrue);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	bool isTrue() {return istrue;}

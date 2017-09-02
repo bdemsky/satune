@@ -333,15 +333,15 @@ Edge constraintNewVar(CNF *cnf) {
 }
 
 int solveCNF(CNF *cnf) {
-	long long startTime=getTimeNano();
+	long long startTime = getTimeNano();
 	countPass(cnf);
 	convertPass(cnf, false);
 	finishedClauses(cnf->solver);
-	long long startSolve=getTimeNano();
+	long long startSolve = getTimeNano();
 	int result = solve(cnf->solver);
-	long long finishTime=getTimeNano();
-	cnf->encodeTime=startSolve-startTime;
-	cnf->solveTime=finishTime-startSolve;
+	long long finishTime = getTimeNano();
+	cnf->encodeTime = startSolve - startTime;
+	cnf->solveTime = finishTime - startSolve;
 	return result;
 }
 

@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   integerencodingrecord.cpp
  * Author: hamed
- * 
+ *
  * Created on August 26, 2017, 6:19 PM
  */
 
@@ -9,19 +9,19 @@
 #include "csolver.h"
 #include "orderelement.h"
 
-IntegerEncodingRecord::IntegerEncodingRecord(Set* _set):
+IntegerEncodingRecord::IntegerEncodingRecord(Set *_set) :
 	secondarySet(_set)
 {
 	elementTable = new HashsetOrderElement();
 }
 
-IntegerEncodingRecord::~IntegerEncodingRecord(){
+IntegerEncodingRecord::~IntegerEncodingRecord() {
 	if (elementTable != NULL) {
 		delete elementTable;
 	}
 }
 
-Element * IntegerEncodingRecord::getOrderIntegerElement(CSolver *This, uint64_t item, bool create) {
+Element *IntegerEncodingRecord::getOrderIntegerElement(CSolver *This, uint64_t item, bool create) {
 	OrderElement oelement(item, NULL);
 	if ( elementTable->contains(&oelement)) {
 		return elementTable->get(&oelement)->getElement();

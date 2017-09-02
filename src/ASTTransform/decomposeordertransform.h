@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   ordertransform.h
  * Author: hamed
  *
@@ -13,19 +13,16 @@
 
 class DecomposeOrderTransform : public Transform {
 public:
-	DecomposeOrderTransform(CSolver* _solver);
-	virtual ~DecomposeOrderTransform();
+	DecomposeOrderTransform(CSolver *_solver);
+	~DecomposeOrderTransform();
 	void doTransform();
-	void setOrderGraph(OrderGraph* _graph){
-		currGraph = _graph;
-	}
-	void setCurrentOrder(Order* _current) { currOrder = _current;}
-	bool canExecuteTransform();
+	void decomposeOrder (Order *currOrder, OrderGraph *currGraph);
+
 	CMEMALLOC;
- private:
-	Order* currOrder;
-	OrderGraph* currGraph;
+private:
+	Order *currOrder;
+	OrderGraph *currGraph;
 };
 
-#endif /* ORDERTRANSFORM_H */
+#endif/* ORDERTRANSFORM_H */
 

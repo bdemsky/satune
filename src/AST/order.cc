@@ -41,7 +41,7 @@ Order::~Order() {
 		orderPairTable->resetanddelete();
 		delete orderPairTable;
 	}
-	
+
 	if (graph != NULL) {
 		delete graph;
 	}

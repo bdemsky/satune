@@ -3,7 +3,7 @@
 #include "classes.h"
 #include "hashtable.h"
 
-uint hashBoolean(Boolean * boolean);
+uint hashBoolean(Boolean *boolean);
 bool compareBoolean(Boolean *b1, Boolean *b2);
 
 uint hashElement(Element *element);

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   integerencoding.h
  * Author: hamed
  *
@@ -11,20 +11,20 @@
 #include "transform.h"
 #include "order.h"
 
-class IntegerEncodingTransform : public Transform{
+class IntegerEncodingTransform : public Transform {
 public:
-	IntegerEncodingTransform(CSolver* solver);
+	IntegerEncodingTransform(CSolver *solver);
 	void orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder);
-	void setCurrentOrder(Order* _curr) {currOrder = _curr;}
 	void doTransform();
-	bool canExecuteTransform();
+	void integerEncode(Order *currOrder);
+
 	virtual ~IntegerEncodingTransform();
 private:
-	Order* currOrder;
+	Order *currOrder;
 	//FIXME:We can remove it, because we don't need it for translating anymore... -HG
-	HashTableOrderIntEncoding* orderIntEncoding;
+	HashTableOrderIntEncoding *orderIntEncoding;
 };
 
 
-#endif /* INTEGERENCODING_H */
+#endif/* INTEGERENCODING_H */
 

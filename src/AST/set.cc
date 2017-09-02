@@ -41,10 +41,10 @@ uint Set::getSize() {
 	}
 }
 
-uint64_t Set::getMemberAt(uint index){
-	if(isRange){
-		return low+index;
-	}else {
+uint64_t Set::getMemberAt(uint index) {
+	if (isRange) {
+		return low + index;
+	} else {
 		return members->get(index);
 	}
 }

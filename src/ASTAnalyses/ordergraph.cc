@@ -111,9 +111,9 @@ OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id, bool create) {
 	if ( tmp != NULL) {
 		delete node;
 		node = tmp;
-	} else if(create) {
+	} else if (create) {
 		nodes->add(node);
-	} else{
+	} else {
 		delete node;
 		return NULL;
 	}

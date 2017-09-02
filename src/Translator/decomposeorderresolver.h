@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   DecomposeOrderResolver.h
  * Author: hamed
  *
@@ -13,15 +13,15 @@
 #include "structs.h"
 #include "orderresolver.h"
 
-class DecomposeOrderResolver : public OrderResolver{
+class DecomposeOrderResolver : public OrderResolver {
 public:
-	DecomposeOrderResolver(OrderGraph* graph, Vector<Order *> & orders);
+	DecomposeOrderResolver(OrderGraph *graph, Vector<Order *> &orders);
 	HappenedBefore resolveOrder(uint64_t first, uint64_t second);
 	virtual ~DecomposeOrderResolver();
 private:
-	OrderGraph* graph;
-	Vector<Order*> orders;
+	OrderGraph *graph;
+	Vector<Order *> orders;
 };
 
-#endif /* DECOMPOSEORDERRESOLVER_H */
+#endif/* DECOMPOSEORDERRESOLVER_H */
 

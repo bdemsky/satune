@@ -148,15 +148,15 @@ public:
 			return false;
 	}
 
-  /** @brief Return random key from set. */
+	/** @brief Return random key from set. */
 
-  _Key getRandomElement() {
+	_Key getRandomElement() {
 		if (getSize() == 0)
 			return NULL;
 		else if (getSize() < 6) {
 			uint count = random() % getSize();
-			Linknode<_Key> *ptr=list;
-			while(count > 0) {
+			Linknode<_Key> *ptr = list;
+			while (count > 0) {
 				ptr = ptr->next;
 				count--;
 			}

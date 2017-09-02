@@ -16,8 +16,8 @@ class OrderElement {
 public:
 	OrderElement(uint64_t item, Element *elem);
 	inline uint getHash() {return (uint) item;}
-	inline bool equals(OrderElement* oe){ return item == oe->item;}
-	inline Element* getElement() { return elem; }
+	inline bool equals(OrderElement *oe) { return item == oe->item;}
+	inline Element *getElement() { return elem; }
 	CMEMALLOC;
 private:
 	uint64_t item;
