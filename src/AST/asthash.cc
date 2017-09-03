@@ -4,7 +4,7 @@
 #include "boolean.h"
 #include "element.h"
 
-bool compareArray(Array<Boolean *> *inputs1, Array<Boolean *> *inputs2) {
+bool compareArray(Array<BooleanEdge> *inputs1, Array<BooleanEdge> *inputs2) {
 	if (inputs1->getSize() != inputs2->getSize())
 		return false;
 	for (uint i = 0; i < inputs1->getSize(); i++) {
@@ -24,10 +24,10 @@ bool compareArray(Array<Element *> *inputs1, Array<Element *> *inputs2) {
 	return true;
 }
 
-uint hashArray(Array<Boolean *> *inputs) {
+uint hashArray(Array<BooleanEdge> *inputs) {
 	uint hash = inputs->getSize();
 	for (uint i = 0; i < inputs->getSize(); i++) {
-		uint newval = (uint)(uintptr_t) inputs->get(i);
+		uint newval = (uint)(uintptr_t) inputs->get(i).getRaw();
 		hash ^= newval;
 		hash = (hash << 3) | (hash >> 29);
 	}

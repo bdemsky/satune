@@ -2,7 +2,11 @@
 #include "boolean.h"
 #include "csolver.h"
 
-void CSolver::replaceBooleanWithTrue(Boolean *bexpr) {
+void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
+	if (constraints.contains(bexpr.negate())) {
+		constraints.remove(bexpr.negate());
+		setUnSAT();
+	}	
 	if (constraints.contains(bexpr)) {
 		constraints.remove(bexpr);
 	}
@@ -15,12 +19,10 @@ void CSolver::replaceBooleanWithTrue(Boolean *bexpr) {
 		case SATC_AND:
 			handleANDTrue(logicop, bexpr);
 			break;
-		case SATC_NOT:
-			replaceBooleanWithFalse(parent);
-			break;
 		case SATC_IFF:
 			handleIFFTrue(logicop, bexpr);
 			break;
+		case SATC_NOT:
 		case SATC_OR:
 		case SATC_XOR:
 		case SATC_IMPLIES:
@@ -29,12 +31,22 @@ void CSolver::replaceBooleanWithTrue(Boolean *bexpr) {
 	}
 }
 
-void CSolver::replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb) {
+void CSolver::replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb) {
+	//Canonicalize
+	if (oldb.isNegated()) {
+		oldb=oldb.negate();
+		newb=newb.negate();
+	}
 	if (constraints.contains(oldb)) {
 		constraints.remove(oldb);
 		constraints.add(newb);
 	}
+	if (constraints.contains(oldb.negate())) {
+		constraints.remove(oldb.negate());
+		constraints.add(newb.negate());
+	}
 
+	BooleanEdge oldbnegated = oldb.negate();
 	uint size = oldb->parents.getSize();
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = oldb->parents.get(i);
@@ -43,74 +55,60 @@ void CSolver::replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb) {
 		uint parentsize = logicop->inputs.getSize();
 
 		for (uint j = 0; j < parentsize; j++) {
-			Boolean *b = logicop->inputs.get(i);
+			BooleanEdge b = logicop->inputs.get(i);
 			if (b == oldb) {
 				logicop->inputs.set(i, newb);
+				newb->parents.push(parent);
+			} else if (b == oldbnegated) {
+				logicop->inputs.set(i, newb.negate());
 				newb->parents.push(parent);
 			}
 		}
 	}
 }
 
-void handleIFFFalse(BooleanLogic *bexpr, Boolean *child) {
+void CSolver::handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child) {
 	uint size = bexpr->inputs.getSize();
-	Boolean *b = bexpr->inputs.get(0);
-	uint childindex = (b == child) ? 0 : 1;
-	bexpr->inputs.remove(childindex);
-	bexpr->op = SATC_NOT;
+	BooleanEdge b0 = bexpr->inputs.get(0);
+	BooleanEdge b1 = bexpr->inputs.get(1);
+	BooleanEdge childnegate = child.negate();
+	if (b0 == child) {
+		replaceBooleanWithBoolean(BooleanEdge(bexpr), b1);
+	} else if (b0 == childnegate) {
+		replaceBooleanWithBoolean(BooleanEdge(bexpr), b1.negate());
+	} else if (b1 == child) {
+		replaceBooleanWithBoolean(BooleanEdge(bexpr), b0);
+	} else if (b1 == childnegate) {
+		replaceBooleanWithBoolean(BooleanEdge(bexpr), b0.negate());
+	} else
+		ASSERT(0);
 }
 
-void CSolver::handleIFFTrue(BooleanLogic *bexpr, Boolean *child) {
-	uint size = bexpr->inputs.getSize();
-	Boolean *b = bexpr->inputs.get(0);
-	uint otherindex = (b == child) ? 1 : 0;
-	replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(otherindex));
-}
-
-void CSolver::handleANDTrue(BooleanLogic *bexpr, Boolean *child) {
-	uint size = bexpr->inputs.getSize();
-
-	if (size == 1) {
-		replaceBooleanWithTrue(bexpr);
-		return;
-	}
-
-	for (uint i = 0; i < size; i++) {
-		Boolean *b = bexpr->inputs.get(i);
+void CSolver::handleANDTrue(BooleanLogic *bexpr, BooleanEdge child) {
+	BooleanEdge childNegate=child.negate();
+	
+	for (uint i = 0; i < bexpr->inputs.getSize(); i++) {
+		BooleanEdge b = bexpr->inputs.get(i);
+		
 		if (b == child) {
 			bexpr->inputs.remove(i);
+			i--;
+		}
+		
+		if (b == childNegate) {
+			replaceBooleanWithFalse(bexpr);
+			return;
 		}
 	}
 
-	if (size == 2) {
+	uint size=bexpr->inputs.getSize();
+	if (size == 0) {
+		replaceBooleanWithTrue(bexpr);
+	} else if (size == 1) {
 		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(0));
 	}
 }
 
-void CSolver::replaceBooleanWithFalse(Boolean *bexpr) {
-	if (constraints.contains(bexpr)) {
-		setUnSAT();
-		constraints.remove(bexpr);
-	}
-
-	uint size = bexpr->parents.getSize();
-	for (uint i = 0; i < size; i++) {
-		Boolean *parent = bexpr->parents.get(i);
-		BooleanLogic *logicop = (BooleanLogic *) parent;
-		switch (logicop->op) {
-		case SATC_AND:
-			replaceBooleanWithFalse(parent);
-			break;
-		case SATC_NOT:
-			replaceBooleanWithTrue(parent);
-			break;
-		case SATC_IFF:
-			handleIFFFalse(logicop, bexpr);
-			break;
-		case SATC_OR:
-		case SATC_XOR:
-		case SATC_IMPLIES:
-			ASSERT(0);
-		}
-	}
+void CSolver::replaceBooleanWithFalse(BooleanEdge bexpr) {
+	replaceBooleanWithTrue(bexpr.negate());
 }

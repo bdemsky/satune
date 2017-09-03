@@ -55,7 +55,7 @@ void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(Order * currOrder,
 	Set *sarray[] = {ierec->getSecondarySet(), ierec->getSecondarySet()};
 	Predicate *predicate = solver->createPredicateOperator(SATC_LT, sarray, 2);
 	Element *parray[] = {elem1, elem2};
-	Boolean *boolean = solver->applyPredicate(predicate, parray, 2);
+	BooleanEdge boolean = solver->applyPredicate(predicate, parray, 2);
 	solver->addConstraint(boolean);
 	solver->replaceBooleanWithBoolean(boolOrder, boolean);
 }

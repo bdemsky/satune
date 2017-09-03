@@ -14,7 +14,7 @@ public:
 	SATEncoder(CSolver *solver);
 	~SATEncoder();
 	void encodeAllSATEncoder(CSolver *csolver);
-	Edge encodeConstraintSATEncoder(Boolean *constraint);
+	Edge encodeConstraintSATEncoder(BooleanEdge constraint);
 	CNF *getCNF() { return cnf;}
 	long long getSolveTime() { return cnf->solveTime; }
 	long long getEncodeTime() { return cnf->encodeTime; }

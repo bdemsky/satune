@@ -26,20 +26,22 @@ int SATEncoder::solve() {
 }
 
 void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
-	SetIteratorBoolean *iterator = csolver->getConstraints();
+	SetIteratorBooleanEdge *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
-		Boolean *constraint = iterator->next();
+		BooleanEdge constraint = iterator->next();
 		Edge c = encodeConstraintSATEncoder(constraint);
 		addConstraintCNF(cnf, c);
 	}
 	delete iterator;
 }
 
-Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
+Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 	Edge result;
+	Boolean * constraint = c.getBoolean();
+
 	if (booledgeMap.contains(constraint)) {
 		Edge e = {(Node *) booledgeMap.get(constraint)};
-		return e;
+		return c.isNegated() ? constraintNegate(e) : e;
 	}
 
 	switch (constraint->type) {
@@ -60,7 +62,7 @@ Edge SATEncoder::encodeConstraintSATEncoder(Boolean *constraint) {
 		exit(-1);
 	}
 	booledgeMap.put(constraint, result.node_ptr);
-	return result;
+	return c.isNegated() ? constraintNegate(result) : result;
 }
 
 void SATEncoder::getArrayNewVarsSATEncoder(uint num, Edge *carray) {

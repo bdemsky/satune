@@ -14,10 +14,10 @@
 #include <strings.h>
 
 void naiveEncodingDecision(CSolver *This) {
-	SetIteratorBoolean *iterator = This->getConstraints();
+	SetIteratorBooleanEdge *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
-		Boolean *boolean = iterator->next();
-		naiveEncodingConstraint(boolean);
+		BooleanEdge b = iterator->next();
+		naiveEncodingConstraint(b.getBoolean());
 	}
 	delete iterator;
 }
@@ -46,7 +46,7 @@ void naiveEncodingConstraint(Boolean *This) {
 
 void naiveEncodingLogicOp(BooleanLogic *This) {
 	for (uint i = 0; i < This->inputs.getSize(); i++) {
-		naiveEncodingConstraint(This->inputs.get(i));
+		naiveEncodingConstraint(This->inputs.get(i).getBoolean());
 	}
 }
 

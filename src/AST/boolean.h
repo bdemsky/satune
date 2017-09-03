@@ -9,6 +9,8 @@
 #include "functionencoding.h"
 #include "constraint.h"
 
+
+
 class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
@@ -56,24 +58,24 @@ public:
 
 class BooleanPredicate : public Boolean {
 public:
-	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, Boolean *_undefinedStatus);
+	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, BooleanEdge _undefinedStatus);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 
 	Predicate *predicate;
 	FunctionEncoding encoding;
 	Array<Element *> inputs;
-	Boolean *undefStatus;
+	BooleanEdge undefStatus;
 	FunctionEncoding *getFunctionEncoding() {return &encoding;}
 	CMEMALLOC;
 };
 
 class BooleanLogic : public Boolean {
 public:
-	BooleanLogic(CSolver *solver, LogicOp _op, Boolean **array, uint asize);
+	BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uint asize);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 
 	LogicOp op;
-	Array<Boolean *> inputs;
+	Array<BooleanEdge> inputs;
 	CMEMALLOC;
 };
 #endif

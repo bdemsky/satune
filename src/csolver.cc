@@ -20,8 +20,8 @@
 #include <stdlib.h>
 
 CSolver::CSolver() :
-	boolTrue(new BooleanConst(true)),
-	boolFalse(new BooleanConst(false)),
+	boolTrue(BooleanEdge(new BooleanConst(true))),
+	boolFalse(boolTrue.negate()),
 	unsat(false),
 	tuner(NULL),
 	elapsedTime(0)
@@ -67,17 +67,16 @@ CSolver::~CSolver() {
 		delete allFunctions.get(i);
 	}
 
-	delete boolTrue;
-	delete boolFalse;
+	delete boolTrue.getBoolean();
 	delete satEncoder;
 }
 
 CSolver *CSolver::clone() {
 	CSolver *copy = new CSolver();
 	CloneMap map;
-	SetIteratorBoolean *it = getConstraints();
+	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
-		Boolean *b = it->next();
+		BooleanEdge b = it->next();
 		copy->addConstraint(b->clone(copy, &map));
 	}
 	delete it;
@@ -140,7 +139,7 @@ Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	}
 }
 
-Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus) {
+Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, BooleanEdge overflowstatus) {
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
@@ -191,52 +190,52 @@ Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 	return function;
 }
 
-Boolean *CSolver::getBooleanVar(VarType type) {
+BooleanEdge CSolver::getBooleanVar(VarType type) {
 	Boolean *boolean = new BooleanVar(type);
 	allBooleans.push(boolean);
-	return boolean;
+	return BooleanEdge(boolean);
 }
 
-Boolean *CSolver::getBooleanTrue() {
+BooleanEdge CSolver::getBooleanTrue() {
 	return boolTrue;
 }
 
-Boolean *CSolver::getBooleanFalse() {
+BooleanEdge CSolver::getBooleanFalse() {
 	return boolFalse;
 }
 
-Boolean *CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
+BooleanEdge CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
 	return applyPredicateTable(predicate, inputs, numInputs, NULL);
 }
 
-Boolean *CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus) {
+BooleanEdge CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, BooleanEdge undefinedStatus) {
 	BooleanPredicate *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
 	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
-		return boolean;
+		return BooleanEdge(boolean);
 	} else {
 		delete boolean;
-		return b;
+		return BooleanEdge(b);
 	}
 }
 
-bool CSolver::isTrue(Boolean *b) {
-	return b->isTrue();
+bool CSolver::isTrue(BooleanEdge b) {
+	return b.isNegated()?b->isFalse():b->isTrue();
 }
 
-bool CSolver::isFalse(Boolean *b) {
-	return b->isFalse();
+bool CSolver::isFalse(BooleanEdge b) {
+	return b.isNegated()?b->isTrue():b->isFalse();
 }
 
-Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg1, Boolean *arg2) {
-	Boolean *array[] = {arg1, arg2};
+BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge arg1, BooleanEdge arg2) {
+	BooleanEdge array[] = {arg1, arg2};
 	return applyLogicalOperation(op, array, 2);
 }
 
-Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean *arg) {
-	Boolean *array[] = {arg};
+BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge arg) {
+	BooleanEdge array[] = {arg};
 	return applyLogicalOperation(op, array, 1);
 }
 
@@ -251,16 +250,11 @@ static int ptrcompares(const void *p1, const void *p2) {
 		return 1;
 }
 
-Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize) {
-	Boolean *newarray[asize];
+BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
+	BooleanEdge newarray[asize];
 	switch (op) {
 	case SATC_NOT: {
-		if (array[0]->type == LOGICOP && ((BooleanLogic *)array[0])->op == SATC_NOT) {
-			return ((BooleanLogic *) array[0])->inputs.get(0);
-		} else if (array[0]->type == BOOLCONST) {
-			return array[0]->isTrue() ? boolFalse : boolTrue;
-		}
-		break;
+		return array[0].negate();
 	}
 	case SATC_IFF: {
 		for (uint i = 0; i < 2; i++) {
@@ -284,7 +278,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 	case SATC_AND: {
 		uint newindex = 0;
 		for (uint i = 0; i < asize; i++) {
-			Boolean *b = array[i];
+			BooleanEdge b = array[i];
 			if (b->type == BOOLCONST) {
 				if (b->isTrue())
 					continue;
@@ -298,7 +292,7 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
-			qsort(newarray, asize, sizeof(Boolean *), ptrcompares);
+			qsort(newarray, asize, sizeof(BooleanEdge), ptrcompares);
 			array = newarray;
 			asize = newindex;
 		}
@@ -320,27 +314,27 @@ Boolean *CSolver::applyLogicalOperation(LogicOp op, Boolean **array, uint asize)
 	if (b == NULL) {
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
-		return boolean;
+		return BooleanEdge(boolean);
 	} else {
 		delete boolean;
-		return b;
+		return BooleanEdge(b);
 	}
 }
 
-Boolean *CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
+BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
 	Boolean *constraint = new BooleanOrder(order, first, second);
 	allBooleans.push(constraint);
-	return constraint;
+	return BooleanEdge(constraint);
 }
 
-void CSolver::addConstraint(Boolean *constraint) {
+void CSolver::addConstraint(BooleanEdge constraint) {
 	if (constraint == boolTrue)
 		return;
 	else if (constraint == boolFalse)
 		setUnSAT();
 	else {
-		if (constraint->type == LOGICOP) {
-			BooleanLogic *b=(BooleanLogic *) constraint;
+		if (!constraint.isNegated() && constraint->type == LOGICOP) {
+			BooleanLogic *b=(BooleanLogic *) constraint.getBoolean();
 			if (b->op==SATC_AND) {
 				for(uint i=0;i<b->inputs.getSize();i++) {
 					addConstraint(b->inputs.get(i));
@@ -401,7 +395,8 @@ uint64_t CSolver::getElementValue(Element *element) {
 	exit(-1);
 }
 
-bool CSolver::getBooleanValue(Boolean *boolean) {
+bool CSolver::getBooleanValue(BooleanEdge bedge) {
+	Boolean *boolean=bedge.getBoolean();
 	switch (boolean->type) {
 	case BOOLEANVAR:
 		return getBooleanVariableValueSATTranslator(this, boolean);

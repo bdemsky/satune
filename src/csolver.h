@@ -41,13 +41,13 @@ public:
 	/** This function creates an element constrant. */
 	Element *getElementConst(VarType type, uint64_t value);
 
-	Boolean *getBooleanTrue();
+	BooleanEdge getBooleanTrue();
 
-	Boolean *getBooleanFalse();
+	BooleanEdge getBooleanFalse();
 
 	/** This function creates a boolean variable. */
 
-	Boolean *getBooleanVar(VarType type);
+	BooleanEdge getBooleanVar(VarType type);
 
 	/** This function creates a function operator. */
 
@@ -75,36 +75,36 @@ public:
 
 	/** This function applies a function to the Elements in its input. */
 
-	Element *applyFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
+	Element *applyFunction(Function *function, Element **array, uint numArrays, BooleanEdge overflowstatus);
 
 	/** This function applies a predicate to the Elements in its input. */
 
-	Boolean *applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, Boolean *undefinedStatus);
+	BooleanEdge applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, BooleanEdge undefinedStatus);
 
-	Boolean *applyPredicate(Predicate *predicate, Element **inputs, uint numInputs);
-
-	/** This function applies a logical operation to the Booleans in its input. */
-
-	Boolean *applyLogicalOperation(LogicOp op, Boolean **array, uint asize);
+	BooleanEdge applyPredicate(Predicate *predicate, Element **inputs, uint numInputs);
 
 	/** This function applies a logical operation to the Booleans in its input. */
 
-	Boolean *applyLogicalOperation(LogicOp op, Boolean *arg1, Boolean *arg2);
+	BooleanEdge applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
 
 	/** This function applies a logical operation to the Booleans in its input. */
 
-	Boolean *applyLogicalOperation(LogicOp op, Boolean *arg);
+	BooleanEdge applyLogicalOperation(LogicOp op, BooleanEdge arg1, BooleanEdge arg2);
+
+	/** This function applies a logical operation to the Booleans in its input. */
+
+	BooleanEdge applyLogicalOperation(LogicOp op, BooleanEdge arg);
 
 	/** This function adds a boolean constraint to the set of constraints
 	    to be satisfied */
 
-	void addConstraint(Boolean *constraint);
+	void addConstraint(BooleanEdge constraint);
 
 	/** This function instantiates an order of type type over the set set. */
 	Order *createOrder(OrderType type, Set *set);
 
 	/** This function instantiates a boolean on two items in an order. */
-	Boolean *orderConstraint(Order *order, uint64_t first, uint64_t second);
+	BooleanEdge orderConstraint(Order *order, uint64_t first, uint64_t second);
 
 	/** When everything is done, the client calls this function and then csolver starts to encode*/
 	int solve();
@@ -113,12 +113,12 @@ public:
 	uint64_t getElementValue(Element *element);
 
 	/** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
-	bool getBooleanValue(Boolean *boolean);
+	bool getBooleanValue(BooleanEdge boolean);
 
 	bool getOrderConstraintValue(Order *order, uint64_t first, uint64_t second);
 
-	bool isTrue(Boolean *b);
-	bool isFalse(Boolean *b);
+	bool isTrue(BooleanEdge b);
+	bool isFalse(BooleanEdge b);
 
 	void setUnSAT() { unsat = true; }
 
@@ -129,13 +129,13 @@ public:
 
 	Tuner *getTuner() { return tuner; }
 
-	SetIteratorBoolean *getConstraints() { return constraints.iterator(); }
+	SetIteratorBooleanEdge * getConstraints() { return constraints.iterator(); }
 
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
-	void replaceBooleanWithTrue(Boolean *bexpr);
-	void replaceBooleanWithFalse(Boolean *bexpr);
-	void replaceBooleanWithBoolean(Boolean *oldb, Boolean *newb);
+	void replaceBooleanWithTrue(BooleanEdge bexpr);
+	void replaceBooleanWithFalse(BooleanEdge bexpr);
+	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void autoTune(uint budget);
 
@@ -147,11 +147,11 @@ public:
 	CMEMALLOC;
 
 private:
-	void handleIFFTrue(BooleanLogic *bexpr, Boolean *child);
-	void handleANDTrue(BooleanLogic *bexpr, Boolean *child);
+	void handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child);
+	void handleANDTrue(BooleanLogic *bexpr, BooleanEdge child);
 
 	/** This is a vector of constraints that must be satisfied. */
-	HashsetBoolean constraints;
+	HashsetBooleanEdge constraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
 	Vector<Boolean *> allBooleans;
@@ -176,8 +176,8 @@ private:
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 
-	Boolean *boolTrue;
-	Boolean *boolFalse;
+	BooleanEdge boolTrue;
+	BooleanEdge boolFalse;
 
 	/** These two tables are used for deduplicating entries. */
 	BooleanMatchMap boolMap;

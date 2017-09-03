@@ -38,10 +38,10 @@ public:
 
 class ElementFunction : public Element {
 public:
-	ElementFunction(Function *function, Element **array, uint numArrays, Boolean *overflowstatus);
+	ElementFunction(Function *function, Element **array, uint numArrays, BooleanEdge overflowstatus);
 	Function *function;
 	Array<Element *> inputs;
-	Boolean *overflowstatus;
+	BooleanEdge overflowstatus;
 	FunctionEncoding functionencoding;
 	Element *clone(CSolver *solver, CloneMap *map);
 	CMEMALLOC;

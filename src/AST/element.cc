@@ -16,7 +16,7 @@ ElementSet::ElementSet(Set *s) :
 	set(s) {
 }
 
-ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, Boolean *_overflowstatus) :
+ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, BooleanEdge _overflowstatus) :
 	Element(ELEMFUNCRETURN),
 	function(_function),
 	inputs(array, numArrays),

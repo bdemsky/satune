@@ -108,7 +108,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		vals[i] = set->getElement(indices[i]);
 	}
 
-	Edge overFlowConstraint = ((BooleanVar *) func->overflowstatus)->var;
+	Edge overFlowConstraint = encodeConstraintSATEncoder(func->overflowstatus);
 
 	bool notfinished = true;
 	while (notfinished) {
