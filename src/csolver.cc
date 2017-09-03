@@ -292,7 +292,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
-			qsort(newarray, asize, sizeof(BooleanEdge), ptrcompares);
+			qsort(newarray, newindex, sizeof(BooleanEdge), ptrcompares);
 			array = newarray;
 			asize = newindex;
 		}
