@@ -134,6 +134,7 @@ public:
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
 	void replaceBooleanWithTrue(BooleanEdge bexpr);
+	void replaceBooleanWithTrueNoRemove(BooleanEdge bexpr);
 	void replaceBooleanWithFalse(BooleanEdge bexpr);
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();

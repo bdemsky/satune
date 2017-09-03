@@ -16,8 +16,8 @@ public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
 	virtual Boolean *clone(CSolver *solver, CloneMap *map) = 0;
-	virtual bool isTrue() {return false;}
-	virtual bool isFalse() {return false;}
+	virtual bool isTrue() {return boolVal == BV_MUSTBETRUE;}
+	virtual bool isFalse() {return boolVal == BV_MUSTBEFALSE;}
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;

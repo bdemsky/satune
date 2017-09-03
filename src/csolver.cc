@@ -348,6 +348,12 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 			updateMustValue(ptr, BV_MUSTBEFALSE);
 		else
 			updateMustValue(ptr, BV_MUSTBETRUE);
+		
+		if (ptr->boolVal == BV_UNSAT)
+			setUnSAT();
+		
+		replaceBooleanWithTrueNoRemove(constraint);
+		constraint->parents.clear();
 	}
 }
 

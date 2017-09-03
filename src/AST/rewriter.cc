@@ -11,6 +11,10 @@ void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 		constraints.remove(bexpr);
 	}
 
+	replaceBooleanWithTrueNoRemove(bexpr);
+}
+	
+void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = bexpr->parents.get(i);
