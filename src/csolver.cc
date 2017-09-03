@@ -342,8 +342,12 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 				return;
 			}
 		}
-
 		constraints.add(constraint);
+		Boolean *ptr=constraint.getBoolean();
+		if (constraint.isNegated())
+			updateMustValue(ptr, BV_MUSTBEFALSE);
+		else
+			updateMustValue(ptr, BV_MUSTBETRUE);
 	}
 }
 
