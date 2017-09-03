@@ -8,21 +8,21 @@
  */
 int main(int numargs, char **argv) {
 	CSolver *solver = new CSolver();
-	Boolean *b1 = solver->getBooleanVar(0);
-	Boolean *b2 = solver->getBooleanVar(0);
-	Boolean *b3 = solver->getBooleanVar(0);
-	Boolean *b4 = solver->getBooleanVar(0);
+	BooleanEdge b1 = solver->getBooleanVar(0);
+	BooleanEdge b2 = solver->getBooleanVar(0);
+	BooleanEdge b3 = solver->getBooleanVar(0);
+	BooleanEdge b4 = solver->getBooleanVar(0);
 	//SATC_AND, SATC_OR, SATC_NOT, SATC_XOR, SATC_IMPLIES
-	Boolean *barray1[] = {b1,b2};
-	Boolean *andb1b2 = solver->applyLogicalOperation(SATC_AND, barray1, 2);
-	Boolean *barray2[] = {andb1b2, b3};
-	Boolean *imply = solver->applyLogicalOperation(SATC_IMPLIES, barray2, 2);
+	BooleanEdge barray1[] = {b1,b2};
+	BooleanEdge andb1b2 = solver->applyLogicalOperation(SATC_AND, barray1, 2);
+	BooleanEdge barray2[] = {andb1b2, b3};
+	BooleanEdge imply = solver->applyLogicalOperation(SATC_IMPLIES, barray2, 2);
 	solver->addConstraint(imply);
-	Boolean *barray3[] = {b3};
-	Boolean *notb3 = solver->applyLogicalOperation(SATC_NOT, barray3, 1);
-	Boolean *barray4[] = {notb3, b4};
+	BooleanEdge barray3[] = {b3};
+	BooleanEdge notb3 = solver->applyLogicalOperation(SATC_NOT, barray3, 1);
+	BooleanEdge barray4[] = {notb3, b4};
 	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, barray4, 2));
-	Boolean *barray5[] = {b1, b4};
+	BooleanEdge barray5[] = {b1, b4};
 	solver->addConstraint(solver->applyLogicalOperation(SATC_XOR, barray5, 2));
 	if (solver->solve() == 1)
 		printf("b1=%d b2=%d b3=%d b4=%d\n",

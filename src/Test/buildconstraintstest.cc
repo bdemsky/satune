@@ -25,7 +25,7 @@ int main(int numargs, char **argv) {
 	Set *domain[] = {s, s};
 	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS, domain, 2);
 	Element *inputs[] = {e1, e2};
-	Boolean *b = solver->applyPredicate(equals, inputs, 2);
+	BooleanEdge b = solver->applyPredicate(equals, inputs, 2);
 	solver->addConstraint(b);
 
 	uint64_t set2[] = {2, 3};
@@ -42,13 +42,13 @@ int main(int numargs, char **argv) {
 	solver->addTableEntry(table, row3, 2, 2);
 	solver->addTableEntry(table, row4, 2, 2);
 	Function *f2 = solver->completeTable(table, SATC_IGNOREBEHAVIOR);	//its range would be as same as s
-	Boolean *overflow = solver->getBooleanVar(2);
+	BooleanEdge overflow = solver->getBooleanVar(2);
 	Element *e3 = solver->applyFunction(f1, inputs, 2, overflow);
 	Element *e4 = solver->applyFunction(f2, inputs, 2, overflow);
 	Set *domain2[] = {s,rangef1};
 	Predicate *equal2 = solver->createPredicateOperator(SATC_EQUALS, domain2, 2);
 	Element *inputs2 [] = {e4, e3};
-	Boolean *pred = solver->applyPredicate(equal2, inputs2, 2);
+	BooleanEdge pred = solver->applyPredicate(equal2, inputs2, 2);
 	solver->addConstraint(pred);
 
 	if (solver->solve() == 1)

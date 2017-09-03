@@ -16,7 +16,7 @@ int main(int numargs, char **argv) {
 	Set *domain2[] = {s1, s3};
 	Predicate *lt = solver->createPredicateOperator(SATC_LT, domain2, 2);
 	Element *inputs2[] = {e1, e2};
-	Boolean *b = solver->applyPredicate(lt, inputs2, 2);
+	BooleanEdge b = solver->applyPredicate(lt, inputs2, 2);
 	solver->addConstraint(b);
 	if (solver->solve() == 1)
 		printf("e1=%" PRIu64 " e2=%" PRIu64 "\n", solver->getElementValue(e1), solver->getElementValue(e2));

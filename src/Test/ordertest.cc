@@ -11,8 +11,8 @@ int main(int numargs, char **argv) {
 	uint64_t set1[] = {5, 1, 4};
 	Set *s = solver->createSet(0, set1, 3);
 	Order *order = solver->createOrder(SATC_TOTAL, s);
-	Boolean *b1 =  solver->orderConstraint(order, 5, 1);
-	Boolean *b2 =  solver->orderConstraint(order, 1, 4);
+	BooleanEdge b1 =  solver->orderConstraint(order, 5, 1);
+	BooleanEdge b2 =  solver->orderConstraint(order, 1, 4);
 	solver->addConstraint(b1);
 	solver->addConstraint(b2);
 	if (solver->solve() == 1)

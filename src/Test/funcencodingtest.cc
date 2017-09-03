@@ -31,7 +31,7 @@ int main(int numargs, char **argv) {
 	Element *e1 = solver->getElementVar(s1);
 	Element *e2 = solver->getElementVar(s2);
 	Element *e7 = solver->getElementVar(s5);
-	Boolean *overflow = solver->getBooleanVar(2);
+	BooleanEdge overflow = solver->getBooleanVar(2);
 	Set *d1[] = {s1, s2};
 	//change the overflow flag
 	Function *f1 = solver->createFunctionOperator(SATC_SUB, d1, 2, s2, SATC_IGNORE);
@@ -70,7 +70,7 @@ int main(int numargs, char **argv) {
 	Set *deq[] = {s5,s4};
 	Predicate *gt = solver->createPredicateOperator(SATC_GT, deq, 2);
 	Element *inputs2 [] = {e7, e6};
-	Boolean *pred = solver->applyPredicate(gt, inputs2, 2);
+	BooleanEdge pred = solver->applyPredicate(gt, inputs2, 2);
 	solver->addConstraint(pred);
 
 	if (solver->solve() == 1)

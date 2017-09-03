@@ -22,7 +22,7 @@ int main(int numargs, char **argv) {
 	Set *domain[] = {s1, s2};
 	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS, domain, 2);
 	Element *inputs[] = {e1, e2};
-	Boolean *b = solver->applyPredicate(equals, inputs, 2);
+	BooleanEdge b = solver->applyPredicate(equals, inputs, 2);
 	solver->addConstraint(b);
 
 	if (solver->solve() == 1)
