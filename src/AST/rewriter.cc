@@ -21,6 +21,7 @@ void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = bexpr->parents.get(i);
+		ASSERT(parent->type == LOGICOP);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
 		switch (logicop->op) {
 		case SATC_AND:
