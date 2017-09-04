@@ -400,12 +400,11 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
-	DecomposeOrderTransform dot(this);
-	dot.doTransform();
+//	DecomposeOrderTransform dot(this);
+//	dot.doTransform();
 
-	//This leaks like crazy
-	//	IntegerEncodingTransform iet(this);
-	//iet.doTransform();
+	IntegerEncodingTransform iet(this);
+	iet.doTransform();
 
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);

@@ -35,6 +35,7 @@ void IntegerEncodingTransform::integerEncode(Order *currOrder) {
 		encodingRecord = new IntegerEncodingRecord(
 			solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize() - 1));
 		orderIntEncoding->put(currOrder, encodingRecord);
+		currOrder->setOrderEncodingType( INTEGERENCODING );
 	} else {
 		encodingRecord = orderIntEncoding->get(currOrder);
 	}

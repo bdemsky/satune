@@ -15,9 +15,15 @@ int main(int numargs, char **argv) {
 	BooleanEdge b2 =  solver->orderConstraint(order, 1, 4);
 	solver->addConstraint(b1);
 	solver->addConstraint(b2);
-	if (solver->solve() == 1)
+	if (solver->solve() == 1){
 		printf("SAT\n");
-	else
+		printf("O(5,1)=%d O(1,4)=%d O(5,4)=%d O(1,5)=%d\n", 
+			solver->getOrderConstraintValue(order, 5, 1), 
+			solver->getOrderConstraintValue(order, 1, 4),
+			solver->getOrderConstraintValue(order, 5, 4),
+			solver->getOrderConstraintValue(order, 1, 5));
+	} else {
 		printf("UNSAT\n");
+	}
 	delete solver;
 }

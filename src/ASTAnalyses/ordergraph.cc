@@ -13,6 +13,7 @@ OrderGraph::OrderGraph(Order *_order) :
 
 OrderGraph *buildOrderGraph(Order *order) {
 	OrderGraph *orderGraph = new OrderGraph(order);
+	order->graph = orderGraph;
 	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
 		orderGraph->addOrderConstraintToOrderGraph(order->constraints.get(j));

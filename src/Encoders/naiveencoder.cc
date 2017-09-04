@@ -28,7 +28,8 @@ void naiveEncodingConstraint(Boolean *This) {
 		return;
 	}
 	case ORDERCONST: {
-		((BooleanOrder *) This)->order->setOrderEncodingType(PAIRWISE);
+		if(((BooleanOrder *) This)->order->encoding.type == ORDER_UNASSIGNED)
+			((BooleanOrder *) This)->order->setOrderEncodingType(PAIRWISE);
 		return;
 	}
 	case LOGICOP: {
