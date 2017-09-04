@@ -77,7 +77,7 @@ CSolver *CSolver::clone() {
 	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
 		BooleanEdge b = it->next();
-		copy->addConstraint(b->clone(copy, &map));
+		copy->addConstraint(cloneEdge(copy, &map, b));
 	}
 	delete it;
 	return copy;
@@ -374,10 +374,6 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 		}
 		constraints.add(constraint);
 		Boolean *ptr=constraint.getBoolean();
-		if (constraint.isNegated())
-			updateMustValue(ptr, BV_MUSTBEFALSE);
-		else
-			updateMustValue(ptr, BV_MUSTBETRUE);
 		
 		if (ptr->boolVal == BV_UNSAT)
 			setUnSAT();

@@ -59,6 +59,8 @@ CNF *createCNF() {
 	initDefVectorEdge(&cnf->constraints);
 	initDefVectorEdge(&cnf->args);
 	cnf->solver = allocIncrementalSolver();
+	cnf->solveTime = 0;
+	cnf->encodeTime = 0;
 	return cnf;
 }
 

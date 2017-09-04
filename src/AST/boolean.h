@@ -79,4 +79,7 @@ public:
 	Array<BooleanEdge> inputs;
 	CMEMALLOC;
 };
+BooleanEdge cloneEdge(CSolver *solver, CloneMap *map, BooleanEdge e);
+
+
 #endif

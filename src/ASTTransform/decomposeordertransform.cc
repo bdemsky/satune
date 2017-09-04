@@ -60,11 +60,13 @@ void DecomposeOrderTransform::doTransform() {
 			}
 		}
 
+		/*
 		bool mustReachPrune = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
 
 		if (mustReachPrune)
 			removeMustBeTrueNodes(solver, graph);
-
+		*/
+		
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
 		decomposeOrder(order, graph);

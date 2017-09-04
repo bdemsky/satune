@@ -17,6 +17,7 @@ long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
 	int result = copy->solve();
+	model_print("SAT %d\n", result);
 	long long elapsedTime = copy->getElapsedTime();
 	long long encodeTime = copy->getEncodeTime();
 	long long solveTime = copy->getSolveTime();
