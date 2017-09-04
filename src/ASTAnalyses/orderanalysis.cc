@@ -114,11 +114,18 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node) {
 			OrderNode *sinkNode = outEdge->sink;
 			sinkNode->inEdges.remove(outEdge);
 			//Adding new edge to new sink and src nodes ...
+			if(srcNode == sinkNode){
+				This->setUnSAT();
+				delete iterout;
+				delete iterin;
+				return;
+			}
 			OrderEdge *newEdge = graph->getOrderEdgeFromOrderGraph(srcNode, sinkNode);
 			newEdge->mustPos = true;
 			newEdge->polPos = true;
-			if (newEdge->mustNeg)
+			if (newEdge->mustNeg){
 				This->setUnSAT();
+			}
 			srcNode->outEdges.add(newEdge);
 			sinkNode->inEdges.add(newEdge);
 		}
