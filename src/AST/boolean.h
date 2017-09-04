@@ -75,6 +75,7 @@ public:
 	Boolean *clone(CSolver *solver, CloneMap *map);
 
 	LogicOp op;
+	bool replaced;
 	Array<BooleanEdge> inputs;
 	CMEMALLOC;
 };

@@ -151,6 +151,10 @@ private:
 	void handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child);
 	void handleANDTrue(BooleanLogic *bexpr, BooleanEdge child);
 
+	//These two functions are helpers if the client has a pointer to a
+	//Boolean object that we have since replaced
+	BooleanEdge rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
+	BooleanEdge doRewrite(BooleanEdge b);
 	/** This is a vector of constraints that must be satisfied. */
 	HashsetBooleanEdge constraints;
 

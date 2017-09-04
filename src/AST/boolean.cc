@@ -45,6 +45,7 @@ BooleanPredicate::BooleanPredicate(Predicate *_predicate, Element **_inputs, uin
 BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uint asize) :
 	Boolean(LOGICOP),
 	op(_op),
+	replaced(false),
 	inputs(array, asize) {
 }
 

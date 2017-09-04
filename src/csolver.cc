@@ -250,6 +250,21 @@ static int ptrcompares(const void *p1, const void *p2) {
 		return 1;
 }
 
+BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge * array, uint asize) {
+	BooleanEdge newarray[asize];
+	memcpy(newarray, array, asize * sizeof(BooleanEdge));
+	for(uint i=0; i < asize; i++) {
+		BooleanEdge b=newarray[i];
+		if (b->type == LOGICOP) {
+			if (((BooleanLogic *) b.getBoolean())->replaced) {
+				newarray[i] = doRewrite(newarray[i]);
+				i--;//Check again
+			}
+		}
+	}
+	return applyLogicalOperation(op, newarray, asize);
+}
+
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
 	BooleanEdge newarray[asize];
 	switch (op) {
@@ -265,6 +280,11 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 					newarray[0] = array[1 - i];
 					return applyLogicalOperation(SATC_NOT, newarray, 1);
 				}
+			} else if (array[i]->type == LOGICOP) {
+				BooleanLogic *b =(BooleanLogic *)array[i].getBoolean();
+				if (b->replaced) {
+					return rewriteLogicalOperation(op, array, asize);
+				}
 			}
 		}
 		break;
@@ -279,6 +299,10 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		uint newindex = 0;
 		for (uint i = 0; i < asize; i++) {
 			BooleanEdge b = array[i];
+			if (b->type == LOGICOP) {
+				if (((BooleanLogic *)b.getBoolean())->replaced)
+					return rewriteLogicalOperation(op, array, asize);
+			}
 			if (b->type == BOOLCONST) {
 				if (b->isTrue())
 					continue;
@@ -328,17 +352,23 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if (constraint == boolTrue)
+	if (isTrue(constraint))
 		return;
-	else if (constraint == boolFalse)
+	else if (isFalse(constraint))
 		setUnSAT();
 	else {
-		if (!constraint.isNegated() && constraint->type == LOGICOP) {
+		if (constraint->type == LOGICOP) {
 			BooleanLogic *b=(BooleanLogic *) constraint.getBoolean();
-			if (b->op==SATC_AND) {
-				for(uint i=0;i<b->inputs.getSize();i++) {
-					addConstraint(b->inputs.get(i));
+			if (!constraint.isNegated()) {
+				if (b->op==SATC_AND) {
+					for(uint i=0;i<b->inputs.getSize();i++) {
+						addConstraint(b->inputs.get(i));
+					}
+					return;
 				}
+			}
+			if (b->replaced) {
+				addConstraint(doRewrite(constraint));
 				return;
 			}
 		}

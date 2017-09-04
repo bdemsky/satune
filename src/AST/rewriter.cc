@@ -1,6 +1,7 @@
 #include "rewriter.h"
 #include "boolean.h"
 #include "csolver.h"
+#include "polarityassignment.h"
 
 void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 	if (constraints.contains(bexpr.negate())) {
@@ -15,6 +16,8 @@ void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 }
 	
 void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
+	updateMustValue(bexpr.getBoolean(), bexpr.isNegated() ? BV_MUSTBEFALSE : BV_MUSTBETRUE);
+	
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = bexpr->parents.get(i);
@@ -76,6 +79,7 @@ void CSolver::handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child) {
 	BooleanEdge b0 = bexpr->inputs.get(0);
 	BooleanEdge b1 = bexpr->inputs.get(1);
 	BooleanEdge childnegate = child.negate();
+	bexpr->replaced = true;
 	if (b0 == child) {
 		replaceBooleanWithBoolean(BooleanEdge(bexpr), b1);
 	} else if (b0 == childnegate) {
@@ -91,15 +95,15 @@ void CSolver::handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child) {
 void CSolver::handleANDTrue(BooleanLogic *bexpr, BooleanEdge child) {
 	BooleanEdge childNegate=child.negate();
 	
+	boolMap.remove(bexpr);
+	
 	for (uint i = 0; i < bexpr->inputs.getSize(); i++) {
 		BooleanEdge b = bexpr->inputs.get(i);
 		
 		if (b == child) {
 			bexpr->inputs.remove(i);
 			i--;
-		}
-		
-		if (b == childNegate) {
+		} else if (b == childNegate) {
 			replaceBooleanWithFalse(bexpr);
 			return;
 		}
@@ -107,12 +111,42 @@ void CSolver::handleANDTrue(BooleanLogic *bexpr, BooleanEdge child) {
 
 	uint size=bexpr->inputs.getSize();
 	if (size == 0) {
+		bexpr->replaced = true;
 		replaceBooleanWithTrue(bexpr);
 	} else if (size == 1) {
+		bexpr->replaced = true;
 		replaceBooleanWithBoolean(bexpr, bexpr->inputs.get(0));
+	} else {
+		//Won't build any of these in future cases...
+		boolMap.put(bexpr, bexpr);
 	}
 }
 
 void CSolver::replaceBooleanWithFalse(BooleanEdge bexpr) {
 	replaceBooleanWithTrue(bexpr.negate());
+}
+
+BooleanEdge CSolver::doRewrite(BooleanEdge bexpr) {
+	bool isNegated=bexpr.isNegated();
+	BooleanLogic * b = (BooleanLogic *) bexpr.getBoolean();
+	BooleanEdge result;
+	if (b->op == SATC_IFF) {
+		if (isTrue(b->inputs.get(0))) {
+			result = b->inputs.get(1);
+		} else if (isFalse(b->inputs.get(0))) {
+			result = b->inputs.get(1).negate();
+		} else if (isTrue(b->inputs.get(1))) {
+			result = b->inputs.get(0);
+		} else if (isFalse(b->inputs.get(1))) {
+			result = b->inputs.get(0).negate();
+		} else ASSERT(0);
+	} else if (b->op==SATC_AND) {
+		uint size = b->inputs.getSize();
+		if (size == 0)
+			result = boolTrue;
+		else if (size == 1)
+			result = b->inputs.get(0);
+		else ASSERT(0);
+	}
+	return isNegated ? result.negate() : result;
 }
