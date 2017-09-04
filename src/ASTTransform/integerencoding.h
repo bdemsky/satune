@@ -14,14 +14,12 @@
 class IntegerEncodingTransform : public Transform {
 public:
 	IntegerEncodingTransform(CSolver *solver);
-	void orderIntegerEncodingSATEncoder(Order * currOrder, BooleanOrder *boolOrder);
+	void orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder, IntegerEncodingRecord *ierec);
 	void doTransform();
 	void integerEncode(Order *currOrder);
 
 	virtual ~IntegerEncodingTransform();
 private:
-	//FIXME:We can remove it, because we don't need it for translating anymore... -HG
-	HashTableOrderIntEncoding *orderIntEncoding;
 };
 
 

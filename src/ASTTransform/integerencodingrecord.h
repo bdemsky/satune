@@ -21,7 +21,7 @@ public:
 
 private:
 	Set *secondarySet;
-	HashsetOrderElement *elementTable;
+	HashsetOrderElement *elementSet;
 };
 
 #endif/* INTEGERENCODINGRECORD_H */

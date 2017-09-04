@@ -12,22 +12,26 @@
 IntegerEncodingRecord::IntegerEncodingRecord(Set *_set) :
 	secondarySet(_set)
 {
-	elementTable = new HashsetOrderElement();
+	elementSet = new HashsetOrderElement();
 }
 
 IntegerEncodingRecord::~IntegerEncodingRecord() {
-	if (elementTable != NULL) {
-		delete elementTable;
+	SetIteratorOrderElement *oiterator = elementSet->iterator();
+	while (oiterator->hasNext()) {
+		OrderElement *oe = oiterator->next();
+		delete oe;
 	}
+	delete oiterator;
+	delete elementSet;
 }
 
 Element *IntegerEncodingRecord::getOrderIntegerElement(CSolver *This, uint64_t item, bool create) {
 	OrderElement oelement(item, NULL);
-	if ( elementTable->contains(&oelement)) {
-		return elementTable->get(&oelement)->getElement();
+	if ( elementSet->contains(&oelement)) {
+		return elementSet->get(&oelement)->getElement();
 	} else if (create) {
 		Element *elem = This->getElementVar(secondarySet);
-		elementTable->add(new OrderElement(item, elem));
+		elementSet->add(new OrderElement(item, elem));
 		return elem;
 	}
 	return NULL;

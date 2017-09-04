@@ -17,6 +17,7 @@ IntegerEncOrderResolver::IntegerEncOrderResolver(CSolver *_solver, IntegerEncodi
 }
 
 IntegerEncOrderResolver::~IntegerEncOrderResolver() {
+	delete ierecord;
 }
 
 

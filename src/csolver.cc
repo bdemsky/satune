@@ -400,8 +400,8 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
-//	DecomposeOrderTransform dot(this);
-//	dot.doTransform();
+	DecomposeOrderTransform dot(this);
+	dot.doTransform();
 
 	IntegerEncodingTransform iet(this);
 	iet.doTransform();

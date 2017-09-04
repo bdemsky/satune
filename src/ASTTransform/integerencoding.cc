@@ -10,11 +10,9 @@
 IntegerEncodingTransform::IntegerEncodingTransform(CSolver *_solver)
 	: Transform(_solver)
 {
-	orderIntEncoding = new HashTableOrderIntEncoding();
 }
 
 IntegerEncodingTransform::~IntegerEncodingTransform() {
-	orderIntEncoding->resetanddelete();
 }
 
 void IntegerEncodingTransform::doTransform() {
@@ -30,26 +28,19 @@ void IntegerEncodingTransform::doTransform() {
 }
 
 void IntegerEncodingTransform::integerEncode(Order *currOrder) {
-	IntegerEncodingRecord *encodingRecord = NULL;
-	if (!orderIntEncoding->contains(currOrder)) {
-		encodingRecord = new IntegerEncodingRecord(
-			solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize() - 1));
-		orderIntEncoding->put(currOrder, encodingRecord);
-		currOrder->setOrderEncodingType( INTEGERENCODING );
-	} else {
-		encodingRecord = orderIntEncoding->get(currOrder);
-	}
+	IntegerEncodingRecord *encodingRecord =  new IntegerEncodingRecord(
+		solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize() - 1));
+	currOrder->setOrderEncodingType( INTEGERENCODING );
 	uint size = currOrder->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
-		orderIntegerEncodingSATEncoder(currOrder, currOrder->constraints.get(i));
+		orderIntegerEncodingSATEncoder(currOrder->constraints.get(i), encodingRecord);
 	}
 	currOrder->setOrderResolver(new IntegerEncOrderResolver(solver, encodingRecord));
 	solver->getActiveOrders()->remove(currOrder);
 }
 
 
-void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(Order * currOrder, BooleanOrder *boolOrder) {
-	IntegerEncodingRecord *ierec = orderIntEncoding->get(currOrder);
+void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(BooleanOrder *boolOrder, IntegerEncodingRecord *ierec) {
 	//getting two elements and using LT predicate ...
 	Element *elem1 = ierec->getOrderIntegerElement(solver, boolOrder->first);
 	Element *elem2 = ierec->getOrderIntegerElement(solver, boolOrder->second);
