@@ -15,8 +15,6 @@
 #include "orderpairresolver.h"
 
 Edge SATEncoder::encodeOrderSATEncoder(BooleanOrder *constraint) {
-	//This is pairwised encoding ...
-	constraint->order->setOrderResolver(new OrderPairResolver(solver, constraint->order));
 	switch ( constraint->order->type) {
 	case SATC_PARTIAL:
 		return encodePartialOrderSATEncoder(constraint);
@@ -81,6 +79,8 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == SATC_TOTAL);
 	if (boolOrder->order->orderPairTable == NULL) {
+		//This is pairwised encoding ...
+		boolOrder->order->setOrderResolver(new OrderPairResolver(solver, boolOrder->order));
 		boolOrder->order->initializeOrderHashtable();
 		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {

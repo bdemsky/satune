@@ -59,19 +59,20 @@ void CSolver::replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb) {
 	for (uint i = 0; i < size; i++) {
 		Boolean *parent = oldb->parents.get(i);
 		BooleanLogic *logicop = (BooleanLogic *) parent;
-
+		boolMap.remove(parent); //could change parent's hash
+		
 		uint parentsize = logicop->inputs.getSize();
-
 		for (uint j = 0; j < parentsize; j++) {
-			BooleanEdge b = logicop->inputs.get(i);
+			BooleanEdge b = logicop->inputs.get(j);
 			if (b == oldb) {
-				logicop->inputs.set(i, newb);
+				logicop->inputs.set(j, newb);
 				newb->parents.push(parent);
 			} else if (b == oldbnegated) {
-				logicop->inputs.set(i, newb.negate());
+				logicop->inputs.set(j, newb.negate());
 				newb->parents.push(parent);
 			}
 		}
+		boolMap.put(parent, parent);
 	}
 }
 

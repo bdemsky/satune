@@ -48,7 +48,6 @@ void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(BooleanOrder *bool
 	Predicate *predicate = solver->createPredicateOperator(SATC_LT, sarray, 2);
 	Element *parray[] = {elem1, elem2};
 	BooleanEdge boolean = solver->applyPredicate(predicate, parray, 2);
-	solver->addConstraint(boolean);
 	solver->replaceBooleanWithBoolean(boolOrder, boolean);
 }
 

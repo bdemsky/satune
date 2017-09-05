@@ -47,6 +47,9 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uin
 	op(_op),
 	replaced(false),
 	inputs(array, asize) {
+	for (uint i = 0; i < asize; i++) {
+		array[i]->parents.push(this);
+	}
 }
 
 BooleanEdge cloneEdge(CSolver *solver, CloneMap *map, BooleanEdge e) {

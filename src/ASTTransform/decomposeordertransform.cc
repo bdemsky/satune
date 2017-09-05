@@ -84,14 +84,33 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 		OrderNode *from = currGraph->getOrderNodeFromOrderGraph(orderconstraint->first);
 		OrderNode *to = currGraph->getOrderNodeFromOrderGraph(orderconstraint->second);
 		if (from->sccNum != to->sccNum) {
-			OrderEdge *edge = currGraph->getOrderEdgeFromOrderGraph(from, to);
-			if (edge->polPos) {
-				solver->replaceBooleanWithTrue(orderconstraint);
-			} else if (edge->polNeg) {
-				solver->replaceBooleanWithFalse(orderconstraint);
+			OrderEdge *edge = currGraph->lookupOrderEdgeFromOrderGraph(from, to);
+			if (edge != NULL) {
+				if (edge->polPos) {
+					solver->replaceBooleanWithTrue(orderconstraint);
+				} else if (edge->polNeg) {
+					solver->replaceBooleanWithFalse(orderconstraint);
+				} else {
+					//This case should only be possible if constraint isn't in AST
+					//This can happen, so don't do anything
+					;
+				}
 			} else {
-				//This case should only be possible if constraint isn't in AST
-				ASSERT(0);
+				OrderEdge *invedge = currGraph->lookupOrderEdgeFromOrderGraph(to, from);
+				if (invedge != NULL) {
+					if (invedge->polPos) {
+						solver->replaceBooleanWithFalse(orderconstraint);
+					} else if (edge->polNeg) {
+						//This case shouldn't happen...  If we have a partial order,
+						//then we should have our own edge...If we have a total
+						//order, then this edge should be positive...
+						ASSERT(0);
+					} else {
+						//This case should only be possible if constraint isn't in AST
+						//This can happen, so don't do anything
+						;
+					}
+				}
 			}
 		} else {
 			//Build new order and change constraint's order
