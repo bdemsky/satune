@@ -3,10 +3,18 @@
 #include "set.h"
 #include "csolver.h"
 
-FunctionOperator::FunctionOperator(ArithOp _op, Set **domain, uint numDomain, Set *_range, OverFlowBehavior _overflowbehavior) : Function(OPERATORFUNC), op(_op), domains(domain, numDomain), range(_range), overflowbehavior(_overflowbehavior) {
+FunctionOperator::FunctionOperator(ArithOp _op, Set **domain, uint numDomain, Set *_range, OverFlowBehavior _overflowbehavior) :
+	Function(OPERATORFUNC),
+	op(_op),
+	domains(domain, numDomain),
+	range(_range),
+	overflowbehavior(_overflowbehavior) {
 }
 
-FunctionTable::FunctionTable (Table *_table, UndefinedBehavior _undefBehavior) : Function(TABLEFUNC), table(_table), undefBehavior(_undefBehavior) {
+FunctionTable::FunctionTable (Table *_table, UndefinedBehavior _undefBehavior) :
+	Function(TABLEFUNC),
+	table(_table),
+	undefBehavior(_undefBehavior) {
 }
 
 uint64_t FunctionOperator::applyFunctionOperator(uint numVals, uint64_t *values) {

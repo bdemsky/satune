@@ -37,9 +37,6 @@ BooleanPredicate::BooleanPredicate(Predicate *_predicate, Element **_inputs, uin
 	encoding(this),
 	inputs(_inputs, _numInputs),
 	undefStatus(_undefinedStatus) {
-	for (uint i = 0; i < _numInputs; i++) {
-		_inputs[i]->parents.push(this);
-	}
 }
 
 BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uint asize) :
@@ -47,9 +44,6 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uin
 	op(_op),
 	replaced(false),
 	inputs(array, asize) {
-	for (uint i = 0; i < asize; i++) {
-		array[i]->parents.push(this);
-	}
 }
 
 BooleanEdge cloneEdge(CSolver *solver, CloneMap *map, BooleanEdge e) {
@@ -95,4 +89,12 @@ Boolean *BooleanPredicate::clone(CSolver *solver, CloneMap *map) {
 	BooleanEdge defstatus = undefStatus ? cloneEdge(solver, map, undefStatus) : BooleanEdge();
 
 	return solver->applyPredicateTable(pred, array, inputs.getSize(), defstatus).getRaw();
+}
+
+void BooleanPredicate::updateParents() {
+	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+}
+
+void BooleanLogic::updateParents() {
+	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
 }
