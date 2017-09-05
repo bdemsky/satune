@@ -839,8 +839,8 @@ CNFExpr *produceDisjunction(CNF *cnf, Edge e) {
 				int eL = argExp->litSize;			// lits in argument
 				int aC = getClauseSizeCNF(accum);		// clauses in accum
 				int eC = getClauseSizeCNF(argExp);	// clauses in argument
-
-				if (eC > CLAUSE_MAX || (eL * aC + aL * eC > eL + aC + aL + aC)) {
+				//POSSIBLE BUG #2 (eL * aC +aL * eC > eL +aC +aL +aC)
+				if (eC > CLAUSE_MAX || (eL * aC + aL * eC > eL + eC + aL + aC)) {
 					disjoinCNFLit(accum, introProxy(cnf, arg, argExp, isNegEdge(arg)));
 				} else {
 					disjoinCNFExpr(accum, argExp, destroy);

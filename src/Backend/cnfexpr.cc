@@ -190,7 +190,7 @@ void copyCNF(CNFExpr *This, CNFExpr *expr, bool destroy) {
 
 void conjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 	if (expr->litSize == 0) {
-		if (!This->isTrue) {
+		if (!expr->isTrue) {
 			clearCNFExpr(This, false);
 		}
 		if (destroy) {
