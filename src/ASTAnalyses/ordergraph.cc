@@ -184,16 +184,19 @@ bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination){
 	SetIteratorOrderEdge *iterator = source->outEdges.iterator();
 	bool found = false;
 	while(iterator->hasNext()){
-		OrderNode* node = iterator->next()->sink;
-		if(!visited.contains(node)){
-			if( node == destination ){
-				found = true;
-				break;
-			}
-			visited.add(node);
-			found =isTherePathVisit(visited, node, destination);
-			if(found){
-				break;
+		OrderEdge* edge = iterator->next();
+		if(edge->polPos){
+			OrderNode* node = edge->sink;
+			if(!visited.contains(node)){
+				if( node == destination ){
+					found = true;
+					break;
+				}
+				visited.add(node);
+				found =isTherePathVisit(visited, node, destination);
+				if(found){
+					break;
+				}
 			}
 		}
 	}
@@ -205,15 +208,18 @@ bool OrderGraph::isTherePathVisit(HashsetOrderNode &visited, OrderNode* current,
 	SetIteratorOrderEdge *iterator = current->outEdges.iterator();
 	bool found = false;
 	while(iterator->hasNext()){
-		OrderNode* node = iterator->next()->sink;
-		if(node == destination){
-			found = true;
-			break;
-		}
-		visited.add(node);
-		if(isTherePathVisit(visited, node, destination)){
-			found = true;
-			break;
+		OrderEdge* edge = iterator->next();
+		if(edge->polPos){
+			OrderNode* node = edge->sink;
+			if(node == destination){
+				found = true;
+				break;
+			}
+			visited.add(node);
+			if(isTherePathVisit(visited, node, destination)){
+				found = true;
+				break;
+			}
 		}
 	}
 	delete iterator;
