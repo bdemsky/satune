@@ -7,50 +7,50 @@ void computePolarities(CSolver *This) {
 		BooleanEdge boolean = iterator->next();
 		Boolean *b = boolean.getBoolean();
 		bool isNegated = boolean.isNegated();
-		if (isNegated) {
-			updatePolarity(b, P_FALSE);
-		} else {
-			updatePolarity(b, P_TRUE);
-		}
-		computePolarity(b);
+		computePolarity(b, isNegated ? P_FALSE : P_TRUE);
 	}
 	delete iterator;
 }
 
-void updatePolarity(Boolean *This, Polarity polarity) {
-	This->polarity = (Polarity) (This->polarity | polarity);
+bool updatePolarity(Boolean *This, Polarity polarity) {
+	Polarity oldpolarity = This->polarity;
+	Polarity newpolarity = (Polarity) (This->polarity | polarity);
+	This->polarity = newpolarity;
+	return newpolarity != oldpolarity;
 }
 
 void updateMustValue(Boolean *This, BooleanValue value) {
 	This->boolVal = (BooleanValue) (This->boolVal | value);
 }
 
-void computePolarity(Boolean *This) {
-	switch (This->type) {
-	case BOOLEANVAR:
-	case ORDERCONST:
-		return;
-	case PREDICATEOP:
-		return computePredicatePolarity((BooleanPredicate *)This);
-	case LOGICOP:
-		return computeLogicOpPolarity((BooleanLogic *)This);
-	default:
-		ASSERT(0);
+void computePolarity(Boolean *This, Polarity polarity) {
+	if (updatePolarity(This, polarity)) {
+		switch (This->type) {
+		case BOOLEANVAR:
+		case ORDERCONST:
+			return;
+		case PREDICATEOP:
+			return computePredicatePolarity((BooleanPredicate *)This);
+		case LOGICOP:
+			return computeLogicOpPolarity((BooleanLogic *)This);
+		default:
+			ASSERT(0);
+		}
 	}
 }
 
 void computePredicatePolarity(BooleanPredicate *This) {
 	if (This->undefStatus) {
-		updatePolarity(This->undefStatus.getBoolean(), P_BOTHTRUEFALSE);
-		computePolarity(This->undefStatus.getBoolean());
+		computePolarity(This->undefStatus.getBoolean(), P_BOTHTRUEFALSE);
 	}
 }
 
 void computeLogicOpPolarity(BooleanLogic *This) {
-	computeLogicOpPolarityChildren(This);
+	Polarity child=computeLogicOpPolarityChildren(This);
 	uint size = This->inputs.getSize();
 	for (uint i = 0; i < size; i++) {
-		computePolarity(This->inputs.get(i).getBoolean());
+		BooleanEdge b=This->inputs.get(i);
+		computePolarity(b.getBoolean(), b.isNegated() ? negatePolarity(child) : child);
 	}
 }
 
@@ -82,22 +82,13 @@ BooleanValue negateBooleanValue(BooleanValue This) {
 	}
 }
 
-void computeLogicOpPolarityChildren(BooleanLogic *This) {
-	Polarity parentpolarity = This->polarity;
+Polarity computeLogicOpPolarityChildren(BooleanLogic *This) {
 	switch (This->op) {
 	case SATC_AND: {
-		uint size = This->inputs.getSize();
-		for (uint i = 0; i < size; i++) {
-			BooleanEdge tmp = This->inputs.get(i);
-			Boolean *btmp = tmp.getBoolean();
-			updatePolarity(btmp, tmp.isNegated() ? negatePolarity(parentpolarity) : parentpolarity);
-		}
-		break;
+		return This->polarity;
 	}
 	case SATC_IFF: {
-		updatePolarity(This->inputs.get(0).getBoolean(), P_BOTHTRUEFALSE);
-		updatePolarity(This->inputs.get(1).getBoolean(), P_BOTHTRUEFALSE);
-		break;
+		return P_BOTHTRUEFALSE;
 	}
 	default:
 		ASSERT(0);
