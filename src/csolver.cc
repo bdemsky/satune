@@ -17,7 +17,7 @@
 #include "structs.h"
 #include "orderresolver.h"
 #include "integerencoding.h"
-#include <stdlib.h>
+#include "qsort.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -318,7 +318,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
-			qsort(newarray, newindex, sizeof(BooleanEdge), ptrcompares);
+			bsdqsort(newarray, newindex, sizeof(BooleanEdge), ptrcompares);
 			array = newarray;
 			asize = newindex;
 		}
