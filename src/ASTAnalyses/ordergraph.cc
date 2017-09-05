@@ -177,3 +177,45 @@ OrderGraph::~OrderGraph() {
 	delete nodes;
 	delete edges;
 }
+
+bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination){
+	HashsetOrderNode visited;
+	visited.add(source);
+	SetIteratorOrderEdge *iterator = source->outEdges.iterator();
+	bool found = false;
+	while(iterator->hasNext()){
+		OrderNode* node = iterator->next()->sink;
+		if(!visited.contains(node)){
+			if( node == destination ){
+				found = true;
+				break;
+			}
+			visited.add(node);
+			found =isTherePathVisit(visited, node, destination);
+			if(found){
+				break;
+			}
+		}
+	}
+	delete iterator;
+	return found;
+}
+
+bool OrderGraph::isTherePathVisit(HashsetOrderNode &visited, OrderNode* current, OrderNode* destination){
+	SetIteratorOrderEdge *iterator = current->outEdges.iterator();
+	bool found = false;
+	while(iterator->hasNext()){
+		OrderNode* node = iterator->next()->sink;
+		if(node == destination){
+			found = true;
+			break;
+		}
+		visited.add(node);
+		if(isTherePathVisit(visited, node, destination)){
+			found = true;
+			break;
+		}
+	}
+	delete iterator;
+	return found;
+}

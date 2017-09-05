@@ -37,7 +37,7 @@ bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
 			case SATC_TOTAL:
 				return from->sccNum < to->sccNum;
 			case SATC_PARTIAL:
-			//Adding support for partial order ...
+				return resolvePartialOrder(from, to);
 			default:
 				ASSERT(0);
 			}
@@ -49,5 +49,14 @@ bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
 		ASSERT(suborder != NULL);
 		return suborder->encoding.resolver->resolveOrder(from->id, to->id);
 	}
+}
+
+bool DecomposeOrderResolver::resolvePartialOrder(OrderNode* first, OrderNode* second){
+	if(first->sccNum > second->sccNum){
+		return false;
+	} else {
+		return graph->isTherePath(first, second);
+	}
+		
 }
 

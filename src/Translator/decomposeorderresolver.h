@@ -17,6 +17,7 @@ class DecomposeOrderResolver : public OrderResolver {
 public:
 	DecomposeOrderResolver(OrderGraph *graph, Vector<Order *> &orders);
 	bool resolveOrder(uint64_t first, uint64_t second);
+	bool resolvePartialOrder(OrderNode* first, OrderNode* second);
 	virtual ~DecomposeOrderResolver();
 private:
 	OrderGraph *graph;
