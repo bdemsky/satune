@@ -64,5 +64,4 @@ private:
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
-Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair);
 #endif

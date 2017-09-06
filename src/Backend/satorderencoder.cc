@@ -56,7 +56,7 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 	if (!edgeIsNull(gvalue))
 		return gvalue;
 
-	HashtableOrderPair *table = order->orderPairTable;
+	HashtableOrderPair *table = order->getOrderPairTable();
 	bool negate = false;
 	OrderPair flipped;
 	if (pair->first < pair->second) {
@@ -65,23 +65,21 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 		flipped.second = pair->first;
 		pair = &flipped;
 	}
-	Edge constraint;
+	OrderPair* tmp;
 	if (!(table->contains(pair))) {
-		constraint = getNewVarSATEncoder();
-		OrderPair *paircopy = new OrderPair(pair->first, pair->second, constraint);
-		table->put(paircopy, paircopy);
-	} else
-		constraint = table->get(pair)->constraint;
-
-	return negate ? constraintNegate(constraint) : constraint;
+		tmp = new OrderPair(pair->first, pair->second, getNewVarSATEncoder());
+		table->put(tmp, tmp);
+	} else {
+		tmp = table->get(pair);
+	}
+	return negate ? tmp->getNegatedConstraint() : tmp->getConstraint();
 }
 
 Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 	ASSERT(boolOrder->order->type == SATC_TOTAL);
-	if (boolOrder->order->orderPairTable == NULL) {
+	if (boolOrder->order->encoding.resolver == NULL) {
 		//This is pairwised encoding ...
 		boolOrder->order->setOrderResolver(new OrderPairResolver(solver, boolOrder->order));
-		boolOrder->order->initializeOrderHashtable();
 		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
@@ -118,24 +116,6 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 			}
 		}
 	}
-}
-
-Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair) {
-	ASSERT(pair->first != pair->second);
-	bool negate = false;
-	OrderPair flipped;
-	if (pair->first < pair->second) {
-		negate = true;
-		flipped.first = pair->second;
-		flipped.second = pair->first;
-		pair = &flipped;
-	}
-	if (!table->contains(pair)) {
-		return E_NULL;
-	}
-	Edge constraint = table->get(pair)->constraint;
-	ASSERT(!edgeIsNull(constraint));
-	return negate ? constraintNegate(constraint) : constraint;
 }
 
 Edge SATEncoder::generateTransOrderConstraintSATEncoder(Edge constIJ,Edge constJK,Edge constIK) {

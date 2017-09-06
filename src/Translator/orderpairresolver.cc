@@ -16,11 +16,16 @@
 
 OrderPairResolver::OrderPairResolver(CSolver *_solver, Order *_order) :
 	solver(_solver),
-	order(_order)
+	order(_order),
+	orderPairTable(new HashtableOrderPair())
 {
 }
 
 OrderPairResolver::~OrderPairResolver() {
+	if (orderPairTable != NULL) {
+		orderPairTable->resetanddelete();
+		delete orderPairTable;
+	}
 }
 
 bool OrderPairResolver::resolveOrder(uint64_t first, uint64_t second) {
@@ -42,24 +47,21 @@ bool OrderPairResolver::resolveOrder(uint64_t first, uint64_t second) {
 	}
 
 	//Couldn't infer from graph. Should call the SAT Solver ...
-	switch ( order->type) {
-	case SATC_TOTAL:
-		resolveTotalOrder(first, second);
-	case SATC_PARTIAL:
-	//TODO: Support for partial order ...
-	default:
-		ASSERT(0);
-	}
-
-
+	return getOrderConstraintValue(first, second);
 }
 
-
-bool OrderPairResolver::resolveTotalOrder(uint64_t first, uint64_t second) {
-	ASSERT(order->orderPairTable != NULL);
-	OrderPair pair(first, second, E_NULL);
-	Edge var = getOrderConstraint(order->orderPairTable, &pair);
-	if (edgeIsNull(var))
+bool OrderPairResolver::getOrderConstraintValue(uint64_t first, uint64_t second) {
+	ASSERT(first != second);
+	bool negate = false;
+	OrderPair tmp(first, second);
+	if (first < second) {
+		negate = true;
+		tmp.first = second;
+		tmp.second = first;
+	}
+	if (!orderPairTable->contains(&tmp)) {
 		return false;
-	return getValueCNF(solver->getSATEncoder()->getCNF(), var);
+	}
+	OrderPair *pair = orderPairTable->get(&tmp);
+	return negate ? pair->getNegatedConstraintValue(solver) : pair->getConstraintValue(solver);
 }
