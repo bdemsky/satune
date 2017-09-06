@@ -18,6 +18,7 @@
 #include "orderresolver.h"
 #include "integerencoding.h"
 #include "qsort.h"
+#include "preprocess.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -403,6 +404,9 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
+	Preprocess pp(this);
+	pp.doTransform();
+	
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
 

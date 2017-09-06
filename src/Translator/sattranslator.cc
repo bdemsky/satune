@@ -81,8 +81,14 @@ uint64_t getElementValueSATTranslator(CSolver *This, Element *element) {
 }
 
 bool getBooleanVariableValueSATTranslator( CSolver *This, Boolean *boolean) {
-	int index = getEdgeVar( ((BooleanVar *) boolean)->var );
-	return getValueSolver(This->getSATEncoder()->getCNF()->solver, index);
+	if (boolean->boolVal == BV_MUSTBETRUE)
+		return true;
+	else if (boolean->boolVal == BV_MUSTBEFALSE)
+		return false;
+	else {
+		int index = getEdgeVar( ((BooleanVar *) boolean)->var );
+		return getValueSolver(This->getSATEncoder()->getCNF()->solver, index);
+	}
 }
 
 

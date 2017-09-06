@@ -24,6 +24,7 @@ typedef Hashset<OrderNode *, uintptr_t, 4, order_node_hash_function, order_node_
 typedef Hashset<OrderEdge *, uintptr_t, 4, order_edge_hash_function, order_edge_equals> HashsetOrderEdge;
 typedef Hashset<OrderElement *, uintptr_t, 4, order_element_hash_function, order_element_equals> HashsetOrderElement;
 typedef Hashset<Boolean *, uintptr_t, 4> HashsetBoolean;
+typedef SetIterator<Boolean *, uintptr_t, 4> SetIteratorBoolean;
 
 typedef Hashtable<OrderNode *, HashsetOrderNode *, uintptr_t, 4> HashtableNodeToNodeSet;
 typedef Hashtable<OrderPair *, OrderPair *, uintptr_t, 4, order_pair_hash_function, order_pair_equals> HashtableOrderPair;
