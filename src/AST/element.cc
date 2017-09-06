@@ -22,8 +22,6 @@ ElementFunction::ElementFunction(Function *_function, Element **array, uint numA
 	inputs(array, numArrays),
 	overflowstatus(_overflowstatus),
 	functionencoding(this) {
-	for (uint i = 0; i < numArrays; i++)
-		array[i]->parents.push(this);
 }
 
 ElementConst::ElementConst(uint64_t _value, VarType _type, Set *_set) :
@@ -76,4 +74,8 @@ Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
 	}
 	Element *e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), overflowstatus->clone(solver, map));
 	return e;
+}
+
+void ElementFunction::updateParents() {
+	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
 }

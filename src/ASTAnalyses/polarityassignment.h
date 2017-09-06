@@ -14,13 +14,13 @@
 #include "boolean.h"
 
 void computePolarities(CSolver *This);
-void updatePolarity(Boolean *This, Polarity polarity);
+bool updatePolarity(Boolean *This, Polarity polarity);
 void updateMustValue(Boolean *This, BooleanValue value);
-void computePolarity(Boolean *boolean);
+void computePolarity(Boolean *boolean, Polarity polarity);
 void computePredicatePolarity(BooleanPredicate *This);
 void computeLogicOpPolarity(BooleanLogic *boolean);
 Polarity negatePolarity(Polarity This);
 BooleanValue negateBooleanValue(BooleanValue This);
-void computeLogicOpPolarityChildren(BooleanLogic *boolean);
+Polarity computeLogicOpPolarityChildren(BooleanLogic *boolean);
 
 #endif/* POLARITYASSIGNMENT_H */

@@ -4,6 +4,7 @@
 #include "inc_solver.h"
 #include "cnfexpr.h"
 #include "common.h"
+#include "qsort.h"
 /*
    V2 Copyright (c) 2014 Ben Chambers, Eugene Goldberg, Pete Manolios,
    Vasilis Papavasileiou, Sudarshan Srinivasan, and Daron Vroon.
@@ -187,7 +188,7 @@ int comparefunction(const Edge *e1, const Edge *e2) {
 
 Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 	ASSERT(numEdges != 0);
-	qsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *))comparefunction);
+	bsdqsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *))comparefunction);
 	uint initindex = 0;
 	while (initindex < numEdges && equalsEdge(edges[initindex], E_True))
 		initindex++;

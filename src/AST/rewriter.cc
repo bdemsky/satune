@@ -17,6 +17,8 @@ void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 	
 void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 	updateMustValue(bexpr.getBoolean(), bexpr.isNegated() ? BV_MUSTBEFALSE : BV_MUSTBETRUE);
+
+	ASSERT(bexpr->boolVal != BV_UNSAT);
 	
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
@@ -44,14 +46,25 @@ void CSolver::replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb) {
 	if (oldb.isNegated()) {
 		oldb=oldb.negate();
 		newb=newb.negate();
+
 	}
 	if (constraints.contains(oldb)) {
 		constraints.remove(oldb);
 		constraints.add(newb);
+		if (newb->type == BOOLEANVAR)
+			replaceBooleanWithTrue(newb);
+		else
+			replaceBooleanWithTrueNoRemove(newb);
+		return;
 	}
 	if (constraints.contains(oldb.negate())) {
 		constraints.remove(oldb.negate());
 		constraints.add(newb.negate());
+		if (newb->type == BOOLEANVAR)
+			replaceBooleanWithTrue(newb.negate());
+		else
+			replaceBooleanWithTrueNoRemove(newb.negate());
+		return;
 	}
 
 	BooleanEdge oldbnegated = oldb.negate();

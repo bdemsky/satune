@@ -17,7 +17,8 @@
 #include "structs.h"
 #include "orderresolver.h"
 #include "integerencoding.h"
-#include <stdlib.h>
+#include "qsort.h"
+#include "preprocess.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -143,6 +144,7 @@ Element *CSolver::applyFunction(Function *function, Element **array, uint numArr
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
+		element->updateParents();
 		allElements.push(element);
 		elemMap.put(element, element);
 		return element;
@@ -212,6 +214,7 @@ BooleanEdge CSolver::applyPredicateTable(Predicate *predicate, Element **inputs,
 	BooleanPredicate *boolean = new BooleanPredicate(predicate, inputs, numInputs, undefinedStatus);
 	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
+		boolean->updateParents();
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
 		return BooleanEdge(boolean);
@@ -316,7 +319,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
-			qsort(newarray, newindex, sizeof(BooleanEdge), ptrcompares);
+			bsdqsort(newarray, newindex, sizeof(BooleanEdge), ptrcompares);
 			array = newarray;
 			asize = newindex;
 		}
@@ -336,6 +339,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
 	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
+		boolean->updateParents();
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
 		return BooleanEdge(boolean);
@@ -400,6 +404,9 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
+	Preprocess pp(this);
+	pp.doTransform();
+	
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
 

@@ -21,7 +21,8 @@ public:
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
-
+	virtual void updateParents() {}
+	
 	CMEMALLOC;
 };
 
@@ -66,6 +67,8 @@ public:
 	Array<Element *> inputs;
 	BooleanEdge undefStatus;
 	FunctionEncoding *getFunctionEncoding() {return &encoding;}
+	void updateParents();
+
 	CMEMALLOC;
 };
 
@@ -77,6 +80,8 @@ public:
 	LogicOp op;
 	bool replaced;
 	Array<BooleanEdge> inputs;
+	void updateParents();
+	
 	CMEMALLOC;
 };
 BooleanEdge cloneEdge(CSolver *solver, CloneMap *map, BooleanEdge e);
