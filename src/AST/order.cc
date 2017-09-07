@@ -4,20 +4,15 @@
 #include "boolean.h"
 #include "ordergraph.h"
 #include "csolver.h"
+#include "orderpairresolver.h"
 
 Order::Order(OrderType _type, Set *_set) :
 	type(_type),
 	set(_set),
-	orderPairTable(NULL),
 	graph(NULL),
 	encoding(this)
 {
 }
-
-void Order::initializeOrderHashtable() {
-	orderPairTable = new HashtableOrderPair();
-}
-
 
 void Order::addOrderConstraint(BooleanOrder *constraint) {
 	constraints.push(constraint);
@@ -36,12 +31,16 @@ Order *Order::clone(CSolver *solver, CloneMap *map) {
 	return o;
 }
 
-Order::~Order() {
-	if (orderPairTable != NULL) {
-		orderPairTable->resetanddelete();
-		delete orderPairTable;
+HashtableOrderPair* Order::getOrderPairTable(){
+	ASSERT( encoding.resolver != NULL);
+	if (OrderPairResolver* t = dynamic_cast<OrderPairResolver*>(encoding.resolver)){
+		return t->getOrderPairTable();
+	} else {
+		ASSERT(0);
 	}
+}
 
+Order::~Order() {
 	if (graph != NULL) {
 		delete graph;
 	}

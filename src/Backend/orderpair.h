@@ -14,12 +14,20 @@
 
 class OrderPair {
 public:
-	OrderPair(uint64_t first, uint64_t second, Edge constraint);
+	OrderPair(uint64_t first, uint64_t second, Edge constraint = E_NULL);
 	OrderPair();
+	virtual ~OrderPair();
+	virtual Edge getConstraint();
+	virtual bool getConstraintValue(CSolver* solver);
+	//for the cases that we swap first and second ... For total order is straight forward.
+	// but for partial order it has some complexity which should be hidden ... -HG
+	virtual Edge getNegatedConstraint();
+	virtual bool getNegatedConstraintValue(CSolver* solver);
 	uint64_t first;
 	uint64_t second;
-	Edge constraint;
 	CMEMALLOC;
+protected:
+	Edge constraint;
 };
 
 #endif/* ORDERPAIR_H */

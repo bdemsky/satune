@@ -14,16 +14,15 @@ public:
 	~Order();
 	OrderType type;
 	Set *set;
-	HashtableOrderPair *orderPairTable;
 	OrderGraph *graph;
 	Order *clone(CSolver *solver, CloneMap *map);
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding encoding;
 	void setOrderResolver(OrderResolver *_resolver) { ASSERT(encoding.resolver == NULL); encoding.resolver = _resolver;};
-	void initializeOrderHashtable();
 	void initializeOrderElementsHashtable();
 	void addOrderConstraint(BooleanOrder *constraint);
 	void setOrderEncodingType(OrderEncodingType type);
+	HashtableOrderPair* getOrderPairTable();
 	CMEMALLOC;
 };
 
