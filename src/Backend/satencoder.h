@@ -47,11 +47,14 @@ private:
 	Edge encodeOrderSATEncoder(BooleanOrder *constraint);
 	Edge inferOrderConstraintFromGraph(Order *order, uint64_t _first, uint64_t _second);
 	Edge getPairConstraint(Order *order, OrderPair *pair);
+	Edge getPartialPairConstraint(Order *order, OrderPair *pair);
 	Edge encodeTotalOrderSATEncoder(BooleanOrder *constraint);
 	Edge encodePartialOrderSATEncoder(BooleanOrder *constraint);
 	void createAllTotalOrderConstraintsSATEncoder(Order *order);
+	void createAllPartialOrderConstraintsSATEncoder(Order *order);
 	Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair);
 	Edge generateTransOrderConstraintSATEncoder(Edge constIJ, Edge constJK, Edge constIK);
+	Edge generatePartialOrderConstraintsSATEncoder(Edge ij,Edge ji, Edge jk, Edge kj,Edge ik, Edge ki);
 	Edge encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint);
 	Edge encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint);
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
