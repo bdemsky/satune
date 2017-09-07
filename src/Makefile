@@ -4,16 +4,16 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard Translator/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc)
+CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard Translator/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard ASTAnalyses/Order/*.cc) $(wildcard ASTAnalyses/Polarity/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc)
 
-C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard Translator/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
+C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard Translator/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard ASTAnalyses/Order/*.c) $(wildcard ASTAnalyses/Polarity/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c)
 
-HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard Translator/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
+HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard Translator/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard ASTAnalyses/Order/*.h) $(wildcard ASTAnalyses/Polarity/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CFLAGS := -Wall -g -O0
-CFLAGS += -IAST -IASTTransform -IASTAnalyses -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner
+CFLAGS += -IAST -IASTTransform -IASTAnalyses -IASTAnalyses/Polarity -IASTAnalyses/Order -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner
 LDFLAGS := -ldl -lrt -rdynamic
 SHARED := -shared
 
@@ -33,6 +33,8 @@ ${OBJ_DIR}:
 	${MKDIR_P} ${OBJ_DIR}
 	${MKDIR_P} ${OBJ_DIR}/AST
 	${MKDIR_P} ${OBJ_DIR}/ASTAnalyses
+	${MKDIR_P} ${OBJ_DIR}/ASTAnalyses/Order
+	${MKDIR_P} ${OBJ_DIR}/ASTAnalyses/Polarity
 	${MKDIR_P} ${OBJ_DIR}/ASTTransform
 	${MKDIR_P} ${OBJ_DIR}/Translator
 	${MKDIR_P} ${OBJ_DIR}/Tuner
@@ -75,10 +77,10 @@ tags:
 	ctags -R
 
 tabbing:
-	uncrustify -c C.cfg --no-backup *.cc */*.cc
-	uncrustify -c C.cfg --no-backup *.h */*.h
+	uncrustify -c C.cfg --no-backup *.cc */*.cc */*/*.cc
+	uncrustify -c C.cfg --no-backup *.h */*.h */*/*.h
 
 wc:
-	wc */*.cc */*.h *.cc *.h
+	wc */*.cc */*.h *.cc *.h */*/*.cc */*/*.h
 
 .PHONY: $(PHONY)
