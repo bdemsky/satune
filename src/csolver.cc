@@ -126,7 +126,7 @@ Element *CSolver::getElementVar(Set *set) {
 Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	uint64_t array[] = {value};
 	Set *set = new Set(type, array, 1);
-	Element *element = new ElementConst(value, type, set);
+	Element *element = new ElementConst(value, set);
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
 		allSets.push(set);

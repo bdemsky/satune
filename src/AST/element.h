@@ -16,23 +16,26 @@ public:
 	ElementEncoding encoding;
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
 	virtual void updateParents() {}
-	
-	CMEMALLOC;
-};
-
-class ElementConst : public Element {
-public:
-	ElementConst(uint64_t value, VarType type, Set *_set);
-	Set *set;
-	uint64_t value;
-	Element *clone(CSolver *solver, CloneMap *map);
+	virtual Set * getRange() = 0;
 	CMEMALLOC;
 };
 
 class ElementSet : public Element {
 public:
+	ElementSet(ASTNodeType type, Set *s);
 	ElementSet(Set *s);
+	virtual Element *clone(CSolver *solver, CloneMap *map);
+	CMEMALLOC;
+	Set *getRange() {return set;}
+ private:
 	Set *set;
+
+};
+
+class ElementConst : public ElementSet {
+public:
+	ElementConst(uint64_t value, Set *_set);
+	uint64_t value;
 	Element *clone(CSolver *solver, CloneMap *map);
 	CMEMALLOC;
 };
@@ -45,11 +48,10 @@ public:
 	BooleanEdge overflowstatus;
 	FunctionEncoding functionencoding;
 	Element *clone(CSolver *solver, CloneMap *map);
+	Set * getRange();
 	void updateParents();
 	CMEMALLOC;
 };
-
-Set *getElementSet(Element *This);
 
 static inline ElementEncoding *getElementEncoding(Element *e) {
 	return &e->encoding;

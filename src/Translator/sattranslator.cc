@@ -59,7 +59,7 @@ uint64_t getElementValueUnarySATTranslator(CSolver *This, ElementEncoding *elemE
 uint64_t getElementValueSATTranslator(CSolver *This, Element *element) {
 	ElementEncoding *elemEnc = getElementEncoding(element);
 	if (elemEnc->numVars == 0)//case when the set has only one item
-		return getElementSet(element)->getElement(0);
+		return element->getRange()->getElement(0);
 	switch (elemEnc->type) {
 	case ONEHOT:
 		return getElementValueOneHotSATTranslator(This, elemEnc);

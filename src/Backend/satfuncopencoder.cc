@@ -104,7 +104,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = getElementSet(func->inputs.get(i));
+		Set *set = func->inputs.get(i)->getRange();
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -173,7 +173,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = getElementSet(func->inputs.get(i));
+			Set *set = func->inputs.get(i)->getRange();
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);
