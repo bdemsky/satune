@@ -25,6 +25,8 @@ public:
 private:
 	ssize_t myread (void *__buf, size_t __nbytes);
 	void deserializeBooleanEdge();
+	void deserializeBooleanVar();
+	void deserializeBooleanOrder();
 	CSolver *solver;
 	int filedesc;
 	CloneMap map;

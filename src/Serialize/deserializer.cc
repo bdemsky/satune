@@ -39,6 +39,9 @@ CSolver * Deserializer::deserialize(){
 			case BOOLEANEDGE:
 				deserializeBooleanEdge();
 				break;
+			case BOOLEANVAR:
+				deserializeBooleanVar();
+				break;
 			default:
 				ASSERT(0);
 		}
@@ -55,4 +58,26 @@ void Deserializer::deserializeBooleanEdge(){
 	b = (Boolean*) map.get(tmp.getBoolean());
 	BooleanEdge res(b);
 	solver->addConstraint(isNegated?res.negate():res);
+}
+
+void Deserializer::deserializeBooleanVar(){
+	BooleanVar *b;
+	myread(&b, sizeof(BooleanVar*));
+	VarType vtype;
+	myread(&vtype, sizeof(VarType));
+	map.put(b, solver->getBooleanVar(vtype).getBoolean());
+}
+
+void Deserializer::deserializeBooleanOrder(){
+	BooleanOrder* bo_ptr;
+	myread(&bo_ptr, sizeof(BooleanOrder*));
+	Order* optr;
+	myread(&optr, sizeof(Order*));
+	uint64_t first;
+	myread(&first, sizeof(uint64_t));
+	uint64_t second;
+	myread(&second, sizeof(uint64_t));
+	ASSERT(map.contains(optr));
+	Order* order  = (Order*) map.get(optr);
+	map.put(bo_ptr, solver->orderConstraint(order, first, second).getBoolean());
 }

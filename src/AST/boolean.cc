@@ -98,3 +98,24 @@ void BooleanPredicate::updateParents() {
 void BooleanLogic::updateParents() {
 	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
 }
+
+void BooleanVar::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	serializer->mywrite(this, sizeof(BooleanVar*));
+	serializer->mywrite(&vtype, sizeof(VarType));
+}
+
+void BooleanOrder::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+//	order->serialize(serializer);
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	serializer->mywrite(this, sizeof(BooleanOrder*));
+	serializer->mywrite(&order, sizeof(Order*));
+	serializer->mywrite(&first, sizeof(uint64_t));
+	serializer->mywrite(&second, sizeof(uint64_t));
+}

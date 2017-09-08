@@ -8,7 +8,6 @@
 
 #ifndef SERIALIZABLE_H
 #define SERIALIZABLE_H
-#include "classlist.h"
 
 class Serializable{
 	virtual void serialize(Serializer* ) = 0;

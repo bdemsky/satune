@@ -9,6 +9,7 @@
 #include "serializer.h"
 #include "unistd.h"
 #include "fcntl.h"
+#include "boolean.h"
 
 Serializer::Serializer(const char *file) {
 	filedesc = open(file, O_WRONLY | O_CREAT, 0666);
@@ -35,7 +36,7 @@ void serializeBooleanEdge(Serializer* serializer, BooleanEdge& be){
 	if(serializer->isSerialized(be.getRaw()))
 		return;
 	serializer->addObject(be.getRaw());
-//	b->seralize(serializer);
+	be.getBoolean()->serialize(serializer);
 	ASTNodeType type = BOOLEANEDGE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	serializer->mywrite(be.getRaw(), sizeof(Boolean*));
