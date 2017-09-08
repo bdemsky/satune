@@ -11,11 +11,8 @@ class Preprocess : public Transform {
 
         CMEMALLOC;
 private:
-				HashsetBoolean processed;
 				HashsetBoolean toremove;
-				void transformBoolean(Boolean *b);
 				void processBooleanVar(BooleanVar * b);
-				void processLogicOp(BooleanLogic * b);
 				void resolveBooleanVars();
 };
 
