@@ -5,7 +5,7 @@
 #include "iterator.h"
 
 Preprocess::Preprocess(CSolver *_solver)
-        : Transform(_solver)
+	: Transform(_solver)
 {
 }
 
