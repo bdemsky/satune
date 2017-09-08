@@ -19,6 +19,8 @@
 #include "integerencoding.h"
 #include "qsort.h"
 #include "preprocess.h"
+#include "serializer.h"
+#include "deserializer.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -82,6 +84,24 @@ CSolver *CSolver::clone() {
 	}
 	delete it;
 	return copy;
+}
+
+void CSolver::serialize() {
+	{
+		Serializer serializer("dump");
+		SetIteratorBooleanEdge *it = getConstraints();
+		while (it->hasNext()) {
+			BooleanEdge b = it->next();
+			serializeBooleanEdge(&serializer, b);
+		}
+		delete it;
+	}
+	model_print("deserializing ...\n");
+	{
+		Deserializer deserializer("dump");
+		deserializer.deserialize();
+	}
+	
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
