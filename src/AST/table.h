@@ -11,10 +11,20 @@ public:
 	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);
 	Table *clone(CSolver *solver, CloneMap *map);
 	~Table();
+	Set * getRange() {return range;}
+	
+	Set * getDomain(uint i) {return domains.get(i);}
+	uint numDomains() {return domains.getSize();}
+ 
+	SetIteratorTableEntry * getEntries() {return entries->iterator();}
+	uint getSize() {return entries->getSize();}
+
+	CMEMALLOC;
+	
+ private:
 	Array<Set *> domains;
 	Set *range;
 	HashsetTableEntry *entries;
-	CMEMALLOC;
 };
 
 #endif

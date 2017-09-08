@@ -18,13 +18,13 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 	FunctionEncodingType encType = constraint->encoding.type;
 	Array<Element *> *inputs = &constraint->inputs;
 	uint inputNum = inputs->getSize();
-	uint size = table->entries->getSize();
+	uint size = table->getSize();
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	Edge constraints[size];
 	Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
 	printCNF(undefConst);
 	model_print("**\n");
-	SetIteratorTableEntry *iterator = table->entries->iterator();
+	SetIteratorTableEntry *iterator = table->getEntries();
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();
@@ -88,7 +88,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 		break;
 	}
 	bool generateNegation = constraint->encoding.type == ENUMERATEIMPLICATIONSNEGATE;
-	uint numDomains = predicate->table->domains.getSize();
+	uint numDomains = predicate->table->numDomains();
 
 	VectorEdge *clauses = allocDefVectorEdge();
 
@@ -97,7 +97,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = predicate->table->domains.get(i);
+		Set *set = predicate->table->getDomain(i);
 		vals[i] = set->getElement(indices[i]);
 	}
 	bool hasOverflow = false;
@@ -150,7 +150,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = predicate->table->domains.get(i);
+			Set *set = predicate->table->getDomain(i);
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);
@@ -181,9 +181,9 @@ void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func)
 	ASSERT(undefStatus == SATC_IGNOREBEHAVIOR || undefStatus == SATC_FLAGFORCEUNDEFINED);
 	Array<Element *> *elements = &func->inputs;
 	Table *table = ((FunctionTable *) (func->function))->table;
-	uint size = table->entries->getSize();
+	uint size = table->getSize();
 	Edge constraints[size];
-	SetIteratorTableEntry *iterator = table->entries->iterator();
+	SetIteratorTableEntry *iterator = table->getEntries();
 	uint i = 0;
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();
@@ -237,7 +237,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		break;
 	}
 
-	uint numDomains = function->table->domains.getSize();
+	uint numDomains = function->table->numDomains();
 
 	VectorEdge *clauses = allocDefVectorEdge();	// Setup array of clauses
 
@@ -246,7 +246,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = function->table->domains.get(i);
+		Set *set = function->table->getDomain(i);
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -300,7 +300,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = function->table->domains.get(i);
+			Set *set = function->table->getDomain(i);
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);

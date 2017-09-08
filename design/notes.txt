@@ -1,6 +1,8 @@
 (1) Elements/BooleanVars should link back to expressions that use them
+--> Done
 
 (2) Need to introduce variables in encoding of functions....
+--> Done
 
 (3) Some cases can do variable elimination of introduced variables...
 
@@ -36,6 +38,8 @@ simply link to it again).  Possibly good to do in TreeConstruction...
 This could be lower priority as it isn't really essential to make
 things work.  Should also probably be switchable on/off...
 
+--> Done
+
 (2) Advanced TreeRewriting --- can rewrite functions/predicates to
 eliminate unused entries or to eliminate effectively identical
 outputs...  e.g., consider a function f() that can output the values
@@ -56,5 +60,35 @@ to turn on/off nearly any optimization we have...
 implement other simplifcation strategies
 
 (6) Convert SATCheck to use Constraint Compiler...not sure about order...
+Started...
 
 (7) Profile system....
+
+---------------------------------------------------------------------
+
+To do:
+
+(0) Support for saving/loading problem instances...
+
+(1) Complete satcheck support
+
+(2) Advance tree rewriting...  Variable value elimination...
+
+(3) Think about undefined semantics...
+
+(4) Smart encoding...
+    Variable Graphs....
+
+    Split graph into connected components
+
+Encoding ideas:
+*    Monotonic increasing index
+*    Matched index (equality)
+*    Bit exposes
+*    Single var
+*    Support arithmetic
+*    Sparse encoding
+
+--------------------------------------------------------------------
+
+

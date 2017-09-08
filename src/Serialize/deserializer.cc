@@ -42,6 +42,9 @@ CSolver * Deserializer::deserialize(){
 			case BOOLEANVAR:
 				deserializeBooleanVar();
 				break;
+			case ORDERCONST:
+				deserializeBooleanOrder();
+				break;
 			default:
 				ASSERT(0);
 		}

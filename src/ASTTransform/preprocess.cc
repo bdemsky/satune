@@ -2,9 +2,10 @@
 #include "boolean.h"
 #include "csolver.h"
 #include "tunable.h"
+#include "iterator.h"
 
 Preprocess::Preprocess(CSolver *_solver)
-        : Transform(_solver)
+	: Transform(_solver)
 {
 }
 
@@ -15,13 +16,12 @@ void Preprocess::doTransform() {
 	if (solver->getTuner()->getTunable(PREPROCESS, &onoff) == 0)
 		return;
 	
-	SetIteratorBooleanEdge *iterator = solver->getConstraints();
-	while (iterator->hasNext()) {
-		BooleanEdge boolean = iterator->next();
-		Boolean *b = boolean.getBoolean();
-		transformBoolean(b);
+	BooleanIterator bit(solver);
+	while(bit.hasNext()) {
+		Boolean *b=bit.next();
+		if (b->type == BOOLEANVAR)
+			processBooleanVar((BooleanVar *)b);
 	}
-	delete iterator;
 	resolveBooleanVars();
 }
 
@@ -38,29 +38,9 @@ void Preprocess::resolveBooleanVars() {
 	delete iterator;
 }
 
-void Preprocess::transformBoolean(Boolean *b) {
-	if (!processed.add(b))
-		return;
-	switch (b->type) {
-	case BOOLEANVAR:
-		processBooleanVar((BooleanVar *)b);
-		break;
-	case LOGICOP:
-		processLogicOp((BooleanLogic *)b);
-		break;
-	default:
-		break;
-	}
-}
-
 void Preprocess::processBooleanVar(BooleanVar * b) {
 	if (b->polarity==P_TRUE ||
 			b->polarity==P_FALSE) {
 		toremove.add(b);
 	}
-}
-
-void Preprocess::processLogicOp(BooleanLogic * b) {
-	for(uint i=0; i < b->inputs.getSize(); i++)
-		transformBoolean(b->inputs.get(i).getBoolean());
 }

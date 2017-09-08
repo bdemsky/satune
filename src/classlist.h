@@ -63,6 +63,10 @@ class TunableDesc;
 class OrderResolver;
 class DecomposeOrderResolver;
 
+class EncodingGraph;
+class EncodingNode;
+class EncodingEdge;
+
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 struct TableEntry;

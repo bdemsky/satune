@@ -60,3 +60,7 @@ Function *FunctionTable::clone(CSolver *solver, CloneMap *map) {
 	map->put(this, f);
 	return f;
 }
+
+Set * FunctionTable::getRange() {
+	return table->getRange();
+}

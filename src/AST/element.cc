@@ -16,6 +16,11 @@ ElementSet::ElementSet(Set *s) :
 	set(s) {
 }
 
+ElementSet::ElementSet(ASTNodeType _type, Set *s) :
+	Element(_type),
+	set(s) {
+}
+
 ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, BooleanEdge _overflowstatus) :
 	Element(ELEMFUNCRETURN),
 	function(_function),
@@ -24,34 +29,9 @@ ElementFunction::ElementFunction(Function *_function, Element **array, uint numA
 	functionencoding(this) {
 }
 
-ElementConst::ElementConst(uint64_t _value, VarType _type, Set *_set) :
-	Element(ELEMCONST),
-	set(_set),
+ElementConst::ElementConst(uint64_t _value, Set *_set) :
+	ElementSet(ELEMCONST, _set),
 	value(_value) {
-}
-
-Set *getElementSet(Element *This) {
-	switch (This->type) {
-	case ELEMSET:
-		return ((ElementSet *)This)->set;
-	case ELEMCONST:
-		return ((ElementConst *)This)->set;
-	case ELEMFUNCRETURN: {
-		Function *func = ((ElementFunction *)This)->function;
-		switch (func->type) {
-		case TABLEFUNC:
-			return ((FunctionTable *)func)->table->range;
-		case OPERATORFUNC:
-			return ((FunctionOperator *)func)->range;
-		default:
-			ASSERT(0);
-		}
-	}
-	default:
-		ASSERT(0);
-	}
-	ASSERT(0);
-	return NULL;
 }
 
 Element *ElementConst::clone(CSolver *solver, CloneMap *map) {
@@ -78,4 +58,8 @@ Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
 
 void ElementFunction::updateParents() {
 	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+}
+
+Set * ElementFunction::getRange() {
+	return function->getRange();
 }

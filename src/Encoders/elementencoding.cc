@@ -39,7 +39,7 @@ void ElementEncoding::setElementEncodingType(ElementEncodingType _type) {
 }
 
 void ElementEncoding::encodingArrayInitialization() {
-	Set *set = getElementSet(element);
+	Set *set = element->getRange();
 	uint size = set->getSize();
 	uint encSize = getSizeEncodingArray(size);
 	allocEncodingArrayElement(encSize);
