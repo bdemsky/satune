@@ -38,14 +38,7 @@ Set *getElementSet(Element *This) {
 		return ((ElementConst *)This)->set;
 	case ELEMFUNCRETURN: {
 		Function *func = ((ElementFunction *)This)->function;
-		switch (func->type) {
-		case TABLEFUNC:
-			return ((FunctionTable *)func)->table->range;
-		case OPERATORFUNC:
-			return ((FunctionOperator *)func)->range;
-		default:
-			ASSERT(0);
-		}
+		return func->getRange();
 	}
 	default:
 		ASSERT(0);
