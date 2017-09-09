@@ -8,14 +8,15 @@
 #include "astnode.h"
 #include "functionencoding.h"
 #include "constraint.h"
+#include "serializable.h"
+#include "serializer.h"
 
-
-
-class Boolean : public ASTNode {
+class Boolean : public ASTNode, public Serializable {
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
 	virtual Boolean *clone(CSolver *solver, CloneMap *map) = 0;
+	virtual void serialize(Serializer* ) = 0;
 	virtual bool isTrue() {return boolVal == BV_MUSTBETRUE;}
 	virtual bool isFalse() {return boolVal == BV_MUSTBEFALSE;}
 	Polarity polarity;
@@ -32,6 +33,8 @@ public:
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	bool isTrue() {return istrue;}
 	bool isFalse() {return !istrue;}
+	void serialize(Serializer *serializer ){};
+	
 	bool istrue;
 	CMEMALLOC;
 };
@@ -40,7 +43,8 @@ class BooleanVar : public Boolean {
 public:
 	BooleanVar(VarType t);
 	Boolean *clone(CSolver *solver, CloneMap *map);
-
+	void serialize(Serializer *serializer );
+	
 	VarType vtype;
 	Edge var;
 	CMEMALLOC;
@@ -50,7 +54,8 @@ class BooleanOrder : public Boolean {
 public:
 	BooleanOrder(Order *_order, uint64_t _first, uint64_t _second);
 	Boolean *clone(CSolver *solver, CloneMap *map);
-
+	void serialize(Serializer *serializer );
+	
 	Order *order;
 	uint64_t first;
 	uint64_t second;
@@ -61,6 +66,7 @@ class BooleanPredicate : public Boolean {
 public:
 	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, BooleanEdge _undefinedStatus);
 	Boolean *clone(CSolver *solver, CloneMap *map);
+	void serialize(Serializer *serializer );
 
 	Predicate *predicate;
 	FunctionEncoding encoding;
@@ -76,7 +82,8 @@ class BooleanLogic : public Boolean {
 public:
 	BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uint asize);
 	Boolean *clone(CSolver *solver, CloneMap *map);
-
+	void serialize(Serializer *serializer );
+	
 	LogicOp op;
 	bool replaced;
 	Array<BooleanEdge> inputs;

@@ -138,6 +138,7 @@ public:
 	void replaceBooleanWithFalse(BooleanEdge bexpr);
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
+	void serialize();
 	void autoTune(uint budget);
 
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }

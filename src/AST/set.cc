@@ -1,6 +1,7 @@
 #include "set.h"
 #include <stddef.h>
 #include "csolver.h"
+#include "serializer.h"
 
 Set::Set(VarType t) : type(t), isRange(false), low(0), high(0) {
 	members = new Vector<uint64_t>();
@@ -65,4 +66,25 @@ Set *Set::clone(CSolver *solver, CloneMap *map) {
 	}
 	map->put(this, s);
 	return s;
+}
+
+
+void Set::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	ASTNodeType asttype = SETTYPE;
+	serializer->mywrite(&asttype, sizeof(ASTNodeType));
+	Set* This = this;
+	serializer->mywrite(&This, sizeof(Set*));
+	serializer->mywrite(&type, sizeof(VarType));
+	serializer->mywrite(&isRange, sizeof(bool));
+	serializer->mywrite(&low, sizeof(uint64_t));
+	serializer->mywrite(&high, sizeof(uint64_t));
+	uint size = members->getSize();
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		uint64_t mem = members->get(i);
+		serializer->mywrite(&mem, sizeof(uint64_t));
+	}
 }
