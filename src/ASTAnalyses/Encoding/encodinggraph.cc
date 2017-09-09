@@ -47,15 +47,38 @@ void EncodingGraph::processFunction(ElementFunction *ef) {
 	Function *f=ef->getFunction();
 	if (f->type==OPERATORFUNC) {
 		FunctionOperator *fo=(FunctionOperator*)f;
-		ArithOp op=fo->op;
+		ASSERT(ef->inputs.getSize() == 2);
+		EncodingNode *left=createNode(ef->inputs.get(0));
+		EncodingNode *right=createNode(ef->inputs.get(1));
+		if (left == NULL && right == NULL)
+			return;
+		EncodingNode *dst=createNode(ef);
+		EncodingEdge *edge=getEdge(left, right, dst);
 	}
+}
+
+EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst) {
+	EncodingEdge e(left, right, dst);
+	EncodingEdge *result = edgeMap.get(&e);
+	if (result == NULL) {
+		result=new EncodingEdge(left, right, dst);
+		edgeMap.put(result, result);
+	}
+	return result;
 }
 
 void EncodingGraph::processPredicate(BooleanPredicate *b) {
 
 }
 
+EncodingNode::EncodingNode(Set *_s) :
+	s(_s),
+	numElements(0) {
+}
+
 EncodingNode * EncodingGraph::createNode(Element *e) {
+	if (e->type == ELEMCONST)
+		return NULL;
 	Set *s = e->getRange();
 	EncodingNode *n = encodingMap.get(s);
 	if (n == NULL) {
@@ -63,6 +86,8 @@ EncodingNode * EncodingGraph::createNode(Element *e) {
 		encodingMap.put(s, n);
 	}
 	n->addElement(e);
+	if (discovered.add(e))
+		n->numElements++;
 	return n;
 }
 
@@ -73,14 +98,20 @@ void EncodingNode::addElement(Element *e) {
 EncodingEdge::EncodingEdge(EncodingNode *_l, EncodingNode *_r) :
 	left(_l),
 	right(_r),
-	dst(NULL)
+	dst(NULL),
+	numArithOps(0),
+	numEquals(0),
+	numComparisons(0)
 {
 }
 
 EncodingEdge::EncodingEdge(EncodingNode *_left, EncodingNode *_right, EncodingNode *_dst) :
 	left(_left),
 	right(_right),
-	dst(_dst)
+	dst(_dst),
+	numArithOps(0),
+	numEquals(0),
+	numComparisons(0)
 {
 }
 
