@@ -177,10 +177,10 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 }
 
 void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func) {
-	UndefinedBehavior undefStatus = ((FunctionTable *) func->function)->undefBehavior;
+	UndefinedBehavior undefStatus = ((FunctionTable *) func->getFunction())->undefBehavior;
 	ASSERT(undefStatus == SATC_IGNOREBEHAVIOR || undefStatus == SATC_FLAGFORCEUNDEFINED);
 	Array<Element *> *elements = &func->inputs;
-	Table *table = ((FunctionTable *) (func->function))->table;
+	Table *table = ((FunctionTable *) (func->getFunction()))->table;
 	uint size = table->getSize();
 	Edge constraints[size];
 	SetIteratorTableEntry *iterator = table->getEntries();
@@ -220,7 +220,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 #ifdef TRACE_DEBUG
 	model_print("Enumeration Table functions ...\n");
 #endif
-	ASSERT(elemFunc->function->type == TABLEFUNC);
+	ASSERT(elemFunc->getFunction()->type == TABLEFUNC);
 	//First encode children
 	Array<Element *> *elements = &elemFunc->inputs;
 	for (uint i = 0; i < elements->getSize(); i++) {
@@ -228,7 +228,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		encodeElementSATEncoder(elem);
 	}
 
-	FunctionTable *function = (FunctionTable *)elemFunc->function;
+	FunctionTable *function = (FunctionTable *)elemFunc->getFunction();
 	switch (function->undefBehavior) {
 	case SATC_IGNOREBEHAVIOR:
 	case SATC_FLAGFORCEUNDEFINED:

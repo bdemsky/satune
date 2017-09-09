@@ -104,7 +104,7 @@ uint hashElement(Element *e) {
 	}
 	case ELEMFUNCRETURN: {
 		ElementFunction *ef = (ElementFunction *) e;
-		return ((uint)(uintptr_t) ef->function) ^
+		return ((uint)(uintptr_t) ef->getFunction()) ^
 					 ((uint)(uintptr_t) ef->overflowstatus) ^
 					 hashArray(&ef->inputs);
 	}
@@ -127,7 +127,7 @@ bool compareElement(Element *e1, Element *e2) {
 	case ELEMFUNCRETURN: {
 		ElementFunction *ef1 = (ElementFunction *) e1;
 		ElementFunction *ef2 = (ElementFunction *) e2;
-		return (ef1->function == ef2->function) &&
+		return (ef1->getFunction() == ef2->getFunction()) &&
 					 (ef1->overflowstatus == ef2->overflowstatus) &&
 					 compareArray(&ef1->inputs, &ef2->inputs);
 	}

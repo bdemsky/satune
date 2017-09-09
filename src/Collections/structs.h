@@ -32,7 +32,7 @@ typedef Hashtable<OrderPair *, OrderPair *, uintptr_t, PTRSHIFT, order_pair_hash
 typedef Hashtable<void *, void *, uintptr_t, PTRSHIFT> CloneMap;
 
 
-typedef Hashtable<Set *, EncodingNode *, uintptr_t, PTRSHIFT> HashTableEncoding;
+typedef Hashtable<Set *, EncodingNode *, uintptr_t, PTRSHIFT> HashtableEncoding;
 
 typedef SetIterator<TableEntry *, uintptr_t, PTRSHIFT, table_entry_hash_function, table_entry_equals> SetIteratorTableEntry;
 typedef SetIterator<OrderEdge *, uintptr_t, PTRSHIFT, order_edge_hash_function, order_edge_equals> SetIteratorOrderEdge;

@@ -88,7 +88,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 #ifdef TRACE_DEBUG
 	model_print("Operator Function ...\n");
 #endif
-	FunctionOperator *function = (FunctionOperator *) func->function;
+	FunctionOperator *function = (FunctionOperator *) func->getFunction();
 	uint numDomains = func->inputs.getSize();
 
 	/* Call base encoders for children */
@@ -115,7 +115,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		Edge carray[numDomains + 1];
 
 		uint64_t result = function->applyFunctionOperator(numDomains, vals);
-		bool isInRange = ((FunctionOperator *)func->function)->isInRangeFunction(result);
+		bool isInRange = ((FunctionOperator *)func->getFunction())->isInRangeFunction(result);
 		bool needClause = isInRange;
 		if (function->overflowbehavior == SATC_OVERFLOWSETSFLAG || function->overflowbehavior == SATC_FLAGIFFOVERFLOW) {
 			needClause = true;

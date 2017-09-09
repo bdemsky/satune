@@ -151,7 +151,7 @@ void SATEncoder::encodeElementSATEncoder(Element *element) {
 }
 
 void SATEncoder::encodeElementFunctionSATEncoder(ElementFunction *function) {
-	switch (function->function->type) {
+	switch (function->getFunction()->type) {
 	case TABLEFUNC:
 		encodeTableElementFunctionSATEncoder(function);
 		break;

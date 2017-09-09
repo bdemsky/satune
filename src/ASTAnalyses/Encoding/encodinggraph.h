@@ -3,33 +3,51 @@
 #include "classlist.h"
 #include "structs.h"
 
+uint hashEncodingEdge(EncodingEdge *edge);
+bool equalsEncodingEdge(EncodingEdge *e1, EncodingEdge *e2);
+
+typedef Hashtable<EncodingEdge *, EncodingEdge *, uintptr_t, PTRSHIFT, hashEncodingEdge, equalsEncodingEdge> HashtableEdge;
+
 class EncodingGraph {
  public:
 	EncodingGraph(CSolver * solver);
-	EncodingNode * getNode(Element * element);
 	void buildGraph();
 	
 	CMEMALLOC;
  private:
 	CSolver * solver;
-	HashTableEncoding encodingMap;
+	HashtableEncoding encodingMap;
+	HashtableEdge edgeMap;
 	void processElement(Element *e);
+	void processFunction(ElementFunction *f);
+	void processPredicate(BooleanPredicate *b);
+	EncodingNode * createNode(Element *e);
 
 };
 
 class EncodingNode {
  public:
-	
+	EncodingNode(Set *_s);
+	void addElement(Element *e);
 	CMEMALLOC;
  private:
-	
+	Set *s;
+	HashsetElement elements;
 };
 
 class EncodingEdge {
  public:
-
+	EncodingEdge(EncodingNode *_l, EncodingNode *_r);
+	EncodingEdge(EncodingNode *_l, EncodingNode *_r, EncodingNode *_d);
 	CMEMALLOC;
  private:
+	EncodingNode *left;
+	EncodingNode *right;
+	EncodingNode *dst;
+	friend uint hashEncodingEdge(EncodingEdge *edge);
+	friend bool equalsEncodingEdge(EncodingEdge *e1, EncodingEdge *e2);
+
 };
+
 
 #endif

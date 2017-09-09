@@ -23,10 +23,10 @@ ElementSet::ElementSet(ASTNodeType _type, Set *s) :
 
 ElementFunction::ElementFunction(Function *_function, Element **array, uint numArrays, BooleanEdge _overflowstatus) :
 	Element(ELEMFUNCRETURN),
-	function(_function),
 	inputs(array, numArrays),
 	overflowstatus(_overflowstatus),
-	functionencoding(this) {
+	functionencoding(this),
+	function(_function) {
 }
 
 ElementConst::ElementConst(uint64_t _value, Set *_set) :
