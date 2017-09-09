@@ -52,5 +52,6 @@ class EncodingEdge {
 	uint numComparisons;
 	friend uint hashEncodingEdge(EncodingEdge *edge);
 	friend bool equalsEncodingEdge(EncodingEdge *e1, EncodingEdge *e2);
+	fiend class EncodingGraph;
 };
 #endif

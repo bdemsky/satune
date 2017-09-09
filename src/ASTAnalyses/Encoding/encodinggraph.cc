@@ -54,6 +54,7 @@ void EncodingGraph::processFunction(ElementFunction *ef) {
 			return;
 		EncodingNode *dst=createNode(ef);
 		EncodingEdge *edge=getEdge(left, right, dst);
+		edge->numArithOps++;
 	}
 }
 
@@ -68,7 +69,6 @@ EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, E
 }
 
 void EncodingGraph::processPredicate(BooleanPredicate *b) {
-
 }
 
 EncodingNode::EncodingNode(Set *_s) :
