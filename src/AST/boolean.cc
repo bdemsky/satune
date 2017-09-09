@@ -104,7 +104,8 @@ void BooleanVar::serialize(Serializer* serializer){
 		return;
 	serializer->addObject(this);
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	serializer->mywrite(this, sizeof(BooleanVar*));
+	BooleanVar* This = this;
+	serializer->mywrite(&This, sizeof(BooleanVar*));
 	serializer->mywrite(&vtype, sizeof(VarType));
 }
 
@@ -112,10 +113,19 @@ void BooleanOrder::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-//	order->serialize(serializer);
+	order->serialize(serializer);
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	serializer->mywrite(this, sizeof(BooleanOrder*));
+	BooleanOrder* This = this;
+	serializer->mywrite(&This, sizeof(BooleanOrder*));
 	serializer->mywrite(&order, sizeof(Order*));
 	serializer->mywrite(&first, sizeof(uint64_t));
 	serializer->mywrite(&second, sizeof(uint64_t));
+}
+
+void BooleanPredicate::serialize(Serializer* serializer){
+	ASSERT(0);
+}
+
+void BooleanLogic::serialize(Serializer* serializer){
+	ASSERT(0);
 }

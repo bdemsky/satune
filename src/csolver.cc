@@ -87,6 +87,7 @@ CSolver *CSolver::clone() {
 }
 
 void CSolver::serialize() {
+	model_print("serializing ...\n");
 	{
 		Serializer serializer("dump");
 		SetIteratorBooleanEdge *it = getConstraints();

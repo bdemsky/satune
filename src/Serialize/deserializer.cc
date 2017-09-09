@@ -26,10 +26,7 @@ Deserializer::~Deserializer() {
 }
 
 ssize_t Deserializer::myread(void* __buf, size_t __nbytes){
-	ssize_t t = read (filedesc, __buf, __nbytes);
-	write (1, __buf, __nbytes);
-	model_print("read\n");
-	return t;
+	return read (filedesc, __buf, __nbytes);
 }
 
 CSolver * Deserializer::deserialize(){
@@ -44,6 +41,12 @@ CSolver * Deserializer::deserialize(){
 				break;
 			case ORDERCONST:
 				deserializeBooleanOrder();
+				break;
+			case ORDERTYPE:
+				deserializeOrder();
+				break;
+			case SETTYPE:
+				deserializeSet();
 				break;
 			default:
 				ASSERT(0);
@@ -83,4 +86,40 @@ void Deserializer::deserializeBooleanOrder(){
 	ASSERT(map.contains(optr));
 	Order* order  = (Order*) map.get(optr);
 	map.put(bo_ptr, solver->orderConstraint(order, first, second).getBoolean());
+}
+
+void Deserializer::deserializeOrder(){
+	Order* o_ptr;
+	myread(&o_ptr, sizeof(Order*));
+	OrderType type;
+	myread(&type, sizeof(OrderType));
+	Set * set_ptr;
+	myread(&set_ptr, sizeof(Set *));
+	ASSERT(map.contains(set_ptr));
+	Set* set  = (Set*) map.get(set_ptr);
+	map.put(o_ptr, solver->createOrder(type, set));
+}
+
+void Deserializer::deserializeSet(){
+	Set *s_ptr;
+	myread(&s_ptr, sizeof(Set*));
+	VarType type;
+	myread(&type, sizeof(VarType));
+	bool isRange;
+	myread(&isRange, sizeof(bool));
+	uint64_t low;
+	myread(&low, sizeof(uint64_t));
+	uint64_t high;
+	myread(&high, sizeof(uint64_t));
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<uint64_t> members;
+	for(uint i=0; i<size; i++){
+		uint64_t mem;
+		myread(&mem, sizeof(uint64_t));
+		members.push(mem);
+	}
+	Set *set = isRange? solver->createRangeSet(type, low, high):
+		solver->createSet(type, members.expose(), size);
+	map.put(s_ptr, set);
 }

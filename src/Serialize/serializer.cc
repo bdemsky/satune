@@ -26,18 +26,14 @@ Serializer::~Serializer() {
 }
 
 void Serializer::mywrite(const void *__buf, size_t __n){
-	write (1, __buf, __n);
-	model_print("\n");
 	write (filedesc, __buf, __n);
 }
 
 
 void serializeBooleanEdge(Serializer* serializer, BooleanEdge& be){
-	if(serializer->isSerialized(be.getRaw()))
-		return;
-	serializer->addObject(be.getRaw());
 	be.getBoolean()->serialize(serializer);
 	ASTNodeType type = BOOLEANEDGE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	serializer->mywrite(be.getRaw(), sizeof(Boolean*));
+	Boolean* boolean = be.getRaw();
+	serializer->mywrite(&boolean, sizeof(Boolean*));
 }

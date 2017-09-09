@@ -11,8 +11,9 @@
 #include "classlist.h"
 #include "structs.h"
 #include "mymemory.h"
+#include "serializable.h"
 
-class Set {
+class Set : public Serializable {
 public:
 	Set(VarType t);
 	Set(VarType t, uint64_t *elements, uint num);
@@ -25,6 +26,7 @@ public:
 	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
 	virtual Set *clone(CSolver *solver, CloneMap *map);
+	virtual void serialize(Serializer* serializer);
 	CMEMALLOC;
 protected:
 	VarType type;
