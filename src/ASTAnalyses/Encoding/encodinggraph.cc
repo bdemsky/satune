@@ -2,6 +2,8 @@
 #include "iterator.h"
 #include "element.h"
 #include "function.h"
+#include "predicate.h"
+#include "set.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
@@ -58,6 +60,33 @@ void EncodingGraph::processFunction(ElementFunction *ef) {
 	}
 }
 
+void EncodingGraph::processPredicate(BooleanPredicate *b) {
+	Predicate *p=b->getPredicate();
+	if (p->type==OPERATORPRED) {
+		PredicateOperator *po=(PredicateOperator *)p;
+		ASSERT(b->inputs.getSize()==2);
+		EncodingNode *left=createNode(b->inputs.get(0));
+		EncodingNode *right=createNode(b->inputs.get(1));
+		if (left == NULL || right == NULL)
+			return;
+		EncodingEdge *edge=getEdge(left, right, NULL);
+		CompOp op=po->getOp();
+		switch(op) {
+		case SATC_EQUALS:
+			edge->numEquals++;
+			break;
+		case SATC_LT:
+		case SATC_LTE:
+		case SATC_GT:
+		case SATC_GTE:
+			edge->numComparisons++;
+			break;
+		default:
+			ASSERT(0);
+		}
+	}
+}
+
 EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst) {
 	EncodingEdge e(left, right, dst);
 	EncodingEdge *result = edgeMap.get(&e);
@@ -68,12 +97,13 @@ EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, E
 	return result;
 }
 
-void EncodingGraph::processPredicate(BooleanPredicate *b) {
-}
-
 EncodingNode::EncodingNode(Set *_s) :
 	s(_s),
 	numElements(0) {
+}
+
+uint EncodingNode::getSize() {
+	return s->getSize();
 }
 
 EncodingNode * EncodingGraph::createNode(Element *e) {

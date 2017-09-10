@@ -30,6 +30,7 @@ class EncodingNode {
  public:
 	EncodingNode(Set *_s);
 	void addElement(Element *e);
+	uint getSize();
 	CMEMALLOC;
  private:
 	Set *s;
@@ -52,6 +53,6 @@ class EncodingEdge {
 	uint numComparisons;
 	friend uint hashEncodingEdge(EncodingEdge *edge);
 	friend bool equalsEncodingEdge(EncodingEdge *e1, EncodingEdge *e2);
-	fiend class EncodingGraph;
+	friend class EncodingGraph;
 };
 #endif

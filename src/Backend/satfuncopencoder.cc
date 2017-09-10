@@ -204,7 +204,7 @@ Edge SATEncoder::encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constra
 	ElementEncoding *ee1 = getElementEncoding(elem1);
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
-	switch (predicate->op) {
+	switch (predicate->getOp()) {
 	case SATC_EQUALS:
 		return generateEquivNVConstraint(cnf, numVars, ee0->variables, ee1->variables);
 	case SATC_LT:

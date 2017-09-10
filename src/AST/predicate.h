@@ -21,9 +21,11 @@ public:
 	PredicateOperator(CompOp op, Set **domain, uint numDomain);
 	bool evalPredicateOperator(uint64_t *inputs);
 	Predicate *clone(CSolver *solver, CloneMap *map);
-	CompOp op;
+	CompOp getOp() {return op;}
 	Array<Set *> domains;
 	CMEMALLOC;
+ private:
+	CompOp op;
 };
 
 class PredicateTable : public Predicate {

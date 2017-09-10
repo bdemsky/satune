@@ -61,15 +61,15 @@ class BooleanPredicate : public Boolean {
 public:
 	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, BooleanEdge _undefinedStatus);
 	Boolean *clone(CSolver *solver, CloneMap *map);
-
+	Predicate *getPredicate() {return predicate;}
+	FunctionEncoding *getFunctionEncoding() {return &encoding;}
+	void updateParents();
+	CMEMALLOC;
+	
 	Predicate *predicate;
 	FunctionEncoding encoding;
 	Array<Element *> inputs;
 	BooleanEdge undefStatus;
-	FunctionEncoding *getFunctionEncoding() {return &encoding;}
-	void updateParents();
-
-	CMEMALLOC;
 };
 
 class BooleanLogic : public Boolean {

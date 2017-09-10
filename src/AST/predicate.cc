@@ -4,7 +4,7 @@
 #include "table.h"
 #include "csolver.h"
 
-PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED), op(_op), domains(domain, numDomain) {
+PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED), domains(domain, numDomain), op(_op) {
 }
 
 PredicateTable::PredicateTable(Table *_table, UndefinedBehavior _undefBehavior) : Predicate(TABLEPRED), table(_table), undefinedbehavior(_undefBehavior) {
