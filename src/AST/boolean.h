@@ -8,10 +8,9 @@
 #include "astnode.h"
 #include "functionencoding.h"
 #include "constraint.h"
-#include "serializable.h"
 #include "serializer.h"
 
-class Boolean : public ASTNode, public Serializable {
+class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}

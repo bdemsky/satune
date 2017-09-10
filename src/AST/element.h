@@ -15,6 +15,7 @@ public:
 	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
+	virtual void serialize(Serializer* serializer) =0;
 	virtual void updateParents() {}
 	virtual Set * getRange() = 0;
 	CMEMALLOC;
@@ -25,9 +26,10 @@ public:
 	ElementSet(ASTNodeType type, Set *s);
 	ElementSet(Set *s);
 	virtual Element *clone(CSolver *solver, CloneMap *map);
+	virtual void serialize(Serializer* serializer);
 	CMEMALLOC;
 	Set *getRange() {return set;}
- private:
+ protected:
 	Set *set;
 
 };
@@ -36,6 +38,7 @@ class ElementConst : public ElementSet {
 public:
 	ElementConst(uint64_t value, Set *_set);
 	uint64_t value;
+	virtual void serialize(Serializer* serializer);
 	Element *clone(CSolver *solver, CloneMap *map);
 	CMEMALLOC;
 };
@@ -48,6 +51,7 @@ public:
 	BooleanEdge overflowstatus;
 	FunctionEncoding functionencoding;
 	Element *clone(CSolver *solver, CloneMap *map);
+	virtual void serialize(Serializer* serializer);
 	Set * getRange();
 	void updateParents();
 	CMEMALLOC;

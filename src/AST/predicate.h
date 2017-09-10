@@ -12,6 +12,7 @@ public:
 	Predicate(PredicateType _type) : type(_type) {}
 	virtual ~Predicate() {}
 	virtual Predicate *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
+	virtual void serialize(Serializer* serializer) = 0;
 	PredicateType type;
 	CMEMALLOC;
 };
@@ -21,6 +22,7 @@ public:
 	PredicateOperator(CompOp op, Set **domain, uint numDomain);
 	bool evalPredicateOperator(uint64_t *inputs);
 	Predicate *clone(CSolver *solver, CloneMap *map);
+	virtual void serialize(Serializer* serializer);
 	CompOp op;
 	Array<Set *> domains;
 	CMEMALLOC;
@@ -30,6 +32,7 @@ class PredicateTable : public Predicate {
 public:
 	PredicateTable(Table *table, UndefinedBehavior undefBehavior);
 	Predicate *clone(CSolver *solver, CloneMap *map);
+	virtual void serialize(Serializer* serializer);
 	Table *table;
 	UndefinedBehavior undefinedbehavior;
 	CMEMALLOC;

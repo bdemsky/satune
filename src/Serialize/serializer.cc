@@ -30,7 +30,7 @@ void Serializer::mywrite(const void *__buf, size_t __n){
 }
 
 
-void serializeBooleanEdge(Serializer* serializer, BooleanEdge& be){
+void serializeBooleanEdge(Serializer* serializer, BooleanEdge be){
 	be.getBoolean()->serialize(serializer);
 	ASTNodeType type = BOOLEANEDGE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));

@@ -10,6 +10,9 @@
 #include "csolver.h"
 #include "unistd.h"
 #include "fcntl.h"
+#include "predicate.h"
+#include "table.h"
+#include "element.h"
 
 Deserializer::Deserializer(const char* file):
 	solver(new CSolver())
@@ -47,6 +50,36 @@ CSolver * Deserializer::deserialize(){
 				break;
 			case SETTYPE:
 				deserializeSet();
+				break;
+			case LOGICOP:
+				deserializeBooleanLogic();
+				break;
+			case PREDICATEOP:
+				deserializeBooleanPredicate();
+				break;
+			case PREDTABLETYPE:
+				deserializePredicateTable();
+				break;
+			case PREDOPERTYPE:
+				deserializePredicateOperator();
+				break;
+			case TABLETYPE:
+				deserializeTable();
+				break;
+			case ELEMSET:
+				deserializeElementSet();
+				break;
+			case ELEMCONST:
+				deserializeElementConst();
+				break;
+			case ELEMFUNCRETURN:
+				deserializeElementFunction();
+				break;
+			case FUNCOPTYPE:
+				deserializeFunctionOperator();
+				break;
+			case FUNCTABLETYPE:
+				deserializeFunctionTable();
 				break;
 			default:
 				ASSERT(0);
@@ -122,4 +155,203 @@ void Deserializer::deserializeSet(){
 	Set *set = isRange? solver->createRangeSet(type, low, high):
 		solver->createSet(type, members.expose(), size);
 	map.put(s_ptr, set);
+}
+
+void Deserializer::deserializeBooleanLogic(){
+	BooleanLogic *bl_ptr;
+	myread(&bl_ptr, sizeof(BooleanLogic *));
+	LogicOp op;
+	myread(&op, sizeof(LogicOp));
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<BooleanEdge> members;
+	for(uint i=0; i<size; i++){
+		
+	}
+	map.put(bl_ptr, solver->applyLogicalOperation(op, members.expose(), size).getBoolean());
+}
+
+void Deserializer::deserializeBooleanPredicate(){
+	BooleanPredicate *bp_ptr;
+	myread(&bp_ptr, sizeof(BooleanPredicate *));
+	Predicate* predicate;
+	myread(&predicate, sizeof(Predicate*));
+	ASSERT(map.contains(predicate));
+	predicate = (Predicate*) map.get(predicate);
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<Element*> members;
+	for(uint i=0; i<size; i++){
+		Element* input;
+		myread(&input, sizeof(Element *));
+		ASSERT(map.contains(input));
+		input = (Element*) map.get(input);
+		members.push(input);
+	}
+	
+	Boolean* stat_ptr;
+	myread(&stat_ptr, sizeof(Boolean *));
+	BooleanEdge tmp(stat_ptr);
+	bool isNegated = tmp.isNegated();
+	ASSERT(map.contains(tmp.getBoolean()));
+	stat_ptr = (Boolean*) map.get(tmp.getBoolean());
+	BooleanEdge res(stat_ptr);
+	BooleanEdge undefStatus = isNegated?res.negate():res;
+	
+	map.put(bp_ptr, solver->applyPredicateTable(predicate, members.expose(), size, undefStatus).getBoolean());
+}
+
+void Deserializer::deserializePredicateTable(){
+	PredicateTable *pt_ptr;
+	myread(&pt_ptr, sizeof(PredicateTable *));
+	Table* table;
+	myread(&table, sizeof(Table*));
+	ASSERT(map.contains(table));
+	table = (Table*) map.get(table);
+	UndefinedBehavior undefinedbehavior;
+	myread(&undefinedbehavior, sizeof(UndefinedBehavior));
+	
+	map.put(pt_ptr, solver->createPredicateTable(table, undefinedbehavior));
+}
+
+void Deserializer::deserializePredicateOperator(){
+	PredicateOperator *po_ptr;
+	myread(&po_ptr, sizeof(PredicateOperator *));
+	CompOp op;
+	myread(&op, sizeof(CompOp));
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<Set*> domains;
+	for(uint i=0; i<size; i++){
+		Set* domain;
+		myread(&domain, sizeof(Set*));
+		ASSERT(map.contains(domain));
+		domain = (Set*) map.get(domain);
+		domains.push(domain);
+	}
+
+	map.put(po_ptr, solver->createPredicateOperator(op, domains.expose(), size));
+}
+
+void Deserializer::deserializeTable(){
+	Table *t_ptr;
+	myread(&t_ptr, sizeof(Table *));
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<Set*> domains;
+	for(uint i=0; i<size; i++){
+		Set* domain;
+		myread(&domain, sizeof(Set*));
+		ASSERT(map.contains(domain));
+		domain = (Set*) map.get(domain);
+		domains.push(domain);
+	}
+	Set* range;
+	myread(&range, sizeof(Set*));
+	ASSERT(map.contains(range));
+	range = (Set*) map.get(range);
+	Table* table = solver->createTable(domains.expose(), size, range);
+	myread(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		uint64_t output;
+		myread(&output, sizeof(uint64_t));
+		uint inputSize;
+		myread(&inputSize, sizeof(uint));
+		Vector<uint64_t> inputs;
+		inputs.setSize(inputSize);
+		myread(inputs.expose(), sizeof(uint64_t)*inputSize);
+		ASSERT(0);
+		table->addNewTableEntry(inputs.expose(), inputSize, output);
+	}
+	
+	map.put(t_ptr, table);
+}
+
+
+void Deserializer::deserializeElementSet(){
+	ElementSet* es_ptr;
+	myread(&es_ptr, sizeof(ElementSet*));
+	Set * set;
+	myread(&set, sizeof(Set *));
+	ASSERT(map.contains(set));
+	set  = (Set*) map.get(set);
+	map.put(es_ptr, solver->getElementVar(set));
+}
+
+void Deserializer::deserializeElementConst(){
+	ElementSet* es_ptr;
+	myread(&es_ptr, sizeof(ElementSet*));
+	VarType type;
+	myread(&type, sizeof(VarType));
+	uint64_t value;
+	myread(&value, sizeof(uint64_t));
+	map.put(es_ptr, solver->getElementConst(type, value));
+}
+
+void Deserializer::deserializeElementFunction(){
+	ElementFunction *ef_ptr;
+	myread(&ef_ptr, sizeof(ElementFunction *));
+	Function *function;
+	myread(&function, sizeof(Function*));
+	ASSERT(map.contains(function));
+	function = (Function*) map.get(function);
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<Element*> members;
+	for(uint i=0; i<size; i++){
+		Element* input;
+		myread(&input, sizeof(Element *));
+		ASSERT(map.contains(input));
+		input = (Element*) map.get(input);
+		members.push(input);
+	}
+	
+	Boolean* overflowstatus;
+	myread(&overflowstatus, sizeof(Boolean *));
+	BooleanEdge tmp(overflowstatus);
+	bool isNegated = tmp.isNegated();
+	ASSERT(map.contains(tmp.getBoolean()));
+	overflowstatus = (Boolean*) map.get(tmp.getBoolean());
+	BooleanEdge res(overflowstatus);
+	BooleanEdge undefStatus = isNegated?res.negate():res;
+	
+	map.put(ef_ptr, solver->applyFunction(function, members.expose(), size, undefStatus));
+}
+
+
+void Deserializer::deserializeFunctionOperator(){
+	FunctionOperator *fo_ptr;
+	myread(&fo_ptr, sizeof(FunctionOperator *));
+	ArithOp op;
+	myread(&op, sizeof(ArithOp));
+	uint size;
+	myread(&size, sizeof(uint));
+	Vector<Set*> domains;
+	for(uint i=0; i<size; i++){
+		Set* domain;
+		myread(&domain, sizeof(Set*));
+		ASSERT(map.contains(domain));
+		domain = (Set*) map.get(domain);
+		domains.push(domain);
+	}
+	Set* range;
+	myread(&range, sizeof(Set*));
+	ASSERT(map.contains(range));
+	range = (Set*) map.get(range);
+	OverFlowBehavior overflowbehavior;
+	myread(&overflowbehavior, sizeof(OverFlowBehavior));
+	map.put(fo_ptr, solver->createFunctionOperator(op, domains.expose(), size, range, overflowbehavior));
+}
+
+void Deserializer::deserializeFunctionTable(){
+	FunctionTable *ft_ptr;
+	myread(&ft_ptr, sizeof(FunctionTable *));
+	Table* table;
+	myread(&table, sizeof(Table*));
+	ASSERT(map.contains(table));
+	table = (Table*) map.get(table);
+	UndefinedBehavior undefinedbehavior;
+	myread(&undefinedbehavior, sizeof(UndefinedBehavior));
+	
+	map.put(ft_ptr, solver->completeTable(table, undefinedbehavior));
 }

@@ -29,6 +29,16 @@ private:
 	void deserializeBooleanOrder();
 	void deserializeOrder();
 	void deserializeSet();
+	void deserializeBooleanLogic();
+	void deserializeBooleanPredicate();
+	void deserializePredicateTable();
+	void deserializePredicateOperator();
+	void deserializeTable();
+	void deserializeElementSet();
+	void deserializeElementConst();
+	void deserializeElementFunction();
+	void deserializeFunctionOperator();
+	void deserializeFunctionTable();
 	CSolver *solver;
 	int filedesc;
 	CloneMap map;
