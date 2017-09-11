@@ -25,6 +25,7 @@ public:
 	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
 	virtual Set *clone(CSolver *solver, CloneMap *map);
+	virtual void serialize(Serializer* serializer);
 	CMEMALLOC;
 protected:
 	VarType type;

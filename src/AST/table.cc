@@ -5,6 +5,7 @@
 #include "set.h"
 #include "mutableset.h"
 #include "csolver.h"
+#include "serializer.h"
 
 Table::Table(Set **_domains, uint numDomain, Set *_range) :
 	domains(_domains, numDomain),
@@ -57,4 +58,42 @@ Table::~Table() {
 	delete iterator;
 	delete entries;
 }
+
+
+
+void Table::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	uint size = domains.getSize();
+	for(uint i=0; i<size; i++){
+		Set* domain = domains.get(i);
+		domain->serialize(serializer);
+	}
+	if(range!= NULL)
+		range->serialize(serializer);
+	
+	ASTNodeType type = TABLETYPE;	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	Table* This = this;
+	serializer->mywrite(&This, sizeof(Table*));
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		Set* domain = domains.get(i);
+		serializer->mywrite(&domain, sizeof(Set*));
+	}
+	serializer->mywrite(&range, sizeof(Set*));
+	size = entries->getSize();
+	serializer->mywrite(&size, sizeof(uint));
+	SetIteratorTableEntry* iterator = getEntries();
+	while(iterator->hasNext()){
+		TableEntry* entry = iterator->next();
+		serializer->mywrite(&entry->output, sizeof(uint64_t));
+		serializer->mywrite(&entry->inputSize, sizeof(uint));
+		serializer->mywrite(entry->inputs, sizeof(uint64_t) * entry->inputSize);
+	}
+	delete iterator;
+}
+
 

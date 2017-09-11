@@ -45,3 +45,16 @@ Order::~Order() {
 		delete graph;
 	}
 }
+
+void Order::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	set->serialize(serializer);
+	ASTNodeType asttype = ORDERTYPE;
+	serializer->mywrite(&asttype, sizeof(ASTNodeType));
+	Order* This = this;
+	serializer->mywrite(&This, sizeof(Order*));
+	serializer->mywrite(&type, sizeof(OrderType));
+	serializer->mywrite(&set, sizeof(Set *));
+}

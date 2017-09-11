@@ -26,6 +26,8 @@ class Tuner;
 class Transformer;
 class Set;
 class BooleanLogic;
+class Serializer;
+
 typedef uint64_t VarType;
 typedef unsigned int uint;
 

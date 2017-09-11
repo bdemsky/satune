@@ -63,3 +63,58 @@ void ElementFunction::updateParents() {
 Set * ElementFunction::getRange() {
 	return function->getRange();
 }
+
+void ElementSet::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	set->serialize(serializer);
+	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	ElementSet *This = this;
+	serializer->mywrite(&This, sizeof(ElementSet*));
+	serializer->mywrite(&set, sizeof(Set*));
+}
+
+void ElementConst::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	set->serialize(serializer);
+	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	ElementSet *This = this;
+	serializer->mywrite(&This, sizeof(ElementSet*));
+	VarType type = set->getType();
+	serializer->mywrite(&type, sizeof(VarType));
+	serializer->mywrite(&value, sizeof(uint64_t));
+}
+
+void ElementFunction::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+
+	function->serialize(serializer);
+	uint size = inputs.getSize();
+	for(uint i=0; i<size; i++){
+		Element *input = inputs.get(i);
+		input->serialize(serializer);
+	}
+	serializeBooleanEdge(serializer, overflowstatus);
+	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	ElementFunction *This = this;
+	serializer->mywrite(&This, sizeof(ElementFunction *));
+	serializer->mywrite(&function, sizeof(Function *));
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		Element* input = inputs.get(i);
+		serializer->mywrite(&input, sizeof(Element*));
+	}
+	Boolean* overflowstat = overflowstatus.getRaw();
+	serializer->mywrite(&overflowstat, sizeof(Boolean*));
+}
+

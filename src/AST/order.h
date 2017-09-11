@@ -8,14 +8,15 @@
 #include "boolean.h"
 #include "orderpair.h"
 
-class Order {
+class Order{
 public:
 	Order(OrderType type, Set *set);
-	~Order();
+	virtual ~Order();
 	OrderType type;
 	Set *set;
 	OrderGraph *graph;
 	Order *clone(CSolver *solver, CloneMap *map);
+	void serialize(Serializer *serializer );
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding encoding;
 	void setOrderResolver(OrderResolver *_resolver) { ASSERT(encoding.resolver == NULL); encoding.resolver = _resolver;};
