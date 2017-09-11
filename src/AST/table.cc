@@ -93,6 +93,7 @@ void Table::serialize(Serializer* serializer){
 		serializer->mywrite(&entry->inputSize, sizeof(uint));
 		serializer->mywrite(entry->inputs, sizeof(uint64_t) * entry->inputSize);
 	}
+	delete iterator;
 }
 
 
