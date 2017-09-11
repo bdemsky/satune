@@ -26,6 +26,10 @@ Deserializer::Deserializer(const char* file):
 
 Deserializer::~Deserializer() {
 	delete solver;
+	
+	if (-1 == close(filedesc)){
+		exit(-1);
+	}
 }
 
 ssize_t Deserializer::myread(void* __buf, size_t __nbytes){

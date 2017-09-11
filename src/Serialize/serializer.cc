@@ -12,7 +12,7 @@
 #include "boolean.h"
 
 Serializer::Serializer(const char *file) {
-	filedesc = open(file, O_WRONLY | O_CREAT, 0666);
+	filedesc = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
  
 	if (filedesc < 0) {
 		exit(-1);
