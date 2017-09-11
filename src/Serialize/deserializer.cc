@@ -170,7 +170,14 @@ void Deserializer::deserializeBooleanLogic(){
 	myread(&size, sizeof(uint));
 	Vector<BooleanEdge> members;
 	for(uint i=0; i<size; i++){
-		
+		Boolean* member;
+		myread(&member, sizeof(Boolean *));
+		BooleanEdge tmp(member);
+		bool isNegated = tmp.isNegated();
+		ASSERT(map.contains(tmp.getBoolean()));
+		member = (Boolean*) map.get(tmp.getBoolean());
+		BooleanEdge res(member);
+		members.push( isNegated?res.negate():res );
 	}
 	map.put(bl_ptr, solver->applyLogicalOperation(op, members.expose(), size).getBoolean());
 }
