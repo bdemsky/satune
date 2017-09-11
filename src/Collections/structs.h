@@ -27,6 +27,7 @@ typedef Hashset<Boolean *, uintptr_t, PTRSHIFT> HashsetBoolean;
 typedef Hashset<Element *, uintptr_t, PTRSHIFT> HashsetElement;
 typedef SetIterator<Boolean *, uintptr_t, PTRSHIFT> SetIteratorBoolean;
 typedef Hashset<uint64_t, uint64_t, 0> Hashset64Int;
+typedef SetIterator<uint64_t, uint64_t, 0> SetIterator64Int;
 
 
 typedef Hashtable<OrderNode *, HashsetOrderNode *, uintptr_t, PTRSHIFT> HashtableNodeToNodeSet;

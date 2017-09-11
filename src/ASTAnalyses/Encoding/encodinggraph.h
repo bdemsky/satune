@@ -58,6 +58,8 @@ class EncodingSubGraph {
 	EncodingSubGraph();
 	void addNode(EncodingNode *n);
 	SetIteratorEncodingNode * nodeIterator();
+	uint computeIntersection(Set *s);
+	uint computeIntersection(EncodingSubGraph *g);
 	
 	CMEMALLOC;
  private:
@@ -87,7 +89,5 @@ class EncodingEdge {
 	friend bool equalsEncodingEdge(EncodingEdge *e1, EncodingEdge *e2);
 	friend class EncodingGraph;
 };
-
-
 
 #endif

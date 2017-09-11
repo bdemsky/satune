@@ -222,3 +222,31 @@ void EncodingSubGraph::addNode(EncodingNode *n) {
 SetIteratorEncodingNode * EncodingSubGraph::nodeIterator() {
 	return nodes.iterator();
 }
+
+uint EncodingSubGraph::computeIntersection(Set *s) {
+	uint intersect=0;
+	uint size=s->getSize();
+	for(uint i=0; i<size; i++) {
+		uint64_t val=s->getElement(i);
+		if (values.contains(val))
+			intersect++;
+	}
+	return intersect;
+}
+
+uint EncodingSubGraph::computeIntersection(EncodingSubGraph *g) {
+	if (g->values.getSize() > values.getSize()) {
+		//iterator over smaller set
+		return g->computeIntersection(this);
+	}
+	
+	uint intersect=0;
+	SetIterator64Int * iter=g->values.iterator();
+	while(iter->hasNext()) {
+		uint64_t val=iter->next();
+		if (values.contains(val))
+			intersect++;
+	}
+	delete iter;
+	return intersect;
+}
