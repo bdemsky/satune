@@ -112,8 +112,6 @@ VarType EncodingNode::getType() {
 	return s->getType();
 }
 
-//ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
-
 static TunableDesc NodeEncodingType(ELEM_UNASSIGNED, BINARYVAL, ELEM_UNASSIGNED);
 
 EncodingNode * EncodingGraph::createNode(Element *e) {

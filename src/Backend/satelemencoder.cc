@@ -13,9 +13,6 @@ Edge SATEncoder::getElementValueConstraint(Element *elem, uint64_t value) {
 		return getElementValueUnaryConstraint(elem, value);
 	case BINARYINDEX:
 		return getElementValueBinaryIndexConstraint(elem, value);
-	case ONEHOTBINARY:
-		ASSERT(0);
-		break;
 	case BINARYVAL:
 		return getElementValueBinaryValueConstraint(elem, value);
 		break;
@@ -137,8 +134,6 @@ void SATEncoder::generateElementEncoding(Element *element) {
 		return;
 	case UNARY:
 		generateUnaryEncodingVars(encoding);
-		return;
-	case ONEHOTBINARY:
 		return;
 	case BINARYVAL:
 		generateBinaryValueEncodingVars(encoding);
