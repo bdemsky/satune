@@ -67,8 +67,6 @@ uint64_t getElementValueSATTranslator(CSolver *This, Element *element) {
 		return getElementValueUnarySATTranslator(This, elemEnc);
 	case BINARYINDEX:
 		return getElementValueBinaryIndexSATTranslator(This, elemEnc);
-	case ONEHOTBINARY:
-		ASSERT(0);
 		break;
 	case BINARYVAL:
 		ASSERT(0);

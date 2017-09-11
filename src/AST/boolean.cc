@@ -114,6 +114,7 @@ void BooleanOrder::serialize(Serializer* serializer){
 		return;
 	serializer->addObject(this);
 	order->serialize(serializer);
+	
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	BooleanOrder* This = this;
 	serializer->mywrite(&This, sizeof(BooleanOrder*));
@@ -123,9 +124,48 @@ void BooleanOrder::serialize(Serializer* serializer){
 }
 
 void BooleanPredicate::serialize(Serializer* serializer){
-	ASSERT(0);
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	predicate->serialize(serializer);
+	uint size = inputs.getSize();
+	for(uint i=0; i<size; i++){
+		Element* input = inputs.get(i);
+		input->serialize(serializer);
+	}
+	serializeBooleanEdge(serializer, undefStatus);
+	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	BooleanPredicate* This = this;
+	serializer->mywrite(&This, sizeof(BooleanPredicate*));
+	serializer->mywrite(&predicate, sizeof(Predicate *));
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		Element *input = inputs.get(i);
+		serializer->mywrite(&input, sizeof(Element *));
+	}
+	Boolean* undefStat = undefStatus!= BooleanEdge(NULL)?undefStatus.getRaw() : NULL;
+	serializer->mywrite(&undefStat, sizeof(Boolean*));
 }
 
 void BooleanLogic::serialize(Serializer* serializer){
-	ASSERT(0);
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	uint size = inputs.getSize();
+	for(uint i=0; i<size; i++){
+		BooleanEdge input = inputs.get(i);
+		serializeBooleanEdge(serializer, input);
+	}
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	BooleanLogic* This = this;
+	serializer->mywrite(&This, sizeof(BooleanLogic*));
+	serializer->mywrite(&op, sizeof(LogicOp));
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		Boolean* input = inputs.get(i).getRaw();
+		serializer->mywrite(&input, sizeof(Boolean*));
+	}
 }
+

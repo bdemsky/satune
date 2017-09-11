@@ -228,7 +228,7 @@ BooleanEdge CSolver::getBooleanFalse() {
 }
 
 BooleanEdge CSolver::applyPredicate(Predicate *predicate, Element **inputs, uint numInputs) {
-	return applyPredicateTable(predicate, inputs, numInputs, NULL);
+	return applyPredicateTable(predicate, inputs, numInputs, BooleanEdge(NULL));
 }
 
 BooleanEdge CSolver::applyPredicateTable(Predicate *predicate, Element **inputs, uint numInputs, BooleanEdge undefinedStatus) {

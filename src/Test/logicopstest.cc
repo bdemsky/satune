@@ -24,6 +24,7 @@ int main(int numargs, char **argv) {
 	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, barray4, 2));
 	BooleanEdge barray5[] = {b1, b4};
 	solver->addConstraint(solver->applyLogicalOperation(SATC_XOR, barray5, 2));
+	solver->serialize();
 	if (solver->solve() == 1)
 		printf("b1=%d b2=%d b3=%d b4=%d\n",
 					 solver->getBooleanValue(b1), solver->getBooleanValue(b2),

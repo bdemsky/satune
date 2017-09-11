@@ -49,6 +49,7 @@ int main(int numargs, char **argv) {
 	Element *inputs2 [] = {e4, e3};
 	BooleanEdge pred = solver->applyPredicate(lte, inputs2, 2);
 	solver->addConstraint(pred);
+	solver->serialize();
 
 	if (solver->solve() == 1)
 		printf("e1=%" PRIu64 " e2=%" PRIu64 " e3=%" PRIu64 " e4=%" PRIu64 " overFlow:%d\n",

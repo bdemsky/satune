@@ -4,7 +4,7 @@
 #include "table.h"
 #include "csolver.h"
 
-PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED), op(_op), domains(domain, numDomain) {
+PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED), domains(domain, numDomain), op(_op) {
 }
 
 PredicateTable::PredicateTable(Table *_table, UndefinedBehavior _undefBehavior) : Predicate(TABLEPRED), table(_table), undefinedbehavior(_undefBehavior) {
@@ -50,3 +50,42 @@ Predicate *PredicateTable::clone(CSolver *solver, CloneMap *map) {
 	map->put(this, p);
 	return p;
 }
+
+void PredicateTable::serialize(Serializer* serializer){	
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	table->serialize(serializer);
+	
+	ASTNodeType type = PREDTABLETYPE;	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	PredicateTable* This = this;
+	serializer->mywrite(&This, sizeof(PredicateTable*));
+	serializer->mywrite(&table, sizeof(Table *));
+	serializer->mywrite(&undefinedbehavior, sizeof(UndefinedBehavior));
+}
+
+void PredicateOperator::serialize(Serializer* serializer){	
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	uint size = domains.getSize();
+	for(uint i=0; i<size; i++){
+		Set* domain = domains.get(i);
+		domain->serialize(serializer);
+	}
+		
+	ASTNodeType type = PREDOPERTYPE;	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	PredicateOperator* This = this;
+	serializer->mywrite(&This, sizeof(PredicateOperator*));
+	serializer->mywrite(&op, sizeof(CompOp));
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		Set* domain = domains.get(i);
+		serializer->mywrite(&domain, sizeof(Set*));
+	}
+}
+

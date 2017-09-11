@@ -7,9 +7,8 @@
 #include "orderencoding.h"
 #include "boolean.h"
 #include "orderpair.h"
-#include "serializable.h"
 
-class Order : public Serializable {
+class Order{
 public:
 	Order(OrderType type, Set *set);
 	virtual ~Order();

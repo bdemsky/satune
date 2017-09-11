@@ -2,6 +2,7 @@
 #include "table.h"
 #include "set.h"
 #include "csolver.h"
+#include "serializer.h"
 
 FunctionOperator::FunctionOperator(ArithOp _op, Set **domain, uint numDomain, Set *_range, OverFlowBehavior _overflowbehavior) :
 	Function(OPERATORFUNC),
@@ -63,4 +64,46 @@ Function *FunctionTable::clone(CSolver *solver, CloneMap *map) {
 
 Set * FunctionTable::getRange() {
 	return table->getRange();
+}
+
+void FunctionTable::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	table->serialize(serializer);
+	
+	ASTNodeType type = FUNCTABLETYPE;	
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	FunctionTable* This = this;
+	serializer->mywrite(&This, sizeof(FunctionTable*));
+	serializer->mywrite(&table, sizeof(Table *));
+	serializer->mywrite(&undefBehavior, sizeof(UndefinedBehavior));
+	
+}
+
+void FunctionOperator::serialize(Serializer* serializer){
+	if(serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	
+	uint size = domains.getSize();
+	for(uint i=0; i<size; i++){
+		Set* domain = domains.get(i);
+		domain->serialize(serializer);
+	}
+	range->serialize(serializer);
+	
+	ASTNodeType nodeType = FUNCOPTYPE; 
+	serializer->mywrite(&nodeType, sizeof(ASTNodeType));
+	FunctionOperator* This = this;
+	serializer->mywrite(&This, sizeof(FunctionOperator*));
+	serializer->mywrite(&op, sizeof(ArithOp));
+	serializer->mywrite(&size, sizeof(uint));
+	for(uint i=0; i<size; i++){
+		Set *domain = domains.get(i);
+		serializer->mywrite(&domain, sizeof(Set *));
+	}
+	serializer->mywrite(&range, sizeof(Set *));
+	serializer->mywrite(&overflowbehavior, sizeof(OverFlowBehavior));
 }

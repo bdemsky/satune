@@ -11,9 +11,8 @@
 #include "classlist.h"
 #include "structs.h"
 #include "mymemory.h"
-#include "serializable.h"
 
-class Set : public Serializable {
+class Set {
 public:
 	Set(VarType t);
 	Set(VarType t, uint64_t *elements, uint num);

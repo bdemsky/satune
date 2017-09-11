@@ -8,10 +8,9 @@
 #include "astnode.h"
 #include "functionencoding.h"
 #include "constraint.h"
-#include "serializable.h"
 #include "serializer.h"
 
-class Boolean : public ASTNode, public Serializable {
+class Boolean : public ASTNode {
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
@@ -66,16 +65,17 @@ class BooleanPredicate : public Boolean {
 public:
 	BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, BooleanEdge _undefinedStatus);
 	Boolean *clone(CSolver *solver, CloneMap *map);
+	Predicate *getPredicate() {return predicate;}
+	FunctionEncoding *getFunctionEncoding() {return &encoding;}
+	void updateParents();
 	void serialize(Serializer *serializer );
+	
+	CMEMALLOC;
 
 	Predicate *predicate;
 	FunctionEncoding encoding;
 	Array<Element *> inputs;
 	BooleanEdge undefStatus;
-	FunctionEncoding *getFunctionEncoding() {return &encoding;}
-	void updateParents();
-
-	CMEMALLOC;
 };
 
 class BooleanLogic : public Boolean {

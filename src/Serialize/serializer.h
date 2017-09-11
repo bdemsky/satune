@@ -9,7 +9,9 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 #include "mymemory.h"
+#include "classlist.h"
 #include "structs.h"
+
 
 class Serializer {
 public:
@@ -31,7 +33,7 @@ inline bool Serializer::isSerialized(void* obj){
 
 
 
-void serializeBooleanEdge(Serializer* serializer, BooleanEdge& be);
+void serializeBooleanEdge(Serializer* serializer, BooleanEdge be);
 
 #endif /* SERIALIZER_H */
 

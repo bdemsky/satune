@@ -4,12 +4,6 @@
 #include "naiveencoder.h"
 #include "constraint.h"
 
-enum ElementEncodingType {
-	ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
-};
-
-typedef enum ElementEncodingType ElementEncodingType;
-
 class ElementEncoding {
 public:
 	ElementEncoding(Element *element);
