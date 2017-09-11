@@ -7,6 +7,7 @@
 class TunableSetting {
 public:
 	TunableSetting(VarType type, TunableParam param);
+	TunableSetting(VarType type1, VarType type2, TunableParam param);
 	TunableSetting(TunableParam param);
 	TunableSetting(TunableSetting *ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
@@ -14,7 +15,8 @@ public:
 	CMEMALLOC;
 private:
 	bool hasVar;
-	VarType type;
+	VarType type1;
+	VarType type2;
 	TunableParam param;
 	int lowValue;
 	int highValue;
@@ -37,6 +39,7 @@ public:
 	~SearchTuner();
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
+	int getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor);
 	SearchTuner *copyUsed();
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}

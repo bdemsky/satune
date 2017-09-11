@@ -4,6 +4,8 @@
 #include "function.h"
 #include "predicate.h"
 #include "set.h"
+#include "csolver.h"
+#include "tunable.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
@@ -106,6 +108,14 @@ uint EncodingNode::getSize() {
 	return s->getSize();
 }
 
+VarType EncodingNode::getType() {
+	return s->getType();
+}
+
+//ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, ONEHOTBINARY, BINARYVAL
+
+static TunableDesc NodeEncodingType(ELEM_UNASSIGNED, BINARYVAL, ELEM_UNASSIGNED);
+
 EncodingNode * EncodingGraph::createNode(Element *e) {
 	if (e->type == ELEMCONST)
 		return NULL;
@@ -113,6 +123,7 @@ EncodingNode * EncodingGraph::createNode(Element *e) {
 	EncodingNode *n = encodingMap.get(s);
 	if (n == NULL) {
 		n = new EncodingNode(s);
+		n->setEncoding((ElementEncodingType)solver->getTuner()->getVarTunable(n->getType(), NODEENCODING, &NodeEncodingType));
 		encodingMap.put(s, n);
 	}
 	n->addElement(e);

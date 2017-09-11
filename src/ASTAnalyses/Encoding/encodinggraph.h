@@ -31,11 +31,15 @@ class EncodingNode {
 	EncodingNode(Set *_s);
 	void addElement(Element *e);
 	uint getSize();
+	VarType getType();
+	void setEncoding(ElementEncodingType e) {encoding=e;}
+	
 	CMEMALLOC;
  private:
 	Set *s;
 	HashsetElement elements;
 	uint numElements;
+	ElementEncodingType encoding;
 	friend class EncodingGraph;
 };
 

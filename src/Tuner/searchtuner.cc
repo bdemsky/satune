@@ -2,19 +2,29 @@
 
 TunableSetting::TunableSetting(VarType _type, TunableParam _param) :
 	hasVar(true),
-	type(_type),
+	type1(_type),
+	type2(0),
+	param(_param) {
+}
+
+TunableSetting::TunableSetting(VarType _type1, VarType _type2, TunableParam _param) :
+	hasVar(true),
+	type1(_type1),
+	type2(_type2),
 	param(_param) {
 }
 
 TunableSetting::TunableSetting(TunableParam _param) :
 	hasVar(false),
-	type(0),
+	type1(0),
+	type2(0),
 	param(_param) {
 }
 
 TunableSetting::TunableSetting(TunableSetting *ts) :
 	hasVar(ts->hasVar),
-	type(ts->type),
+	type1(ts->type1),
+	type2(ts->type2),
 	param(ts->param),
 	lowValue(ts->lowValue),
 	highValue(ts->highValue),
@@ -32,19 +42,21 @@ void TunableSetting::setDecision(int _low, int _high, int _default, int _selecti
 
 void TunableSetting::print() {
 	if (hasVar) {
-		model_print("Type %" PRIu64 ", ", type);
+		model_print("Type1 %" PRIu64 ", ", type1);
+		model_print("Type2 %" PRIu64 ", ", type2);
 	}
 	model_print("Param %u = %u\n", param, selectedValue);
 }
 
 unsigned int tunableSettingHash(TunableSetting *setting) {
-	return setting->hasVar ^ setting->type ^ setting->param;
+	return setting->hasVar ^ setting->type1 ^ setting->type2 ^ setting->param;
 }
 
 bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
 	return setting1->hasVar == setting2->hasVar &&
-				 setting1->type == setting2->type &&
-				 setting1->param == setting2->param;
+		setting1->type1 == setting2->type1 &&
+		setting1->type2 == setting2->type2 &&
+		setting1->param == setting2->param;
 }
 
 SearchTuner::SearchTuner() {
@@ -88,12 +100,17 @@ int SearchTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
 }
 
 int SearchTuner::getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor) {
-	TunableSetting setting(vartype, param);
+	return getVarTunable(vartype, 0, param, descriptor);
+}
+
+int SearchTuner::getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor) {
+	TunableSetting setting(vartype1, vartype2, param);
 	TunableSetting *result = usedSettings.get(&setting);
 	if (result == NULL) {
 		result = settings.get(&setting);
 		if ( result == NULL) {
-			result = new TunableSetting(vartype, param);
+			result = new
+				TunableSetting(vartype1, vartype2, param);
 			uint value = descriptor->lowValue + (random() % (1 + descriptor->highValue - descriptor->lowValue));
 			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
 			settings.add(result);
