@@ -71,7 +71,8 @@ void Table::serialize(Serializer* serializer){
 		Set* domain = domains.get(i);
 		domain->serialize(serializer);
 	}
-	range->serialize(serializer);
+	if(range!= NULL)
+		range->serialize(serializer);
 	
 	ASTNodeType type = TABLETYPE;	
 	serializer->mywrite(&type, sizeof(ASTNodeType));
@@ -91,7 +92,6 @@ void Table::serialize(Serializer* serializer){
 		serializer->mywrite(&entry->output, sizeof(uint64_t));
 		serializer->mywrite(&entry->inputSize, sizeof(uint));
 		serializer->mywrite(entry->inputs, sizeof(uint64_t) * entry->inputSize);
-		ASSERT(0);
 	}
 }
 

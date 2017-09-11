@@ -114,6 +114,7 @@ void BooleanOrder::serialize(Serializer* serializer){
 		return;
 	serializer->addObject(this);
 	order->serialize(serializer);
+	
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	BooleanOrder* This = this;
 	serializer->mywrite(&This, sizeof(BooleanOrder*));
@@ -144,7 +145,7 @@ void BooleanPredicate::serialize(Serializer* serializer){
 		Element *input = inputs.get(i);
 		serializer->mywrite(&input, sizeof(Element *));
 	}
-	Boolean* undefStat = undefStatus.getRaw();
+	Boolean* undefStat = undefStatus!= BooleanEdge(NULL)?undefStatus.getRaw() : NULL;
 	serializer->mywrite(&undefStat, sizeof(Boolean*));
 }
 

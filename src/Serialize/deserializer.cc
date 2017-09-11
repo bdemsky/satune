@@ -110,14 +110,14 @@ void Deserializer::deserializeBooleanVar(){
 void Deserializer::deserializeBooleanOrder(){
 	BooleanOrder* bo_ptr;
 	myread(&bo_ptr, sizeof(BooleanOrder*));
-	Order* optr;
-	myread(&optr, sizeof(Order*));
+	Order* order;
+	myread(&order, sizeof(Order*));
+	ASSERT(map.contains(order));
+	order  = (Order*) map.get(order);
 	uint64_t first;
 	myread(&first, sizeof(uint64_t));
 	uint64_t second;
 	myread(&second, sizeof(uint64_t));
-	ASSERT(map.contains(optr));
-	Order* order  = (Order*) map.get(optr);
 	map.put(bo_ptr, solver->orderConstraint(order, first, second).getBoolean());
 }
 
@@ -191,13 +191,17 @@ void Deserializer::deserializeBooleanPredicate(){
 	
 	Boolean* stat_ptr;
 	myread(&stat_ptr, sizeof(Boolean *));
-	BooleanEdge tmp(stat_ptr);
-	bool isNegated = tmp.isNegated();
-	ASSERT(map.contains(tmp.getBoolean()));
-	stat_ptr = (Boolean*) map.get(tmp.getBoolean());
-	BooleanEdge res(stat_ptr);
-	BooleanEdge undefStatus = isNegated?res.negate():res;
-	
+	BooleanEdge undefStatus;
+	if(stat_ptr != NULL){
+		BooleanEdge tmp(stat_ptr);
+		bool isNegated = tmp.isNegated();
+		ASSERT(map.contains(tmp.getBoolean()));
+		stat_ptr = (Boolean*) map.get(tmp.getBoolean());
+		BooleanEdge res(stat_ptr);
+		undefStatus = isNegated?res.negate():res;
+	} else {
+		undefStatus = NULL;
+	}
 	map.put(bp_ptr, solver->applyPredicateTable(predicate, members.expose(), size, undefStatus).getBoolean());
 }
 
@@ -248,8 +252,10 @@ void Deserializer::deserializeTable(){
 	}
 	Set* range;
 	myread(&range, sizeof(Set*));
-	ASSERT(map.contains(range));
-	range = (Set*) map.get(range);
+	if(range != NULL){
+		ASSERT(map.contains(range));
+		range = (Set*) map.get(range);
+	}
 	Table* table = solver->createTable(domains.expose(), size, range);
 	myread(&size, sizeof(uint));
 	for(uint i=0; i<size; i++){
@@ -260,7 +266,6 @@ void Deserializer::deserializeTable(){
 		Vector<uint64_t> inputs;
 		inputs.setSize(inputSize);
 		myread(inputs.expose(), sizeof(uint64_t)*inputSize);
-		ASSERT(0);
 		table->addNewTableEntry(inputs.expose(), inputSize, output);
 	}
 	
