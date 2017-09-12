@@ -128,9 +128,9 @@ MutableSet *CSolver::createMutableSet(VarType type) {
 	return set;
 }
 
-void CSolver::addItem(MutableSet *set, uint64_t element) {
-	set->addElementMSet(element);
-}
+//void CSolver::addItem(MutableSet *set, uint64_t element) {
+//	set->addElementMSet(element);
+//}
 
 uint64_t CSolver::createUniqueItem(MutableSet *set) {
 	uint64_t element = set->getNewUniqueItem();

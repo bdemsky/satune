@@ -14,7 +14,8 @@ Set *MutableSet::clone(CSolver *solver, CloneMap *map) {
 		return s;
 	s = solver->createMutableSet(type);
 	for (uint i = 0; i < members->getSize(); i++) {
-		solver->addItem((MutableSet *) s, members->get(i));
+		((MutableSet *)s)->addElementMSet(members->get(i));
+		//		solver->addItem((MutableSet *) s, members->get(i));
 	}
 	map->put(this, s);
 	return s;
