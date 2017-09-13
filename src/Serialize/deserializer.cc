@@ -13,6 +13,7 @@
 #include "predicate.h"
 #include "table.h"
 #include "element.h"
+#include "mutableset.h"
 
 Deserializer::Deserializer(const char* file):
 	solver(new CSolver())
@@ -148,16 +149,28 @@ void Deserializer::deserializeSet(){
 	myread(&low, sizeof(uint64_t));
 	uint64_t high;
 	myread(&high, sizeof(uint64_t));
+	bool isMutable;
+	myread(&isMutable, sizeof(bool));
+	Set *set;
+	if(isMutable){
+		set = new MutableSet(type);
+	}
 	uint size;
 	myread(&size, sizeof(uint));
 	Vector<uint64_t> members;
 	for(uint i=0; i<size; i++){
 		uint64_t mem;
 		myread(&mem, sizeof(uint64_t));
-		members.push(mem);
+		if(isMutable) {
+			((MutableSet*) set)->addElementMSet(mem);
+		}else {
+			members.push(mem);
+		}
 	}
-	Set *set = isRange? solver->createRangeSet(type, low, high):
-		solver->createSet(type, members.expose(), size);
+	if(!isMutable){
+		set = isRange? solver->createRangeSet(type, low, high):
+			solver->createSet(type, members.expose(), size);
+	}
 	map.put(s_ptr, set);
 }
 
