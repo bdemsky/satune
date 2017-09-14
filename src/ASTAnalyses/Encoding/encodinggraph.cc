@@ -7,6 +7,7 @@
 #include "csolver.h"
 #include "tunable.h"
 #include "qsort.h"
+#include "subgraph.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
@@ -303,57 +304,4 @@ uint64_t EncodingEdge::getValue() const {
 	return numEquals * min + numComparisons * lSize * rSize;
 }
 
-EncodingSubGraph::EncodingSubGraph() :
-	encodingSize(0),
-	numElements(0) {
-}
 
-uint EncodingSubGraph::estimateNewSize(EncodingSubGraph *sg) {
-	uint newSize=0;
-	SetIteratorEncodingNode * nit = sg->nodes.iterator();
-	while(nit->hasNext()) {
-		EncodingNode *en = nit->next();
-		uint size=estimateNewSize(en);
-		if (size > newSize)
-			newSize = size;
-	}
-	delete nit;
-	return newSize;
-}
-
-uint EncodingSubGraph::estimateNewSize(EncodingNode *n) {
-	SetIteratorEncodingEdge * eeit = n->edges.iterator();
-	uint newsize=n->getSize();
-	while(eeit->hasNext()) {
-		EncodingEdge * ee = eeit->next();
-		if (ee->left != NULL && ee->left != n && nodes.contains(ee->left)) {
-			uint intersectSize = n->s->getUnionSize(ee->left->s);
-			if (intersectSize > newsize)
-				newsize = intersectSize;
-		}
-		if (ee->right != NULL && ee->right != n && nodes.contains(ee->right)) {
-			uint intersectSize = n->s->getUnionSize(ee->right->s);
-			if (intersectSize > newsize)
-				newsize = intersectSize;
-		}
-		if (ee->dst != NULL && ee->dst != n && nodes.contains(ee->dst)) {
-			uint intersectSize = n->s->getUnionSize(ee->dst->s);
-			if (intersectSize > newsize)
-				newsize = intersectSize;
-		}
-	}
-	delete eeit;
-	return newsize;
-}
-
-void EncodingSubGraph::addNode(EncodingNode *n) {
-	nodes.add(n);
-	uint newSize=estimateNewSize(n);
-	numElements += n->elements.getSize();
-	if (newSize > encodingSize)
-		encodingSize=newSize;
-}
-
-SetIteratorEncodingNode * EncodingSubGraph::nodeIterator() {
-	return nodes.iterator();
-}
