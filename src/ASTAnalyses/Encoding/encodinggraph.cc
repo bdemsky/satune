@@ -41,6 +41,7 @@ void EncodingGraph::buildGraph() {
 		}
 	}
 	bsdqsort(edgeVector.expose(), edgeVector.getSize(), sizeof(EncodingEdge *), sortEncodingEdge);
+	decideEdges();
 }
 
 void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
@@ -142,14 +143,18 @@ void EncodingGraph::decideEdges() {
 	uint size=edgeVector.getSize();
 	for(uint i=0; i<size; i++) {
 		EncodingEdge *ee = edgeVector.get(i);
-		if (ee->encoding != EDGE_UNASSIGNED)
+		EncodingNode *left = ee->left;
+		EncodingNode *right = ee->right;
+		
+		if (ee->encoding != EDGE_UNASSIGNED ||
+				left->encoding != BINARYINDEX ||
+				right->encoding != BINARYINDEX)
 			continue;
 		
 		uint64_t eeValue = ee->getValue();
 		if (eeValue == 0)
 			return;
-		EncodingNode *left = ee->left;
-		EncodingNode *right = ee->right;
+
 		EncodingSubGraph *leftGraph = graphMap.get(left);
 		EncodingSubGraph *rightGraph = graphMap.get(right);
 		if (leftGraph == NULL && rightGraph !=NULL) {
