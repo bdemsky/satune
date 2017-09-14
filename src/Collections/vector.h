@@ -81,7 +81,7 @@
 	void setVector ## name(Vector ## name * vector, uint index, type item) { \
 		vector->array[index] = item;                                          \
 	}                                                                     \
-	uint getSizeVector ## name(Vector ## name * vector) {                  \
+	uint getSizeVector ## name(const Vector ## name * vector) {						\
 		return vector->size;                                                \
 	}                                                                     \
 	void deleteVector ## name(Vector ## name * vector) {                     \

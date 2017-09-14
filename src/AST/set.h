@@ -24,6 +24,7 @@ public:
 	uint64_t getNewUniqueItem() {return low++;}
 	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
+	uint getUnionSize(Set *s);
 	virtual Set *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serializer);
 	CMEMALLOC;

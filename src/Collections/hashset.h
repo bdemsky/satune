@@ -205,11 +205,11 @@ public:
 		return true;
 	}
 
-	unsigned int getSize() {
+	unsigned int getSize() const {
 		return table->getSize();
 	}
 
-	bool isEmpty() {
+	bool isEmpty() const {
 		return getSize() == 0;
 	}
 

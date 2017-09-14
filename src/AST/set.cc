@@ -82,6 +82,31 @@ Set *Set::clone(CSolver *solver, CloneMap *map) {
 	return s;
 }
 
+uint Set::getUnionSize(Set *s) {
+	uint sSize = s->getSize();
+	uint thisSize = getSize();
+	uint sIndex = 0;
+	uint thisIndex = 0;
+	uint sum = 0;
+	uint64_t sValue = s->getElement(sIndex);
+	uint64_t thisValue = getElement(thisIndex);
+	while(thisIndex < thisSize && sIndex < sSize) {
+		if (sValue < thisValue) {
+			sValue = s->getElement(++sIndex);
+			sum++;
+		} else if (thisValue < sValue) {
+			thisValue = getElement(++thisIndex);
+			sum++;
+		} else {
+			thisValue = getElement(++thisIndex);
+			sValue = s->getElement(++sIndex);
+			sum++;
+		}
+	}
+	sum += (thisSize - thisIndex) + (sSize - sIndex);
+	
+	return sum;
+}
 
 void Set::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))

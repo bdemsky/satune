@@ -6,11 +6,23 @@
 #include "set.h"
 #include "csolver.h"
 #include "tunable.h"
+#include "qsort.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
-	
+}
 
+int sortEncodingEdge(const void * p1, const void *p2) {
+	const EncodingEdge * e1 = * (const EncodingEdge **) p1;
+	const EncodingEdge * e2 = * (const EncodingEdge **) p2;
+	uint64_t v1 = e1->getValue();
+	uint64_t v2 = e2->getValue();
+	if (v1 < v2)
+		return 1;
+	else if (v1 == v2)
+		return 0;
+	else
+		return -1;
 }
 
 void EncodingGraph::buildGraph() {
@@ -28,6 +40,7 @@ void EncodingGraph::buildGraph() {
 			ASSERT(0);
 		}
 	}
+	bsdqsort(edgeVector.expose(), edgeVector.getSize(), sizeof(EncodingEdge *), sortEncodingEdge);
 }
 
 void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
@@ -120,6 +133,66 @@ void EncodingGraph::processPredicate(BooleanPredicate *b) {
 	}
 }
 
+uint convertSize(uint cost) {
+	cost = 1.2 * cost; // fudge factor
+	return NEXTPOW2(cost);
+}
+
+void EncodingGraph::decideEdges() {
+	uint size=edgeVector.getSize();
+	for(uint i=0; i<size; i++) {
+		EncodingEdge *ee = edgeVector.get(i);
+		if (ee->encoding != EDGE_UNASSIGNED)
+			continue;
+		
+		uint64_t eeValue = ee->getValue();
+		if (eeValue == 0)
+			return;
+		EncodingNode *left = ee->left;
+		EncodingNode *right = ee->right;
+		EncodingSubGraph *leftGraph = graphMap.get(left);
+		EncodingSubGraph *rightGraph = graphMap.get(right);
+		if (leftGraph == NULL && rightGraph !=NULL) {
+			EncodingNode *tmp = left; left=right; right=tmp;
+			EncodingSubGraph *tmpsg = leftGraph; leftGraph = rightGraph; rightGraph = tmpsg;
+		}
+
+		uint leftSize=0, rightSize=0, newSize=0;
+		uint64_t totalCost=0;
+		if (leftGraph == NULL && rightGraph == NULL) {
+			leftSize=convertSize(left->getSize());
+			rightSize=convertSize(right->getSize());
+			newSize=convertSize(left->s->getUnionSize(right->s));
+			newSize=(leftSize > newSize) ? leftSize: newSize;
+			newSize=(rightSize > newSize) ? rightSize: newSize;
+			totalCost = (newSize - leftSize) * left->elements.getSize() +
+				(newSize - rightSize) * right->elements.getSize();
+		} else if (leftGraph != NULL && rightGraph == NULL) {
+			leftSize=convertSize(leftGraph->encodingSize);
+			rightSize=convertSize(right->getSize());
+			newSize=convertSize(leftGraph->estimateNewSize(right));
+			newSize=(leftSize > newSize) ? leftSize: newSize;
+			newSize=(rightSize > newSize) ? rightSize: newSize;
+			totalCost = (newSize - leftSize) * leftGraph->numElements +
+				(newSize - rightSize) * right->elements.getSize();
+		} else {
+			//Neither are null
+			leftSize=convertSize(leftGraph->encodingSize);
+			rightSize=convertSize(rightGraph->encodingSize);
+			newSize=convertSize(leftGraph->estimateNewSize(rightGraph));
+			newSize=(leftSize > newSize) ? leftSize: newSize;
+			newSize=(rightSize > newSize) ? rightSize: newSize;
+			totalCost = (newSize - leftSize) * leftGraph->numElements +
+				(newSize - rightSize) * rightGraph->numElements;
+		}
+		double conversionfactor = 0.5;
+		if ((totalCost * conversionfactor) < eeValue) {
+			//add the edge
+			mergeNodes(left, right);
+		}
+	}
+}
+
 static TunableDesc EdgeEncodingDesc(EDGE_UNASSIGNED, EDGE_MATCH, EDGE_UNASSIGNED);
 
 EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst) {
@@ -134,22 +207,36 @@ EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, E
 			v2=v1;
 			v1=tmp;
 		}
-		result->setEncoding((EdgeEncodingType)solver->getTuner()->getVarTunable(v1, v2, EDGEENCODING, &EdgeEncodingDesc));
+
+		if ((left != NULL && left->encoding==BINARYINDEX) &&
+				(right != NULL) && right->encoding==BINARYINDEX) {
+			EdgeEncodingType type=(EdgeEncodingType)solver->getTuner()->getVarTunable(v1, v2, EDGEENCODING, &EdgeEncodingDesc);
+			result->setEncoding(type);
+			if (type == EDGE_MATCH) {
+				mergeNodes(left, right);
+			}
+		}
 		edgeMap.put(result, result);
+		edgeVector.push(result);
+		if (left != NULL)
+			left->edges.add(result);
+		if (right != NULL)
+			right->edges.add(result);
+		if (dst != NULL)
+			dst->edges.add(result);
 	}
 	return result;
 }
 
 EncodingNode::EncodingNode(Set *_s) :
-	s(_s),
-	numElements(0) {
+	s(_s) {
 }
 
-uint EncodingNode::getSize() {
+uint EncodingNode::getSize() const {
 	return s->getSize();
 }
 
-VarType EncodingNode::getType() {
+VarType EncodingNode::getType() const {
 	return s->getType();
 }
 
@@ -166,8 +253,6 @@ EncodingNode * EncodingGraph::createNode(Element *e) {
 		encodingMap.put(s, n);
 	}
 	n->addElement(e);
-	if (discovered.add(e))
-		n->numElements++;
 	return n;
 }
 
@@ -206,47 +291,64 @@ bool equalsEncodingEdge(EncodingEdge *e1, EncodingEdge *e2) {
 	return e1->left == e2->left && e1->right == e2->right && e1->dst == e2->dst;
 }
 
-EncodingSubGraph::EncodingSubGraph() {
+uint64_t EncodingEdge::getValue() const {
+	uint lSize = (left != NULL) ? left->getSize() : 1;
+	uint rSize = (right != NULL) ? right->getSize() : 1;
+	uint min = (lSize < rSize) ? lSize : rSize;
+	return numEquals * min + numComparisons * lSize * rSize;
+}
+
+EncodingSubGraph::EncodingSubGraph() :
+	encodingSize(0),
+	numElements(0) {
+}
+
+uint EncodingSubGraph::estimateNewSize(EncodingSubGraph *sg) {
+	uint newSize=0;
+	SetIteratorEncodingNode * nit = sg->nodes.iterator();
+	while(nit->hasNext()) {
+		EncodingNode *en = nit->next();
+		uint size=estimateNewSize(en);
+		if (size > newSize)
+			newSize = size;
+	}
+	delete nit;
+	return newSize;
+}
+
+uint EncodingSubGraph::estimateNewSize(EncodingNode *n) {
+	SetIteratorEncodingEdge * eeit = n->edges.iterator();
+	uint newsize=n->getSize();
+	while(eeit->hasNext()) {
+		EncodingEdge * ee = eeit->next();
+		if (ee->left != NULL && ee->left != n && nodes.contains(ee->left)) {
+			uint intersectSize = n->s->getUnionSize(ee->left->s);
+			if (intersectSize > newsize)
+				newsize = intersectSize;
+		}
+		if (ee->right != NULL && ee->right != n && nodes.contains(ee->right)) {
+			uint intersectSize = n->s->getUnionSize(ee->right->s);
+			if (intersectSize > newsize)
+				newsize = intersectSize;
+		}
+		if (ee->dst != NULL && ee->dst != n && nodes.contains(ee->dst)) {
+			uint intersectSize = n->s->getUnionSize(ee->dst->s);
+			if (intersectSize > newsize)
+				newsize = intersectSize;
+		}
+	}
+	delete eeit;
+	return newsize;
 }
 
 void EncodingSubGraph::addNode(EncodingNode *n) {
 	nodes.add(n);
-	Set *s=n->s;
-	uint size=s->getSize();
-	for(uint i=0; i<size; i++) {
-		uint64_t val=s->getElement(i);
-		values.add(val);
-	}
+	uint newSize=estimateNewSize(n);
+	numElements += n->elements.getSize();
+	if (newSize > encodingSize)
+		encodingSize=newSize;
 }
 
 SetIteratorEncodingNode * EncodingSubGraph::nodeIterator() {
 	return nodes.iterator();
-}
-
-uint EncodingSubGraph::computeIntersection(Set *s) {
-	uint intersect=0;
-	uint size=s->getSize();
-	for(uint i=0; i<size; i++) {
-		uint64_t val=s->getElement(i);
-		if (values.contains(val))
-			intersect++;
-	}
-	return intersect;
-}
-
-uint EncodingSubGraph::computeIntersection(EncodingSubGraph *g) {
-	if (g->values.getSize() > values.getSize()) {
-		//iterator over smaller set
-		return g->computeIntersection(this);
-	}
-	
-	uint intersect=0;
-	SetIterator64Int * iter=g->values.iterator();
-	while(iter->hasNext()) {
-		uint64_t val=iter->next();
-		if (values.contains(val))
-			intersect++;
-	}
-	delete iter;
-	return intersect;
 }

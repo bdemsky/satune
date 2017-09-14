@@ -27,7 +27,7 @@ public:
 		}
 	}
 
-	type get(uint index) {
+	type get(uint index) const {
 		return array[index];
 	}
 
@@ -35,7 +35,7 @@ public:
 		array[index] = item;
 	}
 
-	uint getSize() {
+	uint getSize() const {
 		return size;
 	}
 
