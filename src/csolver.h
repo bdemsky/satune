@@ -34,6 +34,11 @@ public:
 	    items to the set. */
 
 	uint64_t createUniqueItem(MutableSet *set);
+	
+	/**
+	 * Freeze and finalize the mutableSet ...
+	 */
+	void finalizeMutableSet(MutableSet* set);
 
 	/** This function creates an element variable over a set. */
 

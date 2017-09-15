@@ -4,10 +4,6 @@
 #include "serializer.h"
 #include "qsort.h"
 
-Set::Set(VarType t) : type(t), isRange(false), low(0), high(0) {
-	members = new Vector<uint64_t>();
-}
-
 int intcompare(const void *p1, const void *p2) {
 	uint64_t a=*(uint64_t const *) p1;
 	uint64_t b=*(uint64_t const *) p2;
@@ -18,6 +14,11 @@ int intcompare(const void *p1, const void *p2) {
 	else
 		return 1;
 }
+
+Set::Set(VarType t) : type(t), isRange(false), low(0), high(0) {
+	members = new Vector<uint64_t>();
+}
+
 
 Set::Set(VarType t, uint64_t *elements, uint num) : type(t), isRange(false), low(0), high(0) {
 	members = new Vector<uint64_t>(num, elements);

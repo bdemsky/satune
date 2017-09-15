@@ -37,5 +37,6 @@ protected:
 
 };
 
+int intcompare(const void *p1, const void *p2);
 #endif/* SET_H */
 

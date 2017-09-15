@@ -138,6 +138,10 @@ uint64_t CSolver::createUniqueItem(MutableSet *set) {
 	return element;
 }
 
+void CSolver::finalizeMutableSet(MutableSet* set){
+	set->finalize();
+}
+
 Element *CSolver::getElementVar(Set *set) {
 	Element *element = new ElementSet(set);
 	allElements.push(element);
