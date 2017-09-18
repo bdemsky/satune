@@ -32,12 +32,24 @@ bool Set::exists(uint64_t element) {
 	if (isRange) {
 		return element >= low && element <= high;
 	} else {
-		uint size = members->getSize();
-		for (uint i = 0; i < size; i++) {
-			if (element == members->get(i))
+		//Use Binary Search
+		uint low=0;
+		uint high=members->getSize()-1;
+		while(true) {
+			uint middle=(low+high)/2;
+			uint64_t val=members->get(middle);
+			if (element < val) {
+				high=middle;
+				if (middle==low)
+					return false;
+			} else if (element > val) {
+				low=middle;
+				if (middle==high)
+					return false;
+			} else {
 				return true;
+			}
 		}
-		return false;
 	}
 }
 

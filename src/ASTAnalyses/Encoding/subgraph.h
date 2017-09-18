@@ -13,9 +13,12 @@ class NodeValuePair {
 
 class EncodingValue {
  public:
+ EncodingValue(uint64_t _val) : value(_val), inComparison(false) {}
 	void merge(EncodingValue *value);
 	uint64_t value;
+	bool inComparison;
 	HashsetEncodingNode nodes;
+	Vector<EncodingValue *> larger;
 };
 
 uint hashNodeValuePair(NodeValuePair *nvp);
@@ -35,8 +38,10 @@ class EncodingSubGraph {
 	uint estimateNewSize(EncodingNode *n);
 	uint estimateNewSize(EncodingSubGraph *sg);
 	void traverseValue(EncodingNode *node, uint64_t value);
+	void computeEncodingValue();
+	void computeInequalities();
+	void generateComparison(EncodingNode *left, EncodingNode *right);
 
-	
 	HashsetEncodingNode nodes;
 	NVPMap map;
 	uint encodingSize;
