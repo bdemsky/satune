@@ -27,13 +27,18 @@ public:
 	/** This function adds a new item to a set. */
 
 	//Deprecating this unless we need it...
-	//	void addItem(MutableSet *set, uint64_t element);
+	void addItem(MutableSet *set, uint64_t element);
 
 	/** This function adds a new unique item to the set and returns it.
 	    This function cannot be used in conjunction with manually adding
 	    items to the set. */
 
 	uint64_t createUniqueItem(MutableSet *set);
+	
+	/**
+	 * Freeze and finalize the mutableSet ...
+	 */
+	void finalizeMutableSet(MutableSet* set);
 
 	/** This function creates an element variable over a set. */
 
