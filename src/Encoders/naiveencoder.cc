@@ -63,7 +63,7 @@ void naiveEncodingPredicate(BooleanPredicate *This) {
 }
 
 void naiveEncodingElement(Element *This) {
-	ElementEncoding *encoding = getElementEncoding(This);
+	ElementEncoding *encoding = This->getElementEncoding();
 	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
 		encoding->setElementEncodingType(BINARYINDEX);
 		encoding->encodingArrayInitialization();
@@ -75,9 +75,9 @@ void naiveEncodingElement(Element *This) {
 			Element *element = function->inputs.get(i);
 			naiveEncodingElement(element);
 		}
-		FunctionEncoding *encoding = getElementFunctionEncoding(function);
+		FunctionEncoding *encoding = function->getElementFunctionEncoding();
 		if (encoding->getFunctionEncodingType() == FUNC_UNASSIGNED)
-			getElementFunctionEncoding(function)->setFunctionEncodingType(ENUMERATEIMPLICATIONS);
+			function->getElementFunctionEncoding()->setFunctionEncodingType(ENUMERATEIMPLICATIONS);
 	}
 }
 

@@ -131,7 +131,7 @@ Edge SATEncoder::encodeTablePredicateSATEncoder(BooleanPredicate *constraint) {
 
 void SATEncoder::encodeElementSATEncoder(Element *element) {
 	/* Check to see if we have already encoded this element. */
-	if (getElementEncoding(element)->variables != NULL)
+	if (element->getElementEncoding()->variables != NULL)
 		return;
 
 	/* Need to encode. */
@@ -164,7 +164,7 @@ void SATEncoder::encodeElementFunctionSATEncoder(ElementFunction *function) {
 }
 
 void SATEncoder::encodeTableElementFunctionSATEncoder(ElementFunction *function) {
-	switch (getElementFunctionEncoding(function)->type) {
+	switch (function->getElementFunctionEncoding()->type) {
 	case ENUMERATEIMPLICATIONS:
 		encodeEnumTableElemFunctionSATEncoder(function);
 		break;

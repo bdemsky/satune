@@ -200,8 +200,8 @@ Edge SATEncoder::encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constra
 	encodeElementSATEncoder(elem0);
 	Element *elem1 = constraint->inputs.get(1);
 	encodeElementSATEncoder(elem1);
-	ElementEncoding *ee0 = getElementEncoding(elem0);
-	ElementEncoding *ee1 = getElementEncoding(elem1);
+	ElementEncoding *ee0 = elem0->getElementEncoding();
+	ElementEncoding *ee1 = elem1->getElementEncoding();
 	ASSERT(ee0->numVars == ee1->numVars);
 	uint numVars = ee0->numVars;
 	switch (predicate->getOp()) {

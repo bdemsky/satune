@@ -6,6 +6,7 @@
 #include "set.h"
 #include "csolver.h"
 #include "tunable.h"
+#include "boolean.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
