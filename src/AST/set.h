@@ -24,6 +24,7 @@ public:
 	uint64_t getNewUniqueItem() {return low++;}
 	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
+	uint getUnionSize(Set *s);
 	virtual bool isMutableSet() {return false;}
 	virtual Set *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serializer);
@@ -34,7 +35,6 @@ protected:
 	uint64_t low;//also used to count unique items
 	uint64_t high;
 	Vector<uint64_t> *members;
-
 };
 
 int intcompare(const void *p1, const void *p2);

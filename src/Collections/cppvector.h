@@ -24,7 +24,7 @@ public:
 		size--;
 	}
 
-	type last() {
+	type last() const {
 		return array[size - 1];
 	}
 
@@ -49,7 +49,7 @@ public:
 		array[size++] = item;
 	}
 
-	type get(uint index) {
+	type get(uint index) const {
 		return array[index];
 	}
 
@@ -63,7 +63,7 @@ public:
 		array[index] = item;
 	}
 
-	uint getSize() {
+	uint getSize() const {
 		return size;
 	}
 

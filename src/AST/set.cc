@@ -33,12 +33,24 @@ bool Set::exists(uint64_t element) {
 	if (isRange) {
 		return element >= low && element <= high;
 	} else {
-		uint size = members->getSize();
-		for (uint i = 0; i < size; i++) {
-			if (element == members->get(i))
+		//Use Binary Search
+		uint low=0;
+		uint high=members->getSize()-1;
+		while(true) {
+			uint middle=(low+high)/2;
+			uint64_t val=members->get(middle);
+			if (element < val) {
+				high=middle;
+				if (middle==low)
+					return false;
+			} else if (element > val) {
+				low=middle;
+				if (middle==high)
+					return false;
+			} else {
 				return true;
+			}
 		}
-		return false;
 	}
 }
 
@@ -83,6 +95,31 @@ Set *Set::clone(CSolver *solver, CloneMap *map) {
 	return s;
 }
 
+uint Set::getUnionSize(Set *s) {
+	uint sSize = s->getSize();
+	uint thisSize = getSize();
+	uint sIndex = 0;
+	uint thisIndex = 0;
+	uint sum = 0;
+	uint64_t sValue = s->getElement(sIndex);
+	uint64_t thisValue = getElement(thisIndex);
+	while(thisIndex < thisSize && sIndex < sSize) {
+		if (sValue < thisValue) {
+			sValue = s->getElement(++sIndex);
+			sum++;
+		} else if (thisValue < sValue) {
+			thisValue = getElement(++thisIndex);
+			sum++;
+		} else {
+			thisValue = getElement(++thisIndex);
+			sValue = s->getElement(++sIndex);
+			sum++;
+		}
+	}
+	sum += (thisSize - thisIndex) + (sSize - sIndex);
+	
+	return sum;
+}
 
 void Set::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))
