@@ -8,6 +8,7 @@ class EncodingGraph {
  public:
 	EncodingGraph(CSolver * solver);
 	void buildGraph();
+	void encode();
 	
 	CMEMALLOC;
  private:
@@ -17,7 +18,8 @@ class EncodingGraph {
 	Vector<EncodingEdge *> edgeVector;
 	HashsetElement discovered;
 	HashtableNodeToSubGraph graphMap;
-
+	HashsetEncodingSubGraph subgraphs;
+	
 	void decideEdges();
 	void mergeNodes(EncodingNode *first, EncodingNode *second);
 	void processElement(Element *e);

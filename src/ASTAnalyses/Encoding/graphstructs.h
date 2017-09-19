@@ -15,4 +15,6 @@ typedef Hashset<EncodingEdge *, uintptr_t, PTRSHIFT> HashsetEncodingEdge;
 typedef SetIterator<EncodingEdge *, uintptr_t, PTRSHIFT> SetIteratorEncodingEdge;
 
 typedef Hashtable<EncodingNode *, EncodingSubGraph *, uintptr_t, PTRSHIFT> HashtableNodeToSubGraph;
+typedef Hashset<EncodingSubGraph *, uintptr_t, PTRSHIFT> HashsetEncodingSubGraph;
+typedef SetIterator<EncodingSubGraph *, uintptr_t, PTRSHIFT> SetIteratorEncodingSubGraph;
 #endif

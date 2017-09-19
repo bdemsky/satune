@@ -5,7 +5,8 @@
 
 EncodingSubGraph::EncodingSubGraph() :
 	encodingSize(0),
-	numElements(0) {
+	numElements(0),
+	maxEncodingVal(0) {
 }
 
 uint hashNodeValuePair(NodeValuePair *nvp) {
@@ -60,6 +61,8 @@ void EncodingSubGraph::solveEquals() {
 			if (!encodingArray.get(encoding))
 				break;
 		}
+		if (encoding > maxEncodingVal)
+			maxEncodingVal = encoding;
 		ev->encoding = encoding;
 		ev->assigned = true;
 	}
@@ -80,6 +83,8 @@ void EncodingSubGraph::solveComparisons() {
 				while(nextIt->hasNext()) {
 					EncodingValue *nextVal=nextIt->next();
 					if (nextVal->encoding < minVal) {
+						if (minVal > maxEncodingVal)
+							maxEncodingVal = minVal;
 						nextVal->encoding = minVal;
 						discovered.add(nextVal);
 						tovisit.push(nextVal);

@@ -8,6 +8,7 @@
 #include "tunable.h"
 #include "qsort.h"
 #include "subgraph.h"
+#include "elementencoding.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
@@ -45,11 +46,39 @@ void EncodingGraph::buildGraph() {
 	decideEdges();
 }
 
+void EncodingGraph::encode() {
+	SetIteratorEncodingSubGraph * itesg=subgraphs.iterator();
+	while(itesg->hasNext()) {
+		EncodingSubGraph *sg=itesg->next();
+		sg->encode();
+	}
+	delete itesg;
+
+	ElementIterator it(solver);
+	while(it.hasNext()) {
+		Element * e = it.next();
+		switch(e->type) {
+		case ELEMSET:
+		case ELEMFUNCRETURN: {
+			ElementEncoding *encoding=getElementEncoding(e);
+			if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
+				//Do assignment...
+			}
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	
+}
+
 void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 	EncodingSubGraph *graph1=graphMap.get(first);
 	EncodingSubGraph *graph2=graphMap.get(second);
 	if (graph1 == NULL && graph2 == NULL) {
 		graph1 = new EncodingSubGraph();
+		subgraphs.add(graph1);
 		graphMap.put(first, graph1);
 		graph1->addNode(first);
 	}
@@ -67,6 +96,7 @@ void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 			graph1->addNode(node);
 			graphMap.put(node, graph1);
 		}
+		subgraphs.remove(graph2);
 		delete nodeit;
 		delete graph2;
 	} else {

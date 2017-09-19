@@ -60,7 +60,8 @@ class EncodingSubGraph {
 	NVPMap map;
 	uint encodingSize;
 	uint numElements;
-
+	uint maxEncodingVal;
+	
 	friend class EncodingGraph;
 };
 
