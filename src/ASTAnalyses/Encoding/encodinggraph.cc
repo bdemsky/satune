@@ -62,7 +62,26 @@ void EncodingGraph::encode() {
 		case ELEMFUNCRETURN: {
 			ElementEncoding *encoding=getElementEncoding(e);
 			if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
-				//Do assignment...
+				EncodingNode *n = getNode(e);
+				ASSERT(n != NULL);
+				ElementEncodingType encodetype=n->getEncoding();
+				encoding->setElementEncodingType(encodetype);
+				if (encodetype == UNARY || encodetype == ONEHOT) {
+					encoding->encodingArrayInitialization();
+				} else if (encodetype == BINARYINDEX) {
+					EncodingSubGraph * subgraph = graphMap.get(n);
+					uint encodingSize = subgraph->getEncodingSize(n);
+					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
+					encoding->allocInUseArrayElement(paddedSize);
+					encoding->allocEncodingArrayElement(paddedSize);
+					Set * s=e->getRange();
+					for(uint i=0;i<s->getSize();i++) {
+						uint64_t value=s->getElement(i);
+						uint encodingIndex=subgraph->getEncoding(n, value);
+						encoding->setInUseElement(encodingIndex);
+						encoding->encodingArray[encodingIndex] = value;
+					}
+				}
 			}
 			break;
 		}
@@ -289,6 +308,14 @@ EncodingNode * EncodingGraph::createNode(Element *e) {
 		encodingMap.put(s, n);
 	}
 	n->addElement(e);
+	return n;
+}
+
+EncodingNode * EncodingGraph::getNode(Element *e) {
+	if (e->type == ELEMCONST)
+		return NULL;
+	Set *s = e->getRange();
+	EncodingNode *n = encodingMap.get(s);
 	return n;
 }
 

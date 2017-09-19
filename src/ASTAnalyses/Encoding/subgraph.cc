@@ -30,6 +30,12 @@ int sortEncodingValue(const void *p1, const void *p2) {
 		return 1;
 }
 
+uint EncodingSubGraph::getEncoding(EncodingNode *n, uint64_t val) {
+	NodeValuePair nvp(n, val);
+	EncodingValue *ev = map.get(&nvp);
+	return ev->encoding;
+}
+
 void EncodingSubGraph::solveEquals() {
 	Vector<EncodingValue *> toEncode;
 	Vector<bool> encodingArray;

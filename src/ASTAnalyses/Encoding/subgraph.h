@@ -40,6 +40,8 @@ class EncodingSubGraph {
 	void addNode(EncodingNode *n);
 	SetIteratorEncodingNode * nodeIterator();
 	void encode();
+	uint getEncoding(EncodingNode *n, uint64_t val);
+	uint getEncodingSize(EncodingNode *n) { return maxEncodingVal;}
 	
 	CMEMALLOC;
  private:

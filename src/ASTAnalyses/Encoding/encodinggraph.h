@@ -26,6 +26,7 @@ class EncodingGraph {
 	void processFunction(ElementFunction *f);
 	void processPredicate(BooleanPredicate *b);
 	EncodingNode * createNode(Element *e);
+	EncodingNode * getNode(Element *e);
 	EncodingEdge * getEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst);
 };
 
@@ -36,7 +37,7 @@ class EncodingNode {
 	uint getSize() const;
 	VarType getType() const;
 	void setEncoding(ElementEncodingType e) {encoding=e;}
-	
+	ElementEncodingType getEncoding() {return encoding;}
 	CMEMALLOC;
  private:
 	Set *s;
