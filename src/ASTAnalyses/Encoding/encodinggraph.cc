@@ -9,6 +9,7 @@
 #include "qsort.h"
 #include "subgraph.h"
 #include "elementencoding.h"
+#include "boolean.h"
 
 EncodingGraph::EncodingGraph(CSolver * _solver) :
 	solver(_solver) {
@@ -60,7 +61,7 @@ void EncodingGraph::encode() {
 		switch(e->type) {
 		case ELEMSET:
 		case ELEMFUNCRETURN: {
-			ElementEncoding *encoding=getElementEncoding(e);
+			ElementEncoding *encoding=e->getElementEncoding();
 			if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
 				EncodingNode *n = getNode(e);
 				ASSERT(n != NULL);

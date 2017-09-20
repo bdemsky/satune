@@ -4,9 +4,9 @@
 #include "mymemory.h"
 #include "structs.h"
 #include "astnode.h"
+#include "corestructs.h"
 #include "functionencoding.h"
 #include "elementencoding.h"
-#include "boolean.h"
 
 class Element : public ASTNode {
 public:
@@ -14,6 +14,7 @@ public:
 	virtual ~Element() {}
 	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
+	inline ElementEncoding *getElementEncoding(){ return &encoding; }
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
 	virtual void serialize(Serializer* serializer) =0;
 	virtual void updateParents() {}
@@ -54,16 +55,11 @@ public:
 	Set * getRange();
 	void updateParents();
 	Function * getFunction() {return function;}
+	inline FunctionEncoding *getElementFunctionEncoding() {return &functionencoding;}
 	CMEMALLOC;
  private:
 	Function *function;
 };
 
-static inline ElementEncoding *getElementEncoding(Element *e) {
-	return &e->encoding;
-}
 
-static inline FunctionEncoding *getElementFunctionEncoding(ElementFunction *func) {
-	return &func->functionencoding;
-}
 #endif

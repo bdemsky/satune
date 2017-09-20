@@ -21,6 +21,7 @@
 #include "preprocess.h"
 #include "serializer.h"
 #include "deserializer.h"
+#include "naiveencoder.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),

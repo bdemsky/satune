@@ -7,6 +7,7 @@
 #include "array.h"
 #include "corestructs.h"
 
+
 unsigned int table_entry_hash_function(TableEntry *This);
 bool table_entry_equals(TableEntry *key1, TableEntry *key2);
 unsigned int order_node_hash_function(OrderNode *This);

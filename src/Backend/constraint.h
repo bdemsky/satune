@@ -10,9 +10,6 @@
 
 typedef int Literal;
 
-struct Edge;
-typedef struct Edge Edge;
-
 struct Node;
 typedef struct Node Node;
 
