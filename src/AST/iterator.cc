@@ -72,7 +72,7 @@ ElementIterator::ElementIterator(CSolver *_solver) :
 	bit(_solver),
 	base(NULL),
 	baseindex(0) {
-	
+	updateNext();
 }
 
 ElementIterator::~ElementIterator() {
@@ -100,7 +100,8 @@ void ElementIterator::updateNext() {
 					if (discovered.add(e)) {
 						element.push(e);
 						index.push(0);
-					}
+					} else
+						continue;
 				}
 			} else {
 				if (bit.hasNext()) {

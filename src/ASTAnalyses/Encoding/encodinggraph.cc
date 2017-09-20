@@ -63,13 +63,16 @@ void EncodingGraph::encode() {
 			ElementEncoding *encoding=e->getElementEncoding();
 			if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
 				EncodingNode *n = getNode(e);
-				ASSERT(n != NULL);
+				if (n == NULL)
+					continue;
 				ElementEncodingType encodetype=n->getEncoding();
 				encoding->setElementEncodingType(encodetype);
 				if (encodetype == UNARY || encodetype == ONEHOT) {
 					encoding->encodingArrayInitialization();
 				} else if (encodetype == BINARYINDEX) {
 					EncodingSubGraph * subgraph = graphMap.get(n);
+					if (subgraph == NULL)
+						continue;
 					uint encodingSize = subgraph->getEncodingSize(n);
 					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
 					encoding->allocInUseArrayElement(paddedSize);

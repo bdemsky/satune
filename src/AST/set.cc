@@ -40,12 +40,12 @@ bool Set::exists(uint64_t element) {
 			uint middle=(low+high)/2;
 			uint64_t val=members->get(middle);
 			if (element < val) {
-				high=middle;
-				if (middle==low)
+				high=middle-1;
+				if (middle<=low)
 					return false;
 			} else if (element > val) {
-				low=middle;
-				if (middle==high)
+				low=middle+1;
+				if (middle>=high)
 					return false;
 			} else {
 				return true;
