@@ -118,6 +118,10 @@ Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange
 	return set;
 }
 
+VarType CSolver::getSetVarType(Set *set){
+	return set->getType();
+}
+
 Element *CSolver::createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange) {
 	Set *s = createRangeSet(type, lowrange, highrange);
 	return getElementVar(s);
@@ -148,6 +152,11 @@ Element *CSolver::getElementVar(Set *set) {
 	allElements.push(element);
 	return element;
 }
+
+Set* CSolver::getElementRange (Element* element){
+	return element->getRange();
+}
+
 
 Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	uint64_t array[] = {value};
@@ -430,8 +439,8 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
-	Preprocess pp(this);
-	pp.doTransform();
+//	Preprocess pp(this);
+//	pp.doTransform();
 	
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
@@ -439,9 +448,9 @@ int CSolver::solve() {
 	IntegerEncodingTransform iet(this);
 	iet.doTransform();
 
-	EncodingGraph eg(this);
-	eg.buildGraph();
-	eg.encode();
+//	EncodingGraph eg(this);
+//	eg.buildGraph();
+//	eg.encode();
 	
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);

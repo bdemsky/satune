@@ -18,6 +18,8 @@ public:
 
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
 
+	VarType getSetVarType(Set *set);
+	
 	Element *createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange);
 
 	/** This function creates a mutable set. */
@@ -46,6 +48,8 @@ public:
 
 	/** This function creates an element constrant. */
 	Element *getElementConst(VarType type, uint64_t value);
+	
+	Set* getElementRange (Element* element);
 
 	BooleanEdge getBooleanTrue();
 
