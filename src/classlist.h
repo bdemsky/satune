@@ -10,6 +10,7 @@
 #ifndef CLASSLIST_H
 #define CLASSLIST_H
 
+#include "mymemory.h"
 #include <inttypes.h>
 #include "classes.h"
 #include "astnode.h"
@@ -66,14 +67,9 @@ class EncodingGraph;
 class EncodingNode;
 class EncodingEdge;
 
-class ElementEncoding;
-class FunctionEncoding;
-
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 struct TableEntry;
 typedef struct TableEntry TableEntry;
 typedef int TunableParam;
-struct Edge;
-typedef struct Edge Edge;
 #endif

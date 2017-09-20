@@ -1,7 +1,8 @@
 #ifndef ELEMENTENCODING_H
 #define ELEMENTENCODING_H
 #include "classlist.h"
-#include "common.h"
+#include "naiveencoder.h"
+#include "constraint.h"
 
 class ElementEncoding {
 public:

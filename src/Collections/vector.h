@@ -18,7 +18,7 @@
 	type getVector ## name(Vector ## name * vector, uint index);           \
 	void setExpandVector ## name(Vector ## name * vector, uint index, type item); \
 	void setVector ## name(Vector ## name * vector, uint index, type item); \
-	uint getSizeVector ## name(Vector ## name * vector);                   \
+	uint getSizeVector ## name(const Vector ## name * vector);                   \
 	void setSizeVector ## name(Vector ## name * vector, uint size);        \
 	void deleteVector ## name(Vector ## name * vector);                    \
 	void clearVector ## name(Vector ## name * vector);                     \

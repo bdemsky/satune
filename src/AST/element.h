@@ -4,9 +4,9 @@
 #include "mymemory.h"
 #include "structs.h"
 #include "astnode.h"
-#include "corestructs.h"
 #include "functionencoding.h"
 #include "elementencoding.h"
+#include "boolean.h"
 
 class Element : public ASTNode {
 public:

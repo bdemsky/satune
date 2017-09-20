@@ -21,7 +21,7 @@
 #include "preprocess.h"
 #include "serializer.h"
 #include "deserializer.h"
-#include "naiveencoder.h"
+#include "encodinggraph.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -439,6 +439,10 @@ int CSolver::solve() {
 	IntegerEncodingTransform iet(this);
 	iet.doTransform();
 
+	EncodingGraph eg(this);
+	eg.buildGraph();
+	eg.encode();
+	
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();

@@ -5,7 +5,6 @@
 #include "function.h"
 #include "table.h"
 #include "csolver.h"
-#include "boolean.h"
 
 Element::Element(ASTNodeType _type) :
 	ASTNode(_type),
