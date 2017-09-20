@@ -20,6 +20,7 @@ class EncodingGraph {
 	HashtableNodeToSubGraph graphMap;
 	HashsetEncodingSubGraph subgraphs;
 	
+	void encodeParent(Element *e);
 	void decideEdges();
 	void mergeNodes(EncodingNode *first, EncodingNode *second);
 	void processElement(Element *e);
@@ -28,6 +29,7 @@ class EncodingGraph {
 	EncodingNode * createNode(Element *e);
 	EncodingNode * getNode(Element *e);
 	EncodingEdge * getEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst);
+	EncodingEdge * createEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst);
 };
 
 class EncodingNode {
@@ -57,6 +59,8 @@ class EncodingEdge {
 	EncodingEdge(EncodingNode *_l, EncodingNode *_r, EncodingNode *_d);
 	void setEncoding(EdgeEncodingType e) {encoding=e;}
 	uint64_t getValue() const;
+	EdgeEncodingType getEncoding() {return encoding;}
+
 	CMEMALLOC;
 	
  private:

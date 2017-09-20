@@ -88,8 +88,34 @@ void EncodingGraph::encode() {
 		default:
 			break;
 		}
+		encodeParent(e);
 	}
-	
+}
+
+void EncodingGraph::encodeParent(Element *e) {
+	uint size=e->parents.getSize();
+	for(uint i=0;i<size;i++) {
+		ASTNode * n = e->parents.get(i);
+		if (n->type==PREDICATEOP) {
+			BooleanPredicate *b=(BooleanPredicate *)n;
+			FunctionEncoding *fenc=b->getFunctionEncoding();
+			if (fenc->getFunctionEncodingType() != FUNC_UNASSIGNED)
+				continue;
+			Predicate *p=b->getPredicate();
+			if (p->type==OPERATORPRED) {
+				PredicateOperator *po=(PredicateOperator *)p;
+				ASSERT(b->inputs.getSize()==2);
+				EncodingNode *left=createNode(b->inputs.get(0));
+				EncodingNode *right=createNode(b->inputs.get(1));
+				if (left == NULL || right == NULL)
+					return;
+				EncodingEdge *edge=getEdge(left, right, NULL);
+				if (edge != NULL && edge->getEncoding() == EDGE_MATCH) {
+					fenc->setFunctionEncodingType(CIRCUIT);
+				}
+			}
+		}
+	}
 }
 
 void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
@@ -152,7 +178,7 @@ void EncodingGraph::processFunction(ElementFunction *ef) {
 		if (left == NULL && right == NULL)
 			return;
 		EncodingNode *dst=createNode(ef);
-		EncodingEdge *edge=getEdge(left, right, dst);
+		EncodingEdge *edge=createEdge(left, right, dst);
 		edge->numArithOps++;
 	}
 }
@@ -166,7 +192,7 @@ void EncodingGraph::processPredicate(BooleanPredicate *b) {
 		EncodingNode *right=createNode(b->inputs.get(1));
 		if (left == NULL || right == NULL)
 			return;
-		EncodingEdge *edge=getEdge(left, right, NULL);
+		EncodingEdge *edge=createEdge(left, right, NULL);
 		CompOp op=po->getOp();
 		switch(op) {
 		case SATC_EQUALS:
@@ -251,6 +277,12 @@ void EncodingGraph::decideEdges() {
 static TunableDesc EdgeEncodingDesc(EDGE_UNASSIGNED, EDGE_MATCH, EDGE_UNASSIGNED);
 
 EncodingEdge * EncodingGraph::getEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst) {
+	EncodingEdge e(left, right, dst);
+	EncodingEdge *result = edgeMap.get(&e);
+	return result;
+}
+
+EncodingEdge * EncodingGraph::createEdge(EncodingNode *left, EncodingNode *right, EncodingNode *dst) {
 	EncodingEdge e(left, right, dst);
 	EncodingEdge *result = edgeMap.get(&e);
 	if (result == NULL) {
