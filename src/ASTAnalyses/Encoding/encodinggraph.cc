@@ -63,7 +63,8 @@ void EncodingGraph::encode() {
 			ElementEncoding *encoding=e->getElementEncoding();
 			if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
 				EncodingNode *n = getNode(e);
-				ASSERT(n != NULL);
+				if (n == NULL)
+					continue;
 				ElementEncodingType encodetype=n->getEncoding();
 				encoding->setElementEncodingType(encodetype);
 				if (encodetype == UNARY || encodetype == ONEHOT) {
