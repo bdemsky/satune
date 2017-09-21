@@ -124,6 +124,11 @@ void EncodingGraph::encodeParent(Element *e) {
 void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 	EncodingSubGraph *graph1=graphMap.get(first);
 	EncodingSubGraph *graph2=graphMap.get(second);
+	if (graph1 == NULL)
+		first->setEncoding(BINARYINDEX);
+	if (graph2 == NULL)
+		second->setEncoding(BINARYINDEX);
+
 	if (graph1 == NULL && graph2 == NULL) {
 		graph1 = new EncodingSubGraph();
 		subgraphs.add(graph1);
@@ -226,8 +231,8 @@ void EncodingGraph::decideEdges() {
 		EncodingNode *right = ee->right;
 		
 		if (ee->encoding != EDGE_UNASSIGNED ||
-				left->encoding != BINARYINDEX ||
-				right->encoding != BINARYINDEX)
+				!left->couldBeBinaryIndex() ||
+				!right->couldBeBinaryIndex())
 			continue;
 		
 		uint64_t eeValue = ee->getValue();
@@ -298,8 +303,8 @@ EncodingEdge * EncodingGraph::createEdge(EncodingNode *left, EncodingNode *right
 			v1=tmp;
 		}
 
-		if ((left != NULL && left->encoding==BINARYINDEX) &&
-				(right != NULL) && right->encoding==BINARYINDEX) {
+		if ((left != NULL && left->couldBeBinaryIndex()) &&
+				(right != NULL) && right->couldBeBinaryIndex()) {
 			EdgeEncodingType type=(EdgeEncodingType)solver->getTuner()->getVarTunable(v1, v2, EDGEENCODING, &EdgeEncodingDesc);
 			result->setEncoding(type);
 			if (type == EDGE_MATCH) {
@@ -340,6 +345,7 @@ EncodingNode * EncodingGraph::createNode(Element *e) {
 	if (n == NULL) {
 		n = new EncodingNode(s);
 		n->setEncoding((ElementEncodingType)solver->getTuner()->getVarTunable(n->getType(), NODEENCODING, &NodeEncodingDesc));
+		
 		encodingMap.put(s, n);
 	}
 	n->addElement(e);

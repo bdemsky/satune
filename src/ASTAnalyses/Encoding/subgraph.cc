@@ -215,8 +215,6 @@ void EncodingSubGraph::computeComparisons() {
 		delete edgeit;
 	}
 	delete nodeit;
-	
-	
 }
 
 void EncodingSubGraph::orderEV(EncodingValue *earlier, EncodingValue *later) {
@@ -276,7 +274,8 @@ void EncodingSubGraph::generateComparison(EncodingNode *left, EncodingNode *righ
 				orderEV(last, rev);
 		}
 		if (lev != rev) {
-			if (rev == NULL || lVal < rVal) {
+			if (rev == NULL ||
+					(lev != NULL && lVal < rVal)) {
 				if (rev != NULL)
 					orderEV(lev, rev);
 				last = lev;

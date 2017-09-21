@@ -13,8 +13,9 @@ int main(int numargs, char **argv) {
 	Order *order = solver->createOrder(SATC_TOTAL, s);
 	BooleanEdge b1 =  solver->orderConstraint(order, 5, 1);
 	BooleanEdge b2 =  solver->orderConstraint(order, 1, 4);
-	solver->addConstraint(b1);
-	solver->addConstraint(b2);
+
+	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, b1, solver->applyLogicalOperation(SATC_NOT, b2)));
+	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, b2, solver->applyLogicalOperation(SATC_NOT, b1)));
 	solver->serialize();
 	if (solver->solve() == 1){
 		printf("SAT\n");

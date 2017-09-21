@@ -40,6 +40,7 @@ class EncodingNode {
 	VarType getType() const;
 	void setEncoding(ElementEncodingType e) {encoding=e;}
 	ElementEncodingType getEncoding() {return encoding;}
+	bool couldBeBinaryIndex() {return encoding == BINARYINDEX || encoding == ELEM_UNASSIGNED;}
 	CMEMALLOC;
  private:
 	Set *s;
