@@ -13,6 +13,7 @@ public:
 	virtual ~Function() {}
 	virtual Function *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
 	virtual void serialize(Serializer* serialiezr) =0;
+        virtual void print() = 0;
 	virtual Set * getRange() = 0;
 	CMEMALLOC;
 };
@@ -28,6 +29,7 @@ public:
 	bool isInRangeFunction(uint64_t val);
 	Function *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serialiezr);
+        virtual void print();
 	Set * getRange() {return range;}
 	CMEMALLOC;
 };
@@ -39,6 +41,7 @@ public:
 	FunctionTable (Table *table, UndefinedBehavior behavior);
 	Function *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serialiezr);
+        virtual void print();
 	Set * getRange();
 	CMEMALLOC;
 };
