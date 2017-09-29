@@ -17,7 +17,7 @@ public:
 	inline ElementEncoding *getElementEncoding(){ return &encoding; }
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
 	virtual void serialize(Serializer* serializer) =0;
-        virtual void print();
+        virtual void print() = 0;
 	virtual void updateParents() {}
 	virtual Set * getRange() = 0;
 	CMEMALLOC;

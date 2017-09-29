@@ -95,3 +95,9 @@ void PredicateOperator::serialize(Serializer* serializer){
 	}
 }
 
+void PredicateOperator::print(){	
+	model_println("{PredicateOperator: %s }", op ==SATC_EQUALS? "EQUAL": "NOT-EQUAL");
+}
+
+
+

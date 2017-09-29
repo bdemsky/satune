@@ -109,6 +109,10 @@ void BooleanVar::serialize(Serializer* serializer){
 	serializer->mywrite(&vtype, sizeof(VarType));
 }
 
+void BooleanVar::print(){
+        model_println("BooleanVar");
+}
+
 void BooleanOrder::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))
 		return;
@@ -121,6 +125,12 @@ void BooleanOrder::serialize(Serializer* serializer){
 	serializer->mywrite(&order, sizeof(Order*));
 	serializer->mywrite(&first, sizeof(uint64_t));
 	serializer->mywrite(&second, sizeof(uint64_t));
+}
+
+void BooleanOrder::print(){
+	model_println("{BooleanOrder: First= %lu, Second = %lu on Order:", first, second);
+	order->print();
+        model_println("}\n");
 }
 
 void BooleanPredicate::serialize(Serializer* serializer){
@@ -149,6 +159,18 @@ void BooleanPredicate::serialize(Serializer* serializer){
 	serializer->mywrite(&undefStat, sizeof(Boolean*));
 }
 
+void BooleanPredicate::print(){
+	model_println("{BooleanPredicate:");
+        predicate->print();
+	model_println("elements:");
+        uint size = inputs.getSize();
+	for(uint i=0; i<size; i++){
+		Element *input = inputs.get(i);
+		input->print();
+	}
+        model_println("}\n");
+}
+
 void BooleanLogic::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))
 		return;
@@ -167,5 +189,17 @@ void BooleanLogic::serialize(Serializer* serializer){
 		Boolean* input = inputs.get(i).getRaw();
 		serializer->mywrite(&input, sizeof(Boolean*));
 	}
+}
+
+void BooleanLogic::print(){
+	model_println("{BooleanLogic: %s", 
+                op ==SATC_AND? "AND": op == SATC_OR? "OR": op==SATC_NOT? "NOT":
+                op == SATC_XOR? "XOR" : op==SATC_IFF? "IFF" : "IMPLIES");
+        uint size = inputs.getSize();
+	for(uint i=0; i<size; i++){
+		BooleanEdge input = inputs.get(i);
+                input.getBoolean()->print();
+	}
+        model_println("}\n");
 }
 

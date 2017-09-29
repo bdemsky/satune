@@ -34,7 +34,7 @@ public:
 	bool isTrue() {return istrue;}
 	bool isFalse() {return !istrue;}
 	void serialize(Serializer *serializer ){};
-        virtual void print();
+        virtual void print(){};
 	bool istrue;
 	CMEMALLOC;
 };
