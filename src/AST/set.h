@@ -28,6 +28,7 @@ public:
 	virtual bool isMutableSet() {return false;}
 	virtual Set *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serializer);
+	virtual void print();
 	CMEMALLOC;
 protected:
 	VarType type;

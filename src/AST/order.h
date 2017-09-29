@@ -17,6 +17,7 @@ public:
 	OrderGraph *graph;
 	Order *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer );
+	void print();
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding encoding;
 	void setOrderResolver(OrderResolver *_resolver) { ASSERT(encoding.resolver == NULL); encoding.resolver = _resolver;};

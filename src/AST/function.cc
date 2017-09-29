@@ -82,6 +82,13 @@ void FunctionTable::serialize(Serializer* serializer){
 	
 }
 
+void FunctionTable::print(){
+	model_println("{FunctionTable:");
+        table->print();
+        model_println("}\n");
+	
+}
+
 void FunctionOperator::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))
 		return;
@@ -106,4 +113,8 @@ void FunctionOperator::serialize(Serializer* serializer){
 	}
 	serializer->mywrite(&range, sizeof(Set *));
 	serializer->mywrite(&overflowbehavior, sizeof(OverFlowBehavior));
+}
+
+void FunctionOperator::print(){
+	model_println("{FunctionOperator: %s}", op == SATC_ADD? "ADD": "SUB" );
 }

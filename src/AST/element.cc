@@ -77,6 +77,12 @@ void ElementSet::serialize(Serializer* serializer){
 	serializer->mywrite(&set, sizeof(Set*));
 }
 
+void ElementSet::print(){
+	model_println("{ElementSet:");
+	set->print();
+	model_println("}\n");
+}
+
 void ElementConst::serialize(Serializer* serializer){
 	if(serializer->isSerialized(this))
 		return;
@@ -90,6 +96,10 @@ void ElementConst::serialize(Serializer* serializer){
 	VarType type = set->getType();
 	serializer->mywrite(&type, sizeof(VarType));
 	serializer->mywrite(&value, sizeof(uint64_t));
+}
+
+void ElementConst::print(){
+	model_println("{ElementConst: %lu}", value);	
 }
 
 void ElementFunction::serialize(Serializer* serializer){
@@ -118,3 +128,14 @@ void ElementFunction::serialize(Serializer* serializer){
 	serializer->mywrite(&overflowstat, sizeof(Boolean*));
 }
 
+void ElementFunction::print(){
+        model_println("{ElementFunction:");
+	function->print();
+        model_println("Elements:");
+	uint size = inputs.getSize();
+	for(uint i=0; i<size; i++){
+		Element *input = inputs.get(i);
+		input->print();
+	}
+	model_println("}\n");
+}

@@ -11,6 +11,7 @@ public:
 	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);
 	Table *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer);
+        void print();
 	~Table();
 	Set * getRange() {return range;}
 	

@@ -66,6 +66,12 @@ void PredicateTable::serialize(Serializer* serializer){
 	serializer->mywrite(&undefinedbehavior, sizeof(UndefinedBehavior));
 }
 
+void PredicateTable::print(){	
+	model_println("{PredicateTable:");
+        table->print();
+        model_println("}\n");
+}
+
 void PredicateOperator::serialize(Serializer* serializer){	
 	if(serializer->isSerialized(this))
 		return;

@@ -29,6 +29,7 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	SetIteratorBooleanEdge *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge constraint = iterator->next();
+                constraint.getBoolean()->print();
 		Edge c = encodeConstraintSATEncoder(constraint);
 		addConstraintCNF(cnf, c);
 	}

@@ -13,6 +13,7 @@ public:
 	virtual ~Predicate() {}
 	virtual Predicate *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;}
 	virtual void serialize(Serializer* serializer) = 0;
+        virtual void print() =0;
 	PredicateType type;
 	CMEMALLOC;
 };
@@ -23,6 +24,7 @@ public:
 	bool evalPredicateOperator(uint64_t *inputs);
 	Predicate *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serializer);
+        virtual void print();
 	Array<Set *> domains;
 	CompOp getOp() {return op;}
 	CMEMALLOC;
@@ -35,6 +37,7 @@ public:
 	PredicateTable(Table *table, UndefinedBehavior undefBehavior);
 	Predicate *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer* serializer);
+        virtual void print();
 	Table *table;
 	UndefinedBehavior undefinedbehavior;
 	CMEMALLOC;
