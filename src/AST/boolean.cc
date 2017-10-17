@@ -110,7 +110,11 @@ void BooleanVar::serialize(Serializer* serializer){
 }
 
 void BooleanVar::print(){
-        model_println("BooleanVar");
+        model_println("BooleanVar:%lu", (uintptr_t)this);
+}
+
+void BooleanConst::print(){
+        model_println("BooleanConst:%s", istrue?"TRUE" :"FALSE");
 }
 
 void BooleanOrder::serialize(Serializer* serializer){
@@ -198,6 +202,8 @@ void BooleanLogic::print(){
         uint size = inputs.getSize();
 	for(uint i=0; i<size; i++){
 		BooleanEdge input = inputs.get(i);
+                if(input.isNegated())
+                        model_print("!");
                 input.getBoolean()->print();
 	}
         model_println("}\n");

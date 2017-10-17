@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "orderanalysis.h"
 #include "structs.h"
 #include "csolver.h"
@@ -40,9 +42,15 @@ void DFSReverse(OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
 
 void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum) {
 	SetIteratorOrderEdge *iterator = isReverse ? node->inEdges.iterator() : node->outEdges.iterator();
+#ifdef TRACE_DEBUG
+        model_print("Node:%lu=>", node->id);
+#endif
 	while (iterator->hasNext()) {
 		OrderEdge *edge = iterator->next();
-		if (mustvisit) {
+#ifdef TRACE_DEBUG
+                model_print("Edge:%lu=>",(uintptr_t) edge);
+#endif
+                if (mustvisit) {
 			if (!edge->mustPos)
 				continue;
 		} else
@@ -50,8 +58,10 @@ void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReve
 			continue;
 
 		OrderNode *child = isReverse ? edge->source : edge->sink;
-
-		if (child->status == NOTVISITED) {
+#ifdef TRACE_DEBUG
+                model_println("NodeChild:%lu", child->id);
+#endif
+                if (child->status == NOTVISITED) {
 			child->status = VISITED;
 			DFSNodeVisit(child, finishNodes, isReverse, mustvisit, sccNum);
 			child->status = FINISHED;
@@ -115,6 +125,9 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node) {
 			sinkNode->inEdges.remove(outEdge);
 			//Adding new edge to new sink and src nodes ...
 			if(srcNode == sinkNode){
+#ifdef TRACE_DEBUG
+                                model_println("bypassMustBe 1");
+#endif
 				This->setUnSAT();
 				delete iterout;
 				delete iterin;
@@ -124,6 +137,9 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node) {
 			newEdge->mustPos = true;
 			newEdge->polPos = true;
 			if (newEdge->mustNeg){
+#ifdef TRACE_DEBUG
+                                model_println("BypassMustBe 2");
+#endif
 				This->setUnSAT();
 			}
 			srcNode->outEdges.add(newEdge);
@@ -266,8 +282,12 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(srcnode, node);
 				newedge->mustPos = true;
 				newedge->polPos = true;
-				if (newedge->mustNeg)
+				if (newedge->mustNeg){
+#ifdef TRACE_DEBUG
+                                        model_println("DFS clear 1");
+#endif
 					solver->setUnSAT();
+                                }
 				srcnode->outEdges.add(newedge);
 				node->inEdges.add(newedge);
 			}
@@ -282,8 +302,12 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				if (!edge->mustPos && sources->contains(parent)) {
 					edge->mustPos = true;
 					edge->polPos = true;
-					if (edge->mustNeg)
-						solver->setUnSAT();
+					if (edge->mustNeg){
+#ifdef TRACE_DEBUG
+                                                model_println("DFS clear 2");
+#endif
+                                                solver->setUnSAT();
+                                        }
 				}
 			}
 			delete iterator;
@@ -297,8 +321,12 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				if (!edge->mustNeg && sources->contains(child)) {
 					edge->mustNeg = true;
 					edge->polNeg = true;
-					if (edge->mustPos)
-						solver->setUnSAT();
+					if (edge->mustPos){
+#ifdef TRACE_DEBUG
+                                                model_println("DFS clear 3: NodeFrom:%lu=>edge%lu=>NodeTo:%lu", node->id, (uintptr_t) edge, child->id);
+#endif
+                                                solver->setUnSAT();
+                                        }
 				}
 			}
 			delete iterator;
@@ -338,6 +366,9 @@ void localMustAnalysisTotal(CSolver *solver, OrderGraph *graph) {
 				if (!invEdge->mustPos) {
 					invEdge->polPos = false;
 				} else {
+#ifdef TRACE_DEBUG
+                                        model_println("localMustAnalysis Total");
+#endif
 					solver->setUnSAT();
 				}
 				invEdge->mustNeg = true;
@@ -360,16 +391,22 @@ void localMustAnalysisPartial(CSolver *solver, OrderGraph *graph) {
 		if (edge->mustPos) {
 			if (!edge->mustNeg) {
 				edge->polNeg = false;
-			} else
+			} else{
+#ifdef TRACE_DEBUG
+                                model_println("Local must analysis partial");
+#endif
 				solver->setUnSAT();
-
+                        }
 			OrderEdge *invEdge = graph->getInverseOrderEdge(edge);
 			if (invEdge != NULL) {
 				if (!invEdge->mustPos)
 					invEdge->polPos = false;
-				else
+				else{
+#ifdef TRACE_DEBUG
+                                        model_println("Local must analysis partial 2");
+#endif
 					solver->setUnSAT();
-
+                                }
 				invEdge->mustNeg = true;
 				invEdge->polNeg = true;
 			}

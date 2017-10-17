@@ -6,6 +6,9 @@
 void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 	if (constraints.contains(bexpr.negate())) {
 		constraints.remove(bexpr.negate());
+#ifdef TRACE_DEBUG
+                model_println("replaceBooleanWithTrue");
+#endif
 		setUnSAT();
 	}	
 	if (constraints.contains(bexpr)) {

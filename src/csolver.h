@@ -5,6 +5,7 @@
 #include "corestructs.h"
 #include "asthash.h"
 #include "solver_interface.h"
+#include "common.h"
 
 class CSolver {
 public:
@@ -130,7 +131,7 @@ public:
 	bool isTrue(BooleanEdge b);
 	bool isFalse(BooleanEdge b);
 
-	void setUnSAT() { unsat = true; }
+	void setUnSAT() { model_println("Setting UNSAT %%%%%%"); unsat = true; }
 
 	bool isUnSAT() { return unsat; }
 

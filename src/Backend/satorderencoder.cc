@@ -104,6 +104,7 @@ Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 		boolOrder->order->setOrderResolver(new OrderPairResolver(solver, boolOrder->order));
 		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
+                        ASSERT(boolOrder->order->graph == NULL);
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
 			reachMustAnalysis(solver, boolOrder->order->graph, true);
 		}

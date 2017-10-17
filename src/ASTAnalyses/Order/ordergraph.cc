@@ -12,6 +12,7 @@ OrderGraph::OrderGraph(Order *_order) :
 }
 
 OrderGraph *buildOrderGraph(Order *order) {
+        ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
 	order->graph = orderGraph;
 	uint constrSize = order->constraints.getSize();
@@ -23,6 +24,7 @@ OrderGraph *buildOrderGraph(Order *order) {
 
 //Builds only the subgraph for the must order graph.
 OrderGraph *buildMustOrderGraph(Order *order) {
+        ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
 	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
