@@ -169,6 +169,7 @@ void copyCNF(CNFExpr *This, CNFExpr *expr, bool destroy) {
 		ourfree(This->singletons.literals);
 		ourfree(This->clauses.array);
 		This->litSize = expr->litSize;
+		This->singletons.size = expr->singletons.size;
 		This->singletons.literals = expr->singletons.literals;
 		This->singletons.capacity = expr->singletons.capacity;
 		This->clauses.size = expr->clauses.size;
