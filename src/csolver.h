@@ -131,7 +131,7 @@ public:
 	bool isTrue(BooleanEdge b);
 	bool isFalse(BooleanEdge b);
 
-	void setUnSAT() { model_println("Setting UNSAT %%%%%%"); unsat = true; }
+	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
 
 	bool isUnSAT() { return unsat; }
 

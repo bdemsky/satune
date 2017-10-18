@@ -341,11 +341,7 @@ int solveCNF(CNF *cnf) {
 	convertPass(cnf, false);
 	finishedClauses(cnf->solver);
 	long long startSolve = getTimeNano();
-#ifdef TRACE_DEBUG
-        model_println("Backend: Calling the SAT Solver from CSolver ...");
-#endif
-        int result = solve(cnf->solver);
-        model_print("Backend: Result got from SATSolver: %d", result);
+	int result = solve(cnf->solver);
 	long long finishTime = getTimeNano();
 	cnf->encodeTime = startSolve - startTime;
 	cnf->solveTime = finishTime - startSolve;

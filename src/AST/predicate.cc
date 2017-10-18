@@ -67,9 +67,9 @@ void PredicateTable::serialize(Serializer* serializer){
 }
 
 void PredicateTable::print(){	
-	model_println("{PredicateTable:");
-        table->print();
-        model_println("}\n");
+	model_print("{PredicateTable:\n");
+	table->print();
+	model_print("}\n");
 }
 
 void PredicateOperator::serialize(Serializer* serializer){	
@@ -96,7 +96,7 @@ void PredicateOperator::serialize(Serializer* serializer){
 }
 
 void PredicateOperator::print(){	
-	model_println("{PredicateOperator: %s }", op ==SATC_EQUALS? "EQUAL": "NOT-EQUAL");
+	model_print("{PredicateOperator: %s }\n", op ==SATC_EQUALS? "EQUAL": "NOT-EQUAL");
 }
 
 

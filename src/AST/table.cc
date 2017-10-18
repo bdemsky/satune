@@ -98,16 +98,16 @@ void Table::serialize(Serializer* serializer){
 
 
 void Table::print(){
-        model_println("{Table:");
+	model_print("{Table:\n");
 	SetIteratorTableEntry* iterator = getEntries();
 	while(iterator->hasNext()){
 		TableEntry* entry = iterator->next();
-                model_print("<");
-                for(uint i=0; i<entry->inputSize; i++){
-                        model_print("%lu, ", entry->inputs[i]);
-                }
-                model_print(" == %lu>", entry->output);
+		model_print("<");
+		for(uint i=0; i<entry->inputSize; i++){
+			model_print("%lu, ", entry->inputs[i]);
+		}
+		model_print(" == %lu>", entry->output);
 	}
-        model_println("}\n");
+	model_print("}\n");
 	delete iterator;
 }

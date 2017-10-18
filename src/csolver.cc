@@ -289,8 +289,7 @@ static int ptrcompares(const void *p1, const void *p2) {
 }
 
 BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge * array, uint asize) {
-  return applyLogicalOperation(op, array, asize);
-  /*  BooleanEdge newarray[asize];
+	BooleanEdge newarray[asize];
 	memcpy(newarray, array, asize * sizeof(BooleanEdge));
 	for(uint i=0; i < asize; i++) {
 		BooleanEdge b=newarray[i];
@@ -301,7 +300,7 @@ BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge * array, ui
 			}
 		}
 	}
-	return applyLogicalOperation(op, newarray, asize);*/
+	return applyLogicalOperation(op, newarray, asize);
 }
 
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
@@ -338,10 +337,6 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		uint newindex = 0;
 		for (uint i = 0; i < asize; i++) {
 			BooleanEdge b = array[i];
-//                        model_print("And: Argument %u:", i);
-//                        if(b.isNegated())
-//                                model_print("!");
-//                        b->print();
 			if (b->type == LOGICOP) {
 				if (((BooleanLogic *)b.getBoolean())->replaced)
 					return rewriteLogicalOperation(op, array, asize);
@@ -372,78 +367,53 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 	}
 	case SATC_IMPLIES: {
 		//handle by translation
-//                model_print("Implies: first:");
-//                if(array[0].isNegated())
-//                        model_print("!");
-//                array[0]->print();
-//                model_print("Implies: second:");
-//                if(array[1].isNegated())
-//                        model_print("!");
-//                array[1]->print();
-//                model_println("##### OK let's get the operation done");
 		return applyLogicalOperation(SATC_OR, applyLogicalOperation(SATC_NOT, array[0]), array[1]);
 	}
 	}
 
 	ASSERT(asize != 0);
 	Boolean *boolean = new BooleanLogic(this, op, array, asize);
-	/*	Boolean *b = boolMap.get(boolean);
+	Boolean *b = boolMap.get(boolean);
 	if (b == NULL) {
 		boolean->updateParents();
 		boolMap.put(boolean, boolean);
 		allBooleans.push(boolean);
 		return BooleanEdge(boolean);
 	} else {
-	delete boolean;*/
+		delete boolean;
 		return BooleanEdge(boolean);
-		/*	}*/
+	}
 }
 
 BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
-#ifdef TRACE_DEBUG
-        model_println("Creating order: From:%lu => To:%lu", first, second);
-#endif
-        if(first == second)
-                return boolFalse;
+	ASSERT(first != second);
 	Boolean *constraint = new BooleanOrder(order, first, second);
 	allBooleans.push(constraint);
 	return BooleanEdge(constraint);
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-#ifdef TRACE_DEBUG
-        model_println("****New Constraint******");
-#endif
-        if(constraint.isNegated())
-                model_print("!");
-        constraint.getBoolean()->print();
+	if(constraint.isNegated())
+		model_print("!");
+	constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
-	else if (isFalse(constraint)){
-                int t=0;
-#ifdef TRACE_DEBUG
-		model_println("Adding constraint which is false :|");
-#endif
-                setUnSAT();
-        }
+	else if (isFalse(constraint)) {
+		int t=0;
+		setUnSAT();
+	}
 	else {
 		if (constraint->type == LOGICOP) {
 			BooleanLogic *b=(BooleanLogic *) constraint.getBoolean();
 			if (!constraint.isNegated()) {
 				if (b->op==SATC_AND) {
 					for(uint i=0;i<b->inputs.getSize();i++) {
-#ifdef TRACE_DEBUG
-                                                model_println("In loop");
-#endif
 						addConstraint(b->inputs.get(i));
 					}
 					return;
 				}
 			}
 			if (b->replaced) {
-#ifdef TRACE_DEBUG
-                                model_println("While rewriting");
-#endif
 				addConstraint(doRewrite(constraint));
 				return;
 			}
@@ -451,12 +421,9 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 		constraints.add(constraint);
 		Boolean *ptr=constraint.getBoolean();
 		
-		if (ptr->boolVal == BV_UNSAT){
-#ifdef TRACE_DEBUG
-			model_println("BooleanValue is Set to UnSAT");
-#endif
-                        setUnSAT();
-                }
+		if (ptr->boolVal == BV_UNSAT) {
+			setUnSAT();
+		}
 		
 		replaceBooleanWithTrueNoRemove(constraint);
 		constraint->parents.clear();
@@ -480,24 +447,24 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
-//	Preprocess pp(this);
-//	pp.doTransform();
+	Preprocess pp(this);
+	pp.doTransform();
 	
-//	DecomposeOrderTransform dot(this);
-//	dot.doTransform();
+	DecomposeOrderTransform dot(this);
+	dot.doTransform();
 
-//	IntegerEncodingTransform iet(this);
-//	iet.doTransform();
+	IntegerEncodingTransform iet(this);
+	iet.doTransform();
 
-//	EncodingGraph eg(this);
-//	eg.buildGraph();
-//	eg.encode();
+	EncodingGraph eg(this);
+	eg.buildGraph();
+	eg.encode();
 	
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
-        model_println("Is problem UNSAT after encoding: %d", unsat);
+        model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
-        model_println("Result Computed in CSolver: %d", result);
+        model_print("Result Computed in CSolver: %d\n", result);
 	long long finishTime = getTimeNano();
 	elapsedTime = finishTime - startTime;
 	if (deleteTuner) {

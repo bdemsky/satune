@@ -145,15 +145,15 @@ void Set::serialize(Serializer* serializer){
 
 void Set::print(){
 	model_print("{Set:");
-        if(isRange){
-                model_print("Range: low=%lu, high=%lu}\n\n", low, high);
-        } else {
-                uint size = members->getSize();
-                model_print("Members: ");
-                for(uint i=0; i<size; i++){
-                        uint64_t mem = members->get(i);
-                        model_print("%lu, ", mem);
-                }
-                model_println("}\n");
-        }
+	if(isRange){
+		model_print("Range: low=%lu, high=%lu}\n\n", low, high);
+	} else {
+		uint size = members->getSize();
+		model_print("Members: ");
+		for(uint i=0; i<size; i++){
+			uint64_t mem = members->get(i);
+			model_print("%lu, ", mem);
+		}
+		model_print("}\n");
+	}
 }

@@ -78,9 +78,9 @@ void ElementSet::serialize(Serializer* serializer){
 }
 
 void ElementSet::print(){
-	model_println("{ElementSet:");
+	model_print("{ElementSet:\n");
 	set->print();
-	model_println("}\n");
+	model_print("}\n");
 }
 
 void ElementConst::serialize(Serializer* serializer){
@@ -99,7 +99,7 @@ void ElementConst::serialize(Serializer* serializer){
 }
 
 void ElementConst::print(){
-	model_println("{ElementConst: %lu}", value);	
+	model_print("{ElementConst: %lu}\n", value);	
 }
 
 void ElementFunction::serialize(Serializer* serializer){
@@ -129,13 +129,13 @@ void ElementFunction::serialize(Serializer* serializer){
 }
 
 void ElementFunction::print(){
-        model_println("{ElementFunction:");
+	model_print("{ElementFunction:\n");
 	function->print();
-        model_println("Elements:");
+	model_print("Elements:\n");
 	uint size = inputs.getSize();
 	for(uint i=0; i<size; i++){
 		Element *input = inputs.get(i);
 		input->print();
 	}
-	model_println("}\n");
+	model_print("}\n");
 }

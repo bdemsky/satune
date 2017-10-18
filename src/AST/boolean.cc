@@ -110,11 +110,11 @@ void BooleanVar::serialize(Serializer* serializer){
 }
 
 void BooleanVar::print(){
-        model_println("BooleanVar:%lu", (uintptr_t)this);
+	model_print("BooleanVar:%lu\n", (uintptr_t)this);
 }
 
 void BooleanConst::print(){
-        model_println("BooleanConst:%s", istrue?"TRUE" :"FALSE");
+	model_print("BooleanConst:%s\n", istrue?"TRUE" :"FALSE");
 }
 
 void BooleanOrder::serialize(Serializer* serializer){
@@ -132,9 +132,9 @@ void BooleanOrder::serialize(Serializer* serializer){
 }
 
 void BooleanOrder::print(){
-	model_println("{BooleanOrder: First= %lu, Second = %lu on Order:", first, second);
+	model_print("{BooleanOrder: First= %lu, Second = %lu on Order:\n", first, second);
 	order->print();
-        model_println("}\n");
+	model_print("}\n");
 }
 
 void BooleanPredicate::serialize(Serializer* serializer){
@@ -164,15 +164,15 @@ void BooleanPredicate::serialize(Serializer* serializer){
 }
 
 void BooleanPredicate::print(){
-	model_println("{BooleanPredicate:");
-        predicate->print();
-	model_println("elements:");
-        uint size = inputs.getSize();
+	model_print("{BooleanPredicate:\n");
+	predicate->print();
+	model_print("elements:\n");
+	uint size = inputs.getSize();
 	for(uint i=0; i<size; i++){
 		Element *input = inputs.get(i);
 		input->print();
 	}
-        model_println("}\n");
+	model_print("}\n");
 }
 
 void BooleanLogic::serialize(Serializer* serializer){
@@ -196,16 +196,16 @@ void BooleanLogic::serialize(Serializer* serializer){
 }
 
 void BooleanLogic::print(){
-	model_println("{BooleanLogic: %s", 
-                op ==SATC_AND? "AND": op == SATC_OR? "OR": op==SATC_NOT? "NOT":
-                op == SATC_XOR? "XOR" : op==SATC_IFF? "IFF" : "IMPLIES");
-        uint size = inputs.getSize();
+	model_print("{BooleanLogic: %s\n", 
+							op ==SATC_AND? "AND": op == SATC_OR? "OR": op==SATC_NOT? "NOT":
+							op == SATC_XOR? "XOR" : op==SATC_IFF? "IFF" : "IMPLIES");
+	uint size = inputs.getSize();
 	for(uint i=0; i<size; i++){
 		BooleanEdge input = inputs.get(i);
-                if(input.isNegated())
-                        model_print("!");
-                input.getBoolean()->print();
+		if(input.isNegated())
+			model_print("!");
+		input.getBoolean()->print();
 	}
-        model_println("}\n");
+	model_print("}\n");
 }
 
