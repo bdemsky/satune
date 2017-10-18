@@ -12,7 +12,7 @@ OrderGraph::OrderGraph(Order *_order) :
 }
 
 OrderGraph *buildOrderGraph(Order *order) {
-        ASSERT(order->graph == NULL);
+	ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
 	order->graph = orderGraph;
 	uint constrSize = order->constraints.getSize();
@@ -24,7 +24,7 @@ OrderGraph *buildOrderGraph(Order *order) {
 
 //Builds only the subgraph for the must order graph.
 OrderGraph *buildMustOrderGraph(Order *order) {
-        ASSERT(order->graph == NULL);
+	ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
 	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
@@ -180,23 +180,23 @@ OrderGraph::~OrderGraph() {
 	delete edges;
 }
 
-bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination){
+bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination) {
 	HashsetOrderNode visited;
 	visited.add(source);
 	SetIteratorOrderEdge *iterator = source->outEdges.iterator();
 	bool found = false;
-	while(iterator->hasNext()){
-		OrderEdge* edge = iterator->next();
-		if(edge->polPos){
-			OrderNode* node = edge->sink;
-			if(!visited.contains(node)){
-				if( node == destination ){
+	while (iterator->hasNext()) {
+		OrderEdge *edge = iterator->next();
+		if (edge->polPos) {
+			OrderNode *node = edge->sink;
+			if (!visited.contains(node)) {
+				if ( node == destination ) {
 					found = true;
 					break;
 				}
 				visited.add(node);
-				found =isTherePathVisit(visited, node, destination);
-				if(found){
+				found = isTherePathVisit(visited, node, destination);
+				if (found) {
 					break;
 				}
 			}
@@ -206,19 +206,19 @@ bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination){
 	return found;
 }
 
-bool OrderGraph::isTherePathVisit(HashsetOrderNode &visited, OrderNode* current, OrderNode* destination){
+bool OrderGraph::isTherePathVisit(HashsetOrderNode &visited, OrderNode *current, OrderNode *destination) {
 	SetIteratorOrderEdge *iterator = current->outEdges.iterator();
 	bool found = false;
-	while(iterator->hasNext()){
-		OrderEdge* edge = iterator->next();
-		if(edge->polPos){
-			OrderNode* node = edge->sink;
-			if(node == destination){
+	while (iterator->hasNext()) {
+		OrderEdge *edge = iterator->next();
+		if (edge->polPos) {
+			OrderNode *node = edge->sink;
+			if (node == destination) {
 				found = true;
 				break;
 			}
 			visited.add(node);
-			if(isTherePathVisit(visited, node, destination)){
+			if (isTherePathVisit(visited, node, destination)) {
 				found = true;
 				break;
 			}

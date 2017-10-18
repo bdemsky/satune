@@ -54,9 +54,9 @@ unsigned int tunableSettingHash(TunableSetting *setting) {
 
 bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
 	return setting1->hasVar == setting2->hasVar &&
-		setting1->type1 == setting2->type1 &&
-		setting1->type2 == setting2->type2 &&
-		setting1->param == setting2->param;
+				 setting1->type1 == setting2->type1 &&
+				 setting1->type2 == setting2->type2 &&
+				 setting1->param == setting2->param;
 }
 
 SearchTuner::SearchTuner() {
@@ -110,7 +110,7 @@ int SearchTuner::getVarTunable(VarType vartype1, VarType vartype2, TunableParam 
 		result = settings.get(&setting);
 		if ( result == NULL) {
 			result = new
-				TunableSetting(vartype1, vartype2, param);
+							 TunableSetting(vartype1, vartype2, param);
 			uint value = descriptor->lowValue + (random() % (1 + descriptor->highValue - descriptor->lowValue));
 			result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
 			settings.add(result);

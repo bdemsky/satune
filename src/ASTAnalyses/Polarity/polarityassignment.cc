@@ -46,10 +46,10 @@ void computePredicatePolarity(BooleanPredicate *This) {
 }
 
 void computeLogicOpPolarity(BooleanLogic *This) {
-	Polarity child=computeLogicOpPolarityChildren(This);
+	Polarity child = computeLogicOpPolarityChildren(This);
 	uint size = This->inputs.getSize();
 	for (uint i = 0; i < size; i++) {
-		BooleanEdge b=This->inputs.get(i);
+		BooleanEdge b = This->inputs.get(i);
 		computePolarity(b.getBoolean(), b.isNegated() ? negatePolarity(child) : child);
 	}
 }

@@ -65,7 +65,7 @@ Edge SATEncoder::getPairConstraint(Order *order, OrderPair *pair) {
 		flipped.second = pair->first;
 		pair = &flipped;
 	}
-	OrderPair* tmp;
+	OrderPair *tmp;
 	if (!(table->contains(pair))) {
 		tmp = new OrderPair(pair->first, pair->second, getNewVarSATEncoder());
 		table->put(tmp, tmp);
@@ -81,8 +81,8 @@ Edge SATEncoder::getPartialPairConstraint(Order *order, OrderPair *pair) {
 		return gvalue;
 
 	HashtableOrderPair *table = order->getOrderPairTable();
-	
-	OrderPair* tmp;
+
+	OrderPair *tmp;
 	if (!(table->contains(pair))) {
 		Edge constraint = getNewVarSATEncoder();
 		tmp = new OrderPair(pair->first, pair->second, constraint);
@@ -104,7 +104,7 @@ Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 		boolOrder->order->setOrderResolver(new OrderPairResolver(solver, boolOrder->order));
 		bool doOptOrderStructure = GETVARTUNABLE(solver->getTuner(), boolOrder->order->type, OPTIMIZEORDERSTRUCTURE, &onoff);
 		if (doOptOrderStructure) {
-                        ASSERT(boolOrder->order->graph == NULL);
+			ASSERT(boolOrder->order->graph == NULL);
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
 			reachMustAnalysis(solver, boolOrder->order->graph, true);
 		}
@@ -153,7 +153,7 @@ Edge SATEncoder::generatePartialOrderConstraintsSATEncoder(Edge ij,Edge ji, Edge
 	Edge uoIJ = constraintAND2(cnf, constraintNegate(ij), constraintNegate(ji));
 	Edge uoJK = constraintAND2(cnf, constraintNegate(jk), constraintNegate(kj));
 	Edge uoIK = constraintAND2(cnf, constraintNegate(ik), constraintNegate(ki));
-		
+
 	Edge t1[] = {ij, jk, ik};
 	Edge t2[] = {ji, jk, ik};
 	Edge t3[] = {ij, kj, ki};
@@ -166,7 +166,7 @@ Edge SATEncoder::generatePartialOrderConstraintsSATEncoder(Edge ij,Edge ji, Edge
 	Edge ct4 = constraintAND(cnf, 3, t4);
 	Edge ct5 = constraintAND(cnf, 3, t5);
 	Edge ct6 = constraintAND(cnf, 3, t6);
-	
+
 	Edge p1[] = {uoIJ, jk, ik};
 	Edge p2[] = {ij, kj, uoIK};
 	Edge p3[] = {ji, uoJK, ki};
@@ -179,7 +179,7 @@ Edge SATEncoder::generatePartialOrderConstraintsSATEncoder(Edge ij,Edge ji, Edge
 	Edge cp4 = constraintAND(cnf, 3, p4);
 	Edge cp5 = constraintAND(cnf, 3, p5);
 	Edge cp6 = constraintAND(cnf, 3, p6);
-	
+
 	Edge o1[] = {uoIJ, uoJK, ik};
 	Edge o2[] = {ij, uoJK, uoIK};
 	Edge o3[] = {uoIK, jk, uoIK};
@@ -192,15 +192,15 @@ Edge SATEncoder::generatePartialOrderConstraintsSATEncoder(Edge ij,Edge ji, Edge
 	Edge co4 = constraintAND(cnf, 3, o4);
 	Edge co5 = constraintAND(cnf, 3, o5);
 	Edge co6 = constraintAND(cnf, 3, o6);
-	
+
 	Edge unorder [] = {uoIJ, uoJK, uoIK};
 	Edge cunorder = constraintAND(cnf, 3, unorder);
-	
-	
+
+
 	Edge res[] = {ct1,ct2,ct3,ct4,ct5,ct6,
-			cp1,cp2,cp3,cp4,cp5,cp6,
-			co1,co2,co3,co4,co5,co6,
-			cunorder};
+								cp1,cp2,cp3,cp4,cp5,cp6,
+								co1,co2,co3,co4,co5,co6,
+								cunorder};
 	return constraintOR(cnf, 19, res);
 }
 
@@ -248,7 +248,7 @@ void SATEncoder::createAllPartialOrderConstraintsSATEncoder(Order *order) {
 				Edge constKI = getPartialPairConstraint(order, &pairKI);
 				Edge constKJ = getPartialPairConstraint(order, &pairKJ);
 				addConstraintCNF(cnf, generatePartialOrderConstraintsSATEncoder(constIJ, constJI,
-					constJK, constKJ, constIK, constKI));
+																																				constJK, constKJ, constIK, constKI));
 			}
 		}
 	}

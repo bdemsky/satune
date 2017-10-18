@@ -75,23 +75,23 @@
  * isn't worth optimizing; the SWAP's get sped up by the cache, and pointer
  * arithmetic gets lost in the time required for comparison function calls.
  */
-#define	SWAP(a, b, count, size, tmp) { \
-	count = size; \
-	do { \
-		tmp = *a; \
-		*a++ = *b; \
-		*b++ = tmp; \
-	} while (--count); \
+#define SWAP(a, b, count, size, tmp) { \
+		count = size; \
+		do { \
+			tmp = *a; \
+			*a++ = *b; \
+			*b++ = tmp; \
+		} while (--count); \
 }
 
 /* Copy one block of size size to another. */
 #define COPY(a, b, count, size, tmp1, tmp2) { \
-	count = size; \
-	tmp1 = a; \
-	tmp2 = b; \
-	do { \
-		*tmp1++ = *tmp2++; \
-	} while (--count); \
+		count = size; \
+		tmp1 = a; \
+		tmp2 = b; \
+		do { \
+			*tmp1++ = *tmp2++; \
+		} while (--count); \
 }
 
 /*
@@ -102,18 +102,18 @@
  * j < nmemb, select largest of Ki, Kj and Kj+1.
  */
 #define CREATE(initval, nmemb, par_i, child_i, par, child, size, count, tmp) { \
-	for (par_i = initval; (child_i = par_i * 2) <= nmemb; \
-	    par_i = child_i) { \
-		child = base + child_i * size; \
-		if (child_i < nmemb && compar(child, child + size) < 0) { \
-			child += size; \
-			++child_i; \
+		for (par_i = initval; (child_i = par_i * 2) <= nmemb; \
+				 par_i = child_i) { \
+			child = base + child_i * size; \
+			if (child_i < nmemb && compar(child, child + size) < 0) { \
+				child += size; \
+				++child_i; \
+			} \
+			par = base + par_i * size; \
+			if (compar(child, par) <= 0) \
+				break; \
+			SWAP(par, child, count, size, tmp); \
 		} \
-		par = base + par_i * size; \
-		if (compar(child, par) <= 0) \
-			break; \
-		SWAP(par, child, count, size, tmp); \
-	} \
 }
 
 /*
@@ -134,26 +134,26 @@
  * XXX Don't break the #define SELECT line, below.  Reiser cpp gets upset.
  */
 #define SELECT(par_i, child_i, nmemb, par, child, size, k, count, tmp1, tmp2) { \
-	for (par_i = 1; (child_i = par_i * 2) <= nmemb; par_i = child_i) { \
-		child = base + child_i * size; \
-		if (child_i < nmemb && compar(child, child + size) < 0) { \
-			child += size; \
-			++child_i; \
+		for (par_i = 1; (child_i = par_i * 2) <= nmemb; par_i = child_i) { \
+			child = base + child_i * size; \
+			if (child_i < nmemb && compar(child, child + size) < 0) { \
+				child += size; \
+				++child_i; \
+			} \
+			par = base + par_i * size; \
+			COPY(par, child, count, size, tmp1, tmp2); \
 		} \
-		par = base + par_i * size; \
-		COPY(par, child, count, size, tmp1, tmp2); \
-	} \
-	for (;;) { \
-		child_i = par_i; \
-		par_i = child_i / 2; \
-		child = base + child_i * size; \
-		par = base + par_i * size; \
-		if (child_i == 1 || compar(k, par) < 0) { \
-			COPY(child, k, count, size, tmp1, tmp2); \
-			break; \
+		for (;; ) { \
+			child_i = par_i; \
+			par_i = child_i / 2; \
+			child = base + child_i * size; \
+			par = base + par_i * size; \
+			if (child_i == 1 || compar(k, par) < 0) { \
+				COPY(child, k, count, size, tmp1, tmp2); \
+				break; \
+			} \
+			COPY(child, par, count, size, tmp1, tmp2); \
 		} \
-		COPY(child, par, count, size, tmp1, tmp2); \
-	} \
 }
 
 /*
@@ -165,7 +165,7 @@
  */
 int
 bsdheapsort(void *vbase, size_t nmemb, size_t size,
-    int (*compar)(const void *, const void *))
+						int (*compar)(const void *, const void *))
 {
 	size_t cnt, i, j, l;
 	char tmp, *tmp1, *tmp2;
@@ -188,7 +188,7 @@ bsdheapsort(void *vbase, size_t nmemb, size_t size,
 	 */
 	base = (char *)vbase - size;
 
-	for (l = nmemb / 2 + 1; --l;)
+	for (l = nmemb / 2 + 1; --l; )
 		CREATE(l, nmemb, i, j, t, p, size, cnt, tmp);
 
 	/*
@@ -207,10 +207,10 @@ bsdheapsort(void *vbase, size_t nmemb, size_t size,
 }
 
 
-static __inline char	*med3(char *, char *, char *, int (*)(const void *, const void *));
-static __inline void	 swapfunc(char *, char *, size_t, int);
+static __inline char  *med3(char *, char *, char *, int (*)(const void *, const void *));
+static __inline void swapfunc(char *, char *, size_t, int);
 
-#define min(a, b)	(a) < (b) ? a : b
+#define min(a, b) (a) < (b) ? a : b
 
 /*
  * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
@@ -230,24 +230,24 @@ static __inline void	 swapfunc(char *, char *, size_t, int);
  *   4. Tail recursion is eliminated when sorting the larger of two
  *	subpartitions to save stack space.
  */
-#define SWAPTYPE_BYTEV	1
-#define SWAPTYPE_INTV	2
-#define SWAPTYPE_LONGV	3
-#define SWAPTYPE_INT	4
-#define SWAPTYPE_LONG	5
+#define SWAPTYPE_BYTEV  1
+#define SWAPTYPE_INTV 2
+#define SWAPTYPE_LONGV  3
+#define SWAPTYPE_INT  4
+#define SWAPTYPE_LONG 5
 
-#define TYPE_ALIGNED(TYPE, a, es)			\
+#define TYPE_ALIGNED(TYPE, a, es)     \
 	(((char *)a - (char *)0) % sizeof(TYPE) == 0 && es % sizeof(TYPE) == 0)
 
-#define swapcode(TYPE, parmi, parmj, n) { 		\
-	size_t i = (n) / sizeof (TYPE); 		\
-	TYPE *pi = (TYPE *) (parmi); 			\
-	TYPE *pj = (TYPE *) (parmj); 			\
-	do { 						\
-		TYPE	t = *pi;			\
-		*pi++ = *pj;				\
-		*pj++ = t;				\
-        } while (--i > 0);				\
+#define swapcode(TYPE, parmi, parmj, n) {     \
+		size_t i = (n) / sizeof (TYPE);     \
+		TYPE *pi = (TYPE *) (parmi);      \
+		TYPE *pj = (TYPE *) (parmj);      \
+		do {            \
+			TYPE t = *pi;      \
+			*pi++ = *pj;        \
+			*pj++ = t;        \
+		} while (--i > 0);        \
 }
 
 static __inline void
@@ -268,47 +268,47 @@ swapfunc(char *a, char *b, size_t n, int swaptype)
 	}
 }
 
-#define swap(a, b)	do {				\
-	switch (swaptype) {				\
-	case SWAPTYPE_INT: {				\
-		int t = *(int *)(a);			\
-		*(int *)(a) = *(int *)(b);		\
-		*(int *)(b) = t;			\
-		break;					\
-	    }						\
-	case SWAPTYPE_LONG: {				\
-		long t = *(long *)(a);			\
-		*(long *)(a) = *(long *)(b);		\
-		*(long *)(b) = t;			\
-		break;					\
-	    }						\
-	default:					\
-		swapfunc(a, b, es, swaptype);		\
-	}						\
+#define swap(a, b)  do {        \
+		switch (swaptype) {       \
+		case SWAPTYPE_INT: {        \
+			int t = *(int *)(a);      \
+			*(int *)(a) = *(int *)(b);    \
+			*(int *)(b) = t;      \
+			break;          \
+		}           \
+		case SWAPTYPE_LONG: {       \
+			long t = *(long *)(a);      \
+			*(long *)(a) = *(long *)(b);    \
+			*(long *)(b) = t;     \
+			break;          \
+		}           \
+		default:          \
+			swapfunc(a, b, es, swaptype);   \
+		}           \
 } while (0)
 
-#define vecswap(a, b, n) 	if ((n) > 0) swapfunc(a, b, n, swaptype)
+#define vecswap(a, b, n)  if ((n) > 0) swapfunc(a, b, n, swaptype)
 
 static __inline char *
 med3(char *a, char *b, char *c, int (*cmp)(const void *, const void *))
 {
 	return cmp(a, b) < 0 ?
-	       (cmp(b, c) < 0 ? b : (cmp(a, c) < 0 ? c : a ))
-              :(cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c ));
+				 (cmp(b, c) < 0 ? b : (cmp(a, c) < 0 ? c : a))
+				 : (cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c));
 }
 
 static void
 introsort(char *a, size_t n, size_t es, size_t maxdepth, int swaptype,
-    int (*cmp)(const void *, const void *))
+					int (*cmp)(const void *, const void *))
 {
 	char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 	int cmp_result;
 	size_t r, s;
 
-loop:	if (n < 7) {
+loop: if (n < 7) {
 		for (pm = a + es; pm < a + n * es; pm += es)
 			for (pl = pm; pl > a && cmp(pl - es, pl) > 0;
-			     pl -= es)
+					 pl -= es)
 				swap(pl, pl - es);
 		return;
 	}
@@ -332,7 +332,7 @@ loop:	if (n < 7) {
 	swap(a, pm);
 	pa = pb = a + es;
 	pc = pd = a + (n - 1) * es;
-	for (;;) {
+	for (;; ) {
 		while (pb <= pc && (cmp_result = cmp(pb, a)) <= 0) {
 			if (cmp_result == 0) {
 				swap(pa, pb);
@@ -370,7 +370,7 @@ loop:	if (n < 7) {
 		if (s > es) {
 			if (r > es) {
 				introsort(a, r / es, es, maxdepth,
-				    swaptype, cmp);
+									swaptype, cmp);
 			}
 			a = pn - s;
 			n = s / es;
@@ -381,7 +381,7 @@ loop:	if (n < 7) {
 		if (r > es) {
 			if (s > es) {
 				introsort(pn - s, s / es, es, maxdepth,
-				    swaptype, cmp);
+									swaptype, cmp);
 			}
 			n = r / es;
 			goto loop;

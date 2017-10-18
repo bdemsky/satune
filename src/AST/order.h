@@ -8,7 +8,7 @@
 #include "boolean.h"
 #include "orderpair.h"
 
-class Order{
+class Order {
 public:
 	Order(OrderType type, Set *set);
 	virtual ~Order();
@@ -24,7 +24,7 @@ public:
 	void initializeOrderElementsHashtable();
 	void addOrderConstraint(BooleanOrder *constraint);
 	void setOrderEncodingType(OrderEncodingType type);
-	HashtableOrderPair* getOrderPairTable();
+	HashtableOrderPair *getOrderPairTable();
 	CMEMALLOC;
 };
 

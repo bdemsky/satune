@@ -24,13 +24,13 @@
    void ourfree(void *ptr);
    void * ourcalloc(size_t count, size_t size);
    void * ourrealloc(void *ptr, size_t size);
-*/
+ */
 
 #if 0
-void * model_malloc(size_t size);
+void *model_malloc(size_t size);
 void model_free(void *ptr);
-void * model_calloc(size_t count, size_t size);
-void * model_realloc(void *ptr, size_t size);
+void *model_calloc(size_t count, size_t size);
+void *model_realloc(void *ptr, size_t size);
 
 
 #define ourmalloc model_malloc

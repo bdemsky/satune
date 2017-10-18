@@ -28,8 +28,8 @@ DecomposeOrderTransform::~DecomposeOrderTransform() {
 
 void DecomposeOrderTransform::doTransform() {
 	HashsetOrder *orders = solver->getActiveOrders()->copy();
-	SetIteratorOrder * orderit=orders->iterator();
-	while(orderit->hasNext()) {
+	SetIteratorOrder *orderit = orders->iterator();
+	while (orderit->hasNext()) {
 		Order *order = orderit->next();
 
 		if (GETVARTUNABLE(solver->getTuner(), order->type, DECOMPOSEORDER, &onoff) == 0) {
@@ -60,12 +60,12 @@ void DecomposeOrderTransform::doTransform() {
 			}
 		}
 
-		
+
 		bool mustReachPrune = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
 
 		if (mustReachPrune)
 			removeMustBeTrueNodes(solver, graph);
-		
+
 		//This is needed for splitorder
 		computeStronglyConnectedComponentGraph(graph);
 		decomposeOrder(order, graph);

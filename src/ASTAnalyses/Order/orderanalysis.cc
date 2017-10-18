@@ -115,7 +115,7 @@ void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node) {
 			OrderNode *sinkNode = outEdge->sink;
 			sinkNode->inEdges.remove(outEdge);
 			//Adding new edge to new sink and src nodes ...
-			if(srcNode == sinkNode) {
+			if (srcNode == sinkNode) {
 				This->setUnSAT();
 				delete iterout;
 				delete iterin;
@@ -297,7 +297,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 				if (!edge->mustNeg && sources->contains(child)) {
 					edge->mustNeg = true;
 					edge->polNeg = true;
-					if (edge->mustPos){
+					if (edge->mustPos) {
 						solver->setUnSAT();
 					}
 				}

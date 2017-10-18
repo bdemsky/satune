@@ -13,8 +13,8 @@
  * 8=>9
  * 9=>2
  * 6=>2
- * 
- * 
+ *
+ *
  */
 int main(int numargs, char **argv) {
 	CSolver *solver = new CSolver();
@@ -53,11 +53,11 @@ int main(int numargs, char **argv) {
 	BooleanEdge b57 =  solver->orderConstraint(order, 5, 7);
 	solver->addConstraint(b57);
 
-	
-	if (solver->solve() == 1){
+
+	if (solver->solve() == 1) {
 		printf("SAT\n");
-		printf("O(5,1)=%d O(1,4)=%d O(5,4)=%d O(1,5)=%d\n", 
-					 solver->getOrderConstraintValue(order, 5, 1), 
+		printf("O(5,1)=%d O(1,4)=%d O(5,4)=%d O(1,5)=%d\n",
+					 solver->getOrderConstraintValue(order, 5, 1),
 					 solver->getOrderConstraintValue(order, 1, 4),
 					 solver->getOrderConstraintValue(order, 5, 4),
 					 solver->getOrderConstraintValue(order, 1, 5));

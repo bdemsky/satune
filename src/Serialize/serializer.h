@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   serializer.h
  * Author: hamed
  *
@@ -26,14 +26,14 @@ private:
 	CloneMap map;
 };
 
-inline bool Serializer::isSerialized(void* obj){
+inline bool Serializer::isSerialized(void *obj) {
 	return map.contains(obj);
 }
 
 
 
 
-void serializeBooleanEdge(Serializer* serializer, BooleanEdge be);
+void serializeBooleanEdge(Serializer *serializer, BooleanEdge be);
 
-#endif /* SERIALIZER_H */
+#endif/* SERIALIZER_H */
 

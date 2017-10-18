@@ -5,11 +5,11 @@
 #include "qsort.h"
 
 int intcompare(const void *p1, const void *p2) {
-	uint64_t a=*(uint64_t const *) p1;
-	uint64_t b=*(uint64_t const *) p2;
+	uint64_t a = *(uint64_t const *) p1;
+	uint64_t b = *(uint64_t const *) p2;
 	if (a < b)
 		return -1;
-	else if (a==b)
+	else if (a == b)
 		return 0;
 	else
 		return 1;
@@ -34,18 +34,18 @@ bool Set::exists(uint64_t element) {
 		return element >= low && element <= high;
 	} else {
 		//Use Binary Search
-		uint low=0;
-		uint high=members->getSize()-1;
-		while(true) {
-			uint middle=(low+high)/2;
-			uint64_t val=members->get(middle);
+		uint low = 0;
+		uint high = members->getSize() - 1;
+		while (true) {
+			uint middle = (low + high) / 2;
+			uint64_t val = members->get(middle);
 			if (element < val) {
-				high=middle-1;
-				if (middle<=low)
+				high = middle - 1;
+				if (middle <= low)
 					return false;
 			} else if (element > val) {
-				low=middle+1;
-				if (middle>=high)
+				low = middle + 1;
+				if (middle >= high)
 					return false;
 			} else {
 				return true;
@@ -103,7 +103,7 @@ uint Set::getUnionSize(Set *s) {
 	uint sum = 0;
 	uint64_t sValue = s->getElement(sIndex);
 	uint64_t thisValue = getElement(thisIndex);
-	while(thisIndex < thisSize && sIndex < sSize) {
+	while (thisIndex < thisSize && sIndex < sSize) {
 		if (sValue < thisValue) {
 			sValue = s->getElement(++sIndex);
 			sum++;
@@ -117,18 +117,18 @@ uint Set::getUnionSize(Set *s) {
 		}
 	}
 	sum += (thisSize - thisIndex) + (sSize - sIndex);
-	
+
 	return sum;
 }
 
-void Set::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void Set::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 	ASTNodeType asttype = SETTYPE;
 	serializer->mywrite(&asttype, sizeof(ASTNodeType));
-	Set* This = this;
-	serializer->mywrite(&This, sizeof(Set*));
+	Set *This = this;
+	serializer->mywrite(&This, sizeof(Set *));
 	serializer->mywrite(&type, sizeof(VarType));
 	serializer->mywrite(&isRange, sizeof(bool));
 	serializer->mywrite(&low, sizeof(uint64_t));
@@ -137,20 +137,20 @@ void Set::serialize(Serializer* serializer){
 	serializer->mywrite(&isMutable, sizeof(bool));
 	uint size = members->getSize();
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
+	for (uint i = 0; i < size; i++) {
 		uint64_t mem = members->get(i);
 		serializer->mywrite(&mem, sizeof(uint64_t));
 	}
 }
 
-void Set::print(){
+void Set::print() {
 	model_print("{Set:");
-	if(isRange){
+	if (isRange) {
 		model_print("Range: low=%lu, high=%lu}\n\n", low, high);
 	} else {
 		uint size = members->getSize();
 		model_print("Members: ");
-		for(uint i=0; i<size; i++){
+		for (uint i = 0; i < size; i++) {
 			uint64_t mem = members->get(i);
 			model_print("%lu, ", mem);
 		}

@@ -24,9 +24,9 @@ public:
 	void addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	void addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	OrderEdge *getInverseOrderEdge(OrderEdge *edge);
-	Order *getOrder() {return order;} 
-	bool isTherePath(OrderNode* source, OrderNode* destination);
-	bool isTherePathVisit(HashsetOrderNode &visited, OrderNode* current, OrderNode* destination);
+	Order *getOrder() {return order;}
+	bool isTherePath(OrderNode *source, OrderNode *destination);
+	bool isTherePathVisit(HashsetOrderNode &visited, OrderNode *current, OrderNode *destination);
 	SetIteratorOrderNode *getNodes() {return nodes->iterator();}
 	SetIteratorOrderEdge *getEdges() {return edges->iterator();}
 

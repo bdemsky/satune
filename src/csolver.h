@@ -20,7 +20,7 @@ public:
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
 
 	VarType getSetVarType(Set *set);
-	
+
 	Element *createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange);
 
 	/** This function creates a mutable set. */
@@ -37,11 +37,11 @@ public:
 	    items to the set. */
 
 	uint64_t createUniqueItem(MutableSet *set);
-	
+
 	/**
 	 * Freeze and finalize the mutableSet ...
 	 */
-	void finalizeMutableSet(MutableSet* set);
+	void finalizeMutableSet(MutableSet *set);
 
 	/** This function creates an element variable over a set. */
 
@@ -49,8 +49,8 @@ public:
 
 	/** This function creates an element constrant. */
 	Element *getElementConst(VarType type, uint64_t value);
-	
-	Set* getElementRange (Element* element);
+
+	Set *getElementRange (Element *element);
 
 	BooleanEdge getBooleanTrue();
 
@@ -136,11 +136,11 @@ public:
 	bool isUnSAT() { return unsat; }
 
 	Vector<Order *> *getOrders() { return &allOrders;}
-	HashsetOrder * getActiveOrders() { return &activeOrders;}
+	HashsetOrder *getActiveOrders() { return &activeOrders;}
 
 	Tuner *getTuner() { return tuner; }
 
-	SetIteratorBooleanEdge * getConstraints() { return constraints.iterator(); }
+	SetIteratorBooleanEdge *getConstraints() { return constraints.iterator(); }
 
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
@@ -189,7 +189,7 @@ private:
 	Vector<Order *> allOrders;
 
 	HashsetOrder activeOrders;
-	
+
 	/** This is a vector of all function structs that we have allocated. */
 	Vector<Function *> allFunctions;
 

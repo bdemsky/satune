@@ -51,12 +51,12 @@ bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
 	}
 }
 
-bool DecomposeOrderResolver::resolvePartialOrder(OrderNode* first, OrderNode* second){
-	if(first->sccNum > second->sccNum){
+bool DecomposeOrderResolver::resolvePartialOrder(OrderNode *first, OrderNode *second) {
+	if (first->sccNum > second->sccNum) {
 		return false;
 	} else {
 		return graph->isTherePath(first, second);
 	}
-		
+
 }
 

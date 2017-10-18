@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   deserializer.h
  * Author: hamed
  *
@@ -14,12 +14,12 @@
 /**
  * Style of serialized file:
  * ASTNodeType#Pointer#ObjectDATA
- * 
+ *
  * @param file
  */
 class Deserializer {
 public:
-	Deserializer(const char* file);
+	Deserializer(const char *file);
 	CSolver *deserialize();
 	virtual ~Deserializer();
 private:
@@ -44,5 +44,5 @@ private:
 	CloneMap map;
 };
 
-#endif /* DESERIALIZER_H */
+#endif/* DESERIALIZER_H */
 

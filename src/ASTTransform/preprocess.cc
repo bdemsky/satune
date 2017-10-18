@@ -15,10 +15,10 @@ Preprocess::~Preprocess() {
 void Preprocess::doTransform() {
 	if (solver->getTuner()->getTunable(PREPROCESS, &onoff) == 0)
 		return;
-	
+
 	BooleanIterator bit(solver);
-	while(bit.hasNext()) {
-		Boolean *b=bit.next();
+	while (bit.hasNext()) {
+		Boolean *b = bit.next();
 		if (b->type == BOOLEANVAR)
 			processBooleanVar((BooleanVar *)b);
 	}
@@ -26,7 +26,7 @@ void Preprocess::doTransform() {
 }
 
 void Preprocess::resolveBooleanVars() {
-	SetIteratorBoolean * iterator = toremove.iterator();
+	SetIteratorBoolean *iterator = toremove.iterator();
 	while (iterator->hasNext()) {
 		BooleanVar *bv = (BooleanVar *) iterator->next();
 		if (bv->polarity == P_TRUE) {
@@ -38,9 +38,9 @@ void Preprocess::resolveBooleanVars() {
 	delete iterator;
 }
 
-void Preprocess::processBooleanVar(BooleanVar * b) {
-	if (b->polarity==P_TRUE ||
-			b->polarity==P_FALSE) {
+void Preprocess::processBooleanVar(BooleanVar *b) {
+	if (b->polarity == P_TRUE ||
+			b->polarity == P_FALSE) {
 		toremove.add(b);
 	}
 }

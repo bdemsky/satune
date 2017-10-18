@@ -103,7 +103,7 @@ void CSolver::serialize() {
 		Deserializer deserializer("dump");
 		deserializer.deserialize();
 	}
-	
+
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
@@ -118,7 +118,7 @@ Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange
 	return set;
 }
 
-VarType CSolver::getSetVarType(Set *set){
+VarType CSolver::getSetVarType(Set *set) {
 	return set->getType();
 }
 
@@ -143,7 +143,7 @@ uint64_t CSolver::createUniqueItem(MutableSet *set) {
 	return element;
 }
 
-void CSolver::finalizeMutableSet(MutableSet* set){
+void CSolver::finalizeMutableSet(MutableSet *set) {
 	set->finalize();
 }
 
@@ -153,7 +153,7 @@ Element *CSolver::getElementVar(Set *set) {
 	return element;
 }
 
-Set* CSolver::getElementRange (Element* element){
+Set *CSolver::getElementRange (Element *element) {
 	return element->getRange();
 }
 
@@ -260,11 +260,11 @@ BooleanEdge CSolver::applyPredicateTable(Predicate *predicate, Element **inputs,
 }
 
 bool CSolver::isTrue(BooleanEdge b) {
-        return b.isNegated()?b->isFalse():b->isTrue();
+	return b.isNegated() ? b->isFalse() : b->isTrue();
 }
 
 bool CSolver::isFalse(BooleanEdge b) {
-        return b.isNegated()?b->isTrue():b->isFalse();
+	return b.isNegated() ? b->isTrue() : b->isFalse();
 }
 
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge arg1, BooleanEdge arg2) {
@@ -279,7 +279,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge arg) {
 
 static int ptrcompares(const void *p1, const void *p2) {
 	uintptr_t b1 = *(uintptr_t const *) p1;
-  uintptr_t b2 = *(uintptr_t const *) p2;
+	uintptr_t b2 = *(uintptr_t const *) p2;
 	if (b1 < b2)
 		return -1;
 	else if (b1 == b2)
@@ -288,11 +288,11 @@ static int ptrcompares(const void *p1, const void *p2) {
 		return 1;
 }
 
-BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge * array, uint asize) {
+BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
 	BooleanEdge newarray[asize];
 	memcpy(newarray, array, asize * sizeof(BooleanEdge));
-	for(uint i=0; i < asize; i++) {
-		BooleanEdge b=newarray[i];
+	for (uint i = 0; i < asize; i++) {
+		BooleanEdge b = newarray[i];
 		if (b->type == LOGICOP) {
 			if (((BooleanLogic *) b.getBoolean())->replaced) {
 				newarray[i] = doRewrite(newarray[i]);
@@ -312,14 +312,14 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 	case SATC_IFF: {
 		for (uint i = 0; i < 2; i++) {
 			if (array[i]->type == BOOLCONST) {
-				if (isTrue(array[i])) { // It can be undefined
+				if (isTrue(array[i])) {	// It can be undefined
 					return array[1 - i];
-				} else if(isFalse(array[i])) {
+				} else if (isFalse(array[i])) {
 					newarray[0] = array[1 - i];
 					return applyLogicalOperation(SATC_NOT, newarray, 1);
 				}
 			} else if (array[i]->type == LOGICOP) {
-				BooleanLogic *b =(BooleanLogic *)array[i].getBoolean();
+				BooleanLogic *b = (BooleanLogic *)array[i].getBoolean();
 				if (b->replaced) {
 					return rewriteLogicalOperation(op, array, asize);
 				}
@@ -328,7 +328,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		break;
 	}
 	case SATC_OR: {
-		for (uint i =0; i <asize; i++) {
+		for (uint i = 0; i < asize; i++) {
 			newarray[i] = applyLogicalOperation(SATC_NOT, array[i]);
 		}
 		return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_AND, newarray, asize));
@@ -344,9 +344,9 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 			if (b->type == BOOLCONST) {
 				if (isTrue(b))
 					continue;
-				else{
+				else {
 					return boolFalse;
-                                }
+				}
 			} else
 				newarray[newindex++] = b;
 		}
@@ -393,21 +393,21 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if(constraint.isNegated())
+	if (constraint.isNegated())
 		model_print("!");
 	constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
-		int t=0;
+		int t = 0;
 		setUnSAT();
 	}
 	else {
 		if (constraint->type == LOGICOP) {
-			BooleanLogic *b=(BooleanLogic *) constraint.getBoolean();
+			BooleanLogic *b = (BooleanLogic *) constraint.getBoolean();
 			if (!constraint.isNegated()) {
-				if (b->op==SATC_AND) {
-					for(uint i=0;i<b->inputs.getSize();i++) {
+				if (b->op == SATC_AND) {
+					for (uint i = 0; i < b->inputs.getSize(); i++) {
 						addConstraint(b->inputs.get(i));
 					}
 					return;
@@ -419,12 +419,12 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 			}
 		}
 		constraints.add(constraint);
-		Boolean *ptr=constraint.getBoolean();
-		
+		Boolean *ptr = constraint.getBoolean();
+
 		if (ptr->boolVal == BV_UNSAT) {
 			setUnSAT();
 		}
-		
+
 		replaceBooleanWithTrueNoRemove(constraint);
 		constraint->parents.clear();
 	}
@@ -449,7 +449,7 @@ int CSolver::solve() {
 
 	Preprocess pp(this);
 	pp.doTransform();
-	
+
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
 
@@ -459,12 +459,12 @@ int CSolver::solve() {
 	EncodingGraph eg(this);
 	eg.buildGraph();
 	eg.encode();
-	
+
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
-        model_print("Is problem UNSAT after encoding: %d\n", unsat);
+	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
-        model_print("Result Computed in CSolver: %d\n", result);
+	model_print("Result Computed in CSolver: %d\n", result);
 	long long finishTime = getTimeNano();
 	elapsedTime = finishTime - startTime;
 	if (deleteTuner) {
@@ -487,7 +487,7 @@ uint64_t CSolver::getElementValue(Element *element) {
 }
 
 bool CSolver::getBooleanValue(BooleanEdge bedge) {
-	Boolean *boolean=bedge.getBoolean();
+	Boolean *boolean = bedge.getBoolean();
 	switch (boolean->type) {
 	case BOOLEANVAR:
 		return getBooleanVariableValueSATTranslator(this, boolean);

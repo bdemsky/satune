@@ -15,21 +15,21 @@ OrderPair::OrderPair() :
 	constraint(E_NULL) {
 }
 
-OrderPair::~OrderPair(){
+OrderPair::~OrderPair() {
 }
 
-Edge OrderPair::getConstraint(){
+Edge OrderPair::getConstraint() {
 	return constraint;
 }
 
-Edge OrderPair::getNegatedConstraint(){
+Edge OrderPair::getNegatedConstraint() {
 	return constraintNegate(constraint);
 }
 
-bool OrderPair::getConstraintValue(CSolver* solver){
+bool OrderPair::getConstraintValue(CSolver *solver) {
 	return getValueCNF(solver->getSATEncoder()->getCNF(), constraint);
 }
 
-bool OrderPair::getNegatedConstraintValue(CSolver* solver){
+bool OrderPair::getNegatedConstraintValue(CSolver *solver) {
 	return getValueCNF(solver->getSATEncoder()->getCNF(), constraintNegate(constraint));
 }
