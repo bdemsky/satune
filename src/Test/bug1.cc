@@ -70,8 +70,8 @@ int main(int numargs, char **argv) {
         BooleanEdge v11 = solver->getBooleanVar(0);
         BooleanEdge v12 = solver->getBooleanVar(0);
         solver->addConstraint(
-                solver->applyLogicalOperation(SATC_IMPLIES, 
-                solver->applyLogicalOperation(SATC_AND, v10, v11),
+                solver->applyLogicalOperation(SATC_OR, 
+                solver->applyLogicalOperation(SATC_OR, v10, v11),
                 solver->applyLogicalOperation(SATC_IFF, v1, v12)));
         BooleanEdge b48 =  solver->orderConstraint(order, 4, 8);
         solver->addConstraint(
