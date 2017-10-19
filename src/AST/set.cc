@@ -146,7 +146,7 @@ void Set::serialize(Serializer *serializer) {
 void Set::print() {
 	model_print("{Set:");
 	if (isRange) {
-		model_print("Range: low=%lu, high=%lu}\n\n", low, high);
+		model_print("Range: low=%lu, high=%lu}", low, high);
 	} else {
 		uint size = members->getSize();
 		model_print("Members: ");
@@ -154,6 +154,6 @@ void Set::print() {
 			uint64_t mem = members->get(i);
 			model_print("%lu, ", mem);
 		}
-		model_print("}\n");
+		model_print("}");
 	}
 }

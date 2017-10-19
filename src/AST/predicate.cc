@@ -96,7 +96,9 @@ void PredicateOperator::serialize(Serializer *serializer) {
 }
 
 void PredicateOperator::print() {
-	model_print("{PredicateOperator: %s }\n", op == SATC_EQUALS ? "EQUAL" : "NOT-EQUAL");
+	const char *names[] = {"==", "<", ">", "<=", ">="};
+
+	model_print("PredicateOperator: %s\n", names[(int)op]);
 }
 
 

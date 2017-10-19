@@ -17,6 +17,8 @@ typedef enum Polarity Polarity;
 enum BooleanValue {BV_UNDEFINED=0, BV_MUSTBETRUE=1, BV_MUSTBEFALSE=2, BV_UNSAT=3};
 typedef enum BooleanValue BooleanValue;
 
+extern const char *elemEncTypeNames[];
+
 enum ElementEncodingType {
 	ELEM_UNASSIGNED, ONEHOT, UNARY, BINARYINDEX, BINARYVAL
 };

@@ -393,9 +393,6 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if (constraint.isNegated())
-		model_print("!");
-	constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
@@ -447,19 +444,19 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
-	//Preprocess pp(this);
-	//pp.doTransform();
+	Preprocess pp(this);
+	pp.doTransform();
 
-	//DecomposeOrderTransform dot(this);
-	//	dot.doTransform();
+	DecomposeOrderTransform dot(this);
+	dot.doTransform();
 
-	//IntegerEncodingTransform iet(this);
-	//	iet.doTransform();
+	IntegerEncodingTransform iet(this);
+	iet.doTransform();
 
-	//EncodingGraph eg(this);
-	//eg.buildGraph();
-	//eg.encode();
-
+	EncodingGraph eg(this);
+	eg.buildGraph();
+	eg.encode();
+	printConstraints();
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
@@ -472,6 +469,19 @@ int CSolver::solve() {
 		tuner = NULL;
 	}
 	return result;
+}
+
+void CSolver::printConstraints() {
+	SetIteratorBooleanEdge *it = getConstraints();
+	while (it->hasNext()) {
+		BooleanEdge b = it->next();
+		if (b.isNegated())
+			model_print("!");
+		b->print();
+		model_print("\n");
+	}
+	delete it;
+
 }
 
 uint64_t CSolver::getElementValue(Element *element) {

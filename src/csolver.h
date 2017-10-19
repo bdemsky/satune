@@ -132,8 +132,9 @@ public:
 	bool isFalse(BooleanEdge b);
 
 	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
-
 	bool isUnSAT() { return unsat; }
+
+	void printConstraints();
 
 	Vector<Order *> *getOrders() { return &allOrders;}
 	HashsetOrder *getActiveOrders() { return &activeOrders;}

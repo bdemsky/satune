@@ -48,7 +48,7 @@ void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReve
 			if (!edge->mustPos)
 				continue;
 		} else
-		if (!edge->polPos && !edge->pseudoPos)	//Ignore edges that do not have positive polarity
+		if (!edge->polPos && !edge->pseudoPos)		//Ignore edges that do not have positive polarity
 			continue;
 
 		OrderNode *child = isReverse ? edge->source : edge->sink;
@@ -56,8 +56,9 @@ void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReve
 			child->status = VISITED;
 			DFSNodeVisit(child, finishNodes, isReverse, mustvisit, sccNum);
 			child->status = FINISHED;
-			if (finishNodes != NULL)
+			if (finishNodes != NULL) {
 				finishNodes->push(child);
+			}
 			if (isReverse)
 				child->sccNum = sccNum;
 		}
@@ -81,69 +82,7 @@ void computeStronglyConnectedComponentGraph(OrderGraph *graph) {
 	resetNodeInfoStatusSCC(graph);
 }
 
-bool isMustBeTrueNode(OrderNode *node) {
-	SetIteratorOrderEdge *iterator = node->inEdges.iterator();
-	while (iterator->hasNext()) {
-		OrderEdge *edge = iterator->next();
-		if (!edge->mustPos) {
-			delete iterator;
-			return false;
-		}
-	}
-	delete iterator;
-	iterator = node->outEdges.iterator();
-	while (iterator->hasNext()) {
-		OrderEdge *edge = iterator->next();
-		if (!edge->mustPos) {
-			delete iterator;
-			return false;
-		}
-	}
-	delete iterator;
-	return true;
-}
 
-void bypassMustBeTrueNode(CSolver *This, OrderGraph *graph, OrderNode *node) {
-	SetIteratorOrderEdge *iterin = node->inEdges.iterator();
-	while (iterin->hasNext()) {
-		OrderEdge *inEdge = iterin->next();
-		OrderNode *srcNode = inEdge->source;
-		srcNode->outEdges.remove(inEdge);
-		SetIteratorOrderEdge *iterout = node->outEdges.iterator();
-		while (iterout->hasNext()) {
-			OrderEdge *outEdge = iterout->next();
-			OrderNode *sinkNode = outEdge->sink;
-			sinkNode->inEdges.remove(outEdge);
-			//Adding new edge to new sink and src nodes ...
-			if (srcNode == sinkNode) {
-				This->setUnSAT();
-				delete iterout;
-				delete iterin;
-				return;
-			}
-			OrderEdge *newEdge = graph->getOrderEdgeFromOrderGraph(srcNode, sinkNode);
-			newEdge->mustPos = true;
-			newEdge->polPos = true;
-			if (newEdge->mustNeg)
-				This->setUnSAT();
-			srcNode->outEdges.add(newEdge);
-			sinkNode->inEdges.add(newEdge);
-		}
-		delete iterout;
-	}
-	delete iterin;
-}
-
-void removeMustBeTrueNodes(CSolver *This, OrderGraph *graph) {
-	SetIteratorOrderNode *iterator = graph->getNodes();
-	while (iterator->hasNext()) {
-		OrderNode *node = iterator->next();
-		if (isMustBeTrueNode(node)) {
-			bypassMustBeTrueNode(This, graph, node);
-		}
-	}
-	delete iterator;
-}
 
 /** This function computes a source set for every nodes, the set of
     nodes that can reach that node via pospolarity edges.  It then

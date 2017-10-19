@@ -5,6 +5,8 @@
 #include "satencoder.h"
 #include "set.h"
 
+const char *elemEncTypeNames[] = {"UNASSIGNED", "ONEHOT", "UNARY", "BINARYINDEX", "BINARYVAL"};
+
 ElementEncoding::ElementEncoding(Element *_element) :
 	type(ELEM_UNASSIGNED),
 	element(_element),
@@ -47,5 +49,19 @@ void ElementEncoding::encodingArrayInitialization() {
 	for (uint i = 0; i < size; i++) {
 		encodingArray[i] = set->getMemberAt(i);
 		setInUseElement(i);
+	}
+}
+
+void ElementEncoding::print() {
+	model_print("%s ", elemEncTypeNames[type]);
+	if (type == BINARYINDEX) {
+		for (uint i = 0; i < encArraySize; i++) {
+			if (i != 0)
+				model_print(" ,");
+			if (isinUseElement(i))
+				model_print("%" PRIu64 "", encodingArray[i]);
+			else
+				model_print("_");
+		}
 	}
 }

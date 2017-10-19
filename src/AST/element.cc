@@ -78,9 +78,11 @@ void ElementSet::serialize(Serializer *serializer) {
 }
 
 void ElementSet::print() {
-	model_print("{ElementSet:\n");
+	model_print("{ElementSet:");
 	set->print();
-	model_print("}\n");
+	model_print(" %p ", this);
+	getElementEncoding()->print();
+	model_print("}");
 }
 
 void ElementConst::serialize(Serializer *serializer) {

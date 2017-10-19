@@ -51,10 +51,9 @@ int main(int numargs, char **argv) {
 	BooleanEdge v3 = solver->getBooleanVar(0);
 	BooleanEdge v4 = solver->getBooleanVar(0);
 	BooleanEdge v5 = solver->getBooleanVar(0);
-	solver->addConstraint(
-		solver->applyLogicalOperation(SATC_OR,
-																	solver->applyLogicalOperation(SATC_IFF, v3, v4),
-																	v5));
+	BooleanEdge be = solver->applyLogicalOperation(SATC_IFF, v3, v4);
+	BooleanEdge sor = solver->applyLogicalOperation(SATC_OR, be, v5);
+	solver->addConstraint(sor);
 	solver->addConstraint(solver->applyLogicalOperation(SATC_NOT, v5));
 	BooleanEdge v6 = solver->getBooleanVar(0);
 	BooleanEdge v7 = solver->getBooleanVar(0);
@@ -74,10 +73,9 @@ int main(int numargs, char **argv) {
 																	solver->applyLogicalOperation(SATC_OR, v10, v11),
 																	solver->applyLogicalOperation(SATC_IFF, v1, v12)));
 	BooleanEdge b48 =  solver->orderConstraint(order, 4, 8);
-	solver->addConstraint(
-		solver->applyLogicalOperation(SATC_OR,
-																	solver->applyLogicalOperation(SATC_OR, v10, v11),
-																	b48));
+	BooleanEdge be1 = solver->applyLogicalOperation(SATC_OR, v10, v11);
+	BooleanEdge be2 = solver->applyLogicalOperation(SATC_OR, be1, b48);
+	solver->addConstraint(be2);
 	BooleanEdge v13 = solver->getBooleanVar(0);
 	BooleanEdge v14 = solver->getBooleanVar(0);
 	solver->addConstraint(
