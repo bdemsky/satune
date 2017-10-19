@@ -381,7 +381,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		return BooleanEdge(boolean);
 	} else {
 		delete boolean;
-		return BooleanEdge(boolean);
+		return BooleanEdge(b);
 	}
 }
 
@@ -447,18 +447,18 @@ int CSolver::solve() {
 	long long startTime = getTimeNano();
 	computePolarities(this);
 
-	Preprocess pp(this);
-	pp.doTransform();
+	//Preprocess pp(this);
+	//pp.doTransform();
 
-	DecomposeOrderTransform dot(this);
-	dot.doTransform();
+	//DecomposeOrderTransform dot(this);
+	//	dot.doTransform();
 
-	IntegerEncodingTransform iet(this);
-	iet.doTransform();
+	//IntegerEncodingTransform iet(this);
+	//	iet.doTransform();
 
-	EncodingGraph eg(this);
-	eg.buildGraph();
-	eg.encode();
+	//EncodingGraph eg(this);
+	//eg.buildGraph();
+	//eg.encode();
 
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
