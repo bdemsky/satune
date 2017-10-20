@@ -9,6 +9,11 @@ EncodingSubGraph::EncodingSubGraph() :
 	maxEncodingVal(0) {
 }
 
+EncodingSubGraph::~EncodingSubGraph() {
+	map.resetAndDeleteKeys();
+	values.resetAndDelete();
+}
+
 uint hashNodeValuePair(NodeValuePair *nvp) {
 	return (uint) (nvp->value ^ ((uintptr_t)nvp->node));
 }

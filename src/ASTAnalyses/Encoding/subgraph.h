@@ -37,6 +37,7 @@ typedef Hashtable<NodeValuePair *, EncodingValue *, uintptr_t, 0, hashNodeValueP
 class EncodingSubGraph {
 public:
 	EncodingSubGraph();
+	~EncodingSubGraph();
 	void addNode(EncodingNode *n);
 	SetIteratorEncodingNode *nodeIterator();
 	void encode();

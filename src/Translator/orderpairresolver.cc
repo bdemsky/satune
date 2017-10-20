@@ -23,7 +23,7 @@ OrderPairResolver::OrderPairResolver(CSolver *_solver, Order *_order) :
 
 OrderPairResolver::~OrderPairResolver() {
 	if (orderPairTable != NULL) {
-		orderPairTable->resetanddelete();
+		orderPairTable->resetAndDeleteVals();
 		delete orderPairTable;
 	}
 }

@@ -126,7 +126,25 @@ public:
 		}
 	}
 
-	void resetanddelete() {
+	void resetAndDeleteKeys() {
+		for (unsigned int i = 0; i < capacity; i++) {
+			struct Hashlistnode<_Key, _Val> *bin = &table[i];
+			if (bin->key != NULL) {
+				delete bin->key;
+				bin->key = NULL;
+				if (bin->val != NULL) {
+					bin->val = NULL;
+				}
+			}
+		}
+		if (zero) {
+			ourfree(zero);
+			zero = NULL;
+		}
+		size = 0;
+	}
+
+	void resetAndDeleteVals() {
 		for (unsigned int i = 0; i < capacity; i++) {
 			struct Hashlistnode<_Key, _Val> *bin = &table[i];
 			if (bin->key != NULL) {
@@ -146,7 +164,7 @@ public:
 		size = 0;
 	}
 
-	void resetandfree() {
+	void resetAndFreeVals() {
 		for (unsigned int i = 0; i < capacity; i++) {
 			struct Hashlistnode<_Key, _Val> *bin = &table[i];
 			if (bin->key != NULL) {

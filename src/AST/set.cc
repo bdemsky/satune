@@ -105,14 +105,22 @@ uint Set::getUnionSize(Set *s) {
 	uint64_t thisValue = getElement(thisIndex);
 	while (thisIndex < thisSize && sIndex < sSize) {
 		if (sValue < thisValue) {
-			sValue = s->getElement(++sIndex);
+			sIndex++;
+			if (sIndex < sSize)
+				sValue = s->getElement(sIndex);
 			sum++;
 		} else if (thisValue < sValue) {
-			thisValue = getElement(++thisIndex);
+			thisIndex++;
+			if (thisIndex < thisSize)
+				thisValue = getElement(thisIndex);
 			sum++;
 		} else {
-			thisValue = getElement(++thisIndex);
-			sValue = s->getElement(++sIndex);
+			thisIndex++;
+			sIndex++;
+			if (sIndex < sSize)
+				sValue = s->getElement(sIndex);
+			if (thisIndex < thisSize)
+				thisValue = getElement(thisIndex);
 			sum++;
 		}
 	}

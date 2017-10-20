@@ -14,6 +14,12 @@ EncodingGraph::EncodingGraph(CSolver *_solver) :
 	solver(_solver) {
 }
 
+EncodingGraph::~EncodingGraph() {
+	subgraphs.resetAndDelete();
+	encodingMap.resetAndDeleteVals();
+	edgeMap.resetAndDeleteVals();
+}
+
 int sortEncodingEdge(const void *p1, const void *p2) {
 	const EncodingEdge *e1 = *(const EncodingEdge **) p1;
 	const EncodingEdge *e2 = *(const EncodingEdge **) p2;

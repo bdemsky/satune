@@ -7,6 +7,7 @@
 class EncodingGraph {
 public:
 	EncodingGraph(CSolver *solver);
+	~EncodingGraph();
 	void buildGraph();
 	void encode();
 

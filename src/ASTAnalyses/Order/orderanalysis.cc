@@ -155,7 +155,7 @@ void completePartialOrderGraph(OrderGraph *graph) {
 		}
 	}
 
-	table->resetanddelete();
+	table->resetAndDeleteVals();
 	delete table;
 	resetNodeInfoStatusSCC(graph);
 }
@@ -245,7 +245,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 		}
 	}
 
-	table->resetanddelete();
+	table->resetAndDeleteVals();
 	delete table;
 }
 
