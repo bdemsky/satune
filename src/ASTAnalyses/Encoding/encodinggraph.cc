@@ -73,12 +73,15 @@ void EncodingGraph::encode() {
 					EncodingSubGraph *subgraph = graphMap.get(n);
 					if (subgraph == NULL)
 						continue;
-					uint encodingSize = subgraph->getEncodingSize(n);
+					uint encodingSize = subgraph->getEncodingMaxVal(n)+1;
 					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
+					model_print("encoding size=%u\n", encodingSize);
+					model_print("padded=%u\n", paddedSize);
 					encoding->allocInUseArrayElement(paddedSize);
 					encoding->allocEncodingArrayElement(paddedSize);
 					Set *s = e->getRange();
 					for (uint i = 0; i < s->getSize(); i++) {
+						model_print("index=%u\n", i);
 						uint64_t value = s->getElement(i);
 						uint encodingIndex = subgraph->getEncoding(n, value);
 						encoding->setInUseElement(encodingIndex);

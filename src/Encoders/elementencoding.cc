@@ -57,7 +57,7 @@ void ElementEncoding::print() {
 	if (type == BINARYINDEX) {
 		for (uint i = 0; i < encArraySize; i++) {
 			if (i != 0)
-				model_print(" ,");
+				model_print(", ");
 			if (isinUseElement(i))
 				model_print("%" PRIu64 "", encodingArray[i]);
 			else
