@@ -36,6 +36,7 @@ CSolver::CSolver() :
 /** This function tears down the solver and the entire AST */
 
 CSolver::~CSolver() {
+        this->serialize();
 	uint size = allBooleans.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allBooleans.get(i);
@@ -48,7 +49,10 @@ CSolver::~CSolver() {
 
 	size = allElements.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete allElements.get(i);
+                Element* el = allElements.get(i);
+                model_print("deleting ...%u", i);
+                ASSERT(el != NULL);
+		delete el;
 	}
 
 	size = allTables.getSize();
@@ -98,11 +102,11 @@ void CSolver::serialize() {
 		}
 		delete it;
 	}
-	model_print("deserializing ...\n");
-	{
-		Deserializer deserializer("dump");
-		deserializer.deserialize();
-	}
+//	model_print("deserializing ...\n");
+//	{
+//		Deserializer deserializer("dump");
+//		deserializer.deserialize();
+//	}
 	
 }
 
@@ -149,6 +153,7 @@ void CSolver::finalizeMutableSet(MutableSet* set){
 
 Element *CSolver::getElementVar(Set *set) {
 	Element *element = new ElementSet(set);
+        model_println("%%%%ElementVar:%u", allElements.getSize());
 	allElements.push(element);
 	return element;
 }
@@ -165,6 +170,7 @@ Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
 		allSets.push(set);
+                model_println("%%%%ElementConst:%u", allElements.getSize());
 		allElements.push(element);
 		elemMap.put(element, element);
 		return element;
@@ -180,6 +186,7 @@ Element *CSolver::applyFunction(Function *function, Element **array, uint numArr
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
 		element->updateParents();
+                model_println("%%%%ElementFunction:%u", allElements.getSize());
 		allElements.push(element);
 		elemMap.put(element, element);
 		return element;

@@ -131,16 +131,19 @@ void Set::serialize(Serializer* serializer){
 	serializer->mywrite(&This, sizeof(Set*));
 	serializer->mywrite(&type, sizeof(VarType));
 	serializer->mywrite(&isRange, sizeof(bool));
-	serializer->mywrite(&low, sizeof(uint64_t));
-	serializer->mywrite(&high, sizeof(uint64_t));
-	bool isMutable = isMutableSet();
+        bool isMutable = isMutableSet();
 	serializer->mywrite(&isMutable, sizeof(bool));
-	uint size = members->getSize();
-	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
-		uint64_t mem = members->get(i);
-		serializer->mywrite(&mem, sizeof(uint64_t));
-	}
+        if(isRange){
+                serializer->mywrite(&low, sizeof(uint64_t));
+                serializer->mywrite(&high, sizeof(uint64_t));
+        }else {
+                uint size = members->getSize();
+                serializer->mywrite(&size, sizeof(uint));
+                for(uint i=0; i<size; i++){
+                        uint64_t mem = members->get(i);
+                        serializer->mywrite(&mem, sizeof(uint64_t));
+                }
+        }
 }
 
 void Set::print(){
