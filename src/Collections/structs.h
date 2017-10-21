@@ -19,11 +19,15 @@ bool order_element_equals(OrderElement *key1, OrderElement *key2);
 unsigned int order_pair_hash_function(OrderPair *This);
 bool order_pair_equals(OrderPair *key1, OrderPair *key2);
 
+unsigned int doredge_hash_function(DOREdge *key);
+bool doredge_equals(DOREdge *key1, DOREdge *key2);
+
 
 typedef Hashset<TableEntry *, uintptr_t, PTRSHIFT, table_entry_hash_function, table_entry_equals> HashsetTableEntry;
 typedef Hashset<OrderNode *, uintptr_t, PTRSHIFT, order_node_hash_function, order_node_equals> HashsetOrderNode;
 typedef Hashset<OrderEdge *, uintptr_t, PTRSHIFT, order_edge_hash_function, order_edge_equals> HashsetOrderEdge;
 typedef Hashset<OrderElement *, uintptr_t, PTRSHIFT, order_element_hash_function, order_element_equals> HashsetOrderElement;
+typedef Hashset<DOREdge *, uintptr_t, PTRSHIFT, doredge_hash_function, doredge_equals> HashsetDOREdge;
 typedef Hashset<Boolean *, uintptr_t, PTRSHIFT> HashsetBoolean;
 typedef Hashset<Element *, uintptr_t, PTRSHIFT> HashsetElement;
 typedef SetIterator<Boolean *, uintptr_t, PTRSHIFT> SetIteratorBoolean;
@@ -43,5 +47,5 @@ typedef SetIterator<TableEntry *, uintptr_t, PTRSHIFT, table_entry_hash_function
 typedef SetIterator<OrderEdge *, uintptr_t, PTRSHIFT, order_edge_hash_function, order_edge_equals> SetIteratorOrderEdge;
 typedef SetIterator<OrderNode *, uintptr_t, PTRSHIFT, order_node_hash_function, order_node_equals> SetIteratorOrderNode;
 typedef SetIterator<OrderElement *, uintptr_t, PTRSHIFT, order_element_hash_function, order_element_equals> SetIteratorOrderElement;
-
+typedef SetIterator<DOREdge *, uintptr_t, PTRSHIFT, doredge_hash_function, doredge_equals> SetIteratorDOREdge;
 #endif

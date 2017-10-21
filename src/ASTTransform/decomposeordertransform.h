@@ -21,7 +21,7 @@ public:
 private:
 	bool isMustBeTrueNode(OrderNode *node);
 	void bypassMustBeTrueNode(OrderGraph *graph, OrderNode *node, HashsetOrderEdge *edgesRemoved);
-	void decomposeOrder(Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved);
+	void decomposeOrder(Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved, DecomposeOrderResolver *dor);
 	void removeMustBeTrueNodes(OrderGraph *graph, HashsetOrderEdge *edgesRemoved);
 };
 

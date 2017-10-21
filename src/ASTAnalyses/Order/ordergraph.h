@@ -27,14 +27,23 @@ public:
 	Order *getOrder() {return order;}
 	bool isTherePath(OrderNode *source, OrderNode *destination);
 	bool isTherePathVisit(HashsetOrderNode &visited, OrderNode *current, OrderNode *destination);
-	SetIteratorOrderNode *getNodes() {return nodes->iterator();}
-	SetIteratorOrderEdge *getEdges() {return edges->iterator();}
-
+	SetIteratorOrderNode *getNodes() {return nodes.iterator();}
+	SetIteratorOrderEdge *getEdges() {return edges.iterator();}
+	void DFS(Vector<OrderNode *> *finishNodes);
+	void DFSMust(Vector<OrderNode *> *finishNodes);
+	void computeStronglyConnectedComponentGraph();
+	void resetNodeInfoStatusSCC();
+	void completePartialOrderGraph();
+	void removeNode(OrderNode *node) {nodes.remove(node);}
+	
 	CMEMALLOC;
 private:
-	HashsetOrderNode *nodes;
-	HashsetOrderEdge *edges;
+	HashsetOrderNode nodes;
+	Vector<OrderNode *> allNodes;
+	HashsetOrderEdge edges;
 	Order *order;
+	void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum);
+	void DFSReverse(Vector<OrderNode *> *finishNodes);
 };
 
 OrderGraph *buildOrderGraph(Order *order);

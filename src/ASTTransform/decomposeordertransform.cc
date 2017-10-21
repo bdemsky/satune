@@ -36,12 +36,15 @@ void DecomposeOrderTransform::doTransform() {
 			continue;
 		}
 
+		DecomposeOrderResolver *dor=new DecomposeOrderResolver(order);
+		order->setOrderResolver(dor);
+		
 		OrderGraph *graph = buildOrderGraph(order);
 		if (order->type == SATC_PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
 			//makes sure we don't incorrectly optimize graphs with negative
 			//polarity edges
-			completePartialOrderGraph(graph);
+			graph->completePartialOrderGraph();
 		}
 
 		bool mustReachGlobal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
@@ -60,7 +63,6 @@ void DecomposeOrderTransform::doTransform() {
 			}
 		}
 
-
 		bool mustReachPrune = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHPRUNE, &onoff);
 		HashsetOrderEdge *edgesRemoved = NULL;
 
@@ -70,8 +72,8 @@ void DecomposeOrderTransform::doTransform() {
 		}
 
 		//This is needed for splitorder
-		computeStronglyConnectedComponentGraph(graph);
-		decomposeOrder(order, graph, edgesRemoved);
+		graph->computeStronglyConnectedComponentGraph();
+		decomposeOrder(order, graph, edgesRemoved, dor);
 		if (edgesRemoved != NULL)
 			delete edgesRemoved;
 	}
@@ -80,8 +82,7 @@ void DecomposeOrderTransform::doTransform() {
 }
 
 
-void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved) {
-	Vector<Order *> ordervec;
+void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved, DecomposeOrderResolver *dor) {
 	Vector<Order *> partialcandidatevec;
 	uint size = currOrder->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
@@ -92,9 +93,11 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 		OrderEdge *invedge = currGraph->lookupOrderEdgeFromOrderGraph(to, from);
 		if (edgesRemoved != NULL) {
 			if (edgesRemoved->contains(edge)) {
+				dor->mustOrderEdge(from->getID(), to->getID());
 				solver->replaceBooleanWithTrue(orderconstraint);
 				continue;
 			} else if (edgesRemoved->contains(invedge)) {
+				dor->mustOrderEdge(to->getID(), from->getID());
 				solver->replaceBooleanWithFalse(orderconstraint);
 				continue;
 			}
@@ -103,8 +106,11 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 		if (from->sccNum != to->sccNum) {
 			if (edge != NULL) {
 				if (edge->polPos) {
+					dor->mustOrderEdge(from->getID(), to->getID());
 					solver->replaceBooleanWithTrue(orderconstraint);
 				} else if (edge->polNeg) {
+					if (currOrder->type == SATC_TOTAL)					
+						dor->mustOrderEdge(to->getID(), from->getID());
 					solver->replaceBooleanWithFalse(orderconstraint);
 				} else {
 					//This case should only be possible if constraint isn't in AST
@@ -114,6 +120,7 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 			} else {
 				if (invedge != NULL) {
 					if (invedge->polPos) {
+						dor->mustOrderEdge(to->getID(), from->getID());
 						solver->replaceBooleanWithFalse(orderconstraint);
 					} else if (edge->polNeg) {
 						//This case shouldn't happen...  If we have a partial order,
@@ -130,12 +137,11 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 		} else {
 			//Build new order and change constraint's order
 			Order *neworder = NULL;
-			if (ordervec.getSize() > from->sccNum)
-				neworder = ordervec.get(from->sccNum);
+			neworder = dor->getOrder(from->sccNum);
 			if (neworder == NULL) {
 				MutableSet *set = solver->createMutableSet(currOrder->set->getType());
 				neworder = solver->createOrder(currOrder->type, set);
-				ordervec.setExpand(from->sccNum, neworder);
+				dor->setOrder(from->sccNum, neworder);
 				if (currOrder->type == SATC_PARTIAL)
 					partialcandidatevec.setExpand(from->sccNum, neworder);
 				else
@@ -154,10 +160,10 @@ void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *curr
 					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}
 			orderconstraint->order = neworder;
+			dor->setEdgeOrder(from->getID(), to->getID(), from->sccNum);
 			neworder->addOrderConstraint(orderconstraint);
 		}
 	}
-	currOrder->setOrderResolver( new DecomposeOrderResolver(currGraph, ordervec) );
 	solver->getActiveOrders()->remove(currOrder);
 	uint pcvsize = partialcandidatevec.getSize();
 	for (uint i = 0; i < pcvsize; i++) {
@@ -209,6 +215,7 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 				solver->setUnSAT();
 				delete iterout;
 				delete iterin;
+				graph->removeNode(node);
 				return;
 			}
 			//Add new order constraint
@@ -227,6 +234,7 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 		delete iterout;
 	}
 	delete iterin;
+	graph->removeNode(node);
 }
 
 void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, HashsetOrderEdge *edgesRemoved) {

@@ -6,8 +6,6 @@
 #include "order.h"
 
 OrderGraph::OrderGraph(Order *_order) :
-	nodes(new HashsetOrderNode()),
-	edges(new HashsetOrderEdge()),
 	order(_order) {
 }
 
@@ -110,43 +108,44 @@ void OrderGraph::addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrd
 
 OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id) {
 	OrderNode *node = new OrderNode(id);
-	OrderNode *tmp = nodes->get(node);
+	OrderNode *tmp = nodes.get(node);
 	if ( tmp != NULL) {
 		delete node;
 		node = tmp;
 	} else {
-		nodes->add(node);
+		nodes.add(node);
+		allNodes.push(node);
 	}
 	return node;
 }
 
 OrderNode *OrderGraph::lookupOrderNodeFromOrderGraph(uint64_t id) {
 	OrderNode node(id);
-	OrderNode *tmp = nodes->get(&node);
+	OrderNode *tmp = nodes.get(&node);
 	return tmp;
 }
 
 OrderEdge *OrderGraph::getOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end) {
 	OrderEdge *edge = new OrderEdge(begin, end);
-	OrderEdge *tmp = edges->get(edge);
+	OrderEdge *tmp = edges.get(edge);
 	if ( tmp != NULL ) {
 		delete edge;
 		edge = tmp;
 	} else {
-		edges->add(edge);
+		edges.add(edge);
 	}
 	return edge;
 }
 
 OrderEdge *OrderGraph::lookupOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end) {
 	OrderEdge edge(begin, end);
-	OrderEdge *tmp = edges->get(&edge);
+	OrderEdge *tmp = edges.get(&edge);
 	return tmp;
 }
 
 OrderEdge *OrderGraph::getInverseOrderEdge(OrderEdge *edge) {
 	OrderEdge inverseedge(edge->sink, edge->source);
-	OrderEdge *tmp = edges->get(&inverseedge);
+	OrderEdge *tmp = edges.get(&inverseedge);
 	return tmp;
 }
 
@@ -163,21 +162,16 @@ void OrderGraph::addMustOrderConstraintToOrderGraph(BooleanOrder *bOrder) {
 }
 
 OrderGraph::~OrderGraph() {
-	SetIteratorOrderNode *iterator = nodes->iterator();
-	while (iterator->hasNext()) {
-		OrderNode *node = iterator->next();
-		delete node;
-	}
-	delete iterator;
+	uint size=allNodes.getSize();
+	for(uint i=0;i<size;i++)
+		delete allNodes.get(i);
 
-	SetIteratorOrderEdge *eiterator = edges->iterator();
+	SetIteratorOrderEdge *eiterator = edges.iterator();
 	while (eiterator->hasNext()) {
 		OrderEdge *edge = eiterator->next();
 		delete edge;
 	}
 	delete eiterator;
-	delete nodes;
-	delete edges;
 }
 
 bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination) {
@@ -226,4 +220,165 @@ bool OrderGraph::isTherePathVisit(HashsetOrderNode &visited, OrderNode *current,
 	}
 	delete iterator;
 	return found;
+}
+
+void OrderGraph::DFS(Vector<OrderNode *> *finishNodes) {
+	SetIteratorOrderNode *iterator = getNodes();
+	while (iterator->hasNext()) {
+		OrderNode *node = iterator->next();
+		if (node->status == NOTVISITED) {
+			node->status = VISITED;
+			DFSNodeVisit(node, finishNodes, false, false, 0);
+			node->status = FINISHED;
+			finishNodes->push(node);
+		}
+	}
+	delete iterator;
+}
+
+void OrderGraph::DFSMust(Vector<OrderNode *> *finishNodes) {
+	SetIteratorOrderNode *iterator = getNodes();
+	while (iterator->hasNext()) {
+		OrderNode *node = iterator->next();
+		if (node->status == NOTVISITED) {
+			node->status = VISITED;
+			DFSNodeVisit(node, finishNodes, false, true, 0);
+			node->status = FINISHED;
+			finishNodes->push(node);
+		}
+	}
+	delete iterator;
+}
+
+void OrderGraph::DFSReverse(Vector<OrderNode *> *finishNodes) {
+	uint size = finishNodes->getSize();
+	uint sccNum = 1;
+	for (int i = size - 1; i >= 0; i--) {
+		OrderNode *node = finishNodes->get(i);
+		if (node->status == NOTVISITED) {
+			node->status = VISITED;
+			DFSNodeVisit(node, NULL, true, false, sccNum);
+			node->sccNum = sccNum;
+			node->status = FINISHED;
+			sccNum++;
+		}
+	}
+}
+
+void OrderGraph::DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum) {
+	SetIteratorOrderEdge *iterator = isReverse ? node->inEdges.iterator() : node->outEdges.iterator();
+	while (iterator->hasNext()) {
+		OrderEdge *edge = iterator->next();
+		if (mustvisit) {
+			if (!edge->mustPos)
+				continue;
+		} else
+		if (!edge->polPos && !edge->pseudoPos)		//Ignore edges that do not have positive polarity
+			continue;
+
+		OrderNode *child = isReverse ? edge->source : edge->sink;
+		if (child->status == NOTVISITED) {
+			child->status = VISITED;
+			DFSNodeVisit(child, finishNodes, isReverse, mustvisit, sccNum);
+			child->status = FINISHED;
+			if (finishNodes != NULL) {
+				finishNodes->push(child);
+			}
+			if (isReverse)
+				child->sccNum = sccNum;
+		}
+	}
+	delete iterator;
+}
+
+void OrderGraph::resetNodeInfoStatusSCC() {
+	SetIteratorOrderNode *iterator = getNodes();
+	while (iterator->hasNext()) {
+		iterator->next()->status = NOTVISITED;
+	}
+	delete iterator;
+}
+
+void OrderGraph::computeStronglyConnectedComponentGraph() {
+	Vector<OrderNode *> finishNodes;
+	DFS(&finishNodes);
+	resetNodeInfoStatusSCC();
+	DFSReverse(&finishNodes);
+	resetNodeInfoStatusSCC();
+}
+
+/** This function computes a source set for every nodes, the set of
+    nodes that can reach that node via pospolarity edges.  It then
+    looks for negative polarity edges from nodes in the the source set
+    to determine whether we need to generate pseudoPos edges. */
+
+void OrderGraph::completePartialOrderGraph() {
+	Vector<OrderNode *> finishNodes;
+	DFS(&finishNodes);
+	resetNodeInfoStatusSCC();
+	HashtableNodeToNodeSet *table = new HashtableNodeToNodeSet(128, 0.25);
+
+	Vector<OrderNode *> sccNodes;
+
+	uint size = finishNodes.getSize();
+	uint sccNum = 1;
+	for (int i = size - 1; i >= 0; i--) {
+		OrderNode *node = finishNodes.get(i);
+		HashsetOrderNode *sources = new HashsetOrderNode(4, 0.25);
+		table->put(node, sources);
+
+		if (node->status == NOTVISITED) {
+			//Need to do reverse traversal here...
+			node->status = VISITED;
+			DFSNodeVisit(node, &sccNodes, true, false, sccNum);
+			node->status = FINISHED;
+			node->sccNum = sccNum;
+			sccNum++;
+			sccNodes.push(node);
+
+			//Compute in set for entire SCC
+			uint rSize = sccNodes.getSize();
+			for (uint j = 0; j < rSize; j++) {
+				OrderNode *rnode = sccNodes.get(j);
+				//Compute source sets
+				SetIteratorOrderEdge *iterator = rnode->inEdges.iterator();
+				while (iterator->hasNext()) {
+					OrderEdge *edge = iterator->next();
+					OrderNode *parent = edge->source;
+					if (edge->polPos) {
+						sources->add(parent);
+						HashsetOrderNode *parent_srcs = (HashsetOrderNode *)table->get(parent);
+						sources->addAll(parent_srcs);
+					}
+				}
+				delete iterator;
+			}
+			for (uint j = 0; j < rSize; j++) {
+				//Copy in set of entire SCC
+				OrderNode *rnode = sccNodes.get(j);
+				HashsetOrderNode *set = (j == 0) ? sources : sources->copy();
+				table->put(rnode, set);
+
+				//Use source sets to compute pseudoPos edges
+				SetIteratorOrderEdge *iterator = node->inEdges.iterator();
+				while (iterator->hasNext()) {
+					OrderEdge *edge = iterator->next();
+					OrderNode *parent = edge->source;
+					ASSERT(parent != rnode);
+					if (edge->polNeg && parent->sccNum != rnode->sccNum &&
+							sources->contains(parent)) {
+						OrderEdge *newedge = getOrderEdgeFromOrderGraph(rnode, parent);
+						newedge->pseudoPos = true;
+					}
+				}
+				delete iterator;
+			}
+
+			sccNodes.clear();
+		}
+	}
+
+	table->resetAndDeleteVals();
+	delete table;
+	resetNodeInfoStatusSCC();
 }

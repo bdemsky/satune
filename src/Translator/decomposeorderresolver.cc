@@ -11,38 +11,61 @@
 #include "ordernode.h"
 #include "ordergraph.h"
 
-DecomposeOrderResolver::DecomposeOrderResolver(OrderGraph *_graph, Vector<Order *> &_orders) :
-	graph(_graph),
-	orders(_orders.getSize(), _orders.expose())
+DecomposeOrderResolver::DecomposeOrderResolver(Order * _order) :
+	graph(NULL),
+	order(_order)
 {
 }
 
 DecomposeOrderResolver::~DecomposeOrderResolver() {
+	if (graph != NULL)
+		delete graph;
+	uint size=edges.getSize();
+	edges.resetAndDelete();
 }
 
-void processNode(HashsetOrderNode * set, OrderNode *node, bool outedges) {
-	if (node->removed) {
-		Vector<OrderNode *> toprocess;
-		HashsetOrderNode visited;
-		toprocess.push(node);
-		while(toprocess.getSize()!=0) {
-			OrderNode *newnode=toprocess.last();toprocess.pop();
-			SetIteratorOrderEdge *iterator=outedges ? newnode->outEdges.iterator() : newnode->inEdges.iterator();
-			while(iterator->hasNext()) {
-				OrderEdge *edge=iterator->next();
-				OrderNode *tmpnode=outedges ? edge->sink : edge->source;
-				if (tmpnode->removed) {
-					if (visited.add(tmpnode)) {
-						toprocess.push(tmpnode);
-					}
-				} else {
-					set->add(tmpnode);
-				}
-			}
-			delete iterator;
-		}
-	} else
-		set->add(node);
+void DecomposeOrderResolver::mustOrderEdge(uint64_t first, uint64_t second) {
+	DOREdge edge(first, second, 0, first, second);
+	if (!edges.contains(&edge)) {
+		DOREdge *newedge=new DOREdge(first, second, 0, first, second);
+		edges.add(newedge);
+	}
+}
+
+void DecomposeOrderResolver::remapEdge(uint64_t first, uint64_t second, uint64_t newfirst, uint64_t newsecond) {
+	DOREdge edge(first, second, 0, first, second);
+	DOREdge *oldedge=edges.get(&edge);
+	if (oldedge != NULL) {
+		edges.remove(oldedge);
+		oldedge->newfirst=newfirst;
+		oldedge->newsecond=newsecond;
+		edges.add(oldedge);
+	} else {
+		DOREdge *newedge=new DOREdge(first, second, 0, newfirst, newsecond);
+		edges.add(newedge);
+	}
+}
+
+void DecomposeOrderResolver::setEdgeOrder(uint64_t first, uint64_t second, uint sccNum) {
+	DOREdge edge(first, second, 0, first, second);
+	DOREdge *oldedge=edges.get(&edge);
+	if (oldedge != NULL) {
+		oldedge->orderindex=sccNum;
+	} else {
+		DOREdge *newedge=new DOREdge(first, second, sccNum, first, second);
+		edges.add(newedge);
+	}
+}
+
+void DecomposeOrderResolver::setOrder(uint sccNum, Order *neworder) {
+	orders.setExpand(sccNum, neworder);
+}
+
+Order * DecomposeOrderResolver::getOrder(uint sccNum) {
+	Order *neworder = NULL;
+	if (orders.getSize() > sccNum)
+		neworder = orders.get(sccNum);
+	return neworder;
 }
 
 bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
@@ -52,8 +75,8 @@ bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
 	ASSERT(to != NULL);
 	if (from->removed || to->removed) {
 		HashsetOrderNode fromset, toset;
-		processNode(&fromset, from, true);
-		processNode(&toset, to, false);
+		//		processNode(&fromset, from, true);
+		//		processNode(&toset, to, false);
 		SetIteratorOrderNode *fromit=fromset.iterator();
 		while(fromit->hasNext()) {
 			OrderNode * nodefrom=fromit->next();

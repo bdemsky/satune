@@ -53,6 +53,7 @@ class OrderEncoding;
 class OrderGraph;
 class OrderNode;
 class OrderEdge;
+class DOREdge;
 
 class AutoTuner;
 class SearchTuner;
