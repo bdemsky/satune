@@ -71,6 +71,16 @@ void OrderGraph::addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *
 	}
 }
 
+void OrderGraph::addEdge(uint64_t first, uint64_t second) {
+	OrderNode *node1 = getOrderNodeFromOrderGraph(first);
+	OrderNode *node2 = getOrderNodeFromOrderGraph(second);
+	OrderEdge *_1to2 = getOrderEdgeFromOrderGraph(node1, node2);
+	_1to2->polPos = true;
+	_1to2->mustPos = true;
+	node1->addNewOutgoingEdge(_1to2);
+	node2->addNewIncomingEdge(_1to2);
+}
+
 void OrderGraph::addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr) {
 	BooleanValue mustval = constr->boolVal;
 	switch (mustval) {

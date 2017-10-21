@@ -44,6 +44,7 @@ public:
 	
  private:
 	bool resolvePartialOrder(OrderNode *first, OrderNode *second);
+	void buildGraph();
 	OrderGraph *graph;
 	Order *order;
 	Vector<Order *> orders;

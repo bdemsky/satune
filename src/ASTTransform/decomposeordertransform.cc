@@ -48,12 +48,10 @@ void DecomposeOrderTransform::doTransform() {
 		}
 
 		bool mustReachGlobal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHGLOBAL, &onoff);
-
 		if (mustReachGlobal)
 			reachMustAnalysis(solver, graph, false);
 
 		bool mustReachLocal = GETVARTUNABLE(solver->getTuner(), order->type, MUSTREACHLOCAL, &onoff);
-
 		if (mustReachLocal) {
 			//This pair of analysis is also optional
 			if (order->type == SATC_PARTIAL) {
@@ -76,6 +74,7 @@ void DecomposeOrderTransform::doTransform() {
 		decomposeOrder(order, graph, edgesRemoved, dor);
 		if (edgesRemoved != NULL)
 			delete edgesRemoved;
+		delete graph;
 	}
 	delete orderit;
 	delete orders;

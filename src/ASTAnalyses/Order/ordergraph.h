@@ -23,6 +23,7 @@ public:
 	OrderEdge *lookupOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end);
 	void addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	void addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
+	void addEdge(uint64_t first, uint64_t second);
 	OrderEdge *getInverseOrderEdge(OrderEdge *edge);
 	Order *getOrder() {return order;}
 	bool isTherePath(OrderNode *source, OrderNode *destination);

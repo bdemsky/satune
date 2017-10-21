@@ -20,7 +20,6 @@ DecomposeOrderResolver::DecomposeOrderResolver(Order * _order) :
 DecomposeOrderResolver::~DecomposeOrderResolver() {
 	if (graph != NULL)
 		delete graph;
-	uint size=edges.getSize();
 	edges.resetAndDelete();
 }
 
@@ -68,47 +67,41 @@ Order * DecomposeOrderResolver::getOrder(uint sccNum) {
 	return neworder;
 }
 
+void DecomposeOrderResolver::buildGraph() {
+	graph = new OrderGraph(order);
+	SetIteratorDOREdge *iterator = edges.iterator();
+	while(iterator->hasNext()) {
+		DOREdge * doredge = iterator->next();
+		if (doredge->orderindex == 0) {
+			graph->addEdge(doredge->origfirst, doredge->origsecond);
+		} else {
+			Order * suborder = orders.get(doredge->orderindex);
+			bool isEdge = suborder->encoding.resolver->resolveOrder(doredge->newfirst, doredge->newsecond);
+			if (isEdge)
+				graph->addEdge(doredge->origfirst, doredge->origsecond);
+		}
+	}
+	delete iterator;
+	if (order->type == SATC_TOTAL) {
+		graph->computeStronglyConnectedComponentGraph();
+	}
+}
+
 bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
+	if (graph == NULL)
+		buildGraph();
+
 	OrderNode *from = graph->lookupOrderNodeFromOrderGraph(first);
 	ASSERT(from != NULL);
 	OrderNode *to = graph->lookupOrderNodeFromOrderGraph(second);
 	ASSERT(to != NULL);
-	if (from->removed || to->removed) {
-		HashsetOrderNode fromset, toset;
-		//		processNode(&fromset, from, true);
-		//		processNode(&toset, to, false);
-		SetIteratorOrderNode *fromit=fromset.iterator();
-		while(fromit->hasNext()) {
-			OrderNode * nodefrom=fromit->next();
-			SetIteratorOrderNode *toit=toset.iterator();
-			while(toit->hasNext()) {
-				OrderNode * nodeto=toit->next();
-				if (resolveOrder(nodefrom->getID(), nodeto->getID())) {
-					delete fromit;
-					delete toit;
-					return true;
-				}
-			}
-			delete toit;
-		}
-		delete fromit;
-		return false;
-	} else if (from->sccNum != to->sccNum) {
-		OrderEdge *edge = graph->lookupOrderEdgeFromOrderGraph(from, to);
-		switch (graph->getOrder()->type) {
-		case SATC_TOTAL:
-			return from->sccNum < to->sccNum;
-		case SATC_PARTIAL:
-			return resolvePartialOrder(from, to);
-		default:
-			ASSERT(0);
-		}
-	} else {
-		Order *suborder = NULL;
-		// We should ask this query from the suborder ....
-		suborder = orders.get(from->sccNum);
-		ASSERT(suborder != NULL);
-		return suborder->encoding.resolver->resolveOrder(from->id, to->id);
+	switch (order->type) {
+	case SATC_TOTAL:
+		return from->sccNum < to->sccNum;
+	case SATC_PARTIAL:
+		return resolvePartialOrder(from, to);
+	default:
+		ASSERT(0);
 	}
 }
 
@@ -118,6 +111,5 @@ bool DecomposeOrderResolver::resolvePartialOrder(OrderNode *first, OrderNode *se
 	} else {
 		return graph->isTherePath(first, second);
 	}
-
 }
 
