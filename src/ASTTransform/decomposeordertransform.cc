@@ -191,6 +191,7 @@ bool DecomposeOrderTransform::isMustBeTrueNode(OrderNode *node) {
 }
 
 void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode *node, HashsetOrderEdge *edgesRemoved) {
+	node->removed = true;
 	SetIteratorOrderEdge *iterin = node->inEdges.iterator();
 	while (iterin->hasNext()) {
 		OrderEdge *inEdge = iterin->next();

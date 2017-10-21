@@ -26,6 +26,7 @@ public:
 
 	uint64_t id;
 	NodeStatus status;
+	bool removed;
 	uint sccNum;
 	HashsetOrderEdge inEdges;
 	HashsetOrderEdge outEdges;
