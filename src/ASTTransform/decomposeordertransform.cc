@@ -191,7 +191,6 @@ bool DecomposeOrderTransform::isMustBeTrueNode(OrderNode *node) {
 
 void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode *node, DecomposeOrderResolver *dor) {
 	node->removed = true;
-	model_print("Removing %llu\n", node->getID());
 	SetIteratorOrderEdge *iterin = node->inEdges.iterator();
 	while (iterin->hasNext()) {
 		OrderEdge *inEdge = iterin->next();
