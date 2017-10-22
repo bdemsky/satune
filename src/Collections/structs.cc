@@ -64,5 +64,5 @@ unsigned int doredge_hash_function(DOREdge *key) {
 
 bool doredge_equals(DOREdge *key1, DOREdge *key2) {
 	return key1->newfirst == key2->newfirst &&
-		key1->newsecond == key2->newsecond;
+				 key1->newsecond == key2->newsecond;
 }

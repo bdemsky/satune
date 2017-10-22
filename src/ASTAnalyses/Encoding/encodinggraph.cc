@@ -79,7 +79,7 @@ void EncodingGraph::encode() {
 					EncodingSubGraph *subgraph = graphMap.get(n);
 					if (subgraph == NULL)
 						continue;
-					uint encodingSize = subgraph->getEncodingMaxVal(n)+1;
+					uint encodingSize = subgraph->getEncodingMaxVal(n) + 1;
 					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
 					encoding->allocInUseArrayElement(paddedSize);
 					encoding->allocEncodingArrayElement(paddedSize);

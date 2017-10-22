@@ -14,14 +14,14 @@
 #include "orderresolver.h"
 
 class DOREdge {
- public:
- DOREdge(uint64_t _origfirst, uint64_t _origsecond, uint _orderindex, uint64_t _newfirst, uint64_t _newsecond) :
-	  origfirst(_origfirst),
+public:
+	DOREdge(uint64_t _origfirst, uint64_t _origsecond, uint _orderindex, uint64_t _newfirst, uint64_t _newsecond) :
+		origfirst(_origfirst),
 		origsecond(_origsecond),
 		orderindex(_orderindex),
 		newfirst(_newfirst),
 		newsecond(_newsecond) {
-	}		
+	}
 	uint64_t origfirst;
 	uint64_t origsecond;
 	uint orderindex;
@@ -39,10 +39,10 @@ public:
 	void remapEdge(uint64_t oldfirst, uint64_t oldsecond, uint64_t newfirst, uint64_t newsecond);
 	void setEdgeOrder(uint64_t first, uint64_t second, uint sccNum);
 	void setOrder(uint sccNum, Order *order);
-	Order * getOrder(uint sccNum);
+	Order *getOrder(uint sccNum);
 	CMEMALLOC;
-	
- private:
+
+private:
 	bool resolvePartialOrder(OrderNode *first, OrderNode *second);
 	void buildGraph();
 	OrderGraph *graph;

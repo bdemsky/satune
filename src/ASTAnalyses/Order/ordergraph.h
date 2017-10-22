@@ -35,7 +35,7 @@ public:
 	void computeStronglyConnectedComponentGraph();
 	void resetNodeInfoStatusSCC();
 	void completePartialOrderGraph();
-	
+
 	CMEMALLOC;
 private:
 	HashsetOrderNode nodes;

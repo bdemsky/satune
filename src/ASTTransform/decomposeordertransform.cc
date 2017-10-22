@@ -36,9 +36,9 @@ void DecomposeOrderTransform::doTransform() {
 			continue;
 		}
 
-		DecomposeOrderResolver *dor=new DecomposeOrderResolver(order);
+		DecomposeOrderResolver *dor = new DecomposeOrderResolver(order);
 		order->setOrderResolver(dor);
-		
+
 		OrderGraph *graph = buildOrderGraph(order);
 		if (order->type == SATC_PARTIAL) {
 			//Required to do SCC analysis for partial order graphs.  It
@@ -108,7 +108,7 @@ void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currG
 					dor->mustOrderEdge(from->getID(), to->getID());
 					solver->replaceBooleanWithTrue(orderconstraint);
 				} else if (edge->polNeg) {
-					if (currOrder->type == SATC_TOTAL)					
+					if (currOrder->type == SATC_TOTAL)
 						dor->mustOrderEdge(to->getID(), from->getID());
 					solver->replaceBooleanWithFalse(orderconstraint);
 				} else {
