@@ -12,7 +12,6 @@ OrderGraph::OrderGraph(Order *_order) :
 OrderGraph *buildOrderGraph(Order *order) {
 	ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
-	order->graph = orderGraph;
 	uint constrSize = order->constraints.getSize();
 	for (uint j = 0; j < constrSize; j++) {
 		orderGraph->addOrderConstraintToOrderGraph(order->constraints.get(j));
@@ -124,7 +123,6 @@ OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id) {
 		node = tmp;
 	} else {
 		nodes.add(node);
-		allNodes.push(node);
 	}
 	return node;
 }
@@ -172,16 +170,8 @@ void OrderGraph::addMustOrderConstraintToOrderGraph(BooleanOrder *bOrder) {
 }
 
 OrderGraph::~OrderGraph() {
-	uint size=allNodes.getSize();
-	for(uint i=0;i<size;i++)
-		delete allNodes.get(i);
-
-	SetIteratorOrderEdge *eiterator = edges.iterator();
-	while (eiterator->hasNext()) {
-		OrderEdge *edge = eiterator->next();
-		delete edge;
-	}
-	delete eiterator;
+	nodes.resetAndDelete();
+	edges.resetAndDelete();
 }
 
 bool OrderGraph::isTherePath(OrderNode *source, OrderNode *destination) {
@@ -236,7 +226,7 @@ void OrderGraph::DFS(Vector<OrderNode *> *finishNodes) {
 	SetIteratorOrderNode *iterator = getNodes();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
-		if (node->status == NOTVISITED) {
+		if (node->status == NOTVISITED && !node->removed) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, false, 0);
 			node->status = FINISHED;
@@ -250,7 +240,7 @@ void OrderGraph::DFSMust(Vector<OrderNode *> *finishNodes) {
 	SetIteratorOrderNode *iterator = getNodes();
 	while (iterator->hasNext()) {
 		OrderNode *node = iterator->next();
-		if (node->status == NOTVISITED) {
+		if (node->status == NOTVISITED && !node->removed) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, true, 0);
 			node->status = FINISHED;

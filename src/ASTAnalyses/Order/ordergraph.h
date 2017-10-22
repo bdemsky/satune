@@ -35,12 +35,10 @@ public:
 	void computeStronglyConnectedComponentGraph();
 	void resetNodeInfoStatusSCC();
 	void completePartialOrderGraph();
-	void removeNode(OrderNode *node) {nodes.remove(node);}
 	
 	CMEMALLOC;
 private:
 	HashsetOrderNode nodes;
-	Vector<OrderNode *> allNodes;
 	HashsetOrderEdge edges;
 	Order *order;
 	void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum);

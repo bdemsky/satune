@@ -39,6 +39,8 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 			SetIteratorOrderNode *srciterator = sources->iterator();
 			while (srciterator->hasNext()) {
 				OrderNode *srcnode = srciterator->next();
+				if (srcnode->removed)
+					continue;
 				OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(srcnode, node);
 				newedge->mustPos = true;
 				newedge->polPos = true;

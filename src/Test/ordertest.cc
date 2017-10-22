@@ -16,7 +16,6 @@ int main(int numargs, char **argv) {
 
 	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, b1, solver->applyLogicalOperation(SATC_NOT, b2)));
 	solver->addConstraint(solver->applyLogicalOperation(SATC_OR, b2, solver->applyLogicalOperation(SATC_NOT, b1)));
-	solver->serialize();
 	if (solver->solve() == 1) {
 		printf("SAT\n");
 		printf("O(5,1)=%d O(1,4)=%d O(5,4)=%d O(1,5)=%d\n",

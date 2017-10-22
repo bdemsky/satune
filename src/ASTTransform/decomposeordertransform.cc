@@ -81,7 +81,7 @@ void DecomposeOrderTransform::doTransform() {
 }
 
 
-void DecomposeOrderTransform::decomposeOrder (Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved, DecomposeOrderResolver *dor) {
+void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved, DecomposeOrderResolver *dor) {
 	Vector<Order *> partialcandidatevec;
 	uint size = currOrder->constraints.getSize();
 	for (uint i = 0; i < size; i++) {
@@ -203,18 +203,21 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 		OrderNode *srcNode = inEdge->source;
 		srcNode->outEdges.remove(inEdge);
 		edgesRemoved->add(inEdge);
+		bool removeOutgoingEdges = !iterin->hasNext();
+
 		SetIteratorOrderEdge *iterout = node->outEdges.iterator();
 		while (iterout->hasNext()) {
 			OrderEdge *outEdge = iterout->next();
 			OrderNode *sinkNode = outEdge->sink;
-			sinkNode->inEdges.remove(outEdge);
-			edgesRemoved->add(outEdge);
+			if (removeOutgoingEdges) {
+				sinkNode->inEdges.remove(outEdge);
+				edgesRemoved->add(outEdge);
+			}
 			//Adding new edge to new sink and src nodes ...
 			if (srcNode == sinkNode) {
 				solver->setUnSAT();
 				delete iterout;
 				delete iterin;
-				graph->removeNode(node);
 				return;
 			}
 			//Add new order constraint
@@ -233,7 +236,6 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 		delete iterout;
 	}
 	delete iterin;
-	graph->removeNode(node);
 }
 
 void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, HashsetOrderEdge *edgesRemoved) {

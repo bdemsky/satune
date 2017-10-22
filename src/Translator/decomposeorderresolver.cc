@@ -79,6 +79,8 @@ void DecomposeOrderResolver::buildGraph() {
 			bool isEdge = suborder->encoding.resolver->resolveOrder(doredge->newfirst, doredge->newsecond);
 			if (isEdge)
 				graph->addEdge(doredge->origfirst, doredge->origsecond);
+			else if (order->type == SATC_TOTAL)
+				graph->addEdge(doredge->origsecond, doredge->origfirst);
 		}
 	}
 	delete iterator;
@@ -92,9 +94,15 @@ bool DecomposeOrderResolver::resolveOrder(uint64_t first, uint64_t second) {
 		buildGraph();
 
 	OrderNode *from = graph->lookupOrderNodeFromOrderGraph(first);
-	ASSERT(from != NULL);
+	if (from == NULL) {
+		ASSERT(order->type != SATC_TOTAL);
+		return false;
+	}
 	OrderNode *to = graph->lookupOrderNodeFromOrderGraph(second);
-	ASSERT(to != NULL);
+	if (to == NULL) {
+		ASSERT(order->type != SATC_TOTAL);
+		return false;
+	}
 	switch (order->type) {
 	case SATC_TOTAL:
 		return from->sccNum < to->sccNum;
