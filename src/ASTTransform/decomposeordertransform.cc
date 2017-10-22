@@ -151,9 +151,9 @@ void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currG
 				if (edge->polNeg)
 					partialcandidatevec.setExpand(from->sccNum, NULL);
 			}
-			BooleanEdge neworderconstraint=solver->orderConstraint(neworder, orderconstraint->first, orderconstraint->second);
+			BooleanEdge neworderconstraint = solver->orderConstraint(neworder, orderconstraint->first, orderconstraint->second);
 			solver->replaceBooleanWithBoolean(orderconstraint, neworderconstraint);
-																												 
+
 			dor->setEdgeOrder(from->getID(), to->getID(), from->sccNum);
 		}
 	}
@@ -198,20 +198,13 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 		OrderNode *srcNode = inEdge->source;
 		srcNode->outEdges.remove(inEdge);
 		dor->mustOrderEdge(srcNode->getID(), node->getID());
-		BooleanEdge be=solver->orderConstraint(graph->getOrder(), srcNode->getID(), node->getID());
+		BooleanEdge be = solver->orderConstraint(graph->getOrder(), srcNode->getID(), node->getID());
 		solver->replaceBooleanWithTrue(be);
-		bool removeOutgoingEdges = !iterin->hasNext();
 
 		SetIteratorOrderEdge *iterout = node->outEdges.iterator();
 		while (iterout->hasNext()) {
 			OrderEdge *outEdge = iterout->next();
 			OrderNode *sinkNode = outEdge->sink;
-			if (removeOutgoingEdges) {
-				dor->mustOrderEdge(node->getID(), sinkNode->getID());
-				sinkNode->inEdges.remove(outEdge);
-				BooleanEdge be2=solver->orderConstraint(graph->getOrder(), node->getID(), sinkNode->getID());
-				solver->replaceBooleanWithTrue(be2);
-			}
 			//Adding new edge to new sink and src nodes ...
 			if (srcNode == sinkNode) {
 				solver->setUnSAT();
@@ -235,6 +228,18 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 		delete iterout;
 	}
 	delete iterin;
+
+	//Clean up old edges...  Keep this later in case we don't have any in edges
+	SetIteratorOrderEdge *iterout = node->outEdges.iterator();
+	while (iterout->hasNext()) {
+		OrderEdge *outEdge = iterout->next();
+		OrderNode *sinkNode = outEdge->sink;
+		dor->mustOrderEdge(node->getID(), sinkNode->getID());
+		sinkNode->inEdges.remove(outEdge);
+		BooleanEdge be2 = solver->orderConstraint(graph->getOrder(), node->getID(), sinkNode->getID());
+		solver->replaceBooleanWithTrue(be2);
+	}
+	delete iterout;
 }
 
 void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, DecomposeOrderResolver *dor) {
@@ -262,25 +267,28 @@ void DecomposeOrderTransform::mustEdgePrune(OrderGraph *graph, DecomposeOrderRes
 }
 
 void DecomposeOrderTransform::attemptNodeMerge(OrderGraph *graph, OrderNode *node, DecomposeOrderResolver *dor) {
-	SetIteratorOrderEdge * edgeit = node->outEdges.iterator();
-	while(edgeit->hasNext()) {
-		OrderEdge *outedge=edgeit->next();
-		OrderNode *dstnode=outedge->sink;
-		uint numOutEdges=node->outEdges.getSize();
-		uint numInEdges=dstnode->inEdges.getSize();
+	SetIteratorOrderEdge *edgeit = node->outEdges.iterator();
+	while (edgeit->hasNext()) {
+		OrderEdge *outedge = edgeit->next();
+		//Only eliminate must edges
+		if (!outedge->mustPos)
+			continue;
+		OrderNode *dstnode = outedge->sink;
+		uint numOutEdges = node->outEdges.getSize();
+		uint numInEdges = dstnode->inEdges.getSize();
 		/*
-			Need to avoid a situation where we create new reachability by
-			the merge.  This can only happen if there is an extra in edge to
-			the dstnode and an extra out edge to our node.
-		*/
-		
+		   Need to avoid a situation where we create new reachability by
+		   the merge.  This can only happen if there is an extra in edge to
+		   the dstnode and an extra out edge to our node.
+		 */
+
 		if (numOutEdges == 1 || numInEdges == 1) {
 			/* Safe to do the Merge */
 			mergeNodes(graph, node, outedge, dstnode, dor);
-			
+
 			//Throw away the iterator and start over
 			delete edgeit;
-			edgeit=node->outEdges.iterator();
+			edgeit = node->outEdges.iterator();
 		}
 	}
 	delete edgeit;
@@ -292,17 +300,20 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 	dstnode->inEdges.remove(edge);
 	dor->mustOrderEdge(node->getID(), dstnode->getID());
 
+	BooleanEdge be = solver->orderConstraint(graph->getOrder(), node->getID(), dstnode->getID());
+	solver->replaceBooleanWithTrue(be);
+
 	/* Go through the incoming edges to the new node */
-	SetIteratorOrderEdge *inedgeit=dstnode->inEdges.iterator();
-	while(inedgeit->hasNext()) {
-		OrderEdge *inedge=inedgeit->next();
-		OrderNode *source=inedge->source;
+	SetIteratorOrderEdge *inedgeit = dstnode->inEdges.iterator();
+	while (inedgeit->hasNext()) {
+		OrderEdge *inedge = inedgeit->next();
+		OrderNode *source = inedge->source;
 		//remove it from the source node
 		source->outEdges.remove(inedge);
 		//save the remapping that we did
 		dor->remapEdge(source->getID(), dstnode->getID(), source->getID(), node->getID());
 		//create the new edge
-		OrderEdge *newedge=graph->getOrderEdgeFromOrderGraph(source, node);
+		OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(source, node);
 		//update the flags
 		newedge->polPos |= inedge->polPos;
 		newedge->polNeg |= inedge->polNeg;
@@ -313,25 +324,24 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		source->outEdges.add(newedge);
 		node->inEdges.add(newedge);
 
-		BooleanEdge be=solver->orderConstraint(graph->getOrder(), source->getID(), dstnode->getID());
-		BooleanEdge benew=solver->orderConstraint(graph->getOrder(), source->getID(), node->getID());
+		BooleanEdge be = solver->orderConstraint(graph->getOrder(), source->getID(), dstnode->getID());
+		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), source->getID(), node->getID());
 		solver->replaceBooleanWithBoolean(be, benew);
-		
 	}
 	dstnode->inEdges.reset();
 	delete inedgeit;
 
-		/* Go through the outgoing edges from the new node */
-	SetIteratorOrderEdge *outedgeit=dstnode->outEdges.iterator();
-	while(outedgeit->hasNext()) {
-		OrderEdge *outedge=outedgeit->next();
-		OrderNode *sink=outedge->sink;
+	/* Go through the outgoing edges from the new node */
+	SetIteratorOrderEdge *outedgeit = dstnode->outEdges.iterator();
+	while (outedgeit->hasNext()) {
+		OrderEdge *outedge = outedgeit->next();
+		OrderNode *sink = outedge->sink;
 		//remove it from the sink node
 		sink->inEdges.remove(outedge);
 		//save the remapping that we did
 		dor->remapEdge(dstnode->getID(), sink->getID(), node->getID(), sink->getID());
 		//create the new edge
-		OrderEdge *newedge=graph->getOrderEdgeFromOrderGraph(node, sink);
+		OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(node, sink);
 		//update the flags
 		newedge->polPos |= outedge->polPos;
 		newedge->polNeg |= outedge->polNeg;
@@ -341,10 +351,14 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		//add new edge to both
 		sink->inEdges.add(newedge);
 		node->outEdges.add(newedge);
-		//add it to the remove set
+
+		BooleanEdge be = solver->orderConstraint(graph->getOrder(), dstnode->getID(), sink->getID());
+		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), node->getID(), sink->getID());
+		solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->outEdges.reset();
 	delete outedgeit;
+
 
 	/* Mark destination as removed */
 	dstnode->removed = true;

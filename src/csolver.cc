@@ -408,7 +408,7 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 		constraint = b;
 	}
 
-	BooleanEdge be=BooleanEdge(constraint);
+	BooleanEdge be = BooleanEdge(constraint);
 	return negate ? be.negate() : be;
 }
 
