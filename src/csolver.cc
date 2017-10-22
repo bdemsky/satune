@@ -36,7 +36,6 @@ CSolver::CSolver() :
 /** This function tears down the solver and the entire AST */
 
 CSolver::~CSolver() {
-        this->serialize();
 	uint size = allBooleans.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allBooleans.get(i);
@@ -421,9 +420,6 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 #ifdef TRACE_DEBUG
         model_println("****New Constraint******");
 #endif
-        if(constraint.isNegated())
-                model_print("!");
-        constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)){
