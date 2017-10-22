@@ -20,9 +20,12 @@ public:
 	CMEMALLOC;
 private:
 	bool isMustBeTrueNode(OrderNode *node);
-	void bypassMustBeTrueNode(OrderGraph *graph, OrderNode *node, HashsetOrderEdge *edgesRemoved);
-	void decomposeOrder(Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved, DecomposeOrderResolver *dor);
-	void removeMustBeTrueNodes(OrderGraph *graph, HashsetOrderEdge *edgesRemoved);
+	void bypassMustBeTrueNode(OrderGraph *graph, OrderNode *node, DecomposeOrderResolver *dor);
+	void decomposeOrder(Order *currOrder, OrderGraph *currGraph, DecomposeOrderResolver *dor);
+	void removeMustBeTrueNodes(OrderGraph *graph, DecomposeOrderResolver *dor);
+	void mustEdgePrune(OrderGraph *graph, DecomposeOrderResolver *dor);
+	void attemptNodeMerge(OrderGraph *graph, OrderNode *node, DecomposeOrderResolver *dor);
+	void mergeNodes(OrderGraph *graph, OrderNode *node, OrderEdge *edge, OrderNode *dstnode, DecomposeOrderResolver *dor);
 };
 
 

@@ -387,9 +387,29 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 
 BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
 	ASSERT(first != second);
+	bool negate = false;
+	if (order->type == SATC_TOTAL) {
+		if (first > second) {
+			uint64_t tmp = first;
+			first = second;
+			second = tmp;
+			negate = true;
+		}
+	}
 	Boolean *constraint = new BooleanOrder(order, first, second);
-	allBooleans.push(constraint);
-	return BooleanEdge(constraint);
+	Boolean *b = boolMap.get(constraint);
+
+	if (b == NULL) {
+		allBooleans.push(constraint);
+		boolMap.put(constraint, constraint);
+		constraint->updateParents();
+	} else {
+		delete constraint;
+		constraint = b;
+	}
+
+	BooleanEdge be=BooleanEdge(constraint);
+	return negate ? be.negate() : be;
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
