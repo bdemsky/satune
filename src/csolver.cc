@@ -49,8 +49,6 @@ CSolver::~CSolver() {
 	size = allElements.getSize();
 	for (uint i = 0; i < size; i++) {
                 Element* el = allElements.get(i);
-                model_print("deleting ...%u", i);
-                ASSERT(el != NULL);
 		delete el;
 	}
 
@@ -90,22 +88,21 @@ CSolver *CSolver::clone() {
 	return copy;
 }
 
+CSolver* CSolver::deserialize(const char * file){
+	model_print("deserializing ...\n");
+	Deserializer deserializer(file);
+	return deserializer.deserialize();
+}
+
 void CSolver::serialize() {
 	model_print("serializing ...\n");
-	{
-		Serializer serializer("dump");
-		SetIteratorBooleanEdge *it = getConstraints();
-		while (it->hasNext()) {
-			BooleanEdge b = it->next();
-			serializeBooleanEdge(&serializer, b);
-		}
-		delete it;
+	Serializer serializer("dump");
+	SetIteratorBooleanEdge *it = getConstraints();
+	while (it->hasNext()) {
+		BooleanEdge b = it->next();
+		serializeBooleanEdge(&serializer, b);
 	}
-//	model_print("deserializing ...\n");
-//	{
-//		Deserializer deserializer("dump");
-//		deserializer.deserialize();
-//	}
+	delete it;
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
@@ -151,7 +148,6 @@ void CSolver::finalizeMutableSet(MutableSet *set) {
 
 Element *CSolver::getElementVar(Set *set) {
 	Element *element = new ElementSet(set);
-        model_println("%%%%ElementVar:%u", allElements.getSize());
 	allElements.push(element);
 	return element;
 }
@@ -168,7 +164,6 @@ Element *CSolver::getElementConst(VarType type, uint64_t value) {
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
 		allSets.push(set);
-                model_println("%%%%ElementConst:%u", allElements.getSize());
 		allElements.push(element);
 		elemMap.put(element, element);
 		return element;
@@ -184,7 +179,6 @@ Element *CSolver::applyFunction(Function *function, Element **array, uint numArr
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
 		element->updateParents();
-                model_println("%%%%ElementFunction:%u", allElements.getSize());
 		allElements.push(element);
 		elemMap.put(element, element);
 		return element;

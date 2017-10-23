@@ -151,6 +151,7 @@ public:
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void serialize();
+	static CSolver* deserialize(const char * file);
 	void autoTune(uint budget);
 
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
