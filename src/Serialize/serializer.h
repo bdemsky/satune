@@ -33,7 +33,7 @@ inline bool Serializer::isSerialized(void *obj) {
 
 
 
-void serializeBooleanEdge(Serializer *serializer, BooleanEdge be);
+void serializeBooleanEdge(Serializer *serializer, BooleanEdge be, bool isTopLevel=false);
 
 #endif/* SERIALIZER_H */
 

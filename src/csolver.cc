@@ -96,11 +96,12 @@ CSolver* CSolver::deserialize(const char * file){
 
 void CSolver::serialize() {
 	model_print("serializing ...\n");
+        printConstraints();
 	Serializer serializer("dump");
 	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
 		BooleanEdge b = it->next();
-		serializeBooleanEdge(&serializer, b);
+		serializeBooleanEdge(&serializer, b, true);
 	}
 	delete it;
 }
@@ -395,6 +396,9 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 #ifdef TRACE_DEBUG
         model_println("****New Constraint******");
 #endif
+        if(constraint.isNegated())
+                model_print("!");
+        constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
@@ -458,7 +462,7 @@ int CSolver::solve() {
 	EncodingGraph eg(this);
 	eg.buildGraph();
 	eg.encode();
-	printConstraints();
+//	printConstraints();
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);

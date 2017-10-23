@@ -8,6 +8,7 @@ int main(int argc, char ** argv){
 	}
 	CSolver* solver = CSolver::deserialize(argv[1]);
 	solver->printConstraints();
+        delete solver;
 	return 1;
 		
 }

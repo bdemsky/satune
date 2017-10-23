@@ -26,8 +26,6 @@ Deserializer::Deserializer(const char *file) :
 }
 
 Deserializer::~Deserializer() {
-	delete solver;
-
 	if (-1 == close(filedesc)) {
 		exit(-1);
 	}
@@ -94,14 +92,18 @@ CSolver *Deserializer::deserialize() {
 }
 
 void Deserializer::deserializeBooleanEdge() {
-	Boolean *b;
-	myread(&b, sizeof(Boolean *));
-	BooleanEdge tmp(b);
+	Boolean *b_ptr;
+	myread(&b_ptr, sizeof(Boolean *));
+	BooleanEdge tmp(b_ptr);
 	bool isNegated = tmp.isNegated();
 	ASSERT(map.contains(tmp.getBoolean()));
-	b = (Boolean *) map.get(tmp.getBoolean());
-	BooleanEdge res(b);
-	solver->addConstraint(isNegated ? res.negate() : res);
+	b_ptr = (Boolean *) map.get(tmp.getBoolean());
+	BooleanEdge res(b_ptr);
+        bool isTopLevel;
+        myread(&isTopLevel, sizeof(bool));
+        if(isTopLevel){
+                solver->addConstraint(isNegated ? res.negate() : res);
+        }
 }
 
 void Deserializer::deserializeBooleanVar() {
@@ -346,7 +348,6 @@ void Deserializer::deserializeElementFunction() {
 	overflowstatus = (Boolean *) map.get(tmp.getBoolean());
 	BooleanEdge res(overflowstatus);
 	BooleanEdge undefStatus = isNegated ? res.negate() : res;
-
 	map.put(ef_ptr, solver->applyFunction(function, members.expose(), size, undefStatus));
 }
 

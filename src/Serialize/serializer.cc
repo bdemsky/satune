@@ -30,12 +30,16 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 }
 
 
-void serializeBooleanEdge(Serializer *serializer, BooleanEdge be) {
-	if (be == BooleanEdge(NULL))
-		return;
+void serializeBooleanEdge(Serializer *serializer, BooleanEdge be, bool isTopLevel) {
+	if (be == BooleanEdge(NULL)){
+		Boolean* boolean = NULL;
+                serializer->mywrite(&boolean, sizeof(Boolean *));
+                return;
+        }
 	be.getBoolean()->serialize(serializer);
 	ASTNodeType type = BOOLEANEDGE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	Boolean *boolean = be.getRaw();
 	serializer->mywrite(&boolean, sizeof(Boolean *));
+        serializer->mywrite(&isTopLevel, sizeof(bool));
 }
