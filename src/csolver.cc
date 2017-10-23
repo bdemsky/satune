@@ -412,12 +412,9 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-#ifdef TRACE_DEBUG
-        model_println("****New Constraint******");
-#endif
-        if(constraint.isNegated())
-                model_print("!");
-        constraint.getBoolean()->print();
+	if(constraint.isNegated())
+		model_print("!");
+	constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
