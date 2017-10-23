@@ -4,15 +4,15 @@
 #include "structs.h"
 
 class BooleanIterator {
- public:
-	BooleanIterator(CSolver * _solver);
+public:
+	BooleanIterator(CSolver *_solver);
 	~BooleanIterator();
 	bool hasNext();
-	Boolean * next();
+	Boolean *next();
 	CMEMALLOC;
 
- private:
-	SetIteratorBooleanEdge * solverit;
+private:
+	SetIteratorBooleanEdge *solverit;
 	HashsetBoolean discovered;
 	Vector<Boolean *> boolean;
 	Vector<uint> index;
@@ -20,14 +20,14 @@ class BooleanIterator {
 };
 
 class ElementIterator {
- public:
+public:
 	ElementIterator(CSolver *_solver);
 	~ElementIterator();
 	bool hasNext();
-	Element * next();
+	Element *next();
 	CMEMALLOC;
 
- private:
+private:
 	BooleanIterator bit;
 	BooleanPredicate *base;
 	uint baseindex;

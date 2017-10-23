@@ -29,7 +29,7 @@ public:
 		}
 		return -1;
 	}
-
+	void print();
 
 	ElementEncodingType type;
 	Element *element;

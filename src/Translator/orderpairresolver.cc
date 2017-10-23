@@ -23,7 +23,7 @@ OrderPairResolver::OrderPairResolver(CSolver *_solver, Order *_order) :
 
 OrderPairResolver::~OrderPairResolver() {
 	if (orderPairTable != NULL) {
-		orderPairTable->resetanddelete();
+		orderPairTable->resetAndDeleteVals();
 		delete orderPairTable;
 	}
 }
@@ -38,7 +38,7 @@ bool OrderPairResolver::resolveOrder(uint64_t first, uint64_t second) {
 		ASSERT(to != NULL);
 
 		OrderEdge *edge = graph->lookupOrderEdgeFromOrderGraph(from, to);
-		
+
 		if (edge != NULL && edge->mustPos) {
 			return true;
 		} else if ( edge != NULL && edge->mustNeg) {

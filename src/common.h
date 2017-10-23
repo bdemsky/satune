@@ -18,6 +18,7 @@
 #include "config.h"
 #include "time.h"
 
+
 #if 1
 extern int model_out;
 extern int model_err;
@@ -31,6 +32,8 @@ extern int switch_alloc;
     #define model_print printf
 #endif
 #define model_println(fmt, ...) do { model_print(fmt, ## __VA_ARGS__); model_print("\n");} while(0)
+
+
 
 #define NEXTPOW2(x) ((x == 1) ? 1 : (1 << (sizeof(uint) * 8 - __builtin_clz(x - 1))))
 #define NUMBITS(x) ((x == 0) ? 0 : 8 * sizeof(x) - __builtin_clz(x))

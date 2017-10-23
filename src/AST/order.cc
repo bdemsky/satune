@@ -31,9 +31,9 @@ Order *Order::clone(CSolver *solver, CloneMap *map) {
 	return o;
 }
 
-HashtableOrderPair* Order::getOrderPairTable(){
+HashtableOrderPair *Order::getOrderPairTable() {
 	ASSERT( encoding.resolver != NULL);
-	if (OrderPairResolver* t = dynamic_cast<OrderPairResolver*>(encoding.resolver)){
+	if (OrderPairResolver *t = dynamic_cast<OrderPairResolver *>(encoding.resolver)) {
 		return t->getOrderPairTable();
 	} else {
 		ASSERT(0);
@@ -46,21 +46,21 @@ Order::~Order() {
 	}
 }
 
-void Order::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void Order::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 	set->serialize(serializer);
 	ASTNodeType asttype = ORDERTYPE;
 	serializer->mywrite(&asttype, sizeof(ASTNodeType));
-	Order* This = this;
-	serializer->mywrite(&This, sizeof(Order*));
+	Order *This = this;
+	serializer->mywrite(&This, sizeof(Order *));
 	serializer->mywrite(&type, sizeof(OrderType));
 	serializer->mywrite(&set, sizeof(Set *));
 }
 
-void Order::print(){
-	model_println("{Order on Set:");
-        set->print();
-	model_println("}\n");
+void Order::print() {
+	model_print("{Order on Set:\n");
+	set->print();
+	model_print("}\n");
 }

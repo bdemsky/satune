@@ -3,7 +3,7 @@
 #include "element.h"
 #include "csolver.h"
 
-BooleanIterator::BooleanIterator(CSolver * _solver) :
+BooleanIterator::BooleanIterator(CSolver *_solver) :
 	solverit(_solver->getConstraints()) {
 	updateNext();
 }
@@ -21,11 +21,11 @@ void BooleanIterator::updateNext() {
 		boolean.pop();
 		index.pop();
 	}
-	
-	while(true) {
+
+	while (true) {
 		if (boolean.getSize() == 0) {
 			if (solverit->hasNext()) {
-				Boolean *b=solverit->next().getBoolean();
+				Boolean *b = solverit->next().getBoolean();
 				if (discovered.add(b)) {
 					boolean.push(b);
 					index.push(0);
@@ -34,22 +34,22 @@ void BooleanIterator::updateNext() {
 			} else
 				return;
 		}
-		Boolean *topboolean=boolean.last();
-		uint topindex=index.last();
-		switch(topboolean->type) {
+		Boolean *topboolean = boolean.last();
+		uint topindex = index.last();
+		switch (topboolean->type) {
 		case ORDERCONST:
 		case BOOLEANVAR:
 		case PREDICATEOP:
 		case BOOLCONST:
 			return;
 		case LOGICOP: {
-			BooleanLogic * logicop=(BooleanLogic*) topboolean;
-			uint size=logicop->inputs.getSize();
+			BooleanLogic *logicop = (BooleanLogic *) topboolean;
+			uint size = logicop->inputs.getSize();
 			if (topindex == size)
 				return;
 			index.pop();
-			index.push(topindex+1);
-			Boolean *newchild=logicop->inputs.get(topindex).getBoolean();
+			index.push(topindex + 1);
+			Boolean *newchild = logicop->inputs.get(topindex).getBoolean();
 			if (discovered.add(newchild)) {
 				boolean.push(newchild);
 				index.push(0);
@@ -62,8 +62,8 @@ void BooleanIterator::updateNext() {
 	}
 }
 
-Boolean * BooleanIterator::next() {
-	Boolean * b = boolean.last();
+Boolean *BooleanIterator::next() {
+	Boolean *b = boolean.last();
 	updateNext();
 	return b;
 }
@@ -87,15 +87,15 @@ void ElementIterator::updateNext() {
 		element.pop();
 		index.pop();
 	}
-	
-	while(true) {
+
+	while (true) {
 		if (element.getSize() == 0) {
 			if (base != NULL) {
 				if (baseindex == base->inputs.getSize()) {
 					base = NULL;
 					continue;
 				} else {
-					Element * e = base->inputs.get(baseindex);
+					Element *e = base->inputs.get(baseindex);
 					baseindex++;
 					if (discovered.add(e)) {
 						element.push(e);
@@ -105,30 +105,30 @@ void ElementIterator::updateNext() {
 				}
 			} else {
 				if (bit.hasNext()) {
-					Boolean *b=bit.next();
+					Boolean *b = bit.next();
 					if (b->type == PREDICATEOP) {
 						base = (BooleanPredicate *)b;
-						baseindex=0;
+						baseindex = 0;
 					}
 					continue;
 				} else
 					return;
 			}
 		}
-		Element *topelement=element.last();
-		uint topindex=index.last();
-		switch(topelement->type) {
+		Element *topelement = element.last();
+		uint topindex = index.last();
+		switch (topelement->type) {
 		case ELEMSET:
 		case ELEMCONST:
 			return;
 		case ELEMFUNCRETURN: {
-			ElementFunction * func=(ElementFunction*) topelement;
-			uint size=func->inputs.getSize();
+			ElementFunction *func = (ElementFunction *) topelement;
+			uint size = func->inputs.getSize();
 			if (topindex == size)
 				return;
 			index.pop();
-			index.push(topindex+1);
-			Element *newchild=func->inputs.get(topindex);
+			index.push(topindex + 1);
+			Element *newchild = func->inputs.get(topindex);
 			if (discovered.add(newchild)) {
 				element.push(newchild);
 				index.push(0);
@@ -141,8 +141,8 @@ void ElementIterator::updateNext() {
 	}
 }
 
-Element * ElementIterator::next() {
-	Element * e = element.last();
+Element *ElementIterator::next() {
+	Element *e = element.last();
 	updateNext();
 	return e;
 }

@@ -47,9 +47,9 @@ BooleanLogic::BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uin
 }
 
 BooleanEdge cloneEdge(CSolver *solver, CloneMap *map, BooleanEdge e) {
-	bool isnegated=e.isNegated();
-	Boolean *b=e->clone(solver, map);
-	BooleanEdge be=BooleanEdge(b);
+	bool isnegated = e.isNegated();
+	Boolean *b = e->clone(solver, map);
+	BooleanEdge be = BooleanEdge(b);
 	return isnegated ? be.negate() : be;
 }
 
@@ -62,7 +62,7 @@ Boolean *BooleanVar::clone(CSolver *solver, CloneMap *map) {
 	if (b != NULL)
 		return b;
 	BooleanEdge bvar = solver->getBooleanVar(type);
-	Boolean * base=bvar.getRaw();
+	Boolean *base = bvar.getRaw();
 	map->put(this, base);
 	return base;
 }
@@ -92,120 +92,120 @@ Boolean *BooleanPredicate::clone(CSolver *solver, CloneMap *map) {
 }
 
 void BooleanPredicate::updateParents() {
-	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+	for (uint i = 0; i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
 }
 
 void BooleanLogic::updateParents() {
-	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+	for (uint i = 0; i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
 }
 
-void BooleanVar::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void BooleanVar::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	BooleanVar* This = this;
-	serializer->mywrite(&This, sizeof(BooleanVar*));
+	BooleanVar *This = this;
+	serializer->mywrite(&This, sizeof(BooleanVar *));
 	serializer->mywrite(&vtype, sizeof(VarType));
 }
 
-void BooleanVar::print(){
-        model_println("BooleanVar:%lu", (uintptr_t)this);
+void BooleanVar::print() {
+	model_print("BooleanVar:%lu\n", (uintptr_t)this);
 }
 
-void BooleanConst::print(){
-        model_println("BooleanConst:%s", istrue?"TRUE" :"FALSE");
+void BooleanConst::print() {
+	model_print("BooleanConst:%s\n", istrue ? "TRUE" : "FALSE");
 }
 
-void BooleanOrder::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void BooleanOrder::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 	order->serialize(serializer);
-	
+
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	BooleanOrder* This = this;
-	serializer->mywrite(&This, sizeof(BooleanOrder*));
-	serializer->mywrite(&order, sizeof(Order*));
+	BooleanOrder *This = this;
+	serializer->mywrite(&This, sizeof(BooleanOrder *));
+	serializer->mywrite(&order, sizeof(Order *));
 	serializer->mywrite(&first, sizeof(uint64_t));
 	serializer->mywrite(&second, sizeof(uint64_t));
 }
 
-void BooleanOrder::print(){
-	model_println("{BooleanOrder: First= %lu, Second = %lu on Order:", first, second);
+void BooleanOrder::print() {
+	model_print("{BooleanOrder: First= %lu, Second = %lu on Order:\n", first, second);
 	order->print();
-        model_println("}\n");
+	model_print("}\n");
 }
 
-void BooleanPredicate::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void BooleanPredicate::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	predicate->serialize(serializer);
 	uint size = inputs.getSize();
-	for(uint i=0; i<size; i++){
-		Element* input = inputs.get(i);
+	for (uint i = 0; i < size; i++) {
+		Element *input = inputs.get(i);
 		input->serialize(serializer);
 	}
 	serializeBooleanEdge(serializer, undefStatus);
-	
+
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	BooleanPredicate* This = this;
-	serializer->mywrite(&This, sizeof(BooleanPredicate*));
+	BooleanPredicate *This = this;
+	serializer->mywrite(&This, sizeof(BooleanPredicate *));
 	serializer->mywrite(&predicate, sizeof(Predicate *));
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
+	for (uint i = 0; i < size; i++) {
 		Element *input = inputs.get(i);
 		serializer->mywrite(&input, sizeof(Element *));
 	}
-	Boolean* undefStat = undefStatus!= BooleanEdge(NULL)?undefStatus.getRaw() : NULL;
-	serializer->mywrite(&undefStat, sizeof(Boolean*));
+	Boolean *undefStat = undefStatus != BooleanEdge(NULL) ? undefStatus.getRaw() : NULL;
+	serializer->mywrite(&undefStat, sizeof(Boolean *));
 }
 
-void BooleanPredicate::print(){
-	model_println("{BooleanPredicate:");
-        predicate->print();
-	model_println("elements:");
-        uint size = inputs.getSize();
-	for(uint i=0; i<size; i++){
+void BooleanPredicate::print() {
+	model_print("{BooleanPredicate:\n");
+	predicate->print();
+	model_print("elements:\n");
+	uint size = inputs.getSize();
+	for (uint i = 0; i < size; i++) {
 		Element *input = inputs.get(i);
 		input->print();
 	}
-        model_println("}\n");
+	model_print("}\n");
 }
 
-void BooleanLogic::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void BooleanLogic::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 	uint size = inputs.getSize();
-	for(uint i=0; i<size; i++){
+	for (uint i = 0; i < size; i++) {
 		BooleanEdge input = inputs.get(i);
 		serializeBooleanEdge(serializer, input);
 	}
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	BooleanLogic* This = this;
-	serializer->mywrite(&This, sizeof(BooleanLogic*));
+	BooleanLogic *This = this;
+	serializer->mywrite(&This, sizeof(BooleanLogic *));
 	serializer->mywrite(&op, sizeof(LogicOp));
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
-		Boolean* input = inputs.get(i).getRaw();
-		serializer->mywrite(&input, sizeof(Boolean*));
+	for (uint i = 0; i < size; i++) {
+		Boolean *input = inputs.get(i).getRaw();
+		serializer->mywrite(&input, sizeof(Boolean *));
 	}
 }
 
-void BooleanLogic::print(){
-	model_println("{BooleanLogic: %s", 
-                op ==SATC_AND? "AND": op == SATC_OR? "OR": op==SATC_NOT? "NOT":
-                op == SATC_XOR? "XOR" : op==SATC_IFF? "IFF" : "IMPLIES");
-        uint size = inputs.getSize();
-	for(uint i=0; i<size; i++){
+void BooleanLogic::print() {
+	model_print("{BooleanLogic: %s\n",
+							op == SATC_AND ? "AND" : op == SATC_OR ? "OR" : op == SATC_NOT ? "NOT" :
+							op == SATC_XOR ? "XOR" : op == SATC_IFF ? "IFF" : "IMPLIES");
+	uint size = inputs.getSize();
+	for (uint i = 0; i < size; i++) {
 		BooleanEdge input = inputs.get(i);
-                if(input.isNegated())
-                        model_print("!");
-                input.getBoolean()->print();
+		if (input.isNegated())
+			model_print("!");
+		input.getBoolean()->print();
 	}
-        model_println("}\n");
+	model_print("}\n");
 }
 

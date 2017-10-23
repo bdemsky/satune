@@ -61,34 +61,34 @@ Table::~Table() {
 
 
 
-void Table::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void Table::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	uint size = domains.getSize();
-	for(uint i=0; i<size; i++){
-		Set* domain = domains.get(i);
+	for (uint i = 0; i < size; i++) {
+		Set *domain = domains.get(i);
 		domain->serialize(serializer);
 	}
-	if(range!= NULL)
+	if (range != NULL)
 		range->serialize(serializer);
-	
-	ASTNodeType type = TABLETYPE;	
+
+	ASTNodeType type = TABLETYPE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	Table* This = this;
-	serializer->mywrite(&This, sizeof(Table*));
+	Table *This = this;
+	serializer->mywrite(&This, sizeof(Table *));
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
-		Set* domain = domains.get(i);
-		serializer->mywrite(&domain, sizeof(Set*));
+	for (uint i = 0; i < size; i++) {
+		Set *domain = domains.get(i);
+		serializer->mywrite(&domain, sizeof(Set *));
 	}
-	serializer->mywrite(&range, sizeof(Set*));
+	serializer->mywrite(&range, sizeof(Set *));
 	size = entries->getSize();
 	serializer->mywrite(&size, sizeof(uint));
-	SetIteratorTableEntry* iterator = getEntries();
-	while(iterator->hasNext()){
-		TableEntry* entry = iterator->next();
+	SetIteratorTableEntry *iterator = getEntries();
+	while (iterator->hasNext()) {
+		TableEntry *entry = iterator->next();
 		serializer->mywrite(&entry->output, sizeof(uint64_t));
 		serializer->mywrite(&entry->inputSize, sizeof(uint));
 		serializer->mywrite(entry->inputs, sizeof(uint64_t) * entry->inputSize);
@@ -97,17 +97,17 @@ void Table::serialize(Serializer* serializer){
 }
 
 
-void Table::print(){
-        model_println("{Table:");
-	SetIteratorTableEntry* iterator = getEntries();
-	while(iterator->hasNext()){
-		TableEntry* entry = iterator->next();
-                model_print("<");
-                for(uint i=0; i<entry->inputSize; i++){
-                        model_print("%lu, ", entry->inputs[i]);
-                }
-                model_print(" == %lu>", entry->output);
+void Table::print() {
+	model_print("{Table:\n");
+	SetIteratorTableEntry *iterator = getEntries();
+	while (iterator->hasNext()) {
+		TableEntry *entry = iterator->next();
+		model_print("<");
+		for (uint i = 0; i < entry->inputSize; i++) {
+			model_print("%lu, ", entry->inputs[i]);
+		}
+		model_print(" == %lu>", entry->output);
 	}
-        model_println("}\n");
+	model_print("}\n");
 	delete iterator;
 }

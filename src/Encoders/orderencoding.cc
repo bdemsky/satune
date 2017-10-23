@@ -8,8 +8,8 @@ OrderEncoding::OrderEncoding(Order *_order) :
 {
 }
 
-OrderEncoding::~OrderEncoding(){
-	if(resolver!= NULL){
+OrderEncoding::~OrderEncoding() {
+	if (resolver != NULL) {
 		delete resolver;
 	}
 }

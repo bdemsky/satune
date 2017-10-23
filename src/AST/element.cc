@@ -57,85 +57,87 @@ Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
 }
 
 void ElementFunction::updateParents() {
-	for(uint i=0;i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+	for (uint i = 0; i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
 }
 
-Set * ElementFunction::getRange() {
+Set *ElementFunction::getRange() {
 	return function->getRange();
 }
 
-void ElementSet::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void ElementSet::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	set->serialize(serializer);
-	
+
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	ElementSet *This = this;
-	serializer->mywrite(&This, sizeof(ElementSet*));
-	serializer->mywrite(&set, sizeof(Set*));
+	serializer->mywrite(&This, sizeof(ElementSet *));
+	serializer->mywrite(&set, sizeof(Set *));
 }
 
-void ElementSet::print(){
-	model_println("{ElementSet:");
+void ElementSet::print() {
+	model_print("{ElementSet:");
 	set->print();
-	model_println("}\n");
+	model_print(" %p ", this);
+	getElementEncoding()->print();
+	model_print("}");
 }
 
-void ElementConst::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void ElementConst::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	set->serialize(serializer);
-	
+
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	ElementSet *This = this;
-	serializer->mywrite(&This, sizeof(ElementSet*));
+	serializer->mywrite(&This, sizeof(ElementSet *));
 	VarType type = set->getType();
 	serializer->mywrite(&type, sizeof(VarType));
 	serializer->mywrite(&value, sizeof(uint64_t));
 }
 
-void ElementConst::print(){
-	model_println("{ElementConst: %lu}", value);	
+void ElementConst::print() {
+	model_print("{ElementConst: %lu}\n", value);
 }
 
-void ElementFunction::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void ElementFunction::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 
 	function->serialize(serializer);
 	uint size = inputs.getSize();
-	for(uint i=0; i<size; i++){
+	for (uint i = 0; i < size; i++) {
 		Element *input = inputs.get(i);
 		input->serialize(serializer);
 	}
 	serializeBooleanEdge(serializer, overflowstatus);
-	
+
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	ElementFunction *This = this;
 	serializer->mywrite(&This, sizeof(ElementFunction *));
 	serializer->mywrite(&function, sizeof(Function *));
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
-		Element* input = inputs.get(i);
-		serializer->mywrite(&input, sizeof(Element*));
+	for (uint i = 0; i < size; i++) {
+		Element *input = inputs.get(i);
+		serializer->mywrite(&input, sizeof(Element *));
 	}
-	Boolean* overflowstat = overflowstatus.getRaw();
-	serializer->mywrite(&overflowstat, sizeof(Boolean*));
+	Boolean *overflowstat = overflowstatus.getRaw();
+	serializer->mywrite(&overflowstat, sizeof(Boolean *));
 }
 
-void ElementFunction::print(){
-        model_println("{ElementFunction:");
+void ElementFunction::print() {
+	model_print("{ElementFunction:\n");
 	function->print();
-        model_println("Elements:");
+	model_print("Elements:\n");
 	uint size = inputs.getSize();
-	for(uint i=0; i<size; i++){
+	for (uint i = 0; i < size; i++) {
 		Element *input = inputs.get(i);
 		input->print();
 	}
-	model_println("}\n");
+	model_print("}\n");
 }

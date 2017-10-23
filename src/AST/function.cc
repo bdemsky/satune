@@ -62,52 +62,51 @@ Function *FunctionTable::clone(CSolver *solver, CloneMap *map) {
 	return f;
 }
 
-Set * FunctionTable::getRange() {
+Set *FunctionTable::getRange() {
 	return table->getRange();
 }
 
-void FunctionTable::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void FunctionTable::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	table->serialize(serializer);
-	
-	ASTNodeType type = FUNCTABLETYPE;	
+
+	ASTNodeType type = FUNCTABLETYPE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	FunctionTable* This = this;
-	serializer->mywrite(&This, sizeof(FunctionTable*));
+	FunctionTable *This = this;
+	serializer->mywrite(&This, sizeof(FunctionTable *));
 	serializer->mywrite(&table, sizeof(Table *));
 	serializer->mywrite(&undefBehavior, sizeof(UndefinedBehavior));
-	
+
 }
 
-void FunctionTable::print(){
-	model_println("{FunctionTable:");
-        table->print();
-        model_println("}\n");
-	
+void FunctionTable::print() {
+	model_print("{FunctionTable:\n");
+	table->print();
+	model_print("}\n");
 }
 
-void FunctionOperator::serialize(Serializer* serializer){
-	if(serializer->isSerialized(this))
+void FunctionOperator::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	uint size = domains.getSize();
-	for(uint i=0; i<size; i++){
-		Set* domain = domains.get(i);
+	for (uint i = 0; i < size; i++) {
+		Set *domain = domains.get(i);
 		domain->serialize(serializer);
 	}
 	range->serialize(serializer);
-	
-	ASTNodeType nodeType = FUNCOPTYPE; 
+
+	ASTNodeType nodeType = FUNCOPTYPE;
 	serializer->mywrite(&nodeType, sizeof(ASTNodeType));
-	FunctionOperator* This = this;
-	serializer->mywrite(&This, sizeof(FunctionOperator*));
+	FunctionOperator *This = this;
+	serializer->mywrite(&This, sizeof(FunctionOperator *));
 	serializer->mywrite(&op, sizeof(ArithOp));
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
+	for (uint i = 0; i < size; i++) {
 		Set *domain = domains.get(i);
 		serializer->mywrite(&domain, sizeof(Set *));
 	}
@@ -115,6 +114,6 @@ void FunctionOperator::serialize(Serializer* serializer){
 	serializer->mywrite(&overflowbehavior, sizeof(OverFlowBehavior));
 }
 
-void FunctionOperator::print(){
-	model_println("{FunctionOperator: %s}", op == SATC_ADD? "ADD": "SUB" );
+void FunctionOperator::print() {
+	model_print("{FunctionOperator: %s}\n", op == SATC_ADD ? "ADD" : "SUB" );
 }

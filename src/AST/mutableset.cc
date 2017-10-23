@@ -16,13 +16,13 @@ Set *MutableSet::clone(CSolver *solver, CloneMap *map) {
 	s = solver->createMutableSet(type);
 	for (uint i = 0; i < members->getSize(); i++) {
 		((MutableSet *)s)->addElementMSet(members->get(i));
-				solver->addItem((MutableSet *) s, members->get(i));
+		solver->addItem((MutableSet *) s, members->get(i));
 	}
-	((MutableSet*)s)->finalize();
+	((MutableSet *)s)->finalize();
 	map->put(this, s);
 	return s;
 }
 
-void MutableSet::finalize(){
+void MutableSet::finalize() {
 	bsdqsort(members->expose(), members->getSize(), sizeof(uint64_t), intcompare);
 }

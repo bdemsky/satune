@@ -23,18 +23,26 @@ public:
 	OrderEdge *lookupOrderEdgeFromOrderGraph(OrderNode *begin, OrderNode *end);
 	void addOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
 	void addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrder *constr);
+	void addEdge(uint64_t first, uint64_t second);
 	OrderEdge *getInverseOrderEdge(OrderEdge *edge);
-	Order *getOrder() {return order;} 
-	bool isTherePath(OrderNode* source, OrderNode* destination);
-	bool isTherePathVisit(HashsetOrderNode &visited, OrderNode* current, OrderNode* destination);
-	SetIteratorOrderNode *getNodes() {return nodes->iterator();}
-	SetIteratorOrderEdge *getEdges() {return edges->iterator();}
+	Order *getOrder() {return order;}
+	bool isTherePath(OrderNode *source, OrderNode *destination);
+	bool isTherePathVisit(HashsetOrderNode &visited, OrderNode *current, OrderNode *destination);
+	SetIteratorOrderNode *getNodes() {return nodes.iterator();}
+	SetIteratorOrderEdge *getEdges() {return edges.iterator();}
+	void DFS(Vector<OrderNode *> *finishNodes);
+	void DFSMust(Vector<OrderNode *> *finishNodes);
+	void computeStronglyConnectedComponentGraph();
+	void resetNodeInfoStatusSCC();
+	void completePartialOrderGraph();
 
 	CMEMALLOC;
 private:
-	HashsetOrderNode *nodes;
-	HashsetOrderEdge *edges;
+	HashsetOrderNode nodes;
+	HashsetOrderEdge edges;
 	Order *order;
+	void DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes, bool isReverse, bool mustvisit, uint sccNum);
+	void DFSReverse(Vector<OrderNode *> *finishNodes);
 };
 
 OrderGraph *buildOrderGraph(Order *order);

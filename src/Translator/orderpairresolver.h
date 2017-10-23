@@ -15,13 +15,13 @@ class OrderPairResolver : public OrderResolver {
 public:
 	OrderPairResolver(CSolver *_solver, Order *_order);
 	bool resolveOrder(uint64_t first, uint64_t second);
-	HashtableOrderPair* getOrderPairTable() { return orderPairTable;}
+	HashtableOrderPair *getOrderPairTable() { return orderPairTable;}
 	virtual ~OrderPairResolver();
 private:
 	CSolver *solver;
 	Order *order;
 	HashtableOrderPair *orderPairTable;
-	
+
 	bool getOrderConstraintValue(uint64_t first, uint64_t second);
 };
 

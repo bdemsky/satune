@@ -17,8 +17,8 @@ IntegerEncodingTransform::~IntegerEncodingTransform() {
 
 void IntegerEncodingTransform::doTransform() {
 	HashsetOrder *orders = solver->getActiveOrders()->copy();
-	SetIteratorOrder * orderit=orders->iterator();
-	while(orderit->hasNext()) {
+	SetIteratorOrder *orderit = orders->iterator();
+	while (orderit->hasNext()) {
 		Order *order = orderit->next();
 		if (GETVARTUNABLE(solver->getTuner(), order->type, ORDERINTEGERENCODING, &onoff))
 			integerEncode(order);

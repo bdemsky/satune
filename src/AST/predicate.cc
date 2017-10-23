@@ -51,52 +51,54 @@ Predicate *PredicateTable::clone(CSolver *solver, CloneMap *map) {
 	return p;
 }
 
-void PredicateTable::serialize(Serializer* serializer){	
-	if(serializer->isSerialized(this))
+void PredicateTable::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	table->serialize(serializer);
-	
-	ASTNodeType type = PREDTABLETYPE;	
+
+	ASTNodeType type = PREDTABLETYPE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	PredicateTable* This = this;
-	serializer->mywrite(&This, sizeof(PredicateTable*));
+	PredicateTable *This = this;
+	serializer->mywrite(&This, sizeof(PredicateTable *));
 	serializer->mywrite(&table, sizeof(Table *));
 	serializer->mywrite(&undefinedbehavior, sizeof(UndefinedBehavior));
 }
 
-void PredicateTable::print(){	
-	model_println("{PredicateTable:");
-        table->print();
-        model_println("}\n");
+void PredicateTable::print() {
+	model_print("{PredicateTable:\n");
+	table->print();
+	model_print("}\n");
 }
 
-void PredicateOperator::serialize(Serializer* serializer){	
-	if(serializer->isSerialized(this))
+void PredicateOperator::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-	
+
 	uint size = domains.getSize();
-	for(uint i=0; i<size; i++){
-		Set* domain = domains.get(i);
+	for (uint i = 0; i < size; i++) {
+		Set *domain = domains.get(i);
 		domain->serialize(serializer);
 	}
-		
-	ASTNodeType type = PREDOPERTYPE;	
+
+	ASTNodeType type = PREDOPERTYPE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
-	PredicateOperator* This = this;
-	serializer->mywrite(&This, sizeof(PredicateOperator*));
+	PredicateOperator *This = this;
+	serializer->mywrite(&This, sizeof(PredicateOperator *));
 	serializer->mywrite(&op, sizeof(CompOp));
 	serializer->mywrite(&size, sizeof(uint));
-	for(uint i=0; i<size; i++){
-		Set* domain = domains.get(i);
-		serializer->mywrite(&domain, sizeof(Set*));
+	for (uint i = 0; i < size; i++) {
+		Set *domain = domains.get(i);
+		serializer->mywrite(&domain, sizeof(Set *));
 	}
 }
 
-void PredicateOperator::print(){	
-	model_println("{PredicateOperator: %s }", op ==SATC_EQUALS? "EQUAL": "NOT-EQUAL");
+void PredicateOperator::print() {
+	const char *names[] = {"==", "<", ">", "<=", ">="};
+
+	model_print("PredicateOperator: %s\n", names[(int)op]);
 }
 
 

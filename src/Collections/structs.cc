@@ -6,6 +6,7 @@
 #include "ordergraph.h"
 #include "orderelement.h"
 #include "structs.h"
+#include "decomposeorderresolver.h"
 
 unsigned int table_entry_hash_function(TableEntry *This) {
 	unsigned int h = 0;
@@ -55,4 +56,13 @@ unsigned int order_pair_hash_function(OrderPair *This) {
 
 bool order_pair_equals(OrderPair *key1, OrderPair *key2) {
 	return key1->first == key2->first && key1->second == key2->second;
+}
+
+unsigned int doredge_hash_function(DOREdge *key) {
+	return (uint) (key->newfirst << 2) ^ key->newsecond;
+}
+
+bool doredge_equals(DOREdge *key1, DOREdge *key2) {
+	return key1->newfirst == key2->newfirst &&
+				 key1->newsecond == key2->newsecond;
 }

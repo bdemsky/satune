@@ -4,15 +4,15 @@
 #include "transform.h"
 
 class Preprocess : public Transform {
- public:
+public:
 	Preprocess(CSolver *_solver);
 	~Preprocess();
 	void doTransform();
-	
+
 	CMEMALLOC;
- private:
+private:
 	HashsetBoolean toremove;
-	void processBooleanVar(BooleanVar * b);
+	void processBooleanVar(BooleanVar *b);
 	void resolveBooleanVars();
 };
 

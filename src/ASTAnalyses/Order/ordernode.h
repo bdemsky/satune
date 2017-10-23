@@ -22,9 +22,11 @@ public:
 	OrderNode(uint64_t id);
 	void addNewIncomingEdge(OrderEdge *edge);
 	void addNewOutgoingEdge(OrderEdge *edge);
+	uint64_t getID() {return id;}
 
 	uint64_t id;
 	NodeStatus status;
+	bool removed;
 	uint sccNum;
 	HashsetOrderEdge inEdges;
 	HashsetOrderEdge outEdges;

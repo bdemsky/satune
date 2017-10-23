@@ -5,8 +5,8 @@
 #include "graphstructs.h"
 
 class NodeValuePair {
- public:
- NodeValuePair(EncodingNode *n, uint64_t val) : node(n), value(val) {}
+public:
+	NodeValuePair(EncodingNode *n, uint64_t val) : node(n), value(val) {}
 	EncodingNode *node;
 	uint64_t value;
 };
@@ -17,8 +17,8 @@ typedef Hashset<EncodingValue *, uintptr_t, PTRSHIFT> HashsetEncodingValue;
 typedef SetIterator<EncodingValue *, uintptr_t, PTRSHIFT> SetIteratorEncodingValue;
 
 class EncodingValue {
- public:
- EncodingValue(uint64_t _val) : value(_val), encoding(0), inComparison(false), assigned(false) {}
+public:
+	EncodingValue(uint64_t _val) : value(_val), encoding(0), inComparison(false), assigned(false) {}
 	void merge(EncodingValue *value);
 	uint64_t value;
 	uint encoding;
@@ -35,16 +35,17 @@ bool equalsNodeValuePair(NodeValuePair *nvp1, NodeValuePair *nvp2);
 typedef Hashtable<NodeValuePair *, EncodingValue *, uintptr_t, 0, hashNodeValuePair, equalsNodeValuePair> NVPMap;
 
 class EncodingSubGraph {
- public:
+public:
 	EncodingSubGraph();
+	~EncodingSubGraph();
 	void addNode(EncodingNode *n);
-	SetIteratorEncodingNode * nodeIterator();
+	SetIteratorEncodingNode *nodeIterator();
 	void encode();
 	uint getEncoding(EncodingNode *n, uint64_t val);
-	uint getEncodingSize(EncodingNode *n) { return maxEncodingVal;}
-	
+	uint getEncodingMaxVal(EncodingNode *n) { return maxEncodingVal;}
+
 	CMEMALLOC;
- private:
+private:
 	uint estimateNewSize(EncodingNode *n);
 	uint estimateNewSize(EncodingSubGraph *sg);
 	void traverseValue(EncodingNode *node, uint64_t value);
@@ -63,7 +64,7 @@ class EncodingSubGraph {
 	uint encodingSize;
 	uint numElements;
 	uint maxEncodingVal;
-	
+
 	friend class EncodingGraph;
 };
 

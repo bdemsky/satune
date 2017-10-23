@@ -117,6 +117,17 @@ public:
 		table->reset();
 	}
 
+	void resetAndDelete() {
+		Linknode<_Key> *tmp = list;
+		while (tmp != NULL) {
+			Linknode<_Key> *tmpnext = tmp->next;
+			ourfree(tmp);
+			tmp = tmpnext;
+		}
+		list = tail = NULL;
+		table->resetAndDeleteKeys();
+	}
+
 	/** @brief Adds a new key to the hashset.  Returns false if the key
 	 *  is already present. */
 

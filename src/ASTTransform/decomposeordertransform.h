@@ -16,11 +16,16 @@ public:
 	DecomposeOrderTransform(CSolver *_solver);
 	~DecomposeOrderTransform();
 	void doTransform();
-	void decomposeOrder (Order *currOrder, OrderGraph *currGraph);
 
 	CMEMALLOC;
 private:
+	bool isMustBeTrueNode(OrderNode *node);
+	void bypassMustBeTrueNode(OrderGraph *graph, OrderNode *node, HashsetOrderEdge *edgesRemoved);
+	void decomposeOrder(Order *currOrder, OrderGraph *currGraph, HashsetOrderEdge *edgesRemoved, DecomposeOrderResolver *dor);
+	void removeMustBeTrueNodes(OrderGraph *graph, HashsetOrderEdge *edgesRemoved);
 };
+
+
 
 #endif/* ORDERTRANSFORM_H */
 

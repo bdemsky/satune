@@ -15,15 +15,15 @@ public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
 	virtual Boolean *clone(CSolver *solver, CloneMap *map) = 0;
-	virtual void serialize(Serializer* ) = 0;
-        virtual void print() =0;
+	virtual void serialize(Serializer * ) = 0;
+	virtual void print() = 0;
 	virtual bool isTrue() {return boolVal == BV_MUSTBETRUE;}
 	virtual bool isFalse() {return boolVal == BV_MUSTBEFALSE;}
 	Polarity polarity;
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
 	virtual void updateParents() {}
-	
+
 	CMEMALLOC;
 };
 
@@ -33,8 +33,8 @@ public:
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	bool isTrue() {return istrue;}
 	bool isFalse() {return !istrue;}
-	void serialize(Serializer *serializer ){};
-        virtual void print();
+	void serialize(Serializer *serializer ) {};
+	virtual void print();
 	bool istrue;
 	CMEMALLOC;
 };
@@ -44,7 +44,7 @@ public:
 	BooleanVar(VarType t);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer );
-        virtual void print();
+	virtual void print();
 	VarType vtype;
 	Edge var;
 	CMEMALLOC;
@@ -55,7 +55,7 @@ public:
 	BooleanOrder(Order *_order, uint64_t _first, uint64_t _second);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer );
-        virtual void print();
+	virtual void print();
 
 	Order *order;
 	uint64_t first;
@@ -71,7 +71,7 @@ public:
 	FunctionEncoding *getFunctionEncoding() {return &encoding;}
 	void updateParents();
 	void serialize(Serializer *serializer );
-        virtual void print();
+	virtual void print();
 	CMEMALLOC;
 
 	Predicate *predicate;
@@ -85,12 +85,12 @@ public:
 	BooleanLogic(CSolver *solver, LogicOp _op, BooleanEdge *array, uint asize);
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer );
-        virtual void print();
+	virtual void print();
 	LogicOp op;
 	bool replaced;
 	Array<BooleanEdge> inputs;
 	void updateParents();
-	
+
 	CMEMALLOC;
 };
 BooleanEdge cloneEdge(CSolver *solver, CloneMap *map, BooleanEdge e);

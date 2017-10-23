@@ -29,7 +29,6 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	SetIteratorBooleanEdge *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge constraint = iterator->next();
-//                constraint.getBoolean()->print();
 		Edge c = encodeConstraintSATEncoder(constraint);
 		addConstraintCNF(cnf, c);
 	}
@@ -38,7 +37,7 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 
 Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 	Edge result;
-	Boolean * constraint = c.getBoolean();
+	Boolean *constraint = c.getBoolean();
 
 	if (booledgeMap.contains(constraint)) {
 		Edge e = {(Node *) booledgeMap.get(constraint)};
@@ -97,7 +96,7 @@ Edge SATEncoder::encodeLogicSATEncoder(BooleanLogic *constraint) {
 	case SATC_OR:
 	case SATC_XOR:
 	case SATC_IMPLIES:
-		//Don't handle, translate these away...
+	//Don't handle, translate these away...
 	default:
 		model_print("Unhandled case in encodeLogicSATEncoder %u", constraint->op);
 		exit(-1);
