@@ -101,7 +101,7 @@ void ElementConst::serialize(Serializer *serializer) {
 }
 
 void ElementConst::print() {
-	model_print("{ElementConst: %lu}\n", value);
+	model_print("{ElementConst: %" PRIu64 "}\n", value);
 }
 
 void ElementFunction::serialize(Serializer *serializer) {

@@ -386,7 +386,10 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 }
 
 BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t second) {
-	ASSERT(first != second);
+	//	ASSERT(first != second);
+	if (first == second)
+		return getBooleanFalse();
+	
 	bool negate = false;
 	if (order->type == SATC_TOTAL) {
 		if (first > second) {
@@ -470,13 +473,13 @@ int CSolver::solve() {
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
 
-	IntegerEncodingTransform iet(this);
-	iet.doTransform();
+	//IntegerEncodingTransform iet(this);
+	//iet.doTransform();
 
-	EncodingGraph eg(this);
-	eg.buildGraph();
-	eg.encode();
-	printConstraints();
+	//EncodingGraph eg(this);
+	//eg.buildGraph();
+	//eg.encode();
+	//printConstraints();
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
@@ -502,6 +505,13 @@ void CSolver::printConstraints() {
 	}
 	delete it;
 
+}
+
+void CSolver::printConstraint(BooleanEdge b) {
+	if (b.isNegated())
+		model_print("!");
+	b->print();
+	model_print("\n");
 }
 
 uint64_t CSolver::getElementValue(Element *element) {
