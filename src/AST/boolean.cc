@@ -28,6 +28,9 @@ BooleanOrder::BooleanOrder(Order *_order, uint64_t _first, uint64_t _second) :
 	order(_order),
 	first(_first),
 	second(_second) {
+}
+
+void BooleanOrder::updateParents() {
 	order->constraints.push(this);
 }
 

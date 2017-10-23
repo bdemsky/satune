@@ -134,6 +134,7 @@ public:
 	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
 	bool isUnSAT() { return unsat; }
 
+	void printConstraint(BooleanEdge boolean);
 	void printConstraints();
 
 	Vector<Order *> *getOrders() { return &allOrders;}

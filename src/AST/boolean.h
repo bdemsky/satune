@@ -56,6 +56,7 @@ public:
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer );
 	virtual void print();
+	void updateParents();
 
 	Order *order;
 	uint64_t first;
