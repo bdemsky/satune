@@ -9,6 +9,7 @@ public:
 	NodeValuePair(EncodingNode *n, uint64_t val) : node(n), value(val) {}
 	EncodingNode *node;
 	uint64_t value;
+	CMEMALLOC;
 };
 
 class EncodingValue;
@@ -27,6 +28,7 @@ public:
 	HashsetEncodingNode nodes;
 	HashsetEncodingValue larger;
 	HashsetEncodingValue notequals;
+	CMEMALLOC;
 };
 
 uint hashNodeValuePair(NodeValuePair *nvp);

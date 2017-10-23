@@ -95,7 +95,7 @@ CSolver* CSolver::deserialize(const char * file){
 
 void CSolver::serialize() {
 	model_print("serializing ...\n");
-        printConstraints();
+	printConstraints();
 	Serializer serializer("dump");
 	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
@@ -412,9 +412,6 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if(constraint.isNegated())
-		model_print("!");
-	constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
@@ -472,8 +469,8 @@ int CSolver::solve() {
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
 
-	//IntegerEncodingTransform iet(this);
-	//iet.doTransform();
+	IntegerEncodingTransform iet(this);
+	iet.doTransform();
 
 	EncodingGraph eg(this);
 	eg.buildGraph();
