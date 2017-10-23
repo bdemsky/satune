@@ -48,7 +48,8 @@ CSolver::~CSolver() {
 
 	size = allElements.getSize();
 	for (uint i = 0; i < size; i++) {
-		delete allElements.get(i);
+                Element* el = allElements.get(i);
+		delete el;
 	}
 
 	size = allTables.getSize();
@@ -86,22 +87,22 @@ CSolver *CSolver::clone() {
 	return copy;
 }
 
+CSolver* CSolver::deserialize(const char * file){
+	model_print("deserializing ...\n");
+	Deserializer deserializer(file);
+	return deserializer.deserialize();
+}
+
 void CSolver::serialize() {
 	model_print("serializing ...\n");
-	{
-		Serializer serializer("dump");
-		SetIteratorBooleanEdge *it = getConstraints();
-		while (it->hasNext()) {
-			BooleanEdge b = it->next();
-			serializeBooleanEdge(&serializer, b);
-		}
-		delete it;
+        printConstraints();
+	Serializer serializer("dump");
+	SetIteratorBooleanEdge *it = getConstraints();
+	while (it->hasNext()) {
+		BooleanEdge b = it->next();
+		serializeBooleanEdge(&serializer, b, true);
 	}
-	model_print("deserializing ...\n");
-	{
-		Deserializer deserializer("dump");
-		deserializer.deserialize();
-	}
+	delete it;
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
@@ -411,6 +412,12 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
+#ifdef TRACE_DEBUG
+        model_println("****New Constraint******");
+#endif
+        if(constraint.isNegated())
+                model_print("!");
+        constraint.getBoolean()->print();
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
@@ -471,10 +478,10 @@ int CSolver::solve() {
 	//IntegerEncodingTransform iet(this);
 	//iet.doTransform();
 
-	//EncodingGraph eg(this);
-	//eg.buildGraph();
-	//eg.encode();
-	//printConstraints();
+	EncodingGraph eg(this);
+	eg.buildGraph();
+	eg.encode();
+//	printConstraints();
 	naiveEncodingDecision(this);
 	satEncoder->encodeAllSATEncoder(this);
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
@@ -499,7 +506,6 @@ void CSolver::printConstraints() {
 		model_print("\n");
 	}
 	delete it;
-
 }
 
 void CSolver::printConstraint(BooleanEdge b) {

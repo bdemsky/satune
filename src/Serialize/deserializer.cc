@@ -26,8 +26,6 @@ Deserializer::Deserializer(const char *file) :
 }
 
 Deserializer::~Deserializer() {
-	delete solver;
-
 	if (-1 == close(filedesc)) {
 		exit(-1);
 	}
@@ -94,14 +92,18 @@ CSolver *Deserializer::deserialize() {
 }
 
 void Deserializer::deserializeBooleanEdge() {
-	Boolean *b;
-	myread(&b, sizeof(Boolean *));
-	BooleanEdge tmp(b);
+	Boolean *b_ptr;
+	myread(&b_ptr, sizeof(Boolean *));
+	BooleanEdge tmp(b_ptr);
 	bool isNegated = tmp.isNegated();
 	ASSERT(map.contains(tmp.getBoolean()));
-	b = (Boolean *) map.get(tmp.getBoolean());
-	BooleanEdge res(b);
-	solver->addConstraint(isNegated ? res.negate() : res);
+	b_ptr = (Boolean *) map.get(tmp.getBoolean());
+	BooleanEdge res(b_ptr);
+        bool isTopLevel;
+        myread(&isTopLevel, sizeof(bool));
+        if(isTopLevel){
+                solver->addConstraint(isNegated ? res.negate() : res);
+        }
 }
 
 void Deserializer::deserializeBooleanVar() {
@@ -145,33 +147,36 @@ void Deserializer::deserializeSet() {
 	myread(&type, sizeof(VarType));
 	bool isRange;
 	myread(&isRange, sizeof(bool));
-	uint64_t low;
-	myread(&low, sizeof(uint64_t));
-	uint64_t high;
-	myread(&high, sizeof(uint64_t));
-	bool isMutable;
+        bool isMutable;
 	myread(&isMutable, sizeof(bool));
-	Set *set;
-	if (isMutable) {
-		set = new MutableSet(type);
-	}
-	uint size;
-	myread(&size, sizeof(uint));
-	Vector<uint64_t> members;
-	for (uint i = 0; i < size; i++) {
-		uint64_t mem;
-		myread(&mem, sizeof(uint64_t));
-		if (isMutable) {
-			((MutableSet *) set)->addElementMSet(mem);
-		} else {
-			members.push(mem);
-		}
-	}
-	if (!isMutable) {
-		set = isRange ? solver->createRangeSet(type, low, high) :
-					solver->createSet(type, members.expose(), size);
-	}
-	map.put(s_ptr, set);
+        if(isRange){
+                uint64_t low;
+                myread(&low, sizeof(uint64_t));
+                uint64_t high;
+                myread(&high, sizeof(uint64_t));
+                map.put(s_ptr, new Set(type, low, high));
+        } else{
+                Set *set;
+                if(isMutable){
+                        set = new MutableSet(type);
+                }
+                uint size;
+                myread(&size, sizeof(uint));
+                Vector<uint64_t> members;
+                for(uint i=0; i<size; i++){
+                        uint64_t mem;
+                        myread(&mem, sizeof(uint64_t));
+                        if(isMutable) {
+                                ((MutableSet*) set)->addElementMSet(mem);
+                        }else {
+                                members.push(mem);
+                        }
+                }
+                if(!isMutable){
+                        set = solver->createSet(type, members.expose(), size);
+                }
+                map.put(s_ptr, set);
+        }
 }
 
 void Deserializer::deserializeBooleanLogic() {
@@ -343,7 +348,6 @@ void Deserializer::deserializeElementFunction() {
 	overflowstatus = (Boolean *) map.get(tmp.getBoolean());
 	BooleanEdge res(overflowstatus);
 	BooleanEdge undefStatus = isNegated ? res.negate() : res;
-
 	map.put(ef_ptr, solver->applyFunction(function, members.expose(), size, undefStatus));
 }
 
