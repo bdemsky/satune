@@ -32,8 +32,6 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 
 void serializeBooleanEdge(Serializer *serializer, BooleanEdge be, bool isTopLevel) {
 	if (be == BooleanEdge(NULL)){
-		Boolean* boolean = NULL;
-                serializer->mywrite(&boolean, sizeof(Boolean *));
                 return;
         }
 	be.getBoolean()->serialize(serializer);
