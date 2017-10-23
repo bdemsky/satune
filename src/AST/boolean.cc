@@ -96,6 +96,8 @@ Boolean *BooleanPredicate::clone(CSolver *solver, CloneMap *map) {
 
 void BooleanPredicate::updateParents() {
 	for (uint i = 0; i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+	if (undefStatus)
+		undefStatus->parents.push(this);
 }
 
 void BooleanLogic::updateParents() {

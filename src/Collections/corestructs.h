@@ -20,7 +20,9 @@ public:
 	Boolean *getBoolean() {return (Boolean *)(((uintptr_t)b) & ~((uintptr_t) 1));}
 	Boolean *getRaw() {return b;}
 	Boolean *operator->() {return getBoolean();}
-	operator bool() const {return b != NULL;}
+	operator bool() {
+		return getBoolean() != NULL;
+	}
 private:
 	Boolean *b;
 };

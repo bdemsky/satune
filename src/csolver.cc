@@ -65,7 +65,6 @@ CSolver::~CSolver() {
 	for (uint i = 0; i < size; i++) {
 		delete allOrders.get(i);
 	}
-
 	size = allFunctions.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allFunctions.get(i);
@@ -103,7 +102,6 @@ void CSolver::serialize() {
 		Deserializer deserializer("dump");
 		deserializer.deserialize();
 	}
-
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {
@@ -174,6 +172,7 @@ Element *CSolver::getElementConst(VarType type, uint64_t value) {
 		return e;
 	}
 }
+
 
 Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, BooleanEdge overflowstatus) {
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
@@ -311,13 +310,11 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 	}
 	case SATC_IFF: {
 		for (uint i = 0; i < 2; i++) {
-			if (array[i]->type == BOOLCONST) {
-				if (isTrue(array[i])) {	// It can be undefined
-					return array[1 - i];
-				} else if (isFalse(array[i])) {
-					newarray[0] = array[1 - i];
-					return applyLogicalOperation(SATC_NOT, newarray, 1);
-				}
+			if (isTrue(array[i])) {	// It can be undefined
+				return array[1 - i];
+			} else if (isFalse(array[i])) {
+				newarray[0] = array[1 - i];
+				return applyLogicalOperation(SATC_NOT, newarray, 1);
 			} else if (array[i]->type == LOGICOP) {
 				BooleanLogic *b = (BooleanLogic *)array[i].getBoolean();
 				if (b->replaced) {
@@ -341,12 +338,10 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 				if (((BooleanLogic *)b.getBoolean())->replaced)
 					return rewriteLogicalOperation(op, array, asize);
 			}
-			if (b->type == BOOLCONST) {
-				if (isTrue(b))
-					continue;
-				else {
-					return boolFalse;
-				}
+			if (isTrue(b))
+				continue;
+			else if (isFalse(b)) {
+				return boolFalse;
 			} else
 				newarray[newindex++] = b;
 		}
@@ -389,7 +384,7 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 	//	ASSERT(first != second);
 	if (first == second)
 		return getBooleanFalse();
-	
+
 	bool negate = false;
 	if (order->type == SATC_TOTAL) {
 		if (first > second) {
