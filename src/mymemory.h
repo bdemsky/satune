@@ -26,7 +26,7 @@
    void * ourrealloc(void *ptr, size_t size);
  */
 
-#if 0
+#ifdef SATCHECK_CONFIG
 void *model_malloc(size_t size);
 void model_free(void *ptr);
 void *model_calloc(size_t count, size_t size);

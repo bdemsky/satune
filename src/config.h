@@ -19,7 +19,7 @@
 //#define CONFIG_DEBUG
 #define TRACE_DEBUG
 #endif
-
+//#define SATCHECK_CONFIG
 #ifndef CONFIG_ASSERT
 #define CONFIG_ASSERT
 #endif
