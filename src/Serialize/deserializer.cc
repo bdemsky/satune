@@ -15,11 +15,17 @@
 #include "element.h"
 #include "mutableset.h"
 
+#define READBUFFERSIZE 16384
+
 Deserializer::Deserializer(const char *file) :
+	buffer((char *)ourmalloc(READBUFFERSIZE)),
+	bufferindex(0),
+	bufferbytes(0),
+	buffercap(READBUFFERSIZE),
 	solver(new CSolver())
 {
 	filedesc = open(file, O_RDONLY);
-
+	
 	if (filedesc < 0) {
 		exit(-1);
 	}
@@ -29,10 +35,35 @@ Deserializer::~Deserializer() {
 	if (-1 == close(filedesc)) {
 		exit(-1);
 	}
+	ourfree(buffer);
 }
 
-ssize_t Deserializer::myread(void *__buf, size_t __nbytes) {
-	return read (filedesc, __buf, __nbytes);
+ssize_t Deserializer::myread(void *__buf, size_t bytestoread) {
+	char * out = (char * ) __buf;
+	size_t totalbytesread = 0;
+	while (bytestoread) {
+		if (bufferbytes != 0) {
+			uint bytestocopy = (bufferbytes > bytestoread) ? bytestoread : bufferbytes;
+			memcpy(out, &buffer[bufferindex], bytestocopy);
+			//update local buffer
+			bufferbytes -= bytestocopy;
+			bufferindex += bytestocopy;
+			totalbytesread += bytestocopy;
+			//update request pointers
+			out += bytestocopy;
+			bytestoread -= bytestocopy;
+		} else {
+			size_t bytesread=read (filedesc, buffer, buffercap);
+			bufferindex = 0;
+			bufferbytes = bytesread;
+			if (bytesread == 0) {
+				break;
+			} else if (bytesread < 0) {
+				exit(-1);
+			}
+		}
+	}
+	return totalbytesread;
 }
 
 CSolver *Deserializer::deserialize() {

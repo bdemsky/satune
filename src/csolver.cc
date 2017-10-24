@@ -22,6 +22,7 @@
 #include "serializer.h"
 #include "deserializer.h"
 #include "encodinggraph.h"
+#include <time.h>
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -95,8 +96,13 @@ CSolver* CSolver::deserialize(const char * file){
 
 void CSolver::serialize() {
 	model_print("serializing ...\n");
-	printConstraints();
-	Serializer serializer("dump");
+	char buffer[255];
+	struct timespec t;
+	clock_gettime(CLOCK_REALTIME, &t);
+
+	unsigned long long nanotime=t.tv_sec*1000000000+t.tv_nsec;
+	int numchars=sprintf(buffer, "DUMP%llu", nanotime);
+	Serializer serializer(buffer);
 	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
 		BooleanEdge b = it->next();
@@ -459,7 +465,8 @@ int CSolver::solve() {
 		tuner = new DefaultTuner();
 		deleteTuner = true;
 	}
-
+	serialize();
+	
 	long long startTime = getTimeNano();
 	computePolarities(this);
 

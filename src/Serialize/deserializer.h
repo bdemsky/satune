@@ -39,6 +39,11 @@ private:
 	void deserializeElementFunction();
 	void deserializeFunctionOperator();
 	void deserializeFunctionTable();
+	char *buffer;
+	uint bufferindex;
+	uint bufferbytes;
+	uint buffercap;
+
 	CSolver *solver;
 	int filedesc;
 	CloneMap map;

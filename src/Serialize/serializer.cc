@@ -11,33 +11,74 @@
 #include "fcntl.h"
 #include "boolean.h"
 
-Serializer::Serializer(const char *file) {
-	filedesc = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+#define SERIALBUFFERLENGTH 4096
 
+Serializer::Serializer(const char *file) :
+	buffer((char *) ourmalloc(SERIALBUFFERLENGTH)),
+	bufferoffset(0),
+	bufferlength(SERIALBUFFERLENGTH) {
+	filedesc = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (filedesc < 0) {
 		exit(-1);
 	}
 }
 
+void Serializer::flushBuffer() {
+	ssize_t datatowrite = bufferoffset;
+	ssize_t index = 0;
+	while(datatowrite) {
+		ssize_t byteswritten = write(filedesc, &buffer[index], datatowrite);
+		if (byteswritten == -1)
+			exit(-1);
+		datatowrite -= byteswritten;
+		index += byteswritten;
+	}
+	bufferoffset=0;
+}
+
 Serializer::~Serializer() {
+	flushBuffer();
 	if (-1 == close(filedesc)) {
 		exit(-1);
 	}
+	ourfree(buffer);
 }
 
 void Serializer::mywrite(const void *__buf, size_t __n) {
-	write (filedesc, __buf, __n);
+	if (__n > SERIALBUFFERLENGTH *2) {
+		if (bufferoffset != 0)
+			flushBuffer();
+		write(filedesc, __buf, __n);
+	} else {
+		char *towrite=(char *) __buf;
+		do  {
+			uint spacefree = bufferlength-bufferoffset;
+			uint datatowrite = spacefree > __n ? __n : spacefree;
+			memcpy(&buffer[bufferoffset], towrite, datatowrite);
+			bufferoffset += datatowrite;
+
+			if (spacefree < __n) {
+				flushBuffer();
+				towrite += datatowrite;
+			} else if (spacefree == __n) {
+				flushBuffer();
+				return;
+			} else {
+				return;
+			}
+		} while(true);
+	}
 }
 
 
 void serializeBooleanEdge(Serializer *serializer, BooleanEdge be, bool isTopLevel) {
-	if (be == BooleanEdge(NULL)){
-                return;
-        }
+	if (be == BooleanEdge(NULL)) {
+		return;
+	}
 	be.getBoolean()->serialize(serializer);
 	ASTNodeType type = BOOLEANEDGE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	Boolean *boolean = be.getRaw();
 	serializer->mywrite(&boolean, sizeof(Boolean *));
-        serializer->mywrite(&isTopLevel, sizeof(bool));
+	serializer->mywrite(&isTopLevel, sizeof(bool));
 }

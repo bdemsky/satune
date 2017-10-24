@@ -22,6 +22,10 @@ public:
 	virtual ~Serializer();
 	CMEMALLOC;
 private:
+	void flushBuffer();
+	char * buffer;
+	uint bufferoffset;
+	uint bufferlength;
 	int filedesc;
 	CloneMap map;
 };
