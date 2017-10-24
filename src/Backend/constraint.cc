@@ -146,12 +146,19 @@ Edge createNode(CNF *cnf, NodeType type, uint numEdges, Edge *edges) {
 }
 
 uint hashNode(NodeType type, uint numEdges, Edge *edges) {
-	uint hashvalue = type ^ numEdges;
+	uint hash = type;
+	hash += hash << 10;
+	hash ^= hash >> 6;
 	for (uint i = 0; i < numEdges; i++) {
-		hashvalue ^= (uint) ((uintptr_t) edges[i].node_ptr);
-		hashvalue = (hashvalue << 3) | (hashvalue >> 29);	//rotate left by 3 bits
+		uint c = (uint) ((uintptr_t) edges[i].node_ptr);
+		hash += c;
+		hash += hash << 10;
+		hash += hash >> 6;
 	}
-	return (uint) hashvalue;
+	hash += hash << 3;
+	hash ^= hash >> 11;
+	hash += hash << 15;
+	return hash;
 }
 
 bool compareNodes(Node *node, NodeType type, uint numEdges, Edge *edges) {

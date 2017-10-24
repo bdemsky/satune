@@ -465,7 +465,6 @@ int CSolver::solve() {
 		tuner = new DefaultTuner();
 		deleteTuner = true;
 	}
-	serialize();
 	
 	long long startTime = getTimeNano();
 	computePolarities(this);
