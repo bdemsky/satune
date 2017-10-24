@@ -20,7 +20,7 @@ void IntegerEncodingTransform::doTransform() {
 	SetIteratorOrder *orderit = orders->iterator();
 	while (orderit->hasNext()) {
 		Order *order = orderit->next();
-		if (GETVARTUNABLE(solver->getTuner(), order->type, ORDERINTEGERENCODING, &onoff))
+		if (GETVARTUNABLE(solver->getTuner(), order->type, ORDERINTEGERENCODING, &offon))
 			integerEncode(order);
 	}
 	delete orders;
