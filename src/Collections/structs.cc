@@ -8,12 +8,15 @@
 #include "structs.h"
 #include "decomposeorderresolver.h"
 
+#define HASHNEXT(hash, newval) {hash+=newval; hash += hash << 10; hash ^= hash >>6;}
+#define HASHFINAL(hash) {hash += hash <<3; hash ^= hash >> 11; hash += hash << 15;}
+
 unsigned int table_entry_hash_function(TableEntry *This) {
 	unsigned int h = 0;
 	for (uint i = 0; i < This->inputSize; i++) {
-		h += This->inputs[i];
-		h *= 31;
+		HASHNEXT(h, This->inputs[i]);
 	}
+	HASHFINAL(h);
 	return h;
 }
 
@@ -35,7 +38,11 @@ bool order_node_equals(OrderNode *key1, OrderNode *key2) {
 }
 
 unsigned int order_edge_hash_function(OrderEdge *This) {
-	return (uint) (((uintptr_t)This->sink) ^ ((uintptr_t)This->source << 4));
+	uint hash=0;
+	HASHNEXT(hash, (uint)(uintptr_t) This->sink);
+	HASHNEXT(hash, (uint)(uintptr_t) This->source);
+	HASHFINAL(hash);
+	return hash;
 }
 
 bool order_edge_equals(OrderEdge *key1, OrderEdge *key2) {
@@ -51,7 +58,11 @@ bool order_element_equals(OrderElement *key1, OrderElement *key2) {
 }
 
 unsigned int order_pair_hash_function(OrderPair *This) {
-	return (uint) (This->first << 2) ^ This->second;
+	uint hash=0;
+	HASHNEXT(hash, This->first);
+	HASHNEXT(hash, This->second);
+	HASHFINAL(hash);
+	return hash;
 }
 
 bool order_pair_equals(OrderPair *key1, OrderPair *key2) {
@@ -59,7 +70,11 @@ bool order_pair_equals(OrderPair *key1, OrderPair *key2) {
 }
 
 unsigned int doredge_hash_function(DOREdge *key) {
-	return (uint) (key->newfirst << 2) ^ key->newsecond;
+	uint hash=0;
+	HASHNEXT(hash, (uint) key->newfirst);
+	HASHNEXT(hash, (uint) key->newsecond);
+	HASHFINAL(hash);
+	return hash;
 }
 
 bool doredge_equals(DOREdge *key1, DOREdge *key2) {

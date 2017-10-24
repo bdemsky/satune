@@ -11,15 +11,16 @@
 #include "mutableset.h"
 #include "tunable.h"
 
-void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode *> *finishNodes, bool computeTransitiveClosure) {
+/** Returns a table that maps a node to the set of nodes that can reach the node. */
+HashtableNodeToNodeSet * getMustReachMap(CSolver  *solver, OrderGraph *graph, Vector<OrderNode *> *finishNodes) {
 	uint size = finishNodes->getSize();
 	HashtableNodeToNodeSet *table = new HashtableNodeToNodeSet(128, 0.25);
-
+	
 	for (int i = size - 1; i >= 0; i--) {
 		OrderNode *node = finishNodes->get(i);
 		HashsetOrderNode *sources = new HashsetOrderNode(4, 0.25);
 		table->put(node, sources);
-
+		
 		{
 			//Compute source sets
 			SetIteratorOrderEdge *iterator = node->inEdges.iterator();
@@ -34,13 +35,22 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 			}
 			delete iterator;
 		}
+	}
+	return table;
+}
+
+void DFSClearContradictions(CSolver *solver, OrderGraph *graph, HashtableNodeToNodeSet * table, Vector<OrderNode *> *finishNodes, bool computeTransitiveClosure) {
+	uint size = finishNodes->getSize();
+
+	for (int i = size - 1; i >= 0; i--) {
+		OrderNode *node = finishNodes->get(i);
+		HashsetOrderNode *sources = table->get(node);
+		
 		if (computeTransitiveClosure) {
 			//Compute full transitive closure for nodes
 			SetIteratorOrderNode *srciterator = sources->iterator();
 			while (srciterator->hasNext()) {
 				OrderNode *srcnode = srciterator->next();
-				if (srcnode->removed)
-					continue;
 				OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(srcnode, node);
 				newedge->mustPos = true;
 				newedge->polPos = true;
@@ -83,9 +93,6 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, Vector<OrderNode
 			delete iterator;
 		}
 	}
-
-	table->resetAndDeleteVals();
-	delete table;
 }
 
 /* This function finds edges that would form a cycle with must edges
@@ -98,9 +105,11 @@ void reachMustAnalysis(CSolver *solver, OrderGraph *graph, bool computeTransitiv
 	//Topologically sort the mustPos edge graph
 	graph->DFSMust(&finishNodes);
 	graph->resetNodeInfoStatusSCC();
-
+	HashtableNodeToNodeSet * table=getMustReachMap(solver, graph, & finishNodes);
 	//Find any backwards edges that complete cycles and force them to be mustNeg
-	DFSClearContradictions(solver, graph, &finishNodes, computeTransitiveClosure);
+	DFSClearContradictions(solver, graph, table, &finishNodes, computeTransitiveClosure);
+	table->resetAndDeleteVals();
+	delete table;
 }
 
 /* This function finds edges that must be positive and forces the

@@ -30,6 +30,7 @@ template<typename _Key, typename _Val>
 struct Hashlistnode {
 	_Key key;
 	_Val val;
+	uint hashcode;
 };
 
 template<typename _Key, int _Shift, typename _KeyInt>
@@ -206,7 +207,8 @@ public:
 
 		struct Hashlistnode<_Key, _Val> *search;
 
-		unsigned int index = hash_function(key);
+		unsigned int hashcode = hash_function(key);
+		unsigned int index = hashcode;
 		do {
 			index &= capacitymask;
 			search = &table[index];
@@ -214,15 +216,17 @@ public:
 				//key is null, probably done
 				break;
 			}
-			if (equals(search->key, key)) {
-				search->val = val;
-				return;
-			}
+			if (search->hashcode == hashcode)
+				if (equals(search->key, key)) {
+					search->val = val;
+					return;
+				}
 			index++;
 		} while (true);
 
 		search->key = key;
 		search->val = val;
+		search->hashcode = hashcode;
 		size++;
 	}
 
@@ -242,7 +246,8 @@ public:
 				return (_Val) 0;
 		}
 
-		unsigned int oindex = hash_function(key) & capacitymask;
+		unsigned int hashcode = hash_function(key);
+		unsigned int oindex = hashcode & capacitymask;
 		unsigned int index = oindex;
 		do {
 			search = &table[index];
@@ -250,8 +255,9 @@ public:
 				if (!search->val)
 					break;
 			} else
-			if (equals(search->key, key))
-				return search->val;
+				if (hashcode == search->hashcode)
+					if (equals(search->key, key))
+						return search->val;
 			index++;
 			index &= capacitymask;
 			if (index == oindex)
@@ -282,7 +288,8 @@ public:
 		}
 
 
-		unsigned int index = hash_function(key);
+		unsigned int hashcode = hash_function(key);
+		unsigned int index = hashcode;
 		do {
 			index &= capacitymask;
 			search = &table[index];
@@ -290,14 +297,15 @@ public:
 				if (!search->val)
 					break;
 			} else
-			if (equals(search->key, key)) {
-				_Val v = search->val;
-				//empty out this bin
-				search->val = (_Val) 1;
-				search->key = 0;
-				size--;
-				return v;
-			}
+				if (hashcode == search->hashcode)
+					if (equals(search->key, key)) {
+						_Val v = search->val;
+						//empty out this bin
+						search->val = (_Val) 1;
+						search->key = 0;
+						size--;
+						return v;
+					}
 			index++;
 		} while (true);
 		return (_Val)0;
@@ -322,6 +330,7 @@ public:
 		}
 
 		unsigned int index = hash_function(key);
+		unsigned int hashcode = index;
 		do {
 			index &= capacitymask;
 			search = &table[index];
@@ -329,8 +338,9 @@ public:
 				if (!search->val)
 					break;
 			} else
-			if (equals(search->key, key))
-				return true;
+				if (hashcode == search->hashcode)
+					if (equals(search->key, key))
+						return true;
 			index++;
 		} while (true);
 		return false;
@@ -365,13 +375,15 @@ public:
 			if (!key)
 				continue;
 
-			unsigned int index = hash_function(key);
+			unsigned int hashcode = bin->hashcode;
+			unsigned int index = hashcode;
 			do {
 				index &= capacitymask;
 				search = &table[index];
 				index++;
 			} while (search->key);
 
+			search->hashcode = hashcode;
 			search->key = key;
 			search->val = bin->val;
 		}

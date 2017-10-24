@@ -22,6 +22,9 @@
 #include "serializer.h"
 #include "deserializer.h"
 #include "encodinggraph.h"
+#include "ordergraph.h"
+#include "orderedge.h"
+#include "orderanalysis.h"
 #include <time.h>
 
 CSolver::CSolver() :
@@ -408,6 +411,26 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 		allBooleans.push(constraint);
 		boolMap.put(constraint, constraint);
 		constraint->updateParents();
+		if (order->graph != NULL) {
+			OrderGraph *graph=order->graph;
+			OrderNode *from=graph->lookupOrderNodeFromOrderGraph(first);
+			if (from != NULL) {
+				OrderNode *to=graph->lookupOrderNodeFromOrderGraph(second);
+				if (to != NULL) {
+					OrderEdge *edge=graph->lookupOrderEdgeFromOrderGraph(from, to);
+					OrderEdge *invedge;
+
+					if (edge != NULL && edge->mustPos) {
+						replaceBooleanWithTrueNoRemove(constraint);
+					} else if (edge != NULL && edge->mustNeg) {
+						replaceBooleanWithFalseNoRemove(constraint);
+					} else if ((invedge=graph->lookupOrderEdgeFromOrderGraph(to, from)) != NULL
+										 && invedge->mustPos) {
+						replaceBooleanWithFalseNoRemove(constraint);
+					}
+				}
+			}
+		}
 	} else {
 		delete constraint;
 		constraint = b;
@@ -459,14 +482,45 @@ Order *CSolver::createOrder(OrderType type, Set *set) {
 	return order;
 }
 
+/** Computes static ordering information to allow isTrue/isFalse
+		queries on newly created orders to work. */
+
+void CSolver::inferFixedOrder(Order *order) {
+	if (order->graph != NULL) {
+		delete order->graph;
+	}
+	order->graph = buildMustOrderGraph(order);
+	reachMustAnalysis(this, order->graph, true);
+}
+	
+void CSolver::inferFixedOrders() {
+	SetIteratorOrder *orderit = activeOrders.iterator();
+	while (orderit->hasNext()) {
+		Order *order = orderit->next();
+		inferFixedOrder(order);
+	}
+}
+
 int CSolver::solve() {
 	bool deleteTuner = false;
 	if (tuner == NULL) {
 		tuner = new DefaultTuner();
 		deleteTuner = true;
 	}
+
+
+	{
+		SetIteratorOrder *orderit = activeOrders.iterator();
+		while (orderit->hasNext()) {
+			Order *order = orderit->next();
+			if (order->graph != NULL) {
+				delete order->graph;
+				order->graph = NULL;
+			}
+		}
+		delete orderit;
+	}
 	
-	long long startTime = getTimeNano();
 	computePolarities(this);
 
 	Preprocess pp(this);
@@ -481,8 +535,10 @@ int CSolver::solve() {
 	EncodingGraph eg(this);
 	eg.buildGraph();
 	eg.encode();
-//	printConstraints();
+
 	naiveEncodingDecision(this);
+
+	long long startTime = getTimeNano();
 	satEncoder->encodeAllSATEncoder(this);
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
