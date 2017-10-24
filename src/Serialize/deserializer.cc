@@ -178,36 +178,36 @@ void Deserializer::deserializeSet() {
 	myread(&type, sizeof(VarType));
 	bool isRange;
 	myread(&isRange, sizeof(bool));
-        bool isMutable;
+	bool isMutable;
 	myread(&isMutable, sizeof(bool));
-        if(isRange){
-                uint64_t low;
-                myread(&low, sizeof(uint64_t));
-                uint64_t high;
-                myread(&high, sizeof(uint64_t));
-                map.put(s_ptr, new Set(type, low, high));
-        } else{
-                Set *set;
-                if(isMutable){
-                        set = new MutableSet(type);
-                }
-                uint size;
-                myread(&size, sizeof(uint));
-                Vector<uint64_t> members;
-                for(uint i=0; i<size; i++){
-                        uint64_t mem;
-                        myread(&mem, sizeof(uint64_t));
-                        if(isMutable) {
-                                ((MutableSet*) set)->addElementMSet(mem);
-                        }else {
-                                members.push(mem);
-                        }
-                }
-                if(!isMutable){
-                        set = solver->createSet(type, members.expose(), size);
-                }
-                map.put(s_ptr, set);
-        }
+	if(isRange){
+		uint64_t low;
+		myread(&low, sizeof(uint64_t));
+		uint64_t high;
+		myread(&high, sizeof(uint64_t));
+		map.put(s_ptr, new Set(type, low, high));
+	} else {
+		Set *set = NULL;
+		if(isMutable) {
+			set = new MutableSet(type);
+		}
+		uint size;
+		myread(&size, sizeof(uint));
+		Vector<uint64_t> members;
+		for(uint i=0; i<size; i++) {
+			uint64_t mem;
+			myread(&mem, sizeof(uint64_t));
+			if(isMutable) {
+				((MutableSet*) set)->addElementMSet(mem);
+			} else {
+				members.push(mem);
+			}
+		}
+		if(!isMutable) {
+			set = solver->createSet(type, members.expose(), size);
+		}
+		map.put(s_ptr, set);
+	}
 }
 
 void Deserializer::deserializeBooleanLogic() {

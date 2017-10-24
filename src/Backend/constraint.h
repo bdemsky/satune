@@ -49,7 +49,7 @@ struct Node {
 	Edge edges[];
 };
 
-#define DEFAULT_CNF_ARRAY_SIZE 256
+#define DEFAULT_CNF_ARRAY_SIZE 64
 #define LOAD_FACTOR 0.25
 
 struct CNF {

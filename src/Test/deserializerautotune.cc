@@ -7,7 +7,7 @@ int main(int argc, char ** argv){
 		exit(-1);	
 	}
 	CSolver * solvers[argc-1];
-	AutoTuner *autotuner = new AutoTuner(300);
+	AutoTuner *autotuner = new AutoTuner(100);
 	for(int i = 1; i < argc; i++) {
 		solvers[i-1] = CSolver::deserialize(argv[i]);
 		autotuner->addProblem(solvers[i-1]);

@@ -12,9 +12,9 @@ HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wi
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
-CFLAGS := -Wall -g -O0
+CFLAGS := -Wall -O3 -g
 CFLAGS += -IAST -IASTTransform -IASTAnalyses -IASTAnalyses/Polarity -IASTAnalyses/Order -IASTAnalyses/Encoding -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner -ISerialize
-LDFLAGS := -ldl -lrt -rdynamic
+LDFLAGS := -ldl -lrt -rdynamic -g
 SHARED := -shared
 
 # Mac OSX options

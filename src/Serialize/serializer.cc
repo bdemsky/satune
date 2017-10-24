@@ -48,7 +48,9 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 	if (__n > SERIALBUFFERLENGTH *2) {
 		if (bufferoffset != 0)
 			flushBuffer();
-		write(filedesc, __buf, __n);
+		ssize_t result=write(filedesc, __buf, __n);
+		if (result != (ssize_t) __n)
+			exit(-1);
 	} else {
 		char *towrite=(char *) __buf;
 		do  {
