@@ -19,7 +19,7 @@
 #include "time.h"
 
 
-#ifdef SATCHECK_CONFIG
+#if 1
 extern int model_out;
 extern int model_err;
 extern int switch_alloc;
