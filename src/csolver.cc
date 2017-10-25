@@ -22,6 +22,9 @@
 #include "serializer.h"
 #include "deserializer.h"
 #include "encodinggraph.h"
+#include "ordergraph.h"
+#include "orderedge.h"
+#include "orderanalysis.h"
 #include <time.h>
 
 CSolver::CSolver() :
@@ -97,10 +100,7 @@ CSolver* CSolver::deserialize(const char * file){
 void CSolver::serialize() {
 	model_print("serializing ...\n");
 	char buffer[255];
-	struct timespec t;
-	clock_gettime(CLOCK_REALTIME, &t);
-
-	unsigned long long nanotime=t.tv_sec*1000000000+t.tv_nsec;
+	long long nanotime=getTimeNano();
 	int numchars=sprintf(buffer, "DUMP%llu", nanotime);
 	Serializer serializer(buffer);
 	SetIteratorBooleanEdge *it = getConstraints();
@@ -408,6 +408,26 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 		allBooleans.push(constraint);
 		boolMap.put(constraint, constraint);
 		constraint->updateParents();
+		if (order->graph != NULL) {
+			OrderGraph *graph=order->graph;
+			OrderNode *from=graph->lookupOrderNodeFromOrderGraph(first);
+			if (from != NULL) {
+				OrderNode *to=graph->lookupOrderNodeFromOrderGraph(second);
+				if (to != NULL) {
+					OrderEdge *edge=graph->lookupOrderEdgeFromOrderGraph(from, to);
+					OrderEdge *invedge;
+
+					if (edge != NULL && edge->mustPos) {
+						replaceBooleanWithTrueNoRemove(constraint);
+					} else if (edge != NULL && edge->mustNeg) {
+						replaceBooleanWithFalseNoRemove(constraint);
+					} else if ((invedge=graph->lookupOrderEdgeFromOrderGraph(to, from)) != NULL
+										 && invedge->mustPos) {
+						replaceBooleanWithFalseNoRemove(constraint);
+					}
+				}
+			}
+		}
 	} else {
 		delete constraint;
 		constraint = b;
@@ -459,21 +479,59 @@ Order *CSolver::createOrder(OrderType type, Set *set) {
 	return order;
 }
 
+/** Computes static ordering information to allow isTrue/isFalse
+		queries on newly created orders to work. */
+
+void CSolver::inferFixedOrder(Order *order) {
+	if (order->graph != NULL) {
+		delete order->graph;
+	}
+	order->graph = buildMustOrderGraph(order);
+	reachMustAnalysis(this, order->graph, true);
+}
+	
+void CSolver::inferFixedOrders() {
+	SetIteratorOrder *orderit = activeOrders.iterator();
+	while (orderit->hasNext()) {
+		Order *order = orderit->next();
+		inferFixedOrder(order);
+	}
+}
+
+#define NANOSEC 1000000000.0
 int CSolver::solve() {
+	long long starttime = getTimeNano();	
 	bool deleteTuner = false;
 	if (tuner == NULL) {
 		tuner = new DefaultTuner();
 		deleteTuner = true;
 	}
-	
-	long long startTime = getTimeNano();
-	computePolarities(this);
 
+
+	{
+		SetIteratorOrder *orderit = activeOrders.iterator();
+		while (orderit->hasNext()) {
+			Order *order = orderit->next();
+			if (order->graph != NULL) {
+				delete order->graph;
+				order->graph = NULL;
+			}
+		}
+		delete orderit;
+	}
+
+	computePolarities(this);
+	long long time2 = getTimeNano();
+	model_print("Polarity time: %f\n", (time2-starttime)/NANOSEC);
 	Preprocess pp(this);
 	pp.doTransform();
-
+	long long time3 = getTimeNano();
+	model_print("Preprocess time: %f\n", (time3-time2)/NANOSEC);
+	
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
+	long long time4 = getTimeNano();
+	model_print("Decompose Order: %f\n", (time4-time3)/NANOSEC);
 
 	IntegerEncodingTransform iet(this);
 	iet.doTransform();
@@ -481,14 +539,22 @@ int CSolver::solve() {
 	EncodingGraph eg(this);
 	eg.buildGraph();
 	eg.encode();
-//	printConstraints();
+
 	naiveEncodingDecision(this);
+	long long time5 = getTimeNano();
+	model_print("Encoding Graph Time: %f\n", (time5-time4)/NANOSEC);
+	
+	long long startTime = getTimeNano();
 	satEncoder->encodeAllSATEncoder(this);
+	long long endTime = getTimeNano();
+
+	elapsedTime = endTime - startTime;
+	model_print("Elapse Encode time: %f\n", elapsedTime/NANOSEC);
+	
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
 	model_print("Result Computed in CSolver: %d\n", result);
-	long long finishTime = getTimeNano();
-	elapsedTime = finishTime - startTime;
+	
 	if (deleteTuner) {
 		delete tuner;
 		tuner = NULL;

@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#define SATCHECK_CONFIG
+
 /*
    void * ourmalloc(size_t size);
    void ourfree(void *ptr);

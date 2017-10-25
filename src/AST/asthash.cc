@@ -4,6 +4,9 @@
 #include "boolean.h"
 #include "element.h"
 
+#define HASHNEXT(hash, newval) {hash+=newval; hash += hash << 10; hash ^= hash >>6;}
+#define HASHFINAL(hash) {hash += hash <<3; hash ^= hash >> 11; hash += hash << 15;}
+
 bool compareArray(Array<BooleanEdge> *inputs1, Array<BooleanEdge> *inputs2) {
 	if (inputs1->getSize() != inputs2->getSize())
 		return false;
@@ -25,22 +28,22 @@ bool compareArray(Array<Element *> *inputs1, Array<Element *> *inputs2) {
 }
 
 uint hashArray(Array<BooleanEdge> *inputs) {
-	uint hash = inputs->getSize();
+	uint hash = 0;
 	for (uint i = 0; i < inputs->getSize(); i++) {
 		uint newval = (uint)(uintptr_t) inputs->get(i).getRaw();
-		hash ^= newval;
-		hash = (hash << 3) | (hash >> 29);
+		HASHNEXT(hash, newval);
 	}
+	HASHFINAL(hash);
 	return hash;
 }
 
 uint hashArray(Array<Element *> *inputs) {
-	uint hash = inputs->getSize();
+	uint hash = 0;
 	for (uint i = 0; i < inputs->getSize(); i++) {
 		uint newval = (uint)(uintptr_t) inputs->get(i);
-		hash ^= newval;
-		hash = (hash << 3) | (hash >> 29);
+		HASHNEXT(hash, newval);
 	}
+	HASHFINAL(hash);
 	return hash;
 }
 
@@ -48,20 +51,29 @@ uint hashBoolean(Boolean *b) {
 	switch (b->type) {
 	case ORDERCONST: {
 		BooleanOrder *o = (BooleanOrder *)b;
-		return ((uint)(uintptr_t) o->order) ^ ((uint) o->first) ^ (((uint)(o->second)) << 2);
+		uint hash = 0;
+		HASHNEXT(hash, (uint) o->first);
+		HASHNEXT(hash, (uint) o->second);
+		HASHNEXT(hash, (((uint)(uintptr_t) o->order) & 0xffff));
+		HASHFINAL(hash);
+		return hash;
 	}
+
 	case BOOLEANVAR: {
 		return (uint)(uintptr_t) b;
 	}
 	case LOGICOP: {
 		BooleanLogic *l = (BooleanLogic *)b;
-		return ((uint)l->op) ^ hashArray(&l->inputs);
+		return ((uint)l->op) + 43* hashArray(&l->inputs);
 	}
 	case PREDICATEOP: {
 		BooleanPredicate *p = (BooleanPredicate *)b;
-		return ((uint)(uintptr_t) p->predicate) ^
-					 (((uint)(uintptr_t) p->undefStatus) << 1) ^
-					 hashArray(&p->inputs);
+		uint hash = 0;
+		HASHNEXT(hash, hashArray(&p->inputs));
+		HASHNEXT(hash, (uint)(uintptr_t) p->predicate);
+		HASHNEXT(hash, (uint)(uintptr_t) p->undefStatus);
+		HASHFINAL(hash);
+		return hash;
 	}
 	default:
 		ASSERT(0);
@@ -104,9 +116,12 @@ uint hashElement(Element *e) {
 	}
 	case ELEMFUNCRETURN: {
 		ElementFunction *ef = (ElementFunction *) e;
-		return ((uint)(uintptr_t) ef->getFunction()) ^
-					 ((uint)(uintptr_t) ef->overflowstatus) ^
-					 hashArray(&ef->inputs);
+		uint hash = 0;
+		HASHNEXT(hash, hashArray (&ef->inputs));
+		HASHNEXT(hash, (uint)(uintptr_t) ef->getFunction());
+		HASHNEXT(hash, (uint)(uintptr_t) ef->overflowstatus);
+		HASHFINAL(hash);
+		return hash;
 	}
 	case ELEMCONST: {
 		ElementConst *ec = (ElementConst *) e;

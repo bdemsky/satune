@@ -15,6 +15,10 @@ void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 	replaceBooleanWithTrueNoRemove(bexpr);
 }
 
+void CSolver::replaceBooleanWithFalseNoRemove(BooleanEdge bexpr) {
+	replaceBooleanWithTrueNoRemove(bexpr.negate());
+}
+
 void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 	updateMustValue(bexpr.getBoolean(), bexpr.isNegated() ? BV_MUSTBEFALSE : BV_MUSTBETRUE);
 

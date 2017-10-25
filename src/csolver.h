@@ -148,13 +148,17 @@ public:
 
 	void replaceBooleanWithTrue(BooleanEdge bexpr);
 	void replaceBooleanWithTrueNoRemove(BooleanEdge bexpr);
+	void replaceBooleanWithFalseNoRemove(BooleanEdge bexpr);
 	void replaceBooleanWithFalse(BooleanEdge bexpr);
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void serialize();
 	static CSolver* deserialize(const char * file);
 	void autoTune(uint budget);
+	void inferFixedOrders();
+	void inferFixedOrder(Order *order);
 
+	
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();

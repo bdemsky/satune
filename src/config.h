@@ -11,16 +11,15 @@
  * @brief Configuration file.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef SATC_CONFIG_H
+#define SATC_CONFIG_H
 
 /** Turn on debugging. */
 #ifndef CONFIG_DEBUG
 //#define CONFIG_DEBUG
-#define TRACE_DEBUG
 #endif
 
-//#define SATCHECK_CONFIG
+#define SATCHECK_CONFIG
 
 #ifndef CONFIG_ASSERT
 #define CONFIG_ASSERT

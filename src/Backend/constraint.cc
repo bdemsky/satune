@@ -352,6 +352,7 @@ int solveCNF(CNF *cnf) {
 	long long finishTime = getTimeNano();
 	cnf->encodeTime = startSolve - startTime;
 	cnf->solveTime = finishTime - startSolve;
+	model_print("CNF Encode time: %f\n Solve time: %f\n", cnf->encodeTime/1000000000.0, cnf->solveTime/ 1000000000.0);
 	return result;
 }
 
