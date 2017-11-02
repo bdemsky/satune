@@ -67,7 +67,6 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 				flushBuffer();
 				__n -= datatowrite;
 				towrite += datatowrite;
-                                __n-=datatowrite;
 			} else if (spacefree == __n) {
 				flushBuffer();
 				return;
