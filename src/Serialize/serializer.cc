@@ -45,14 +45,18 @@ Serializer::~Serializer() {
 }
 
 void Serializer::mywrite(const void *__buf, size_t __n) {
+	char *towrite=(char *) __buf;
 	if (__n > SERIALBUFFERLENGTH *2) {
 		if (bufferoffset != 0)
 			flushBuffer();
-		ssize_t result=write(filedesc, __buf, __n);
-		if (result != (ssize_t) __n)
-			exit(-1);
+		while (__n > 0) {
+			ssize_t result=write(filedesc, &towrite, __n);
+			if (result != (ssize_t) __n)
+				exit(-1);
+			towrite += result;
+			__n -= result;
+		}
 	} else {
-		char *towrite=(char *) __buf;
 		do  {
 			uint spacefree = bufferlength-bufferoffset;
 			uint datatowrite = spacefree > __n ? __n : spacefree;
@@ -61,6 +65,7 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 
 			if (spacefree < __n) {
 				flushBuffer();
+				__n -= datatowrite;
 				towrite += datatowrite;
 			} else if (spacefree == __n) {
 				flushBuffer();

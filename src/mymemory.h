@@ -19,7 +19,7 @@
 
 #include "config.h"
 
-#define SATCHECK_CONFIG
+//#define SATCHECK_CONFIG
 
 /*
    void * ourmalloc(size_t size);
