@@ -98,7 +98,7 @@ void Table::serialize(Serializer *serializer) {
 
 
 void Table::print() {
-	model_print("{Table:\n");
+	model_print("{Table<%p>:\n", this);
 	SetIteratorTableEntry *iterator = getEntries();
 	while (iterator->hasNext()) {
 		TableEntry *entry = iterator->next();

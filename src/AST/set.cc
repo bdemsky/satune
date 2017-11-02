@@ -155,7 +155,7 @@ void Set::serialize(Serializer *serializer) {
 }
 
 void Set::print() {
-	model_print("{Set:");
+	model_print("{Set<%p>:", this);
 	if (isRange) {
 		model_print("Range: low=%lu, high=%lu}", low, high);
 	} else {

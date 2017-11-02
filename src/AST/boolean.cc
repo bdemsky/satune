@@ -115,11 +115,11 @@ void BooleanVar::serialize(Serializer *serializer) {
 }
 
 void BooleanVar::print() {
-	model_print("BooleanVar:%lu\n", (uintptr_t)this);
+	model_print("BooleanVar<%p>\n", this);
 }
 
 void BooleanConst::print() {
-	model_print("BooleanConst:%s\n", istrue ? "TRUE" : "FALSE");
+	model_print("BooleanConst<%p>:%s\n", this, istrue ? "TRUE" : "FALSE");
 }
 
 void BooleanOrder::serialize(Serializer *serializer) {
@@ -137,7 +137,7 @@ void BooleanOrder::serialize(Serializer *serializer) {
 }
 
 void BooleanOrder::print() {
-	model_print("{BooleanOrder: First= %lu, Second = %lu on Order:\n", first, second);
+	model_print("{BooleanOrder<%p>: First= %lu, Second = %lu on Order:\n", this, first, second);
 	order->print();
 	model_print("}\n");
 }
@@ -169,7 +169,7 @@ void BooleanPredicate::serialize(Serializer *serializer) {
 }
 
 void BooleanPredicate::print() {
-	model_print("{BooleanPredicate:\n");
+	model_print("{BooleanPredicate<%p>:\n", this);
 	predicate->print();
 	model_print("elements:\n");
 	uint size = inputs.getSize();
@@ -201,7 +201,7 @@ void BooleanLogic::serialize(Serializer *serializer) {
 }
 
 void BooleanLogic::print() {
-	model_print("{BooleanLogic: %s\n",
+	model_print("{BooleanLogic<%p>: %s\n", this,
 							op == SATC_AND ? "AND" : op == SATC_OR ? "OR" : op == SATC_NOT ? "NOT" :
 							op == SATC_XOR ? "XOR" : op == SATC_IFF ? "IFF" : "IMPLIES");
 	uint size = inputs.getSize();

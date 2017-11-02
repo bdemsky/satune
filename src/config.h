@@ -19,7 +19,6 @@
 //#define CONFIG_DEBUG
 #endif
 
-#define SATCHECK_CONFIG
 
 #ifndef CONFIG_ASSERT
 #define CONFIG_ASSERT

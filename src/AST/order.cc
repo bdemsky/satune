@@ -60,7 +60,7 @@ void Order::serialize(Serializer *serializer) {
 }
 
 void Order::print() {
-	model_print("{Order on Set:\n");
+	model_print("{Order<%p> on Set:\n", this);
 	set->print();
 	model_print("}\n");
 }

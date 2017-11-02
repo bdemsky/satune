@@ -40,6 +40,7 @@ CSolver::CSolver() :
 /** This function tears down the solver and the entire AST */
 
 CSolver::~CSolver() {
+	serialize();
 	uint size = allBooleans.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allBooleans.get(i);

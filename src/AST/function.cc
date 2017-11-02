@@ -83,7 +83,7 @@ void FunctionTable::serialize(Serializer *serializer) {
 }
 
 void FunctionTable::print() {
-	model_print("{FunctionTable:\n");
+	model_print("{FunctionTable<%p>:\n", this);
 	table->print();
 	model_print("}\n");
 }
@@ -115,5 +115,5 @@ void FunctionOperator::serialize(Serializer *serializer) {
 }
 
 void FunctionOperator::print() {
-	model_print("{FunctionOperator: %s}\n", op == SATC_ADD ? "ADD" : "SUB" );
+	model_print("{FunctionOperator<%p>: %s}\n", this, op == SATC_ADD ? "ADD" : "SUB" );
 }

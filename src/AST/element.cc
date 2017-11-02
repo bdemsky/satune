@@ -78,7 +78,7 @@ void ElementSet::serialize(Serializer *serializer) {
 }
 
 void ElementSet::print() {
-	model_print("{ElementSet:");
+	model_print("{ElementSet<%p>:", this);
 	set->print();
 	model_print(" %p ", this);
 	getElementEncoding()->print();
@@ -101,7 +101,7 @@ void ElementConst::serialize(Serializer *serializer) {
 }
 
 void ElementConst::print() {
-	model_print("{ElementConst: %" PRIu64 "}\n", value);
+	model_print("{ElementConst<%p>: %" PRIu64 "}\n", this, value);
 }
 
 void ElementFunction::serialize(Serializer *serializer) {
@@ -131,7 +131,7 @@ void ElementFunction::serialize(Serializer *serializer) {
 }
 
 void ElementFunction::print() {
-	model_print("{ElementFunction:\n");
+	model_print("{ElementFunction<%p>:\n", this);
 	function->print();
 	model_print("Elements:\n");
 	uint size = inputs.getSize();
