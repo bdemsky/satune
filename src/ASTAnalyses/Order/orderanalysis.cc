@@ -50,7 +50,7 @@ void DFSClearContradictions(CSolver *solver, OrderGraph *graph, HashtableNodeToN
 			//Compute full transitive closure for nodes
 			SetIteratorOrderNode *srciterator = sources->iterator();
 			while (srciterator->hasNext()) {
-				OrderNode *srcnode = srciterator->next();
+				OrderNode *srcnode = (OrderNode*)srciterator->next();
 				OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(srcnode, node);
 				newedge->mustPos = true;
 				newedge->polPos = true;

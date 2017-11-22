@@ -244,7 +244,7 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, DecomposeOrderResolver *dor) {
 	SetIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
-		OrderNode *node = iterator->next();
+		OrderNode *node = (OrderNode*)iterator->next();
 		if (node->removed)
 			continue;
 		if (isMustBeTrueNode(node)) {
@@ -257,7 +257,7 @@ void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, Decompose
 void DecomposeOrderTransform::mustEdgePrune(OrderGraph *graph, DecomposeOrderResolver *dor) {
 	SetIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
-		OrderNode *node = iterator->next();
+		OrderNode *node = (OrderNode*)iterator->next();
 		if (node->removed)
 			continue;
 		attemptNodeMerge(graph, node, dor);

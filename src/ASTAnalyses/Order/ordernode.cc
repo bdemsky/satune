@@ -2,7 +2,7 @@
 #include "orderedge.h"
 
 OrderNode::OrderNode(uint64_t _id) :
-	id(_id),
+	OrderNodeKey(_id),
 	status(NOTVISITED),
 	removed(false),
 	sccNum(0),

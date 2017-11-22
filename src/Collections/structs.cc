@@ -29,11 +29,11 @@ bool table_entry_equals(TableEntry *key1, TableEntry *key2) {
 	return true;
 }
 
-unsigned int order_node_hash_function(OrderNode *This) {
+unsigned int order_node_hash_function(OrderNodeKey *This) {
 	return (uint) This->id;
 }
 
-bool order_node_equals(OrderNode *key1, OrderNode *key2) {
+bool order_node_equals(OrderNodeKey *key1, OrderNodeKey *key2) {
 	return key1->id == key2->id;
 }
 

@@ -51,6 +51,7 @@ class FunctionEncoding;
 class OrderEncoding;
 
 class OrderGraph;
+class OrderNodeKey;
 class OrderNode;
 class OrderEdge;
 class DOREdge;
