@@ -177,6 +177,7 @@ static inline Literal getProxy(CNFExpr *expr) {
 
 CNF *createCNF();
 void deleteCNF(CNF *cnf);
+void resetCNF(CNF *cnf);
 
 uint hashNode(NodeType type, uint numEdges, Edge *edges);
 Node *allocNode(NodeType type, uint numEdges, Edge *edges, uint hashCode);

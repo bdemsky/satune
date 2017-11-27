@@ -40,7 +40,7 @@ CSolver::CSolver() :
 /** This function tears down the solver and the entire AST */
 
 CSolver::~CSolver() {
-	serialize();
+	//serialize();
 	uint size = allBooleans.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allBooleans.get(i);
@@ -78,6 +78,64 @@ CSolver::~CSolver() {
 
 	delete boolTrue.getBoolean();
 	delete satEncoder;
+}
+
+void CSolver::resetSolver(){
+        //serialize();
+        uint size = allBooleans.getSize();
+	for (uint i = 0; i < size; i++) {
+		delete allBooleans.get(i);
+	}
+
+	size = allSets.getSize();
+	for (uint i = 0; i < size; i++) {
+		delete allSets.get(i);
+	}
+
+	size = allElements.getSize();
+	for (uint i = 0; i < size; i++) {
+                Element* el = allElements.get(i);
+		delete el;
+	}
+
+	size = allTables.getSize();
+	for (uint i = 0; i < size; i++) {
+		delete allTables.get(i);
+	}
+
+	size = allPredicates.getSize();
+	for (uint i = 0; i < size; i++) {
+		delete allPredicates.get(i);
+	}
+
+	size = allOrders.getSize();
+	for (uint i = 0; i < size; i++) {
+		delete allOrders.get(i);
+	}
+	size = allFunctions.getSize();
+	for (uint i = 0; i < size; i++) {
+		delete allFunctions.get(i);
+	}
+	delete boolTrue.getBoolean();
+        allBooleans.clear();
+        allSets.clear();
+        allElements.clear();
+        allTables.clear();
+        allPredicates.clear();
+        allOrders.clear();
+        allFunctions.clear();
+        constraints.reset();
+        activeOrders.reset();
+        boolMap.reset();
+	elemMap.reset();
+        
+        boolTrue = BooleanEdge(new BooleanConst(true));
+	boolFalse = boolTrue.negate();
+        unsat = false;
+        elapsedTime = 0;
+        tuner = NULL;
+        satEncoder->resetSATEncoder();
+        
 }
 
 CSolver *CSolver::clone() {

@@ -13,6 +13,7 @@ public:
 	int solve();
 	SATEncoder(CSolver *solver);
 	~SATEncoder();
+        void resetSATEncoder();
 	void encodeAllSATEncoder(CSolver *csolver);
 	Edge encodeConstraintSATEncoder(BooleanEdge constraint);
 	CNF *getCNF() { return cnf;}

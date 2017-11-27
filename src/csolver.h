@@ -11,7 +11,7 @@ class CSolver {
 public:
 	CSolver();
 	~CSolver();
-
+        void resetSolver();
 	/** This function creates a set containing the elements passed in the array. */
 	Set *createSet(VarType type, uint64_t *elements, uint num);
 

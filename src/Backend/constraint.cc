@@ -78,6 +78,25 @@ void deleteCNF(CNF *cnf) {
 	ourfree(cnf);
 }
 
+void resetCNF(CNF *cnf){
+        for (uint i = 0; i < cnf->capacity; i++) {
+		Node *n = cnf->node_array[i];
+		if (n != NULL)
+			ourfree(n);
+	}
+        clearVectorEdge(&cnf->constraints);
+        clearVectorEdge(&cnf->args);
+        deleteIncrementalSolver(cnf->solver);
+        memset(cnf->node_array, 0, sizeof(Node *) * cnf->capacity);
+        
+        cnf->varcount = 1;
+        cnf->size = 0;
+        cnf->enableMatching = true;
+        cnf->solver = allocIncrementalSolver();
+        cnf->solveTime = 0;
+	cnf->encodeTime = 0;
+}
+
 void resizeCNF(CNF *cnf, uint newCapacity) {
 	Node **old_array = cnf->node_array;
 	Node **new_array = (Node **) ourcalloc(1, sizeof(Node *) * newCapacity);
