@@ -21,9 +21,9 @@ SATEncoder::~SATEncoder() {
 	deleteCNF(cnf);
 }
 
-void SATEncoder::resetSATEncoder(){
-        resetCNF(cnf);
-        booledgeMap.reset();
+void SATEncoder::resetSATEncoder() {
+	resetCNF(cnf);
+	booledgeMap.reset();
 }
 
 int SATEncoder::solve() {

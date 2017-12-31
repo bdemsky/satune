@@ -23,7 +23,7 @@ public:
 	CMEMALLOC;
 private:
 	void flushBuffer();
-	char * buffer;
+	char *buffer;
 	uint bufferoffset;
 	uint bufferlength;
 	int filedesc;
@@ -37,7 +37,7 @@ inline bool Serializer::isSerialized(void *obj) {
 
 
 
-void serializeBooleanEdge(Serializer *serializer, BooleanEdge be, bool isTopLevel=false);
+void serializeBooleanEdge(Serializer *serializer, BooleanEdge be, bool isTopLevel = false);
 
 #endif/* SERIALIZER_H */
 

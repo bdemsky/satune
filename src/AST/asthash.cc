@@ -4,8 +4,8 @@
 #include "boolean.h"
 #include "element.h"
 
-#define HASHNEXT(hash, newval) {hash+=newval; hash += hash << 10; hash ^= hash >>6;}
-#define HASHFINAL(hash) {hash += hash <<3; hash ^= hash >> 11; hash += hash << 15;}
+#define HASHNEXT(hash, newval) {hash += newval; hash += hash << 10; hash ^= hash >> 6;}
+#define HASHFINAL(hash) {hash += hash << 3; hash ^= hash >> 11; hash += hash << 15;}
 
 bool compareArray(Array<BooleanEdge> *inputs1, Array<BooleanEdge> *inputs2) {
 	if (inputs1->getSize() != inputs2->getSize())
@@ -64,7 +64,7 @@ uint hashBoolean(Boolean *b) {
 	}
 	case LOGICOP: {
 		BooleanLogic *l = (BooleanLogic *)b;
-		return ((uint)l->op) + 43* hashArray(&l->inputs);
+		return ((uint)l->op) + 43 * hashArray(&l->inputs);
 	}
 	case PREDICATEOP: {
 		BooleanPredicate *p = (BooleanPredicate *)b;

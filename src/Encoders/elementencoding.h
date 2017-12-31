@@ -42,7 +42,7 @@ public:
 		};
 		struct {
 			uint64_t offset;/* Value = offset + encoded number (interpretted according to isBinaryValSigned) */
-			uint64_t low;/* Lowest value to encode */
+			uint64_t low;	/* Lowest value to encode */
 			uint64_t high;/* High value to encode.   If low > high, we assume wrap around to include 0. */
 			uint numBits;
 			bool isBinaryValSigned;

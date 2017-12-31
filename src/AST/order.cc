@@ -33,7 +33,7 @@ Order *Order::clone(CSolver *solver, CloneMap *map) {
 
 HashtableOrderPair *Order::getOrderPairTable() {
 	ASSERT( encoding.resolver != NULL);
-	if (OrderPairResolver *t = dynamic_cast<OrderPairResolver *>(encoding.resolver)) {
+	if (OrderPairResolver * t = dynamic_cast<OrderPairResolver *>(encoding.resolver)) {
 		return t->getOrderPairTable();
 	} else {
 		ASSERT(0);

@@ -11,7 +11,7 @@ class CSolver {
 public:
 	CSolver();
 	~CSolver();
-        void resetSolver();
+	void resetSolver();
 	/** This function creates a set containing the elements passed in the array. */
 	Set *createSet(VarType type, uint64_t *elements, uint num);
 
@@ -153,12 +153,12 @@ public:
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void serialize();
-	static CSolver* deserialize(const char * file);
+	static CSolver *deserialize(const char *file);
 	void autoTune(uint budget);
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);
 
-	
+
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();

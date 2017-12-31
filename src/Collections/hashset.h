@@ -18,10 +18,10 @@ struct Linknode {
 	Linknode<_Key> *next;
 };
 
-template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key), bool (*equals)(_Key, _Key)>
+template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function) (_Key), bool (*equals) (_Key, _Key)>
 class Hashset;
 
-template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
+template<typename _Key, typename _KeyInt, int _Shift, unsigned int (*hash_function) (_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals) (_Key, _Key) = defaultEquals<_Key> >
 class SetIterator {
 public:
 	SetIterator(Linknode<_Key> *_curr, Hashset <_Key, _KeyInt, _Shift, hash_function, equals> *_set) :
@@ -76,7 +76,7 @@ private:
 	Hashset <_Key, _KeyInt, _Shift, hash_function, equals> *set;
 };
 
-template<typename _Key, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
+template<typename _Key, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function) (_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals) (_Key, _Key) = defaultEquals<_Key> >
 class Hashset {
 public:
 	Hashset(unsigned int initialcapacity = 16, double factor = 0.5) :

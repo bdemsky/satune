@@ -32,7 +32,7 @@ void ElementEncoding::allocEncodingArrayElement(uint size) {
 }
 
 void ElementEncoding::allocInUseArrayElement(uint size) {
-	uint bytes = ((size + ((1 << 9) - 1)) >> 6) & ~7;//Depends on size of inUseArray
+	uint bytes = ((size + 63) >> 3) & ~7;	//Depends on size of inUseArray
 	inUseArray = (uint64_t *) ourcalloc(1, bytes);
 }
 

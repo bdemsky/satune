@@ -67,7 +67,10 @@ void addArrayClauseLiteral(IncrementalSolver *This, uint numliterals, int *liter
 }
 
 void finishedClauses(IncrementalSolver *This) {
-	addClauseLiteral(This, 0);
+	This->buffer[This->offset++] = 0;
+	if (This->offset == IS_BUFFERSIZE) {
+		flushBufferSolver(This);
+	}
 }
 
 void freeze(IncrementalSolver *This, int variable) {

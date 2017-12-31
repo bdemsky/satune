@@ -76,19 +76,19 @@
  * arithmetic gets lost in the time required for comparison function calls.
  */
 #define SWAP(a, b, count, size, tmp) { \
-		count = size; \
+		count = size;	\
 		do { \
-			tmp = *a; \
+			tmp = *a;	\
 			*a++ = *b; \
-			*b++ = tmp; \
+			*b++ = tmp;	\
 		} while (--count); \
 }
 
 /* Copy one block of size size to another. */
-#define COPY(a, b, count, size, tmp1, tmp2) { \
-		count = size; \
-		tmp1 = a; \
-		tmp2 = b; \
+#define COPY(a, b, count, size, tmp1, tmp2) {	\
+		count = size;	\
+		tmp1 = a;	\
+		tmp2 = b;	\
 		do { \
 			*tmp1++ = *tmp2++; \
 		} while (--count); \
@@ -102,18 +102,18 @@
  * j < nmemb, select largest of Ki, Kj and Kj+1.
  */
 #define CREATE(initval, nmemb, par_i, child_i, par, child, size, count, tmp) { \
-		for (par_i = initval; (child_i = par_i * 2) <= nmemb; \
-				 par_i = child_i) { \
+		for (par_i = initval; (child_i = par_i * 2) <= nmemb;	\
+				 par_i = child_i) {	\
 			child = base + child_i * size; \
-			if (child_i < nmemb && compar(child, child + size) < 0) { \
+			if (child_i < nmemb && compar(child, child + size) < 0) {	\
 				child += size; \
 				++child_i; \
-			} \
+			}	\
 			par = base + par_i * size; \
 			if (compar(child, par) <= 0) \
 				break; \
-			SWAP(par, child, count, size, tmp); \
-		} \
+			SWAP(par, child, count, size, tmp);	\
+		}	\
 }
 
 /*
@@ -133,27 +133,27 @@
  *
  * XXX Don't break the #define SELECT line, below.  Reiser cpp gets upset.
  */
-#define SELECT(par_i, child_i, nmemb, par, child, size, k, count, tmp1, tmp2) { \
+#define SELECT(par_i, child_i, nmemb, par, child, size, k, count, tmp1, tmp2) {	\
 		for (par_i = 1; (child_i = par_i * 2) <= nmemb; par_i = child_i) { \
 			child = base + child_i * size; \
-			if (child_i < nmemb && compar(child, child + size) < 0) { \
+			if (child_i < nmemb && compar(child, child + size) < 0) {	\
 				child += size; \
 				++child_i; \
-			} \
+			}	\
 			par = base + par_i * size; \
 			COPY(par, child, count, size, tmp1, tmp2); \
-		} \
-		for (;; ) { \
+		}	\
+		for (;; ) {	\
 			child_i = par_i; \
 			par_i = child_i / 2; \
 			child = base + child_i * size; \
 			par = base + par_i * size; \
-			if (child_i == 1 || compar(k, par) < 0) { \
+			if (child_i == 1 || compar(k, par) < 0) {	\
 				COPY(child, k, count, size, tmp1, tmp2); \
 				break; \
-			} \
+			}	\
 			COPY(child, par, count, size, tmp1, tmp2); \
-		} \
+		}	\
 }
 
 /*
@@ -236,18 +236,18 @@ static __inline void swapfunc(char *, char *, size_t, int);
 #define SWAPTYPE_INT  4
 #define SWAPTYPE_LONG 5
 
-#define TYPE_ALIGNED(TYPE, a, es)     \
+#define TYPE_ALIGNED(TYPE, a, es)			\
 	(((char *)a - (char *)0) % sizeof(TYPE) == 0 && es % sizeof(TYPE) == 0)
 
-#define swapcode(TYPE, parmi, parmj, n) {     \
-		size_t i = (n) / sizeof (TYPE);     \
-		TYPE *pi = (TYPE *) (parmi);      \
-		TYPE *pj = (TYPE *) (parmj);      \
-		do {            \
-			TYPE t = *pi;      \
-			*pi++ = *pj;        \
-			*pj++ = t;        \
-		} while (--i > 0);        \
+#define swapcode(TYPE, parmi, parmj, n) {			\
+		size_t i = (n) / sizeof (TYPE);			\
+		TYPE *pi = (TYPE *) (parmi);			\
+		TYPE *pj = (TYPE *) (parmj);			\
+		do {						\
+			TYPE t = *pi;			 \
+			*pi++ = *pj;				\
+			*pj++ = t;				\
+		} while (--i > 0);				\
 }
 
 static __inline void
@@ -268,23 +268,23 @@ swapfunc(char *a, char *b, size_t n, int swaptype)
 	}
 }
 
-#define swap(a, b)  do {        \
-		switch (swaptype) {       \
-		case SWAPTYPE_INT: {        \
-			int t = *(int *)(a);      \
-			*(int *)(a) = *(int *)(b);    \
-			*(int *)(b) = t;      \
-			break;          \
-		}           \
-		case SWAPTYPE_LONG: {       \
-			long t = *(long *)(a);      \
-			*(long *)(a) = *(long *)(b);    \
-			*(long *)(b) = t;     \
-			break;          \
-		}           \
-		default:          \
-			swapfunc(a, b, es, swaptype);   \
-		}           \
+#define swap(a, b)  do {				\
+		switch (swaptype) {				\
+		case SWAPTYPE_INT: {				\
+			int t = *(int *)(a);			\
+			*(int *)(a) = *(int *)(b);		\
+			*(int *)(b) = t;			\
+			break;					\
+		}						\
+		case SWAPTYPE_LONG: {				\
+			long t = *(long *)(a);			\
+			*(long *)(a) = *(long *)(b);		\
+			*(long *)(b) = t;			\
+			break;					\
+		}						\
+		default:					\
+			swapfunc(a, b, es, swaptype);		\
+		}						\
 } while (0)
 
 #define vecswap(a, b, n)  if ((n) > 0) swapfunc(a, b, n, swaptype)

@@ -117,7 +117,7 @@ void OrderGraph::addMustOrderEdge(OrderNode *node1, OrderNode *node2, BooleanOrd
 
 OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id) {
 	OrderNode *node = new OrderNode(id);
-	OrderNode *tmp = (OrderNode*)nodes.get(node);
+	OrderNode *tmp = (OrderNode *)nodes.get(node);
 	if ( tmp != NULL) {
 		delete node;
 		node = tmp;
@@ -129,7 +129,7 @@ OrderNode *OrderGraph::getOrderNodeFromOrderGraph(uint64_t id) {
 
 OrderNode *OrderGraph::lookupOrderNodeFromOrderGraph(uint64_t id) {
 	OrderNodeKey node(id);
-	OrderNode *tmp = (OrderNode*)nodes.get(&node);
+	OrderNode *tmp = (OrderNode *)nodes.get(&node);
 	return tmp;
 }
 
@@ -225,7 +225,7 @@ bool OrderGraph::isTherePathVisit(HashsetOrderNode &visited, OrderNode *current,
 void OrderGraph::DFS(Vector<OrderNode *> *finishNodes) {
 	SetIteratorOrderNode *iterator = getNodes();
 	while (iterator->hasNext()) {
-		OrderNode *node = (OrderNode*)iterator->next();
+		OrderNode *node = (OrderNode *)iterator->next();
 		if (node->status == NOTVISITED && !node->removed) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, false, 0);
@@ -239,7 +239,7 @@ void OrderGraph::DFS(Vector<OrderNode *> *finishNodes) {
 void OrderGraph::DFSMust(Vector<OrderNode *> *finishNodes) {
 	SetIteratorOrderNode *iterator = getNodes();
 	while (iterator->hasNext()) {
-		OrderNode *node = (OrderNode*)iterator->next();
+		OrderNode *node = (OrderNode *)iterator->next();
 		if (node->status == NOTVISITED && !node->removed) {
 			node->status = VISITED;
 			DFSNodeVisit(node, finishNodes, false, true, 0);
@@ -294,7 +294,7 @@ void OrderGraph::DFSNodeVisit(OrderNode *node, Vector<OrderNode *> *finishNodes,
 void OrderGraph::resetNodeInfoStatusSCC() {
 	SetIteratorOrderNode *iterator = getNodes();
 	while (iterator->hasNext()) {
-		((OrderNode*)iterator->next())->status = NOTVISITED;
+		((OrderNode *)iterator->next())->status = NOTVISITED;
 	}
 	delete iterator;
 }
