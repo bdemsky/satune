@@ -20,13 +20,15 @@ public:
 		origsecond(_origsecond),
 		orderindex(_orderindex),
 		newfirst(_newfirst),
-		newsecond(_newsecond) {
+		newsecond(_newsecond),
+		mustbetrue(false) {
 	}
 	uint64_t origfirst;
 	uint64_t origsecond;
 	uint orderindex;
 	uint64_t newfirst;
 	uint64_t newsecond;
+	bool mustbetrue;
 	CMEMALLOC;
 };
 

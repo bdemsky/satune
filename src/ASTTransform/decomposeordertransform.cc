@@ -153,7 +153,6 @@ void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currG
 			}
 			BooleanEdge neworderconstraint = solver->orderConstraint(neworder, orderconstraint->first, orderconstraint->second);
 			solver->replaceBooleanWithBoolean(orderconstraint, neworderconstraint);
-
 			dor->setEdgeOrder(from->getID(), to->getID(), from->sccNum);
 		}
 	}

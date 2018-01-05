@@ -25,8 +25,12 @@ DecomposeOrderResolver::~DecomposeOrderResolver() {
 
 void DecomposeOrderResolver::mustOrderEdge(uint64_t first, uint64_t second) {
 	DOREdge edge(first, second, 0, first, second);
-	if (!edges.contains(&edge)) {
+	DOREdge *oldedge=edges.get(&edge);
+	if (oldedge != NULL) {
+		oldedge->mustbetrue=true;
+	} else {
 		DOREdge *newedge = new DOREdge(first, second, 0, first, second);
+		newedge->mustbetrue=true;
 		edges.add(newedge);
 	}
 }
@@ -54,6 +58,12 @@ void DecomposeOrderResolver::setEdgeOrder(uint64_t first, uint64_t second, uint 
 		DOREdge *newedge = new DOREdge(first, second, sccNum, first, second);
 		edges.add(newedge);
 	}
+	/* Also fix up reverse edge if it exists */
+	DOREdge revedge(second, first, 0, second, first);
+	oldedge = edges.get(&revedge);
+	if (oldedge != NULL) {
+		oldedge->orderindex = sccNum;
+	}
 }
 
 void DecomposeOrderResolver::setOrder(uint sccNum, Order *neworder) {
@@ -72,9 +82,12 @@ void DecomposeOrderResolver::buildGraph() {
 	SetIteratorDOREdge *iterator = edges.iterator();
 	while (iterator->hasNext()) {
 		DOREdge *doredge = iterator->next();
-		if (doredge->orderindex == 0) {
+		if (doredge->mustbetrue) {
 			graph->addEdge(doredge->origfirst, doredge->origsecond);
-		} else {
+			if (doredge->newfirst != doredge->origfirst || doredge->newsecond!=doredge->origsecond) {
+				graph->addEdge(doredge->newfirst, doredge->newsecond);
+			}
+		} else if (doredge->orderindex != 0) {
 			Order *suborder = orders.get(doredge->orderindex);
 			bool isEdge = suborder->encoding.resolver->resolveOrder(doredge->newfirst, doredge->newsecond);
 			if (isEdge)
