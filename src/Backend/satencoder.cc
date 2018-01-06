@@ -14,11 +14,13 @@
 
 SATEncoder::SATEncoder(CSolver *_solver) :
 	cnf(createCNF()),
-	solver(_solver) {
+	solver(_solver),
+  vector(allocDefVectorEdge()) {
 }
 
 SATEncoder::~SATEncoder() {
 	deleteCNF(cnf);
+	deleteVectorEdge(vector);
 }
 
 void SATEncoder::resetSATEncoder() {

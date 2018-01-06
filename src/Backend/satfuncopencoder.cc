@@ -34,7 +34,7 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 		Element *elem = constraint->inputs.get(i);
 		encodeElementSATEncoder(elem);
 	}
-	VectorEdge *clauses = allocDefVectorEdge();	// Setup array of clauses
+	VectorEdge *clauses = vector;
 
 	uint indices[numDomains];	//setup indices
 	bzero(indices, sizeof(uint) * numDomains);
@@ -75,11 +75,11 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 		}
 	}
 	if (getSizeVectorEdge(clauses) == 0) {
-		deleteVectorEdge(clauses);
+		clearVectorEdge(clauses);
 		return E_False;
 	}
 	Edge cor = constraintOR(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
-	deleteVectorEdge(clauses);
+	clearVectorEdge(clauses);
 	return generateNegation ? constraintNegate(cor) : cor;
 }
 

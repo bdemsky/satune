@@ -64,7 +64,7 @@ private:
 	CNF *cnf;
 	CSolver *solver;
 	BooleanToEdgeMap booledgeMap;
-
+	VectorEdge *vector;
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
