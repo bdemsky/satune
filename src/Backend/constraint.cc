@@ -86,13 +86,12 @@ void resetCNF(CNF *cnf){
 	}
         clearVectorEdge(&cnf->constraints);
         clearVectorEdge(&cnf->args);
-        deleteIncrementalSolver(cnf->solver);
+        resetSolver(cnf->solver);
         memset(cnf->node_array, 0, sizeof(Node *) * cnf->capacity);
         
         cnf->varcount = 1;
         cnf->size = 0;
         cnf->enableMatching = true;
-        cnf->solver = allocIncrementalSolver();
         cnf->solveTime = 0;
 	cnf->encodeTime = 0;
 }
