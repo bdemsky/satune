@@ -26,7 +26,7 @@ public:
 class ElementSet : public Element {
 public:
 	ElementSet(ASTNodeType type, Set *s);
-        virtual ~ElementSet(){}
+	virtual ~ElementSet() {}
 	ElementSet(Set *s);
 	virtual Element *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer *serializer);
@@ -41,7 +41,7 @@ protected:
 class ElementConst : public ElementSet {
 public:
 	ElementConst(uint64_t value, Set *_set);
-        virtual ~ElementConst(){}
+	virtual ~ElementConst() {}
 	uint64_t value;
 	virtual void serialize(Serializer *serializer);
 	virtual void print();
@@ -51,7 +51,7 @@ public:
 
 class ElementFunction : public Element {
 public:
-        virtual ~ElementFunction(){}
+	virtual ~ElementFunction() {}
 	ElementFunction(Function *function, Element **array, uint numArrays, BooleanEdge overflowstatus);
 	Array<Element *> inputs;
 	BooleanEdge overflowstatus;

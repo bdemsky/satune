@@ -18,14 +18,14 @@
 #define READBUFFERSIZE 16384
 
 Deserializer::Deserializer(const char *file) :
-	buffer((char *)ourmalloc(READBUFFERSIZE)),
+	buffer((char *) ourmalloc(READBUFFERSIZE)),
 	bufferindex(0),
 	bufferbytes(0),
 	buffercap(READBUFFERSIZE),
 	solver(new CSolver())
 {
 	filedesc = open(file, O_RDONLY);
-	
+
 	if (filedesc < 0) {
 		exit(-1);
 	}
@@ -39,7 +39,7 @@ Deserializer::~Deserializer() {
 }
 
 ssize_t Deserializer::myread(void *__buf, size_t bytestoread) {
-	char * out = (char * ) __buf;
+	char *out = (char * ) __buf;
 	size_t totalbytesread = 0;
 	while (bytestoread) {
 		if (bufferbytes != 0) {
@@ -53,7 +53,7 @@ ssize_t Deserializer::myread(void *__buf, size_t bytestoread) {
 			out += bytestocopy;
 			bytestoread -= bytestocopy;
 		} else {
-			size_t bytesread=read (filedesc, buffer, buffercap);
+			size_t bytesread = read (filedesc, buffer, buffercap);
 			bufferindex = 0;
 			bufferbytes = bytesread;
 			if (bytesread == 0) {
@@ -130,11 +130,11 @@ void Deserializer::deserializeBooleanEdge() {
 	ASSERT(map.contains(tmp.getBoolean()));
 	b_ptr = (Boolean *) map.get(tmp.getBoolean());
 	BooleanEdge res(b_ptr);
-        bool isTopLevel;
-        myread(&isTopLevel, sizeof(bool));
-        if(isTopLevel){
-                solver->addConstraint(isNegated ? res.negate() : res);
-        }
+	bool isTopLevel;
+	myread(&isTopLevel, sizeof(bool));
+	if (isTopLevel) {
+		solver->addConstraint(isNegated ? res.negate() : res);
+	}
 }
 
 void Deserializer::deserializeBooleanVar() {
@@ -180,7 +180,7 @@ void Deserializer::deserializeSet() {
 	myread(&isRange, sizeof(bool));
 	bool isMutable;
 	myread(&isMutable, sizeof(bool));
-	if(isRange){
+	if (isRange) {
 		uint64_t low;
 		myread(&low, sizeof(uint64_t));
 		uint64_t high;
@@ -188,22 +188,22 @@ void Deserializer::deserializeSet() {
 		map.put(s_ptr, new Set(type, low, high));
 	} else {
 		Set *set = NULL;
-		if(isMutable) {
+		if (isMutable) {
 			set = new MutableSet(type);
 		}
 		uint size;
 		myread(&size, sizeof(uint));
 		Vector<uint64_t> members;
-		for(uint i=0; i<size; i++) {
+		for (uint i = 0; i < size; i++) {
 			uint64_t mem;
 			myread(&mem, sizeof(uint64_t));
-			if(isMutable) {
-				((MutableSet*) set)->addElementMSet(mem);
+			if (isMutable) {
+				((MutableSet *) set)->addElementMSet(mem);
 			} else {
 				members.push(mem);
 			}
 		}
-		if(!isMutable) {
+		if (!isMutable) {
 			set = solver->createSet(type, members.expose(), size);
 		}
 		map.put(s_ptr, set);

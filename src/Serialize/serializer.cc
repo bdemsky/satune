@@ -26,14 +26,14 @@ Serializer::Serializer(const char *file) :
 void Serializer::flushBuffer() {
 	ssize_t datatowrite = bufferoffset;
 	ssize_t index = 0;
-	while(datatowrite) {
+	while (datatowrite) {
 		ssize_t byteswritten = write(filedesc, &buffer[index], datatowrite);
 		if (byteswritten == -1)
 			exit(-1);
 		datatowrite -= byteswritten;
 		index += byteswritten;
 	}
-	bufferoffset=0;
+	bufferoffset = 0;
 }
 
 Serializer::~Serializer() {
@@ -45,12 +45,12 @@ Serializer::~Serializer() {
 }
 
 void Serializer::mywrite(const void *__buf, size_t __n) {
-	char *towrite=(char *) __buf;
-	if (__n > SERIALBUFFERLENGTH *2) {
+	char *towrite = (char *) __buf;
+	if (__n > SERIALBUFFERLENGTH * 2) {
 		if (bufferoffset != 0)
 			flushBuffer();
 		while (__n > 0) {
-			ssize_t result=write(filedesc, &towrite, __n);
+			ssize_t result = write(filedesc, &towrite, __n);
 			if (result != (ssize_t) __n)
 				exit(-1);
 			towrite += result;
@@ -58,7 +58,7 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 		}
 	} else {
 		do  {
-			uint spacefree = bufferlength-bufferoffset;
+			uint spacefree = bufferlength - bufferoffset;
 			uint datatowrite = spacefree > __n ? __n : spacefree;
 			memcpy(&buffer[bufferoffset], towrite, datatowrite);
 			bufferoffset += datatowrite;
@@ -73,7 +73,7 @@ void Serializer::mywrite(const void *__buf, size_t __n) {
 			} else {
 				return;
 			}
-		} while(true);
+		} while (true);
 	}
 }
 

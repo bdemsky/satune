@@ -78,21 +78,21 @@ void deleteCNF(CNF *cnf) {
 	ourfree(cnf);
 }
 
-void resetCNF(CNF *cnf){
-        for (uint i = 0; i < cnf->capacity; i++) {
+void resetCNF(CNF *cnf) {
+	for (uint i = 0; i < cnf->capacity; i++) {
 		Node *n = cnf->node_array[i];
 		if (n != NULL)
 			ourfree(n);
 	}
-        clearVectorEdge(&cnf->constraints);
-        clearVectorEdge(&cnf->args);
-        resetSolver(cnf->solver);
-        memset(cnf->node_array, 0, sizeof(Node *) * cnf->capacity);
-        
-        cnf->varcount = 1;
-        cnf->size = 0;
-        cnf->enableMatching = true;
-        cnf->solveTime = 0;
+	clearVectorEdge(&cnf->constraints);
+	clearVectorEdge(&cnf->args);
+	resetSolver(cnf->solver);
+	memset(cnf->node_array, 0, sizeof(Node *) * cnf->capacity);
+
+	cnf->varcount = 1;
+	cnf->size = 0;
+	cnf->enableMatching = true;
+	cnf->solveTime = 0;
 	cnf->encodeTime = 0;
 }
 
@@ -208,7 +208,12 @@ Edge constraintOR2(CNF *cnf, Edge left, Edge right) {
 }
 
 int comparefunction(const Edge *e1, const Edge *e2) {
-	return ((uintptr_t)e1->node_ptr) - ((uintptr_t)e2->node_ptr);
+	if (e1->node_ptr == e2->node_ptr)
+		return 0;
+	if (((uintptr_t)e1->node_ptr) < ((uintptr_t) e2->node_ptr))
+		return -1;
+	else
+		return 1;
 }
 
 Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
@@ -369,9 +374,9 @@ int solveCNF(CNF *cnf) {
 	int result = solve(cnf->solver);
 	long long finishTime = getTimeNano();
 	cnf->encodeTime = startSolve - startTime;
-        model_print("CNF Encode time: %f\n", cnf->encodeTime/1000000000.0);
+	model_print("CNF Encode time: %f\n", cnf->encodeTime / 1000000000.0);
 	cnf->solveTime = finishTime - startSolve;
-	model_print("Solve time: %f\n", cnf->solveTime/ 1000000000.0);
+	model_print("Solve time: %f\n", cnf->solveTime / 1000000000.0);
 	return result;
 }
 

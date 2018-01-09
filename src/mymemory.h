@@ -45,21 +45,21 @@ static inline void *ourcalloc(size_t count, size_t size) { return calloc(count, 
 static inline void *ourrealloc(void *ptr, size_t size) { return realloc(ptr, size); }
 #endif
 
-#define CMEMALLOC                           \
-	void *operator new(size_t size) {       \
-		return ourmalloc(size);                \
-	}                                                  \
-	void operator delete(void *p, size_t size) {       \
-		ourfree(p);                                      \
-	}                                                  \
-	void *operator new[](size_t size) {               \
-		return ourmalloc(size);                          \
-	}                                                    \
-	void operator delete[](void *p, size_t size) {       \
-		ourfree(p);                                        \
-	}                                                                     \
-	void *operator new(size_t size, void *p) {															/* placement new */ \
-		return p;                                                           \
+#define CMEMALLOC														\
+	void *operator new(size_t size) {				\
+		return ourmalloc(size);								 \
+	}																									 \
+	void operator delete(void *p, size_t size) {			 \
+		ourfree(p);																			 \
+	}																									 \
+	void *operator new[](size_t size) {								\
+		return ourmalloc(size);													 \
+	}																										 \
+	void operator delete[](void *p, size_t size) {			 \
+		ourfree(p);																				 \
+	}																																			\
+	void *operator new(size_t size, void *p) {															/* placement new */	\
+		return p;																														\
 	}
 
 #endif/* _MY_MEMORY_H */

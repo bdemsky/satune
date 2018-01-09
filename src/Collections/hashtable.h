@@ -57,7 +57,7 @@ inline bool defaultEquals(_Key key1, _Key key2) {
  *                 manipulation and storage.
  * @tparam _Shift  Logical shift to apply to all keys. Default 0.
  */
-template<typename _Key, typename _Val, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
+template<typename _Key, typename _Val, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function) (_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals) (_Key, _Key) = defaultEquals<_Key> >
 class Hashtable {
 public:
 	/**
@@ -255,9 +255,9 @@ public:
 				if (!search->val)
 					break;
 			} else
-				if (hashcode == search->hashcode)
-					if (equals(search->key, key))
-						return search->val;
+			if (hashcode == search->hashcode)
+				if (equals(search->key, key))
+					return search->val;
 			index++;
 			index &= capacitymask;
 			if (index == oindex)
@@ -297,15 +297,15 @@ public:
 				if (!search->val)
 					break;
 			} else
-				if (hashcode == search->hashcode)
-					if (equals(search->key, key)) {
-						_Val v = search->val;
-						//empty out this bin
-						search->val = (_Val) 1;
-						search->key = 0;
-						size--;
-						return v;
-					}
+			if (hashcode == search->hashcode)
+				if (equals(search->key, key)) {
+					_Val v = search->val;
+					//empty out this bin
+					search->val = (_Val) 1;
+					search->key = 0;
+					size--;
+					return v;
+				}
 			index++;
 		} while (true);
 		return (_Val)0;
@@ -338,9 +338,9 @@ public:
 				if (!search->val)
 					break;
 			} else
-				if (hashcode == search->hashcode)
-					if (equals(search->key, key))
-						return true;
+			if (hashcode == search->hashcode)
+				if (equals(search->key, key))
+					return true;
 			index++;
 		} while (true);
 		return false;

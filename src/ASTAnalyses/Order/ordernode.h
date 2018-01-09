@@ -17,18 +17,18 @@
 enum NodeStatus {NOTVISITED, VISITED, FINISHED, ADDEDTOSET};
 typedef enum NodeStatus NodeStatus;
 
-class OrderNodeKey{
+class OrderNodeKey {
 public:
-    OrderNodeKey(uint64_t id) : id(id){}
-    virtual ~OrderNodeKey(){}
-    uint64_t getID() {return id;}
-    uint64_t id;
+	OrderNodeKey(uint64_t id) : id(id) {}
+	virtual ~OrderNodeKey() {}
+	uint64_t getID() {return id;}
+	uint64_t id;
 };
 
 class OrderNode : public OrderNodeKey {
 public:
 	OrderNode(uint64_t id);
-        virtual ~OrderNode(){}
+	virtual ~OrderNode() {}
 	void addNewIncomingEdge(OrderEdge *edge);
 	void addNewOutgoingEdge(OrderEdge *edge);
 

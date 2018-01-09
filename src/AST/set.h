@@ -33,7 +33,7 @@ public:
 protected:
 	VarType type;
 	bool isRange;
-	uint64_t low;//also used to count unique items
+	uint64_t low;	//also used to count unique items
 	uint64_t high;
 	Vector<uint64_t> *members;
 };

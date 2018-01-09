@@ -13,7 +13,7 @@ public:
 	int solve();
 	SATEncoder(CSolver *solver);
 	~SATEncoder();
-        void resetSATEncoder();
+	void resetSATEncoder();
 	void encodeAllSATEncoder(CSolver *csolver);
 	Edge encodeConstraintSATEncoder(BooleanEdge constraint);
 	CNF *getCNF() { return cnf;}
@@ -64,7 +64,7 @@ private:
 	CNF *cnf;
 	CSolver *solver;
 	BooleanToEdgeMap booledgeMap;
-
+	VectorEdge *vector;
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);

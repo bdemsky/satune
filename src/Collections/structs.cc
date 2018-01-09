@@ -8,8 +8,8 @@
 #include "structs.h"
 #include "decomposeorderresolver.h"
 
-#define HASHNEXT(hash, newval) {hash+=newval; hash += hash << 10; hash ^= hash >>6;}
-#define HASHFINAL(hash) {hash += hash <<3; hash ^= hash >> 11; hash += hash << 15;}
+#define HASHNEXT(hash, newval) {hash += newval; hash += hash << 10; hash ^= hash >> 6;}
+#define HASHFINAL(hash) {hash += hash << 3; hash ^= hash >> 11; hash += hash << 15;}
 
 unsigned int table_entry_hash_function(TableEntry *This) {
 	unsigned int h = 0;
@@ -38,7 +38,7 @@ bool order_node_equals(OrderNodeKey *key1, OrderNodeKey *key2) {
 }
 
 unsigned int order_edge_hash_function(OrderEdge *This) {
-	uint hash=0;
+	uint hash = 0;
 	HASHNEXT(hash, (uint)(uintptr_t) This->sink);
 	HASHNEXT(hash, (uint)(uintptr_t) This->source);
 	HASHFINAL(hash);
@@ -58,7 +58,7 @@ bool order_element_equals(OrderElement *key1, OrderElement *key2) {
 }
 
 unsigned int order_pair_hash_function(OrderPair *This) {
-	uint hash=0;
+	uint hash = 0;
 	HASHNEXT(hash, This->first);
 	HASHNEXT(hash, This->second);
 	HASHFINAL(hash);
@@ -70,7 +70,7 @@ bool order_pair_equals(OrderPair *key1, OrderPair *key2) {
 }
 
 unsigned int doredge_hash_function(DOREdge *key) {
-	uint hash=0;
+	uint hash = 0;
 	HASHNEXT(hash, (uint) key->newfirst);
 	HASHNEXT(hash, (uint) key->newsecond);
 	HASHFINAL(hash);

@@ -1,5 +1,6 @@
 #include "cnfexpr.h"
 #include <stdio.h>
+#include "common.h"
 /*
    V2 Copyright (c) 2014 Ben Chambers, Eugene Goldberg, Pete Manolios,
    Vasilis Papavasileiou, Sudarshan Srinivasan, and Daron Vroon.
@@ -417,7 +418,7 @@ void disjoinCNFExpr(CNFExpr *This, CNFExpr *expr, bool destroy) {
 				mergeArray[mergeIndex++] = merge;
 			}
 		}
-		deleteLitVector(lThis);//Done with this litVector
+		deleteLitVector(lThis);	//Done with this litVector
 	}
 
 	/** Finally do the singleton, singleton pairs */

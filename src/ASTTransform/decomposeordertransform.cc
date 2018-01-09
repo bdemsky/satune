@@ -153,7 +153,6 @@ void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currG
 			}
 			BooleanEdge neworderconstraint = solver->orderConstraint(neworder, orderconstraint->first, orderconstraint->second);
 			solver->replaceBooleanWithBoolean(orderconstraint, neworderconstraint);
-
 			dor->setEdgeOrder(from->getID(), to->getID(), from->sccNum);
 		}
 	}
@@ -244,7 +243,7 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, DecomposeOrderResolver *dor) {
 	SetIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
-		OrderNode *node = (OrderNode*)iterator->next();
+		OrderNode *node = (OrderNode *)iterator->next();
 		if (node->removed)
 			continue;
 		if (isMustBeTrueNode(node)) {
@@ -257,7 +256,7 @@ void DecomposeOrderTransform::removeMustBeTrueNodes(OrderGraph *graph, Decompose
 void DecomposeOrderTransform::mustEdgePrune(OrderGraph *graph, DecomposeOrderResolver *dor) {
 	SetIteratorOrderNode *iterator = graph->getNodes();
 	while (iterator->hasNext()) {
-		OrderNode *node = (OrderNode*)iterator->next();
+		OrderNode *node = (OrderNode *)iterator->next();
 		if (node->removed)
 			continue;
 		attemptNodeMerge(graph, node, dor);
@@ -339,6 +338,7 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		sink->inEdges.remove(outedge);
 		//save the remapping that we did
 		dor->remapEdge(dstnode->getID(), sink->getID(), node->getID(), sink->getID());
+
 		//create the new edge
 		OrderEdge *newedge = graph->getOrderEdgeFromOrderGraph(node, sink);
 		//update the flags
