@@ -53,11 +53,15 @@ CNF *createCNF() {
 	cnf->solver = allocIncrementalSolver();
 	cnf->solveTime = 0;
 	cnf->encodeTime = 0;
+	cnf->asize = DEFAULT_CNF_ARRAY_SIZE;
+	cnf->array = (int *) ourmalloc(sizeof(int) * DEFAULT_CNF_ARRAY_SIZE);
+	cnf->unsat = false;
 	return cnf;
 }
 
 void deleteCNF(CNF *cnf) {
 	deleteIncrementalSolver(cnf->solver);
+	ourfree(cnf->array);
 	ourfree(cnf);
 }
 
@@ -66,16 +70,130 @@ void resetCNF(CNF *cnf) {
 	cnf->varcount = 1;
 	cnf->solveTime = 0;
 	cnf->encodeTime = 0;
+	cnf->unsat = false;
 }
 
 Node *allocNode(NodeType type, uint numEdges, Edge *edges) {
 	Node *n = (Node *)ourmalloc(sizeof(Node) + sizeof(Edge) * numEdges);
+	n->type = type;
+	n->numEdges = numEdges;
 	memcpy(n->edges, edges, sizeof(Edge) * numEdges);
+	return n;
+}
+
+Node *allocBaseNode(NodeType type, uint numEdges) {
+	Node *n = (Node *)ourmalloc(sizeof(Node) + sizeof(Edge) * numEdges);
+	n->type = type;
 	n->numEdges = numEdges;
 	return n;
 }
 
-Edge createNode(CNF *cnf, NodeType type, uint numEdges, Edge *edges) {
+Node *allocResizeNode(uint capacity) {
+	Node *n = (Node *)ourmalloc(sizeof(Node) + sizeof(Edge) * capacity);
+	n->numEdges = 0;
+	n->capacity = capacity;
+	return n;
+}
+
+Edge cloneEdge(Edge e) {
+	if (edgeIsVarConst(e))
+		return e;
+	Node * node = getNodePtrFromEdge(e);
+	bool isneg = isNegEdge(e);
+	uint numEdges = node->numEdges;
+	Node * clone = allocBaseNode(node->type, numEdges);
+	for(uint i=0; i < numEdges; i++) {
+		clone->edges[i] = cloneEdge(node->edges[i]);
+	}
+	return isneg ? constraintNegate((Edge) {clone}) : (Edge) {clone};
+}
+
+void freeEdgeRec(Edge e) {
+	if (edgeIsVarConst(e))
+		return;
+	Node * node = getNodePtrFromEdge(e);
+	uint numEdges = node->numEdges;
+	for(uint i=0; i < numEdges; i++) {
+		freeEdgeRec(node->edges[i]);
+	}
+}
+
+void freeEdgeCNF(Edge e) {
+	Node * node = getNodePtrFromEdge(e);
+	uint numEdges = node->numEdges;
+	for(uint i=0; i < numEdges; i++) {
+		Edge ec = node->edges[i];
+		if (!edgeIsVarConst(ec)) {
+			ourfree(ec.node_ptr);
+		}
+	}
+	ourfree(node);
+}
+
+void addEdgeToResizeNode(Node ** node, Edge e) {
+	Node *currnode = *node;
+	if (currnode->capacity == currnode->numEdges) {
+		Node *newnode = allocResizeNode( currnode->capacity << 1);
+		newnode->numEdges = currnode->numEdges;
+		memcpy(newnode->edges, currnode->edges, newnode->numEdges * sizeof(Edge));
+		ourfree(currnode);
+		*node=newnode;
+		currnode = newnode;
+	}
+	currnode->edges[currnode->numEdges++] = e;
+}
+
+void mergeFreeNodeToResizeNode(Node **node, Node * innode) {
+	Node * currnode = *node;
+	uint currEdges = currnode->numEdges;
+	uint inEdges = innode->numEdges;
+	
+	uint newsize = currEdges + inEdges;
+	if (newsize >= currnode->capacity) {
+		if (newsize < innode->capacity) {
+			//just swap
+			Node *tmp = innode;
+			innode = currnode;
+			*node = currnode = tmp;
+		} else {
+			Node *newnode = allocResizeNode( newsize << 1);
+			newnode->numEdges = currnode->numEdges;
+			memcpy(newnode->edges, currnode->edges, newnode->numEdges * sizeof(Edge));
+			ourfree(currnode);
+			*node=newnode;
+			currnode = newnode;
+		}
+	} else {
+		if (inEdges > currEdges && newsize < innode->capacity) {
+			//just swap
+			Node *tmp = innode;
+			innode = currnode;
+			*node = currnode = tmp;
+		}
+	}
+	memcpy(&currnode->edges[currnode->numEdges], innode->edges, innode->numEdges * sizeof(Edge));
+	currnode->numEdges += innode->numEdges;
+	ourfree(innode);
+}
+
+void mergeNodeToResizeNode(Node **node, Node * innode) {
+	Node * currnode = *node;
+	uint currEdges = currnode->numEdges;
+	uint inEdges = innode->numEdges;
+	uint newsize = currEdges + inEdges;
+	if (newsize >= currnode->capacity) {
+		Node *newnode = allocResizeNode( newsize << 1);
+		newnode->numEdges = currnode->numEdges;
+		memcpy(newnode->edges, currnode->edges, newnode->numEdges * sizeof(Edge));
+		ourfree(currnode);
+		*node=newnode;
+		currnode = newnode;
+	}
+	memcpy(&currnode->edges[currnode->numEdges], innode->edges, inEdges * sizeof(Edge));
+	currnode->numEdges += inEdges;
+}
+
+Edge createNode(NodeType type, uint numEdges, Edge *edges) {
 	Edge e = {allocNode(type, numEdges, edges)};
 	return e;
 }
@@ -108,6 +226,7 @@ int comparefunction(const Edge *e1, const Edge *e2) {
 
 Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 	ASSERT(numEdges != 0);
+
 	bsdqsort(edges, numEdges, sizeof(Edge), (int (*)(const void *, const void *))comparefunction);
 	uint initindex = 0;
 	while (initindex < numEdges && equalsEdge(edges[initindex], E_True))
@@ -160,7 +279,7 @@ Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 		}
 	}
 
-	return createNode(cnf, NodeType_AND, lowindex, edges);
+	return createNode(NodeType_AND, lowindex, edges);
 }
 
 Edge constraintAND2(CNF *cnf, Edge left, Edge right) {
@@ -186,10 +305,10 @@ Edge constraintIFF(CNF *cnf, Edge left, Edge right) {
 		e = E_True;
 	} else if (ltEdge(lpos, rpos)) {
 		Edge edges[] = {lpos, rpos};
-		e = (edgeIsConst(lpos)) ? rpos : createNode(cnf, NodeType_IFF, 2, edges);
+		e = (edgeIsConst(lpos)) ? rpos : createNode(NodeType_IFF, 2, edges);
 	} else {
 		Edge edges[] = {rpos, lpos};
-		e = (edgeIsConst(rpos)) ? lpos : createNode(cnf, NodeType_IFF, 2, edges);
+		e = (edgeIsConst(rpos)) ? lpos : createNode(NodeType_IFF, 2, edges);
 	}
 	if (negate)
 		e = constraintNegate(e);
@@ -226,22 +345,229 @@ Edge constraintITE(CNF *cnf, Edge cond, Edge thenedge, Edge elseedge) {
 	} else if (sameNodeOppSign(thenedge, elseedge)) {
 		if (ltEdge(cond, thenedge)) {
 			Edge array[] = {cond, thenedge};
-			result = createNode(cnf, NodeType_IFF, 2, array);
+			result = createNode(NodeType_IFF, 2, array);
 		} else {
 			Edge array[] = {thenedge, cond};
-			result = createNode(cnf, NodeType_IFF, 2, array);
+			result = createNode(NodeType_IFF, 2, array);
 		}
 	} else {
 		Edge edges[] = {cond, thenedge, elseedge};
-		result = createNode(cnf, NodeType_ITE, 3, edges);
+		result = createNode(NodeType_ITE, 3, edges);
 	}
 	if (negate)
 		result = constraintNegate(result);
 	return result;
 }
 
+Edge simplifyCNF(CNF *cnf, Edge input) {
+	if (edgeIsVarConst(input)) {
+		Node *newvec = allocResizeNode(1);
+		addEdgeToResizeNode(&newvec, input);
+		return (Edge) {newvec};
+	}
+	bool negated = isNegEdge(input);
+	Node * node = getNodePtrFromEdge(input);
+	NodeType type = node->type;
+	if (!negated) {
+		if (type == NodeType_AND) {
+			//AND case
+			Node *newvec = allocResizeNode(node->numEdges);
+			uint numEdges = node->numEdges;
+			for(uint i = 0; i < numEdges; i++) {
+				Edge e = simplifyCNF(cnf, node->edges[i]);
+				mergeFreeNodeToResizeNode(&newvec, e.node_ptr);
+			}
+			return (Edge) {newvec};
+		} else {
+			Edge cond = node->edges[0];
+			Edge thenedge = node->edges[1];
+			Edge elseedge = (type == NodeType_IFF) ? constraintNegate(thenedge) : node->edges[2];
+			Edge thenedges[] = {cond, constraintNegate(thenedge)};
+			Edge thencons = constraintNegate(createNode(NodeType_AND, 2, thenedges));
+			Edge elseedges[] = {constraintNegate(cond), constraintNegate(elseedge)};
+			Edge elsecons = constraintNegate(createNode(NodeType_AND, 2, elseedges));
+			Edge thencnf = simplifyCNF(cnf, thencons);
+			Edge elsecnf = simplifyCNF(cnf, elsecons);
+			//free temporary nodes
+			ourfree(getNodePtrFromEdge(thencons));
+			ourfree(getNodePtrFromEdge(elsecons));
+			Node * result = thencnf.node_ptr;
+			mergeFreeNodeToResizeNode(&result, elsecnf.node_ptr);
+			return (Edge) {result};
+		}
+	} else {
+		if (type == NodeType_AND) {
+			//OR Case
+			uint numEdges = node->numEdges;
+			
+			for(uint i = 0; i < numEdges; i++) {
+				Edge e = node->edges[i];
+				bool enegate = isNegEdge(e);
+				if (!edgeIsVarConst(e)) {
+					Node * enode = getNodePtrFromEdge(e);
+					NodeType etype = enode->type;
+					if (enegate) {
+						if (etype == NodeType_AND) {
+							//OR of AND Case
+							uint eNumEdges = enode->numEdges;
+							Node * newnode = allocResizeNode(0);
+							Node * clause = allocBaseNode(NodeType_AND, numEdges);
+							memcpy(clause->edges, node->edges, sizeof(Edge) * i);
+							if ((i + 1) < numEdges) {
+								memcpy(&clause->edges[i+1], &node->edges[i+1], sizeof(Edge) * (numEdges - i - 1));
+							}
+										 
+							for(uint j = 0; j < eNumEdges; j++) {
+								clause->edges[i] = constraintNegate(enode->edges[j]);
+								Edge simplify = simplifyCNF(cnf, constraintNegate((Edge){clause}));
+								mergeFreeNodeToResizeNode(&newnode, simplify.node_ptr);
+							}
+							ourfree(clause);
+							return (Edge) {newnode};
+						} else {
+							//OR of IFF or ITE
+							Edge cond = enode->edges[0];
+							Edge thenedge = enode->edges[1];
+							Edge elseedge = (enode->type == NodeType_IFF) ? constraintNegate(thenedge) : enode->edges[2];
+							Edge thenedges[] = {cond, constraintNegate(thenedge)};
+							Edge thencons = constraintNegate(createNode(NodeType_AND, 2, thenedges));
+							Edge elseedges[] = {constraintNegate(cond), constraintNegate(elseedge)};
+							Edge elsecons = constraintNegate(createNode(NodeType_AND, 2, elseedges));
+
+							//OR of AND Case
+							Node * newnode = allocResizeNode(0);
+							Node * clause = allocBaseNode(NodeType_AND, numEdges);
+							memcpy(clause->edges, node->edges, sizeof(Edge) * i);
+							if ((i + 1) < numEdges) {
+								memcpy(&clause->edges[i+1], &node->edges[i+1], sizeof(Edge) * (numEdges - i - 1));
+							}
+
+							clause->edges[i] = constraintNegate(thencons);
+							Edge simplify = simplifyCNF(cnf, constraintNegate((Edge){clause}));
+							mergeFreeNodeToResizeNode(&newnode, simplify.node_ptr);
+							
+							clause->edges[i] = constraintNegate(elsecons);
+							simplify = simplifyCNF(cnf, constraintNegate((Edge){clause}));
+							mergeFreeNodeToResizeNode(&newnode, simplify.node_ptr);
+
+							//free temporary nodes
+							ourfree(getNodePtrFromEdge(thencons));
+							ourfree(getNodePtrFromEdge(elsecons));
+							ourfree(clause);
+							return (Edge) {newnode};
+						}
+					} else {
+						if (etype == NodeType_AND) {
+							//OR of OR Case
+							uint eNumEdges = enode->numEdges;
+							Node * clause = allocBaseNode(NodeType_AND, eNumEdges + numEdges - 1);
+							memcpy(clause->edges, node->edges, sizeof(Edge) * i);
+							if ((i + 1) < numEdges) {
+								memcpy(&clause->edges[i], &node->edges[i+1], sizeof(Edge) * (numEdges - i - 1));
+							}
+							memcpy(&clause->edges[numEdges-1], enode->edges, sizeof(Edge) * eNumEdges);
+							Edge eclause = {clause};
+							Edge result = simplifyCNF(cnf, constraintNegate(eclause));
+							ourfree(clause);
+							return result;
+						} else {
+							//OR of !(IFF or ITE)
+							Edge cond = node->edges[0];
+							Edge thenedge = node->edges[1];
+							Edge elseedge = (type == NodeType_IFF) ? constraintNegate(thenedge) : node->edges[2];
+							Edge thenedges[] = {cond, constraintNegate(thenedge)};
+							Edge thencons = createNode(NodeType_AND, 2, thenedges);
+							Edge elseedges[] = {constraintNegate(cond), constraintNegate(elseedge)};
+							Edge elsecons = createNode(NodeType_AND, 2, elseedges);
+
+
+							Node * clause = allocBaseNode(NodeType_AND, numEdges + 1);
+							memcpy(clause->edges, node->edges, sizeof(Edge) * i);
+							if ((i + 1) < numEdges) {
+								memcpy(&clause->edges[i], &node->edges[i+1], sizeof(Edge) * (numEdges - i - 1));
+							}
+							clause->edges[numEdges-1] = constraintNegate(thencons);
+							clause->edges[numEdges] = constraintNegate(elsecons);
+							Edge result = simplifyCNF(cnf, constraintNegate((Edge) {clause}));
+							//free temporary nodes
+							ourfree(getNodePtrFromEdge(thencons));
+							ourfree(getNodePtrFromEdge(elsecons));
+							ourfree(clause);
+							return result;
+						}
+					}
+				}
+			}
+			
+			Node *newvec = allocResizeNode(numEdges);
+			for(uint i=0; i < numEdges; i++) {
+				addEdgeToResizeNode(&newvec, constraintNegate(node->edges[i]));
+			}
+			Node * result = allocResizeNode(1);
+			addEdgeToResizeNode(&result, (Edge){newvec});
+			return (Edge) {result};
+		} else {
+			Edge cond = node->edges[0];
+			Edge thenedge = node->edges[1];
+			Edge elseedge = (type == NodeType_IFF) ? constraintNegate(thenedge) : node->edges[2];
+
+
+			Edge thenedges[] = {cond, constraintNegate(thenedge)};
+			Edge thencons = createNode(NodeType_AND, 2, thenedges);
+			Edge elseedges[] = {constraintNegate(cond), constraintNegate(elseedge)};
+			Edge elsecons = createNode(NodeType_AND, 2, elseedges);
+			
+			Edge combinededges[] = {constraintNegate(thencons), constraintNegate(elsecons)};
+			Edge combined = constraintNegate(createNode(NodeType_AND, 2, combinededges));
+			Edge result = simplifyCNF(cnf, combined);
+			//free temporary nodes
+			ourfree(getNodePtrFromEdge(thencons));
+			ourfree(getNodePtrFromEdge(elsecons));
+			ourfree(getNodePtrFromEdge(combined));
+			return result;
+		}
+	}
+}
+
+void outputCNF(CNF *cnf, Edge cnfform) {
+	Node * andNode = cnfform.node_ptr;
+	uint numEdges = andNode->numEdges;
+	for(uint i=0; i < numEdges; i++) {
+		Edge e = andNode->edges[i];
+		if (edgeIsVarConst(e)) {
+			int array[1] = {getEdgeVar(e)};
+			ASSERT(array[0] != 0);
+			addArrayClauseLiteral(cnf->solver, 1, array);
+		} else {
+			Node * clause = e.node_ptr;
+			uint cnumEdges = clause->numEdges;
+			if (cnumEdges > cnf->asize) {
+				cnf->asize = cnumEdges << 1;
+				ourfree(cnf->array);
+				cnf->array = (int *) ourmalloc(sizeof(int) * cnf->asize);
+			}
+			int * array = cnf->array;
+			for(uint j=0; j < cnumEdges; j++) {
+				array[j] = getEdgeVar(clause->edges[j]);
+				ASSERT(array[j] != 0);
+			}
+			addArrayClauseLiteral(cnf->solver, cnumEdges, array);
+		}
+	}
+}
+
 void addConstraintCNF(CNF *cnf, Edge constraint) {
-	//	pushVectorEdge(&cnf->constraints, constraint);
+	if (equalsEdge(constraint, E_True))
+		return;
+	else if (equalsEdge(constraint, E_False)) {
+		cnf->unsat = true;
+		return;
+	}
+
+	Edge cnfform = simplifyCNF(cnf, constraint);
+	freeEdgeRec(constraint);
+	outputCNF(cnf, cnfform);
+	freeEdgeCNF(cnfform);
 #ifdef CONFIG_DEBUG
 	model_print("****SATC_ADDING NEW Constraint*****\n");
 	printCNF(constraint);
@@ -259,7 +585,7 @@ int solveCNF(CNF *cnf) {
 	long long startTime = getTimeNano();
 	finishedClauses(cnf->solver);
 	long long startSolve = getTimeNano();
-	int result = solve(cnf->solver);
+	int result = cnf->unsat ? IS_UNSAT : solve(cnf->solver);
 	long long finishTime = getTimeNano();
 	cnf->encodeTime = startSolve - startTime;
 	model_print("CNF Encode time: %f\n", cnf->encodeTime / 1000000000.0);

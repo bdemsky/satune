@@ -32,17 +32,25 @@ typedef enum NodeType NodeType;
 
 struct Node {
 	uint numEdges;
-	NodeType type;
+	union {
+		NodeType type;
+		uint capacity;
+	};
 	Edge edges[];
 };
 
 typedef struct Node Node;
 
+#define DEFAULT_CNF_ARRAY_SIZE 2048
+
 struct CNF {
 	uint varcount;
+	uint asize;
 	IncrementalSolver *solver;
+	int * array;
 	long long solveTime;
 	long long encodeTime;
+	bool unsat;
 };
 
 typedef struct CNF CNF;
@@ -78,6 +86,10 @@ static inline bool isNodeEdge(Edge e) {
 
 static inline bool isNegNodeEdge(Edge e) {
 	return (((uintptr_t) e.node_ptr) & (NEGATE_EDGE | EDGE_IS_VAR_CONSTANT)) == NEGATE_EDGE;
+}
+
+static inline bool isPosNodeEdge(Edge e) {
+	return (((uintptr_t) e.node_ptr) & (NEGATE_EDGE | EDGE_IS_VAR_CONSTANT)) == 0;
 }
 
 static inline Node *getNodePtrFromEdge(Edge e) {
@@ -141,7 +153,7 @@ void resetCNF(CNF *cnf);
 uint hashNode(NodeType type, uint numEdges, Edge *edges);
 Node *allocNode(NodeType type, uint numEdges, Edge *edges);
 bool compareNodes(Node *node, NodeType type, uint numEdges, Edge *edges);
-Edge create(CNF *cnf, NodeType type, uint numEdges, Edge *edges);
+Edge createNode(NodeType type, uint numEdges, Edge *edges);
 Edge constraintOR(CNF *cnf, uint numEdges, Edge *edges);
 Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges);
 Edge constraintOR2(CNF *cnf, Edge left, Edge right);
@@ -157,7 +169,13 @@ void addConstraintCNF(CNF *cnf, Edge constraint);
 int solveCNF(CNF *cnf);
 bool getValueCNF(CNF *cnf, Edge var);
 void printCNF(Edge e);
-
+Node *allocBaseNode(NodeType type, uint numEdges);
+Node *allocResizeNode(uint capacity);
+Edge cloneEdge(Edge e);
+void addEdgeToResizeNode(Node ** node, Edge e);
+void mergeFreeNodeToResizeNode(Node **node, Node * innode);
+void mergeNodeToResizeNode(Node **node, Node * innode);
+void freeEdgeRec(Edge e);
 
 Edge generateBinaryConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateLTValueConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);

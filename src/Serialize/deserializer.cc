@@ -53,7 +53,7 @@ ssize_t Deserializer::myread(void *__buf, size_t bytestoread) {
 			out += bytestocopy;
 			bytestoread -= bytestocopy;
 		} else {
-			size_t bytesread = read (filedesc, buffer, buffercap);
+			ssize_t bytesread = read (filedesc, buffer, buffercap);
 			bufferindex = 0;
 			bufferbytes = bytesread;
 			if (bytesread == 0) {
