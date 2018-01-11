@@ -68,7 +68,13 @@ Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
 		exit(-1);
 	}
-	booledgeMap.put(constraint, result.node_ptr);
+	if (constraint->parents.getSize() > 1) {
+		Edge e = getNewVarSATEncoder();
+		generateProxy(cnf, result, e, constraint->polarity);
+		booledgeMap.put(constraint, e.node_ptr);
+		result = e;
+	}
+
 	return c.isNegated() ? constraintNegate(result) : result;
 }
 
@@ -99,6 +105,7 @@ Edge SATEncoder::encodeLogicSATEncoder(BooleanLogic *constraint) {
 	case SATC_NOT:
 		return constraintNegate(array[0]);
 	case SATC_IFF:
+		ASSERT(constraint->inputs.getSize() == 2);
 		return constraintIFF(cnf, array[0], array[1]);
 	case SATC_OR:
 	case SATC_XOR:

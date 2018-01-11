@@ -57,6 +57,7 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 			}
 			Edge term = constraintAND(cnf, numDomains, carray);
 			pushVectorEdge(clauses, term);
+			ASSERT(getSizeVectorEdge(clauses) > 0);
 		}
 
 		notfinished = false;
@@ -75,7 +76,6 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 		}
 	}
 	if (getSizeVectorEdge(clauses) == 0) {
-		clearVectorEdge(clauses);
 		return E_False;
 	}
 	Edge cor = constraintOR(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));

@@ -116,6 +116,21 @@ void freeEdgeRec(Edge e) {
 	for(uint i=0; i < numEdges; i++) {
 		freeEdgeRec(node->edges[i]);
 	}
+	ourfree(node);
+}
+
+void freeEdge(Edge e) {
+	if (edgeIsVarConst(e))
+		return;
+	Node * node = getNodePtrFromEdge(e);
+	ourfree(node);
+}
+
+void freeEdgesRec(uint numEdges, Edge * earray) {
+	for(uint i=0; i < numEdges; i++) {
+		Edge e = earray[i];
+		freeEdgeRec(e);
+	}
 }
 
 void freeEdgeCNF(Edge e) {
@@ -238,8 +253,10 @@ Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 		return E_True;
 	else if (remainSize == 1)
 		return edges[initindex];
-	else if (equalsEdge(edges[initindex], E_False))
+	else if (equalsEdge(edges[initindex], E_False)) {
+		freeEdgesRec(numEdges, edges);
 		return E_False;
+	}
 
 	/** De-duplicate array */
 	uint lowindex = 0;
@@ -249,7 +266,10 @@ Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 		Edge e1 = edges[lowindex];
 		Edge e2 = edges[initindex];
 		if (sameNodeVarEdge(e1, e2)) {
+			ASSERT(!isNodeEdge(e1));
 			if (!sameSignEdge(e1, e2)) {
+				freeEdgesRec(lowindex + 1, edges);
+				freeEdgesRec(numEdges-initindex, &edges[initindex]);
 				return E_False;
 			}
 		} else
@@ -269,13 +289,25 @@ Edge constraintAND(CNF *cnf, uint numEdges, Edge *edges) {
 		Edge *e0edges = getEdgeArray(edges[0]);
 		Edge *e1edges = getEdgeArray(edges[1]);
 		if (sameNodeOppSign(e0edges[0], e1edges[0])) {
-			return constraintNegate(constraintITE(cnf, e0edges[0], e0edges[1], e1edges[1]));
+			Edge result=constraintNegate(constraintITE(cnf, e0edges[0], e0edges[1], e1edges[1]));
+			freeEdge(edges[0]);
+			freeEdge(edges[1]);
+			return result;
 		} else if (sameNodeOppSign(e0edges[0], e1edges[1])) {
-			return constraintNegate(constraintITE(cnf, e0edges[0], e0edges[1], e1edges[0]));
+			Edge result=constraintNegate(constraintITE(cnf, e0edges[0], e0edges[1], e1edges[0]));
+			freeEdge(edges[0]);
+			freeEdge(edges[1]);
+			return result;
 		} else if (sameNodeOppSign(e0edges[1], e1edges[0])) {
-			return constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[1]));
+			Edge result=constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[1]));
+			freeEdge(edges[0]);
+			freeEdge(edges[1]);
+			return result;
 		} else if (sameNodeOppSign(e0edges[1], e1edges[1])) {
-			return constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[0]));
+			Edge result=constraintNegate(constraintITE(cnf, e0edges[1], e0edges[0], e1edges[0]));
+			freeEdge(edges[0]);
+			freeEdge(edges[1]);
+			return result;
 		}
 	}
 
@@ -302,6 +334,8 @@ Edge constraintIFF(CNF *cnf, Edge left, Edge right) {
 
 	Edge e;
 	if (equalsEdge(lpos, rpos)) {
+		freeEdgeRec(left);
+		freeEdgeRec(right);
 		e = E_True;
 	} else if (ltEdge(lpos, rpos)) {
 		Edge edges[] = {lpos, rpos};
@@ -331,16 +365,18 @@ Edge constraintITE(CNF *cnf, Edge cond, Edge thenedge, Edge elseedge) {
 
 	Edge result;
 	if (equalsEdge(cond, E_True)) {
+		freeEdgeRec(elseedge);
 		result = thenedge;
 	} else if (equalsEdge(thenedge, E_True) || equalsEdge(cond, thenedge)) {
 		Edge array[] = {cond, elseedge};
 		result = constraintOR(cnf,  2, array);
 	} else if (equalsEdge(elseedge, E_True) || sameNodeOppSign(cond, elseedge)) {
 		result = constraintIMPLIES(cnf, cond, thenedge);
-	} else if (equalsEdge(thenedge, E_False) || equalsEdge(cond, elseedge)) {
+	} else if (equalsEdge(elseedge, E_False) || equalsEdge(cond, elseedge)) {
 		Edge array[] = {cond, thenedge};
 		result = constraintAND(cnf, 2, array);
 	} else if (equalsEdge(thenedge, elseedge)) {
+		freeEdgeRec(cond);
 		result = thenedge;
 	} else if (sameNodeOppSign(thenedge, elseedge)) {
 		if (ltEdge(cond, thenedge)) {
@@ -529,6 +565,37 @@ Edge simplifyCNF(CNF *cnf, Edge input) {
 	}
 }
 
+void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar) {
+	Node * andNode = cnfform.node_ptr;
+	int orvar = getEdgeVar(eorvar);
+	ASSERT(orvar != 0);
+	uint numEdges = andNode->numEdges;
+	for(uint i=0; i < numEdges; i++) {
+		Edge e = andNode->edges[i];
+		if (edgeIsVarConst(e)) {
+			int array[2] = {getEdgeVar(e), orvar};
+			ASSERT(array[0] != 0);
+			addArrayClauseLiteral(cnf->solver, 2, array);
+		} else {
+			Node * clause = e.node_ptr;
+			uint cnumEdges = clause->numEdges + 1;
+			if (cnumEdges > cnf->asize) {
+				cnf->asize = cnumEdges << 1;
+				ourfree(cnf->array);
+				cnf->array = (int *) ourmalloc(sizeof(int) * cnf->asize);
+			}
+			int * array = cnf->array;
+			for(uint j=0; j < (cnumEdges - 1); j++) {
+				array[j] = getEdgeVar(clause->edges[j]);
+				ASSERT(array[j] != 0);
+			}
+			array[cnumEdges - 1] = orvar;
+			addArrayClauseLiteral(cnf->solver, cnumEdges, array);
+		}
+	}
+}
+
+
 void outputCNF(CNF *cnf, Edge cnfform) {
 	Node * andNode = cnfform.node_ptr;
 	uint numEdges = andNode->numEdges;
@@ -556,23 +623,45 @@ void outputCNF(CNF *cnf, Edge cnfform) {
 	}
 }
 
+void generateProxy(CNF *cnf, Edge expression, Edge proxy, Polarity p) {
+	if (P_TRUE || P_BOTHTRUEFALSE) {
+		// proxy => expression
+		Edge cnfexpr = simplifyCNF(cnf, expression);
+		freeEdgeRec(expression);
+		outputCNFOR(cnf, cnfexpr, constraintNegate(proxy));
+		freeEdgeCNF(cnfexpr);
+	}
+	if (P_FALSE || P_BOTHTRUEFALSE) {
+		// expression => proxy
+		Edge cnfnegexpr = simplifyCNF(cnf, constraintNegate(expression));
+		freeEdgeRec(expression);
+		outputCNFOR(cnf, cnfnegexpr, proxy);
+		freeEdgeCNF(cnfnegexpr);
+	}
+}
+
 void addConstraintCNF(CNF *cnf, Edge constraint) {
-	if (equalsEdge(constraint, E_True))
+	if (equalsEdge(constraint, E_True)) {
 		return;
-	else if (equalsEdge(constraint, E_False)) {
+	} else if (equalsEdge(constraint, E_False)) {
 		cnf->unsat = true;
 		return;
 	}
+	if (cnf->unsat) {
+		freeEdgeRec(constraint);
+		return;
+	}
 
-	Edge cnfform = simplifyCNF(cnf, constraint);
-	freeEdgeRec(constraint);
-	outputCNF(cnf, cnfform);
-	freeEdgeCNF(cnfform);
-#ifdef CONFIG_DEBUG
+#if 0
 	model_print("****SATC_ADDING NEW Constraint*****\n");
 	printCNF(constraint);
 	model_print("\n******************************\n");
 #endif
+	
+	Edge cnfform = simplifyCNF(cnf, constraint);
+	freeEdgeRec(constraint);
+	outputCNF(cnf, cnfform);
+	freeEdgeCNF(cnfform);
 }
 
 Edge constraintNewVar(CNF *cnf) {

@@ -176,6 +176,9 @@ void addEdgeToResizeNode(Node ** node, Edge e);
 void mergeFreeNodeToResizeNode(Node **node, Node * innode);
 void mergeNodeToResizeNode(Node **node, Node * innode);
 void freeEdgeRec(Edge e);
+void outputCNF(CNF *cnf, Edge cnfform);
+void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar);
+void generateProxy(CNF *cnf, Edge expression, Edge proxy, Polarity p);
 
 Edge generateBinaryConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateLTValueConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
