@@ -32,6 +32,7 @@ typedef enum NodeType NodeType;
 
 struct Node {
 	uint numEdges;
+	uint numVars;
 	union {
 		NodeType type;
 		uint capacity;
