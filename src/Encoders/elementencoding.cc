@@ -13,7 +13,10 @@ ElementEncoding::ElementEncoding(Element *_element) :
 	variables(NULL),
 	encodingArray(NULL),
 	inUseArray(NULL),
+	edgeArray(NULL),
+	polarityArray(NULL),
 	encArraySize(0),
+	encoding(EENC_UNKNOWN),
 	numVars(0) {
 }
 
@@ -24,6 +27,10 @@ ElementEncoding::~ElementEncoding() {
 		ourfree(encodingArray);
 	if (inUseArray != NULL)
 		ourfree(inUseArray);
+	if (edgeArray != NULL)
+		ourfree(edgeArray);
+	if (polarityArray != NULL)
+		ourfree(polarityArray);
 }
 
 void ElementEncoding::allocEncodingArrayElement(uint size) {

@@ -25,9 +25,11 @@ Edge SATEncoder::encodeOperatorPredicateSATEncoder(BooleanPredicate *constraint)
 Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *)constraint->predicate;
 	uint numDomains = predicate->domains.getSize();
-
+	Polarity polarity = constraint->polarity;
 	FunctionEncodingType encType = constraint->encoding.type;
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
+	if (generateNegation)
+		polarity = negatePolarity(polarity);
 
 	/* Call base encoders for children */
 	for (uint i = 0; i < numDomains; i++) {
@@ -53,7 +55,7 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
 				Element *elem = constraint->inputs.get(i);
-				carray[i] = getElementValueConstraint(elem, vals[i]);
+				carray[i] = getElementValueConstraint(elem, polarity, vals[i]);
 			}
 			Edge term = constraintAND(cnf, numDomains, carray);
 			pushVectorEdge(clauses, term);
@@ -108,8 +110,6 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		vals[i] = set->getElement(indices[i]);
 	}
 
-	Edge overFlowConstraint = encodeConstraintSATEncoder(func->overflowstatus);
-
 	bool notfinished = true;
 	while (notfinished) {
 		Edge carray[numDomains + 1];
@@ -125,10 +125,10 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 			//Include this in the set of terms
 			for (uint i = 0; i < numDomains; i++) {
 				Element *elem = func->inputs.get(i);
-				carray[i] = getElementValueConstraint(elem, vals[i]);
+				carray[i] = getElementValueConstraint(elem, P_FALSE, vals[i]);
 			}
 			if (isInRange) {
-				carray[numDomains] = getElementValueConstraint(func, result);
+				carray[numDomains] = getElementValueConstraint(func, P_TRUE, result);
 			}
 
 			Edge clause;
@@ -140,6 +140,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 				break;
 			}
 			case SATC_FLAGFORCESOVERFLOW: {
+				Edge overFlowConstraint = encodeConstraintSATEncoder(func->overflowstatus);
 				clause = constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				break;
 			}
@@ -147,11 +148,13 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 				if (isInRange) {
 					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 				} else {
+					Edge overFlowConstraint = encodeConstraintSATEncoder(func->overflowstatus);
 					clause = constraintIMPLIES(cnf,constraintAND(cnf, numDomains, carray), overFlowConstraint);
 				}
 				break;
 			}
 			case SATC_FLAGIFFOVERFLOW: {
+				Edge overFlowConstraint = encodeConstraintSATEncoder(func->overflowstatus);
 				if (isInRange) {
 					clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), constraintAND2(cnf, carray[numDomains], constraintNegate(overFlowConstraint)));
 				} else {

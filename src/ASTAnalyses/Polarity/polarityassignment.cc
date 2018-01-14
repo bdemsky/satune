@@ -12,6 +12,22 @@ void computePolarities(CSolver *This) {
 	delete iterator;
 }
 
+void updateEdgePolarity(BooleanEdge dst, BooleanEdge src) {
+	Boolean *bdst = dst.getBoolean();
+	Boolean *bsrc = src.getBoolean();
+	bool isNegated = dst.isNegated() ^ src.isNegated();
+	Polarity p = isNegated ? negatePolarity(bsrc->polarity) : bsrc->polarity;
+	updatePolarity(bdst, p);
+}
+
+void updateEdgePolarity(BooleanEdge dst, Polarity p) {
+	Boolean *bdst = dst.getBoolean();
+	bool isNegated = dst.isNegated();
+	if (isNegated)
+		p=negatePolarity(p);
+	updatePolarity(bdst, p);
+}
+
 bool updatePolarity(Boolean *This, Polarity polarity) {
 	Polarity oldpolarity = This->polarity;
 	Polarity newpolarity = (Polarity) (This->polarity | polarity);
@@ -54,20 +70,6 @@ void computeLogicOpPolarity(BooleanLogic *This) {
 	}
 }
 
-Polarity negatePolarity(Polarity This) {
-	switch (This) {
-	case P_UNDEFINED:
-	case P_BOTHTRUEFALSE:
-		return This;
-	case P_TRUE:
-		return P_FALSE;
-	case P_FALSE:
-		return P_TRUE;
-	default:
-		ASSERT(0);
-	}
-}
-
 BooleanValue negateBooleanValue(BooleanValue This) {
 	switch (This) {
 	case BV_UNDEFINED:
@@ -90,6 +92,20 @@ Polarity computeLogicOpPolarityChildren(BooleanLogic *This) {
 	case SATC_IFF: {
 		return P_BOTHTRUEFALSE;
 	}
+	default:
+		ASSERT(0);
+	}
+}
+
+Polarity negatePolarity(Polarity This) {
+	switch (This) {
+	case P_UNDEFINED:
+	case P_BOTHTRUEFALSE:
+		return This;
+	case P_TRUE:
+		return P_FALSE;
+	case P_FALSE:
+		return P_TRUE;
 	default:
 		ASSERT(0);
 	}

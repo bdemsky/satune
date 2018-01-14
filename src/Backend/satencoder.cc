@@ -68,9 +68,11 @@ Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
 		exit(-1);
 	}
-	if (constraint->parents.getSize() > 1) {
+	Polarity p = constraint->polarity;
+	uint pSize = constraint->parents.getSize();
+	if ((pSize > 1 && p != P_BOTHTRUEFALSE ) || pSize > 2) {
 		Edge e = getNewVarSATEncoder();
-		generateProxy(cnf, result, e, constraint->polarity);
+		generateProxy(cnf, result, e, p);
 		booledgeMap.put(constraint, e.node_ptr);
 		result = e;
 	}
