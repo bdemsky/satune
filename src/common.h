@@ -24,7 +24,7 @@ extern int model_out;
 extern int model_err;
 extern int switch_alloc;
 
-#define model_dprintf(fd, fmt, ...) do { switch_alloc = 1; dprintf(fd, fmt, ## __VA_ARGS__); switch_alloc = 0; } while (0)
+#define model_dprintf(fd, fmt, ...) do { int oldsw = switch_alloc; switch_alloc = 1; dprintf(fd, fmt, ## __VA_ARGS__); switch_alloc = oldsw; } while (0)
 
 #define model_print(fmt, ...) do { model_dprintf(model_out, fmt, ## __VA_ARGS__); } while (0)
 #define model_print_err(fmt, ...) do { model_dprintf(model_err, fmt, ## __VA_ARGS__); } while (0)

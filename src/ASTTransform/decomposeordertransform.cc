@@ -16,6 +16,7 @@
 #include "decomposeorderresolver.h"
 #include "tunable.h"
 #include "orderanalysis.h"
+#include "polarityassignment.h"
 
 
 DecomposeOrderTransform::DecomposeOrderTransform(CSolver *_solver)
@@ -153,6 +154,7 @@ void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currG
 			}
 			BooleanEdge neworderconstraint = solver->orderConstraint(neworder, orderconstraint->first, orderconstraint->second);
 			solver->replaceBooleanWithBoolean(orderconstraint, neworderconstraint);
+			updateEdgePolarity(neworderconstraint, orderconstraint);
 			dor->setEdgeOrder(from->getID(), to->getID(), from->sccNum);
 		}
 	}
@@ -212,6 +214,7 @@ void DecomposeOrderTransform::bypassMustBeTrueNode(OrderGraph *graph, OrderNode 
 			}
 			//Add new order constraint
 			BooleanEdge orderconstraint = solver->orderConstraint(graph->getOrder(), srcNode->getID(), sinkNode->getID());
+			updateEdgePolarity(orderconstraint, P_TRUE);
 			solver->addConstraint(orderconstraint);
 
 			//Add new edge
@@ -324,6 +327,7 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 
 		BooleanEdge be = solver->orderConstraint(graph->getOrder(), source->getID(), dstnode->getID());
 		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), source->getID(), node->getID());
+		updateEdgePolarity(benew, be);
 		solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->inEdges.reset();
@@ -353,6 +357,7 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 
 		BooleanEdge be = solver->orderConstraint(graph->getOrder(), dstnode->getID(), sink->getID());
 		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), node->getID(), sink->getID());
+		updateEdgePolarity(benew, be);
 		solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->outEdges.reset();

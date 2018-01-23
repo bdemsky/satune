@@ -23,7 +23,7 @@ public:
 	BooleanValue boolVal;
 	Vector<Boolean *> parents;
 	virtual void updateParents() {}
-
+	
 	CMEMALLOC;
 };
 

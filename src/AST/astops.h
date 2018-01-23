@@ -25,5 +25,10 @@ enum ElementEncodingType {
 
 typedef enum ElementEncodingType ElementEncodingType;
 
+Polarity negatePolarity(Polarity This);
+bool impliesPolarity(Polarity curr, Polarity goal);
+
+
+
 
 #endif

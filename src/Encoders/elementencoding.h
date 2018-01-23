@@ -4,6 +4,8 @@
 #include "naiveencoder.h"
 #include "constraint.h"
 
+typedef enum ElemEnc {EENC_UNKNOWN, EENC_NONE, EENC_BOTH} ElemEnc;
+
 class ElementEncoding {
 public:
 	ElementEncoding(Element *element);
@@ -38,7 +40,10 @@ public:
 		struct {
 			uint64_t *encodingArray;	/* List the Variables in the appropriate order */
 			uint64_t *inUseArray;	/* Bitmap to track variables in use */
+			Edge * edgeArray;
+			Polarity * polarityArray;
 			uint encArraySize;
+			ElemEnc encoding;
 		};
 		struct {
 			uint64_t offset;/* Value = offset + encoded number (interpretted according to isBinaryValSigned) */

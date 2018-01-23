@@ -15,11 +15,12 @@
 
 void computePolarities(CSolver *This);
 bool updatePolarity(Boolean *This, Polarity polarity);
+void updateEdgePolarity(BooleanEdge dst, BooleanEdge src);
+void updateEdgePolarity(BooleanEdge dst, Polarity polarity);
 void updateMustValue(Boolean *This, BooleanValue value);
 void computePolarity(Boolean *boolean, Polarity polarity);
 void computePredicatePolarity(BooleanPredicate *This);
 void computeLogicOpPolarity(BooleanLogic *boolean);
-Polarity negatePolarity(Polarity This);
 BooleanValue negateBooleanValue(BooleanValue This);
 Polarity computeLogicOpPolarityChildren(BooleanLogic *boolean);
 

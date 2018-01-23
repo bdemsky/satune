@@ -22,6 +22,7 @@ public:
 
 	CMEMALLOC;
 private:
+	void shouldMemoize(Element *elem, uint64_t val, bool & memo);
 	Edge getNewVarSATEncoder();
 	void getArrayNewVarsSATEncoder(uint num, Edge *carray);
 	Edge encodeVarSATEncoder(BooleanVar *constraint);
@@ -31,11 +32,11 @@ private:
 	void encodeElementSATEncoder(Element *element);
 	void encodeElementFunctionSATEncoder(ElementFunction *function);
 	void encodeTableElementFunctionSATEncoder(ElementFunction *This);
-	Edge getElementValueOneHotConstraint(Element *elem, uint64_t value);
-	Edge getElementValueUnaryConstraint(Element *elem, uint64_t value);
-	Edge getElementValueBinaryIndexConstraint(Element *element, uint64_t value);
-	Edge getElementValueBinaryValueConstraint(Element *element, uint64_t value);
-	Edge getElementValueConstraint(Element *element, uint64_t value);
+	Edge getElementValueOneHotConstraint(Element *elem, Polarity p, uint64_t value);
+	Edge getElementValueUnaryConstraint(Element *elem, Polarity p, uint64_t value);
+	Edge getElementValueBinaryIndexConstraint(Element *element, Polarity p, uint64_t value);
+	Edge getElementValueBinaryValueConstraint(Element *element, Polarity p, uint64_t value);
+	Edge getElementValueConstraint(Element *element, Polarity p, uint64_t value);
 	void generateOneHotEncodingVars(ElementEncoding *encoding);
 	void generateUnaryEncodingVars(ElementEncoding *encoding);
 	void generateBinaryIndexEncodingVars(ElementEncoding *encoding);
