@@ -182,6 +182,10 @@ Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange
 	return set;
 }
 
+bool CSolver::itemExistInSet(Set *set, uint64_t item){
+        return set->exists(item);
+}
+
 VarType CSolver::getSetVarType(Set *set) {
 	return set->getType();
 }

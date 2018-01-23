@@ -89,7 +89,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 	}
 	bool generateNegation = constraint->encoding.type == ENUMERATEIMPLICATIONSNEGATE;
 	uint numDomains = predicate->table->numDomains();
-
+        ASSERT(numDomains != 0);
 	VectorEdge *clauses = allocDefVectorEdge();
 
 	uint indices[numDomains];	//setup indices
@@ -269,7 +269,6 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		switch (function->undefBehavior) {
 		case SATC_UNDEFINEDSETSFLAG: {
 			if (isInRange) {
-				//FIXME: Talk to Brian, It should be IFF not only IMPLY. --HG
 				clause = constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]);
 			} else {
 				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), undefConstraint));

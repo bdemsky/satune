@@ -18,12 +18,17 @@ public:
 	/** This function creates a set from lowrange to highrange (inclusive). */
 
 	Set *createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange);
+        
+        bool itemExistInSet(Set *set, uint64_t item);
 
 	VarType getSetVarType(Set *set);
 
 	Element *createRangeVar(VarType type, uint64_t lowrange, uint64_t highrange);
 
-	/** This function creates a mutable set. */
+	/** This function creates a mutable set.
+         * Note: You should use addItem for adding new item to Mutable sets, and
+         * at the end, you should call finalizeMutableSet!
+         */
 
 	MutableSet *createMutableSet(VarType type);
 
