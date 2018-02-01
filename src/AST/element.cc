@@ -133,6 +133,10 @@ void ElementFunction::serialize(Serializer *serializer) {
 void ElementFunction::print() {
 	model_print("{ElementFunction<%p>:\n", this);
 	function->print();
+	model_print("OverFlow Boolean Flag:\n");
+	overflowstatus.getBoolean()->print();
+	model_print("Range:\n");
+	getRange()->print();
 	model_print("Elements:\n");
 	uint size = inputs.getSize();
 	for (uint i = 0; i < size; i++) {

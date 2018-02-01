@@ -22,7 +22,6 @@ public:
 	uint getSize();
 	VarType getType() {return type;}
 	uint64_t getNewUniqueItem() {return low++;}
-	uint64_t getMemberAt(uint index);
 	uint64_t getElement(uint index);
 	uint getUnionSize(Set *s);
 	virtual bool isMutableSet() {return false;}

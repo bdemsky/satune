@@ -69,14 +69,6 @@ uint Set::getSize() {
 	}
 }
 
-uint64_t Set::getMemberAt(uint index) {
-	if (isRange) {
-		return low + index;
-	} else {
-		return members->get(index);
-	}
-}
-
 Set::~Set() {
 	if (!isRange)
 		delete members;
@@ -155,7 +147,7 @@ void Set::serialize(Serializer *serializer) {
 }
 
 void Set::print() {
-	model_print("{Set<%p>:", this);
+	model_print("{Set(%lu)<%p>:", type, this);
 	if (isRange) {
 		model_print("Range: low=%lu, high=%lu}", low, high);
 	} else {

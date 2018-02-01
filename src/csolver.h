@@ -157,6 +157,7 @@ public:
 	void replaceBooleanWithFalse(BooleanEdge bexpr);
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
+//        Set* addItemsToRange(Element* element, uint num, ...);
 	void serialize();
 	static CSolver *deserialize(const char *file);
 	void autoTune(uint budget);

@@ -54,7 +54,7 @@ void ElementEncoding::encodingArrayInitialization() {
 	allocEncodingArrayElement(encSize);
 	allocInUseArrayElement(encSize);
 	for (uint i = 0; i < size; i++) {
-		encodingArray[i] = set->getMemberAt(i);
+		encodingArray[i] = set->getElement(i);
 		setInUseElement(i);
 	}
 }

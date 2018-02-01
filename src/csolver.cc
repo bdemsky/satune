@@ -26,6 +26,7 @@
 #include "orderedge.h"
 #include "orderanalysis.h"
 #include <time.h>
+#include <stdarg.h>
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -582,14 +583,15 @@ int CSolver::solve() {
 		}
 		delete orderit;
 	}
-
+        model_print("*****************Before any modifications:************\n");
+        printConstraints();
 	computePolarities(this);
 	long long time2 = getTimeNano();
 	model_print("Polarity time: %f\n", (time2 - starttime) / NANOSEC);
-	Preprocess pp(this);
-	pp.doTransform();
+//	Preprocess pp(this);
+//	pp.doTransform();
 	long long time3 = getTimeNano();
-	model_print("Preprocess time: %f\n", (time3 - time2) / NANOSEC);
+//	model_print("Preprocess time: %f\n", (time3 - time2) / NANOSEC);
 
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
@@ -615,6 +617,8 @@ int CSolver::solve() {
 	model_print("Elapse Encode time: %f\n", elapsedTime / NANOSEC);
 
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
+       	model_print("########## After all modifications: #############\n");
+       	printConstraints();
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
 	model_print("Result Computed in CSolver: %d\n", result);
 
@@ -681,3 +685,21 @@ void CSolver::autoTune(uint budget) {
 	autotuner->tune();
 	delete autotuner;
 }
+
+//Set* CSolver::addItemsToRange(Element* element, uint num, ...){
+//        va_list args;
+//        va_start(args, num);
+//        element->getRange()
+//        uint setSize = set->getSize();
+//        uint newSize = setSize+ num;
+//        uint64_t members[newSize];
+//        for(uint i=0; i<setSize; i++){
+//                members[i] = set->getElement(i);
+//        }
+//        for( uint i=0; i< num; i++){
+//                uint64_t arg = va_arg(args, uint64_t);
+//                members[setSize+i] = arg;
+//        }
+//        va_end(args);
+//        return createSet(set->getType(), members, newSize);
+//}

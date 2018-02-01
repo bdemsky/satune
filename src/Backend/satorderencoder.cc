@@ -124,13 +124,13 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 	Set *set = order->set;
 	uint size = order->set->getSize();
 	for (uint i = 0; i < size; i++) {
-		uint64_t valueI = set->getMemberAt(i);
+		uint64_t valueI = set->getElement(i);
 		for (uint j = i + 1; j < size; j++) {
-			uint64_t valueJ = set->getMemberAt(j);
+			uint64_t valueJ = set->getElement(j);
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			Edge constIJ = getPairConstraint(order, &pairIJ);
 			for (uint k = j + 1; k < size; k++) {
-				uint64_t valueK = set->getMemberAt(k);
+				uint64_t valueK = set->getElement(k);
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPairConstraint(order, &pairIK);
@@ -230,15 +230,15 @@ void SATEncoder::createAllPartialOrderConstraintsSATEncoder(Order *order) {
 	Set *set = order->set;
 	uint size = order->set->getSize();
 	for (uint i = 0; i < size; i++) {
-		uint64_t valueI = set->getMemberAt(i);
+		uint64_t valueI = set->getElement(i);
 		for (uint j = i + 1; j < size; j++) {
-			uint64_t valueJ = set->getMemberAt(j);
+			uint64_t valueJ = set->getElement(j);
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			OrderPair pairJI(valueJ, valueI, E_NULL);
 			Edge constIJ = getPartialPairConstraint(order, &pairIJ);
 			Edge constJI = getPartialPairConstraint(order, &pairJI);
 			for (uint k = j + 1; k < size; k++) {
-				uint64_t valueK = set->getMemberAt(k);
+				uint64_t valueK = set->getElement(k);
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPartialPairConstraint(order, &pairIK);
