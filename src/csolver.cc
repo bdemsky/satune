@@ -583,15 +583,13 @@ int CSolver::solve() {
 		}
 		delete orderit;
 	}
-        model_print("*****************Before any modifications:************\n");
-        printConstraints();
 	computePolarities(this);
 	long long time2 = getTimeNano();
 	model_print("Polarity time: %f\n", (time2 - starttime) / NANOSEC);
-//	Preprocess pp(this);
-//	pp.doTransform();
+	Preprocess pp(this);
+	pp.doTransform();
 	long long time3 = getTimeNano();
-//	model_print("Preprocess time: %f\n", (time3 - time2) / NANOSEC);
+	model_print("Preprocess time: %f\n", (time3 - time2) / NANOSEC);
 
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
@@ -617,8 +615,6 @@ int CSolver::solve() {
 	model_print("Elapse Encode time: %f\n", elapsedTime / NANOSEC);
 
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
-       	model_print("########## After all modifications: #############\n");
-       	printConstraints();
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
 	model_print("Result Computed in CSolver: %d\n", result);
 
