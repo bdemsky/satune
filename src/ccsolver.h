@@ -6,9 +6,9 @@ typedef void* CCSolver;
 #ifdef __cplusplus
 extern "C" {
 #endif
-void* CreateCCSolver();
+void* createCCSolver();
 void deleteCCSolver(void* solver);
-void *createSet(void* solver,unsigned int type, void *elements, unsigned int num);
+void *createSet(void* solver,unsigned int type, long *elements, unsigned int num);
 void *createRangeSet(void* solver,unsigned int type, long lowrange, long highrange);
 void *createRangeVar(void* solver,unsigned type, long lowrange, long highrange);
 void *createMutableSet(void* solver,unsigned type);
@@ -19,7 +19,7 @@ void *getElementConst(void* solver,unsigned type, long value);
 void *getElementRange (void* solver,void *element);
 void* getBooleanVar(void* solver,unsigned int type);
 void *createFunctionOperator(void* solver,unsigned int op, void *domain, unsigned int numDomain, void *range,unsigned int overflowbehavior);
-void *createPredicateOperator(void* solver,unsigned int op, void *domain, unsigned int numDomain);
+void *createPredicateOperator(void* solver,unsigned int op, void **domain, unsigned int numDomain);
 void *createPredicateTable(void* solver,void *table, unsigned int behavior);
 void *createTable(void* solver,void*domains, unsigned int numDomain, void *range);
 void *createTableForPredicate(void* solver,void*domains, unsigned int numDomain);

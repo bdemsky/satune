@@ -4,7 +4,7 @@
 #define SATC_EQUALS 0
 
 int main (int num, char** args){
-	void* solver = CreateCCSolver();
+	void* solver = createCCSolver();
 	long set1[] = {0, 1, 2};
         long set2[] = {3, 1, 7};
         void *s1 = createSet(solver,0, set1, 3);

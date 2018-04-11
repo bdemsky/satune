@@ -3,14 +3,14 @@
 
 #define CCSOLVER(solver) ((CSolver*)solver)
 
-void* CreateCCSolver(){
+void* createCCSolver(){
 	return (void*) new CSolver();
 }
 void deleteCCSolver(void* solver){
 	delete CCSOLVER(solver);
 }
 
-void *createSet(void* solver,unsigned int type, void *elements, unsigned int num){
+void *createSet(void* solver,unsigned int type, long *elements, unsigned int num){
 	return CCSOLVER(solver)->createSet((VarType) type, (uint64_t *)elements, (uint) num);
 }
 
@@ -54,7 +54,7 @@ void *createFunctionOperator(void* solver,unsigned int op, void *domain, unsigne
 	return CCSOLVER(solver)->createFunctionOperator((ArithOp) op, (Set **)domain, (uint) numDomain, (Set *)range, (OverFlowBehavior) overflowbehavior);
 }
 
-void *createPredicateOperator(void* solver,unsigned int op, void *domain, unsigned int numDomain){
+void *createPredicateOperator(void* solver,unsigned int op, void **domain, unsigned int numDomain){
 	return CCSOLVER(solver)->createPredicateOperator((CompOp) op, (Set **)domain, (uint) numDomain);
 }
 
