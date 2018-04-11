@@ -18,11 +18,11 @@ void *createRangeSet(void* solver,unsigned int type, long lowrange, long highran
 	return CCSOLVER(solver)->createRangeSet((VarType) type, (uint64_t) lowrange, (uint64_t) highrange);
 }
 
-void *createRangeVar(void* solver,unsigned type, long lowrange, long highrange){
+void *createRangeVar(void* solver,unsigned int type, long lowrange, long highrange){
 	return CCSOLVER(solver)->createRangeVar((VarType) type, (uint64_t) lowrange, (uint64_t) highrange);
 }
 
-void *createMutableSet(void* solver,unsigned type){
+void *createMutableSet(void* solver,unsigned int type){
 	return CCSOLVER(solver)->createMutableSet((VarType) type);
 }
 
@@ -38,7 +38,7 @@ void *getElementVar(void* solver,void *set){
 	return CCSOLVER(solver)->getElementVar((Set*) set);
 }
 
-void *getElementConst(void* solver,unsigned type, long value){
+void *getElementConst(void* solver,unsigned int type, long value){
 	return CCSOLVER(solver)->getElementConst((VarType) type, (uint64_t) value);
 }
 
@@ -50,7 +50,7 @@ void* getBooleanVar(void* solver,unsigned int type){
 	return CCSOLVER(solver)->getBooleanVar((VarType) type).getRaw();
 }
 
-void *createFunctionOperator(void* solver,unsigned int op, void *domain, unsigned int numDomain, void *range,unsigned int overflowbehavior){
+void *createFunctionOperator(void* solver,unsigned int op, void **domain, unsigned int numDomain, void *range,unsigned int overflowbehavior){
 	return CCSOLVER(solver)->createFunctionOperator((ArithOp) op, (Set **)domain, (uint) numDomain, (Set *)range, (OverFlowBehavior) overflowbehavior);
 }
 
@@ -62,11 +62,11 @@ void *createPredicateTable(void* solver,void *table, unsigned int behavior){
 	return CCSOLVER(solver)->createPredicateTable((Table *)table, (UndefinedBehavior) behavior);
 }
 
-void *createTable(void* solver,void*domains, unsigned int numDomain, void *range){
+void *createTable(void* solver,void**domains, unsigned int numDomain, void *range){
 	return CCSOLVER(solver)->createTable((Set **)domains, (uint) numDomain, (Set *)range);
 }
 
-void *createTableForPredicate(void* solver,void*domains, unsigned int numDomain){
+void *createTableForPredicate(void* solver,void**domains, unsigned int numDomain){
 	return CCSOLVER(solver)->createTableForPredicate((Set **)domains, (uint) numDomain);
 }
 
@@ -78,15 +78,15 @@ void *completeTable(void* solver,void *table, unsigned int behavior){
 	return CCSOLVER(solver)->completeTable((Table *) table, (UndefinedBehavior) behavior);
 }
 
-void *applyFunction(void* solver,void *function, void*array, unsigned int numArrays, void* overflowstatus){
+void *applyFunction(void* solver,void *function, void**array, unsigned int numArrays, void* overflowstatus){
 	return CCSOLVER(solver)->applyFunction((Function *)function, (Element **)array, (uint) numArrays, BooleanEdge ((Boolean*)overflowstatus));
 }
 
-void* applyPredicateTable(void* solver,void *predicate, void *inputs, unsigned int numInputs, void* undefinedStatus){
+void* applyPredicateTable(void* solver,void *predicate, void **inputs, unsigned int numInputs, void* undefinedStatus){
 	return CCSOLVER(solver)->applyPredicateTable((Predicate *)predicate, (Element **)inputs, (uint) numInputs, BooleanEdge((Boolean*) undefinedStatus)).getRaw();
 }
 
-void* applyPredicate(void* solver,void *predicate, void *inputs, unsigned int numInputs){
+void* applyPredicate(void* solver,void *predicate, void **inputs, unsigned int numInputs){
 	return CCSOLVER(solver)->applyPredicate((Predicate *)predicate, (Element **)inputs, (uint) numInputs).getRaw();
 }
 
