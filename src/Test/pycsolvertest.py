@@ -1,7 +1,6 @@
 import pycsolver as ps
 from ctypes import *
 
-SATC_EQUALS = 0
 
 def main():
 	csolverlb = ps.loadCSolver()
@@ -16,7 +15,7 @@ def main():
         e2 = csolverlb.getElementVar(solver,s2)
         d = [s1, s2]
 	domain = (c_void_p*len(d))(*d)
-        equals = csolverlb.createPredicateOperator(solver,c_uint(SATC_EQUALS), domain, c_uint(2));
+        equals = csolverlb.createPredicateOperator(solver,c_uint(ps.CompOp.SATC_EQUALS), domain, c_uint(2));
         inp = [e1, e2];
 	inputs = (c_void_p*len(inp))(*inp)
         b = csolverlb.applyPredicate(solver,equals, inputs, c_uint(2));

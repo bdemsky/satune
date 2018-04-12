@@ -1,5 +1,20 @@
 from ctypes import *
 
+class LogicOps:
+	SATC_AND=0
+	SATC_OR=1
+	SATC_NOT=2
+	SATC_XOR=3
+	SATC_IFF=4
+	SATC_IMPLIES=5
+
+class CompOp:
+	SATC_EQUALS = 0
+	SATC_LT=1
+	SATC_GT=2
+	SATC_LTE=3
+	SATC_GTE=4
+
 def loadCSolver():
         csolverlb = cdll.LoadLibrary("lib_cons_comp.so")
         csolverlb.createCCSolver.restype = c_void_p
