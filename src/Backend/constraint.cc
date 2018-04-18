@@ -686,7 +686,7 @@ int solveCNF(CNF *cnf) {
 	cnf->encodeTime = startSolve - startTime;
 	model_print("CNF Encode time: %f\n", cnf->encodeTime / 1000000000.0);
 	cnf->solveTime = finishTime - startSolve;
-	model_print("Solve time: %f\n", cnf->solveTime / 1000000000.0);
+	model_print("SAT Solving time: %f\n", cnf->solveTime / 1000000000.0);
 	return result;
 }
 

@@ -616,7 +616,7 @@ int CSolver::solve() {
 
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
-	model_print("Result Computed in CSolver: %d\n", result);
+	model_print("Result Computed in SAT solver: %d\n", result);
 
 	if (deleteTuner) {
 		delete tuner;

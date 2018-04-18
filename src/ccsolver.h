@@ -39,6 +39,7 @@ long getElementValue(void* solver,void *element);
 int getBooleanValue(void* solver,void* boolean);
 int getOrderConstraintValue(void* solver,void *order, long first, long second);
 void printConstraints(void* solver);
+void serialize(void* solver);
 #ifdef __cplusplus
 }
 #endif

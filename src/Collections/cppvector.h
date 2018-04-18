@@ -63,7 +63,7 @@ public:
 		array[index] = item;
 	}
 
-	uint getSize() const {
+	inline uint getSize() const {
 		return size;
 	}
 

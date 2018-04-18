@@ -136,4 +136,6 @@ void printConstraints(void* solver){
 
 
 
-
+void serialize(void* solver){
+	CCSOLVER(solver)->serialize();
+}

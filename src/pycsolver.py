@@ -94,5 +94,7 @@ def loadCSolver():
 	csolverlb.getOrderConstraintValue.restype = c_int
 	csolverlb.printConstraints.argtypes = [c_void_p]
 	csolverlb.printConstraints.restype = None
+	csolverlb.serialize.argtypes = [c_void_p]
+	csolverlb.serialize.restype = None
 	return csolverlb
 

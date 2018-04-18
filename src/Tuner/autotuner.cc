@@ -16,15 +16,16 @@ void AutoTuner::addProblem(CSolver *solver) {
 long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
+        model_print("**********************\n");
 	int result = copy->solve();
-	model_print("SAT %d\n", result);
+	//model_print("SAT %d\n", result);
 	long long elapsedTime = copy->getElapsedTime();
-	long long encodeTime = copy->getEncodeTime();
-	long long solveTime = copy->getSolveTime();
+//	long long encodeTime = copy->getEncodeTime();
+//	long long solveTime = copy->getSolveTime();
 	long long metric = elapsedTime;
-	model_print("Elapsed Time: %llu\n", elapsedTime);
-	model_print("Encode Time: %llu\n", encodeTime);
-	model_print("Solve Time: %llu\n", solveTime);
+//	model_print("Elapsed Time: %llu\n", elapsedTime);
+//	model_print("Encode Time: %llu\n", encodeTime);
+//	model_print("Solve Time: %llu\n", solveTime);
 	delete copy;
 	return metric;
 }
