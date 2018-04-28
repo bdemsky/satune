@@ -5,8 +5,10 @@
 #include <stdlib.h>
 #include <float.h>
 
+#define UNSETVALUE -1
+
 AutoTuner::AutoTuner(uint _budget) :
-	budget(_budget) {
+	budget(_budget), result(UNSETVALUE) {
 }
 
 void AutoTuner::addProblem(CSolver *solver) {
@@ -17,7 +19,13 @@ long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
         model_print("**********************\n");
-	int result = copy->solve();
+	int sat = copy->solve();
+        if(result == UNSETVALUE)
+                result = sat;
+        else if(result != sat){
+                model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
+                copy->printConstraints();
+        }
 	//model_print("SAT %d\n", result);
 	long long elapsedTime = copy->getElapsedTime();
 //	long long encodeTime = copy->getEncodeTime();

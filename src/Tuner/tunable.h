@@ -41,4 +41,6 @@ static TunableDesc offon(0, 1, 0);
 
 enum Tunables {DECOMPOSEORDER, MUSTREACHGLOBAL, MUSTREACHLOCAL, MUSTREACHPRUNE, OPTIMIZEORDERSTRUCTURE, ORDERINTEGERENCODING, PREPROCESS, NODEENCODING, EDGEENCODING, MUSTEDGEPRUNE};
 typedef enum Tunables Tunables;
+
+const char* tunableParameterToString(Tunables tunable);
 #endif

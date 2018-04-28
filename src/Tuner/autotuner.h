@@ -16,5 +16,6 @@ private:
 
 	Vector<CSolver *> solvers;
 	uint budget;
+        int result;
 };
 #endif
