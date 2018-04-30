@@ -78,8 +78,10 @@ void EncodingGraph::encode() {
 				} else if (encodetype == BINARYINDEX) {
 					EncodingSubGraph *subgraph = graphMap.get(n);
                                         DEBUG("graphMap.get(subgraph=%p, n=%p)\n", subgraph, n);
-					if (subgraph == NULL)
+					if (subgraph == NULL){
+                                                encoding->encodingArrayInitialization();
 						continue;
+                                        }
 					uint encodingSize = subgraph->getEncodingMaxVal(n) + 1;
 					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
 					encoding->allocInUseArrayElement(paddedSize);

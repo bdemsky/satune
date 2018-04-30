@@ -35,7 +35,12 @@ ElementConst::ElementConst(uint64_t _value, Set *_set) :
 }
 
 Element *ElementConst::clone(CSolver *solver, CloneMap *map) {
-	return solver->getElementConst(type, value);
+        Element *e = (Element *) map->get(this);
+	if (e != NULL)
+		return e;
+	e= solver->getElementConst(type, value);
+        map->put(this,e);
+        return e;
 }
 
 Element *ElementSet::clone(CSolver *solver, CloneMap *map) {
@@ -43,16 +48,20 @@ Element *ElementSet::clone(CSolver *solver, CloneMap *map) {
 	if (e != NULL)
 		return e;
 	e = solver->getElementVar(set->clone(solver, map));
-	map->put(e, e);
+	map->put(this, e);
 	return e;
 }
 
 Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
+        Element *e = (Element *) map->get(this);
+	if (e != NULL)
+		return e;
 	Element *array[inputs.getSize()];
 	for (uint i = 0; i < inputs.getSize(); i++) {
 		array[i] = inputs.get(i)->clone(solver, map);
 	}
-	Element *e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), overflowstatus->clone(solver, map));
+	e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), overflowstatus->clone(solver, map));
+        map->put(this,e);
 	return e;
 }
 
