@@ -71,32 +71,19 @@ Boolean *BooleanVar::clone(CSolver *solver, CloneMap *map) {
 }
 
 Boolean *BooleanOrder::clone(CSolver *solver, CloneMap *map) {
-        Boolean *b = (Boolean *) map->get(this);
-	if (b != NULL)
-		return b;
 	Order *ordercopy = order->clone(solver, map);
-	b= solver->orderConstraint(ordercopy, first, second).getRaw();
-        map->put(this, b);
-        return b;
+	return solver->orderConstraint(ordercopy, first, second).getRaw();
 }
 
 Boolean *BooleanLogic::clone(CSolver *solver, CloneMap *map) {
-        Boolean *b = (Boolean *) map->get(this);
-	if (b != NULL)
-		return b;
 	BooleanEdge array[inputs.getSize()];
 	for (uint i = 0; i < inputs.getSize(); i++) {
 		array[i] = cloneEdge(solver, map, inputs.get(i));
 	}
-	b= solver->applyLogicalOperation(op, array, inputs.getSize()).getRaw();
-        map->put(this, b);
-        return b;
+	return solver->applyLogicalOperation(op, array, inputs.getSize()).getRaw();
 }
 
 Boolean *BooleanPredicate::clone(CSolver *solver, CloneMap *map) {
-        Boolean *b = (Boolean *) map->get(this);
-	if (b != NULL)
-		return b;
 	Element *array[inputs.getSize()];
 	for (uint i = 0; i < inputs.getSize(); i++) {
 		array[i] = inputs.get(i)->clone(solver, map);
@@ -104,9 +91,7 @@ Boolean *BooleanPredicate::clone(CSolver *solver, CloneMap *map) {
 	Predicate *pred = predicate->clone(solver, map);
 	BooleanEdge defstatus = undefStatus ? cloneEdge(solver, map, undefStatus) : BooleanEdge();
 
-	b= solver->applyPredicateTable(pred, array, inputs.getSize(), defstatus).getRaw();
-        map->put(this, b);
-        return b;
+	return solver->applyPredicateTable(pred, array, inputs.getSize(), defstatus).getRaw();
 }
 
 void BooleanPredicate::updateParents() {
