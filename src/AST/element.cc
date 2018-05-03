@@ -52,7 +52,8 @@ Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
 	for (uint i = 0; i < inputs.getSize(); i++) {
 		array[i] = inputs.get(i)->clone(solver, map);
 	}
-	Element *e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), overflowstatus->clone(solver, map));
+	BooleanEdge ofstatus = overflowstatus ? cloneEdge(solver, map, overflowstatus) : BooleanEdge();
+	Element *e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), ofstatus);
 	return e;
 }
 
