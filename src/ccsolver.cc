@@ -139,3 +139,8 @@ void printConstraints(void* solver){
 void serialize(void* solver){
 	CCSOLVER(solver)->serialize();
 }
+
+
+void mustHaveValue(void *solver, void *element){
+	CCSOLVER(solver)->mustHaveValue( (Element*) element);
+}

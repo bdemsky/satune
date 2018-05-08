@@ -214,12 +214,16 @@ void SATEncoder::generateBinaryValueEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYVAL);
 	allocElementConstraintVariables(encoding, encoding->numBits);
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
+	if(encoding->anyValue)
+		generateAnyValueBinaryValueEncoding(encoding);
 }
 
 void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
+	if(encoding->anyValue)
+		generateAnyValueBinaryIndexEncoding(encoding);
 }
 
 void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
@@ -231,6 +235,8 @@ void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
 		}
 	}
 	addConstraintCNF(cnf, constraintOR(cnf, encoding->numVars, encoding->variables));
+	if(encoding->anyValue)
+		generateAnyValueOneHotEncoding(encoding);
 }
 
 void SATEncoder::generateUnaryEncodingVars(ElementEncoding *encoding) {
@@ -240,6 +246,8 @@ void SATEncoder::generateUnaryEncodingVars(ElementEncoding *encoding) {
 	for (uint i = 1; i < encoding->numVars; i++) {
 		addConstraintCNF(cnf, constraintOR2(cnf, encoding->variables[i - 1], constraintNegate(encoding->variables[i])));
 	}
+	if(encoding->anyValue)
+		generateAnyValueUnaryEncoding(encoding);
 }
 
 void SATEncoder::generateElementEncoding(Element *element) {
@@ -263,5 +271,77 @@ void SATEncoder::generateElementEncoding(Element *element) {
 	default:
 		ASSERT(0);
 	}
+}
+
+void SATEncoder::generateAnyValueOneHotEncoding(ElementEncoding *encoding){
+	if(encoding->numVars == 0)
+		return;
+	Edge carray[encoding->numVars];
+	int size = 0;
+	for (uint i = 0; i < encoding->encArraySize; i++) {
+		if (encoding->isinUseElement(i)){
+			carray[size++] = encoding->variables[i];
+		}
+	}
+	if(size > 0){
+		addConstraintCNF(cnf, constraintOR(cnf, size, carray));
+	}
+}
+
+void SATEncoder::generateAnyValueUnaryEncoding(ElementEncoding *encoding){
+	if (encoding->numVars == 0)
+		return;
+	Edge carray[encoding->numVars];
+	int size = 0;
+	for (uint i = 0; i < encoding->encArraySize; i++) {
+		if (encoding->isinUseElement(i)) {
+			if (i == 0)
+				 carray[size++] = constraintNegate(encoding->variables[0]);
+			else if ((i + 1) == encoding->encArraySize)
+				carray[size++] = encoding->variables[i - 1];
+			else
+				carray[size++] = constraintAND2(cnf, encoding->variables[i - 1], constraintNegate(encoding->variables[i]));
+		}
+	}
+	if(size > 0){
+		addConstraintCNF(cnf, constraintOR(cnf, size, carray));
+	}
+}
+
+void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding){
+	if(encoding->numVars == 0)
+		return;
+	Edge carray[encoding->numVars];
+	int size = 0;
+	int index = -1;
+	for(uint i= encoding->encArraySize-1; i>=0; i--){
+		if(encoding->isinUseElement(i)){
+			if(i+1 < encoding->encArraySize){
+				index = i+1;
+			}
+			break;
+		}
+	}
+	if( index != -1 ){
+		carray[size++] = generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index);
+	}
+	index = index == -1? encoding->encArraySize-1 : index-1;
+	for(int i= index; i>=0; i--){
+		if (!encoding->isinUseElement(i)){
+			carray[size++] = constraintNegate( generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i));
+		}
+	}
+	if(size > 0){
+		addConstraintCNF(cnf, constraintAND(cnf, size, carray));
+	}
+}
+
+void SATEncoder::generateAnyValueBinaryValueEncoding(ElementEncoding *encoding){
+	uint64_t minvalueminusoffset = encoding->low - encoding->offset;
+	uint64_t maxvalueminusoffset = encoding->high - encoding->offset;
+	model_print("This is minvalueminus offset: %lu", minvalueminusoffset);
+	Edge lowerbound = generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, maxvalueminusoffset);
+	Edge upperbound = constraintNegate(generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, minvalueminusoffset));
+	addConstraintCNF(cnf, constraintAND2(cnf, lowerbound, upperbound));
 }
 

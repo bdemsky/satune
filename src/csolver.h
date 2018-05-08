@@ -57,6 +57,8 @@ public:
 
 	Set *getElementRange (Element *element);
 
+        void mustHaveValue(Element *element);
+        
 	BooleanEdge getBooleanTrue();
 
 	BooleanEdge getBooleanFalse();
