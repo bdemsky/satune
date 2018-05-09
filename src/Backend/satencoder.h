@@ -62,7 +62,6 @@ private:
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
 	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
         void generateAnyValueOneHotEncoding(ElementEncoding *encoding);
-	void generateAnyValueUnaryEncoding(ElementEncoding *encoding);
 	void generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding);
 	void generateAnyValueBinaryValueEncoding(ElementEncoding *encoding);
 	CNF *cnf;

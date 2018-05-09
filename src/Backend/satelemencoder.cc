@@ -246,8 +246,6 @@ void SATEncoder::generateUnaryEncodingVars(ElementEncoding *encoding) {
 	for (uint i = 1; i < encoding->numVars; i++) {
 		addConstraintCNF(cnf, constraintOR2(cnf, encoding->variables[i - 1], constraintNegate(encoding->variables[i])));
 	}
-	if(encoding->anyValue)
-		generateAnyValueUnaryEncoding(encoding);
 }
 
 void SATEncoder::generateElementEncoding(Element *element) {
@@ -281,26 +279,6 @@ void SATEncoder::generateAnyValueOneHotEncoding(ElementEncoding *encoding){
 	for (uint i = 0; i < encoding->encArraySize; i++) {
 		if (encoding->isinUseElement(i)){
 			carray[size++] = encoding->variables[i];
-		}
-	}
-	if(size > 0){
-		addConstraintCNF(cnf, constraintOR(cnf, size, carray));
-	}
-}
-
-void SATEncoder::generateAnyValueUnaryEncoding(ElementEncoding *encoding){
-	if (encoding->numVars == 0)
-		return;
-	Edge carray[encoding->numVars];
-	int size = 0;
-	for (uint i = 0; i < encoding->encArraySize; i++) {
-		if (encoding->isinUseElement(i)) {
-			if (i == 0)
-				 carray[size++] = constraintNegate(encoding->variables[0]);
-			else if ((i + 1) == encoding->encArraySize)
-				carray[size++] = encoding->variables[i - 1];
-			else
-				carray[size++] = constraintAND2(cnf, encoding->variables[i - 1], constraintNegate(encoding->variables[i]));
 		}
 	}
 	if(size > 0){
