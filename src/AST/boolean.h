@@ -23,7 +23,7 @@ public:
 	virtual bool isFalse() {return boolVal == BV_MUSTBEFALSE;}
 	Polarity polarity;
 	BooleanValue boolVal;
-	Vector<Boolean *> parents;
+	Vector<ASTNode *> parents;
 	virtual void updateParents() {}
         uint64_t id;
 	CMEMALLOC;

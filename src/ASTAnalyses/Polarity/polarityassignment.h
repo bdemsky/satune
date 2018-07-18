@@ -12,12 +12,14 @@
 #include "common.h"
 #include "ops.h"
 #include "boolean.h"
+#include "element.h"
 
 void computePolarities(CSolver *This);
 bool updatePolarity(Boolean *This, Polarity polarity);
 void updateEdgePolarity(BooleanEdge dst, BooleanEdge src);
 void updateEdgePolarity(BooleanEdge dst, Polarity polarity);
 void updateMustValue(Boolean *This, BooleanValue value);
+void computeElement(Element *e);
 void computePolarity(Boolean *boolean, Polarity polarity);
 void computePredicatePolarity(BooleanPredicate *This);
 void computeLogicOpPolarity(BooleanLogic *boolean);

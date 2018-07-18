@@ -2,6 +2,7 @@
 #include "boolean.h"
 #include "csolver.h"
 #include "polarityassignment.h"
+#include "element.h"
 
 void CSolver::replaceBooleanWithTrue(BooleanEdge bexpr) {
 	if (constraints.contains(bexpr.negate())) {
@@ -26,23 +27,39 @@ void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = bexpr->parents.get(i);
-		ASSERT(parent->type == LOGICOP);
-		BooleanLogic *logicop = (BooleanLogic *) parent;
-		switch (logicop->op) {
-		case SATC_AND:
-			handleANDTrue(logicop, bexpr);
-			break;
-		case SATC_IFF:
-			handleIFFTrue(logicop, bexpr);
-			break;
-		case SATC_NOT:
-		case SATC_OR:
-		case SATC_XOR:
-		case SATC_IMPLIES:
-			ASSERT(0);
+		ASTNode *parent = bexpr->parents.get(i);
+		if (parent->type == ELEMFUNCRETURN) {
+			ElementFunction *ef = (ElementFunction *) parent;
+			handleFunction(ef, bexpr);
+		} else {
+			ASSERT(parent->type == LOGICOP);
+			BooleanLogic *logicop = (BooleanLogic *) parent;
+			switch (logicop->op) {
+			case SATC_AND:
+				handleANDTrue(logicop, bexpr);
+				break;
+			case SATC_IFF:
+				handleIFFTrue(logicop, bexpr);
+				break;
+			case SATC_NOT:
+			case SATC_OR:
+			case SATC_XOR:
+			case SATC_IMPLIES:
+				ASSERT(0);
+			}
 		}
 	}
+}
+
+void CSolver::handleFunction(ElementFunction * ef, BooleanEdge child) {
+	BooleanEdge childNegate = child.negate();
+	elemMap.remove(ef);
+	if (ef->overflowstatus == child) {
+		ef->overflowstatus = boolTrue;
+	} else if (ef->overflowstatus == childNegate) {
+		ef->overflowstatus = boolFalse;
+	}
+	elemMap.put(ef, ef);
 }
 
 void CSolver::replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb) {
@@ -74,22 +91,35 @@ void CSolver::replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb) {
 	BooleanEdge oldbnegated = oldb.negate();
 	uint size = oldb->parents.getSize();
 	for (uint i = 0; i < size; i++) {
-		Boolean *parent = oldb->parents.get(i);
-		BooleanLogic *logicop = (BooleanLogic *) parent;
-		boolMap.remove(parent);	//could change parent's hash
-
-		uint parentsize = logicop->inputs.getSize();
-		for (uint j = 0; j < parentsize; j++) {
-			BooleanEdge b = logicop->inputs.get(j);
-			if (b == oldb) {
-				logicop->inputs.set(j, newb);
-				newb->parents.push(parent);
-			} else if (b == oldbnegated) {
-				logicop->inputs.set(j, newb.negate());
-				newb->parents.push(parent);
+		ASTNode *parent = oldb->parents.get(i);
+		if (parent->type == ELEMFUNCRETURN) {
+			ElementFunction *ef = (ElementFunction *) parent;
+			elemMap.remove(ef);
+			if (ef->overflowstatus == oldb) {
+				ef->overflowstatus = newb;
+				newb->parents.push(ef);
+			} else if (ef->overflowstatus == oldbnegated) {
+				ef->overflowstatus = newb.negate();
+				newb->parents.push(ef);
 			}
+			elemMap.put(ef, ef);
+		} else {
+			BooleanLogic *logicop = (BooleanLogic *) parent;
+			boolMap.remove(logicop);	//could change parent's hash
+			
+			uint parentsize = logicop->inputs.getSize();
+			for (uint j = 0; j < parentsize; j++) {
+				BooleanEdge b = logicop->inputs.get(j);
+				if (b == oldb) {
+					logicop->inputs.set(j, newb);
+					newb->parents.push(logicop);
+				} else if (b == oldbnegated) {
+					logicop->inputs.set(j, newb.negate());
+					newb->parents.push(logicop);
+				}
+			}
+			boolMap.put(logicop, logicop);
 		}
-		boolMap.put(parent, parent);
 	}
 }
 

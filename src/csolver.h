@@ -177,7 +177,8 @@ public:
 private:
 	void handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child);
 	void handleANDTrue(BooleanLogic *bexpr, BooleanEdge child);
-
+	void handleFunction(ElementFunction * ef, BooleanEdge child);
+	
 	//These two functions are helpers if the client has a pointer to a
 	//Boolean object that we have since replaced
 	BooleanEdge rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
