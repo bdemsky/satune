@@ -59,6 +59,8 @@ Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
 
 void ElementFunction::updateParents() {
 	for (uint i = 0; i < inputs.getSize(); i++) inputs.get(i)->parents.push(this);
+	if (overflowstatus)
+		overflowstatus->parents.push(this);
 }
 
 Set *ElementFunction::getRange() {

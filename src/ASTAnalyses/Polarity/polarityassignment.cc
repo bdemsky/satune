@@ -59,6 +59,25 @@ void computePredicatePolarity(BooleanPredicate *This) {
 	if (This->undefStatus) {
 		computePolarity(This->undefStatus.getBoolean(), P_BOTHTRUEFALSE);
 	}
+	for(uint i=0; i < This->inputs.getSize(); i++) {
+		Element * e = This->inputs.get(i);
+		computeElement(e);
+	}
+}
+
+void computeElement(Element *e) {
+	if (e->type == ELEMFUNCRETURN) {
+		ElementFunction *ef = (ElementFunction *) e;
+
+		if (ef->overflowstatus) {
+			computePolarity(ef->overflowstatus.getBoolean(), P_BOTHTRUEFALSE);
+		}
+
+		for(uint i=0; i < ef->inputs.getSize(); i++) {
+			Element * echild = ef->inputs.get(i);
+			computeElement(echild);
+		}	
+	}
 }
 
 void computeLogicOpPolarity(BooleanLogic *This) {
