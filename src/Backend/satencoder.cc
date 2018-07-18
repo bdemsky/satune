@@ -64,6 +64,9 @@ Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 	case PREDICATEOP:
 		result = encodePredicateSATEncoder((BooleanPredicate *) constraint);
 		break;
+	case BOOLCONST:
+		result = ((BooleanConst *) constraint)->isTrue() ? E_True : E_False;
+		break;
 	default:
 		model_print("Unhandled case in encodeConstraintSATEncoder %u", constraint->type);
 		exit(-1);
