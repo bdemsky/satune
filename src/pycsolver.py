@@ -15,6 +15,19 @@ class CompOp:
 	SATC_LTE=3
 	SATC_GTE=4
 
+class ArithOp:
+    SATC_ADD=0
+    SATC_SUB=1
+
+class OverFlowBehavior:
+    SATC_IGNORE=0
+    SATC_WRAPAROUND=1
+    SATC_FLAGFORCESOVERFLOW=2
+    SATC_OVERFLOWSETSFLAG=3
+    SATC_FLAGIFFOVERFLOW=4
+    SATC_NOOVERFLOW=5
+
+
 def loadCSolver():
         csolverlb = cdll.LoadLibrary("lib_cons_comp.so")
         csolverlb.createCCSolver.restype = c_void_p

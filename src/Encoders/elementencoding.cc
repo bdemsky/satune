@@ -8,6 +8,7 @@
 const char *elemEncTypeNames[] = {"UNASSIGNED", "ONEHOT", "UNARY", "BINARYINDEX", "BINARYVAL"};
 
 ElementEncoding::ElementEncoding(Element *_element) :
+	anyValue(false),
 	type(ELEM_UNASSIGNED),
 	element(_element),
 	variables(NULL),

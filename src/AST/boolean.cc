@@ -5,11 +5,13 @@
 #include "order.h"
 #include "predicate.h"
 
+uint64_t Boolean::counter = 0;
+
 Boolean::Boolean(ASTNodeType _type) :
 	ASTNode(_type),
 	polarity(P_UNDEFINED),
 	boolVal(BV_UNDEFINED),
-	parents() {
+	parents(), id(counter++) {
 }
 
 BooleanConst::BooleanConst(bool _isTrue) :

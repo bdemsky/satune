@@ -40,6 +40,7 @@ int getBooleanValue(void* solver,void* boolean);
 int getOrderConstraintValue(void* solver,void *order, long first, long second);
 void printConstraints(void* solver);
 void serialize(void* solver);
+void mustHaveValue(void *solver, void *element);
 #ifdef __cplusplus
 }
 #endif

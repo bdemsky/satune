@@ -11,6 +11,8 @@
 #include "serializer.h"
 
 class Boolean : public ASTNode {
+private:
+    static uint64_t counter;
 public:
 	Boolean(ASTNodeType _type);
 	virtual ~Boolean() {}
@@ -23,7 +25,7 @@ public:
 	BooleanValue boolVal;
 	Vector<ASTNode *> parents;
 	virtual void updateParents() {}
-	
+        uint64_t id;
 	CMEMALLOC;
 };
 

@@ -222,6 +222,10 @@ Element *CSolver::getElementVar(Set *set) {
 	return element;
 }
 
+void CSolver::mustHaveValue(Element *element){
+	element->getElementEncoding()->anyValue = true;
+}
+
 Set *CSolver::getElementRange (Element *element) {
 	return element->getRange();
 }
@@ -347,9 +351,11 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge arg) {
 	return applyLogicalOperation(op, array, 1);
 }
 
-static int ptrcompares(const void *p1, const void *p2) {
-	uintptr_t b1 = *(uintptr_t const *) p1;
-	uintptr_t b2 = *(uintptr_t const *) p2;
+static int booleanEdgeCompares(const void *p1, const void *p2) {
+	BooleanEdge be1 = *(BooleanEdge const *) p1;
+	BooleanEdge be2 = *(BooleanEdge const *) p2;
+	uint64_t b1 = be1->id;
+	uint64_t b2 = be2->id;
 	if (b1 < b2)
 		return -1;
 	else if (b1 == b2)
@@ -421,7 +427,7 @@ BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint 
 		} else if (newindex == 1) {
 			return newarray[0];
 		} else {
-			bsdqsort(newarray, newindex, sizeof(BooleanEdge), ptrcompares);
+			bsdqsort(newarray, newindex, sizeof(BooleanEdge), booleanEdgeCompares);
 			array = newarray;
 			asize = newindex;
 		}
