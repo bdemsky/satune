@@ -190,8 +190,8 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 		deleteVectorEdge(clauses);
 		return;
 	}
-	Edge cor = constraintAND(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
-	addConstraintCNF(cnf, cor);
+	Edge cand = constraintAND(cnf, getSizeVectorEdge(clauses), exposeArrayEdge(clauses));
+	addConstraintCNF(cnf, cand);
 	deleteVectorEdge(clauses);
 }
 

@@ -9,3 +9,6 @@ src/lib_cons_comp.so
 /src/mymemory.cc
 .*
 *.dSYM
+
+#Ignoring Benchmarks
+src/Benchmarks/
