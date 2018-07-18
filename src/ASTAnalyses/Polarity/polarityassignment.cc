@@ -44,6 +44,7 @@ void computePolarity(Boolean *This, Polarity polarity) {
 		switch (This->type) {
 		case BOOLEANVAR:
 		case ORDERCONST:
+		case BOOLCONST:
 			return;
 		case PREDICATEOP:
 			return computePredicatePolarity((BooleanPredicate *)This);
