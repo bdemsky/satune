@@ -10,5 +10,5 @@ src/lib_cons_comp.so
 .*
 *.dSYM
 
-#Ignoring Benchmarks
+# Ignoring the Benchmarks
 src/Benchmarks/
