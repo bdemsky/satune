@@ -6,6 +6,7 @@
 #include "integerencodingrecord.h"
 #include "integerencorderresolver.h"
 #include "tunable.h"
+#include "polarityassignment.h"
 
 IntegerEncodingTransform::IntegerEncodingTransform(CSolver *_solver)
 	: Transform(_solver)
@@ -48,6 +49,7 @@ void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(BooleanOrder *bool
 	Predicate *predicate = solver->createPredicateOperator(SATC_LT, sarray, 2);
 	Element *parray[] = {elem1, elem2};
 	BooleanEdge boolean = solver->applyPredicate(predicate, parray, 2);
+	updateEdgePolarity(boolean, boolOrder);
 	solver->replaceBooleanWithBoolean(boolOrder, boolean);
 }
 

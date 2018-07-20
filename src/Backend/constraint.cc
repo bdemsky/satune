@@ -471,7 +471,7 @@ Edge disjoinAndFree(CNF * cnf, Edge newvec, Edge cnfform) {
 			uint cSize = isNodeEdge(cedge) ? cedge.node_ptr->numEdges : 1;
 			if (equalsEdge(cedge, nedge)) {
 				addEdgeToResizeNode(&result, cedge);
-				result->numVars += cedge.node_ptr->numEdges;
+				result->numVars += cSize;
 			} else if (!sameNodeOppSign(nedge, cedge)) {
 				Node *clause = allocResizeNode(cSize + nSize);
 				if (isNodeEdge(nedge)) {
