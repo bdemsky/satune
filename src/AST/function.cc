@@ -4,10 +4,9 @@
 #include "csolver.h"
 #include "serializer.h"
 
-FunctionOperator::FunctionOperator(ArithOp _op, Set **domain, uint numDomain, Set *_range, OverFlowBehavior _overflowbehavior) :
+FunctionOperator::FunctionOperator(ArithOp _op, Set *_range, OverFlowBehavior _overflowbehavior) :
 	Function(OPERATORFUNC),
 	op(_op),
-	domains(domain, numDomain),
 	range(_range),
 	overflowbehavior(_overflowbehavior) {
 }
@@ -41,12 +40,8 @@ Function *FunctionOperator::clone(CSolver *solver, CloneMap *map) {
 	if (f != NULL)
 		return f;
 
-	Set *array[domains.getSize()];
-	for (uint i = 0; i < domains.getSize(); i++) {
-		array[i] = domains.get(i)->clone(solver, map);
-	}
 	Set *rcopy = range->clone(solver, map);
-	f = solver->createFunctionOperator(op, array, domains.getSize(), rcopy, overflowbehavior);
+	f = solver->createFunctionOperator(op, rcopy, overflowbehavior);
 	map->put(this, f);
 	return f;
 }
@@ -92,12 +87,6 @@ void FunctionOperator::serialize(Serializer *serializer) {
 	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
-
-	uint size = domains.getSize();
-	for (uint i = 0; i < size; i++) {
-		Set *domain = domains.get(i);
-		domain->serialize(serializer);
-	}
 	range->serialize(serializer);
 
 	ASTNodeType nodeType = FUNCOPTYPE;
@@ -105,11 +94,6 @@ void FunctionOperator::serialize(Serializer *serializer) {
 	FunctionOperator *This = this;
 	serializer->mywrite(&This, sizeof(FunctionOperator *));
 	serializer->mywrite(&op, sizeof(ArithOp));
-	serializer->mywrite(&size, sizeof(uint));
-	for (uint i = 0; i < size; i++) {
-		Set *domain = domains.get(i);
-		serializer->mywrite(&domain, sizeof(Set *));
-	}
 	serializer->mywrite(&range, sizeof(Set *));
 	serializer->mywrite(&overflowbehavior, sizeof(OverFlowBehavior));
 }

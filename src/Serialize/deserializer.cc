@@ -283,40 +283,21 @@ void Deserializer::deserializePredicateOperator() {
 	myread(&po_ptr, sizeof(PredicateOperator *));
 	CompOp op;
 	myread(&op, sizeof(CompOp));
-	uint size;
-	myread(&size, sizeof(uint));
-	Vector<Set *> domains;
-	for (uint i = 0; i < size; i++) {
-		Set *domain;
-		myread(&domain, sizeof(Set *));
-		ASSERT(map.contains(domain));
-		domain = (Set *) map.get(domain);
-		domains.push(domain);
-	}
 
-	map.put(po_ptr, solver->createPredicateOperator(op, domains.expose(), size));
+	map.put(po_ptr, solver->createPredicateOperator(op));
 }
 
 void Deserializer::deserializeTable() {
 	Table *t_ptr;
 	myread(&t_ptr, sizeof(Table *));
-	uint size;
-	myread(&size, sizeof(uint));
-	Vector<Set *> domains;
-	for (uint i = 0; i < size; i++) {
-		Set *domain;
-		myread(&domain, sizeof(Set *));
-		ASSERT(map.contains(domain));
-		domain = (Set *) map.get(domain);
-		domains.push(domain);
-	}
 	Set *range;
 	myread(&range, sizeof(Set *));
 	if (range != NULL) {
 		ASSERT(map.contains(range));
 		range = (Set *) map.get(range);
 	}
-	Table *table = solver->createTable(domains.expose(), size, range);
+	Table *table = solver->createTable(range);
+	uint size;
 	myread(&size, sizeof(uint));
 	for (uint i = 0; i < size; i++) {
 		uint64_t output;
@@ -388,23 +369,13 @@ void Deserializer::deserializeFunctionOperator() {
 	myread(&fo_ptr, sizeof(FunctionOperator *));
 	ArithOp op;
 	myread(&op, sizeof(ArithOp));
-	uint size;
-	myread(&size, sizeof(uint));
-	Vector<Set *> domains;
-	for (uint i = 0; i < size; i++) {
-		Set *domain;
-		myread(&domain, sizeof(Set *));
-		ASSERT(map.contains(domain));
-		domain = (Set *) map.get(domain);
-		domains.push(domain);
-	}
 	Set *range;
 	myread(&range, sizeof(Set *));
 	ASSERT(map.contains(range));
 	range = (Set *) map.get(range);
 	OverFlowBehavior overflowbehavior;
 	myread(&overflowbehavior, sizeof(OverFlowBehavior));
-	map.put(fo_ptr, solver->createFunctionOperator(op, domains.expose(), size, range, overflowbehavior));
+	map.put(fo_ptr, solver->createFunctionOperator(op, range, overflowbehavior));
 }
 
 void Deserializer::deserializeFunctionTable() {

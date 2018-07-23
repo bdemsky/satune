@@ -24,7 +24,7 @@ Edge SATEncoder::encodeOperatorPredicateSATEncoder(BooleanPredicate *constraint)
 
 Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constraint) {
 	PredicateOperator *predicate = (PredicateOperator *)constraint->predicate;
-	uint numDomains = predicate->domains.getSize();
+	uint numDomains = constraint->inputs.getSize();
 	Polarity polarity = constraint->polarity;
 	FunctionEncodingType encType = constraint->encoding.type;
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
@@ -43,7 +43,7 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = predicate->domains.get(i);
+		Set *set = constraint->inputs.get(i)->getRange();
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -64,7 +64,7 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = predicate->domains.get(i);
+			Set *set = constraint->inputs.get(i)->getRange();
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);

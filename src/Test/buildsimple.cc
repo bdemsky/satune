@@ -23,18 +23,16 @@ int main(int numargs, char **argv) {
 	Element *e2 = solver->getElementVar(s2);
 	solver->mustHaveValue(e1);
 	solver->mustHaveValue(e2);
-	Set *domain[] = {s1, s2};
 	Element *inputs[] = {e1, e2};
 
 	uint64_t set2[] = {3};
 	Set *rangef1 = solver->createSet(1, set2, 1);
-	Function *f1 = solver->createFunctionOperator(SATC_ADD, domain, 2, rangef1, SATC_FLAGIFFOVERFLOW);
+	Function *f1 = solver->createFunctionOperator(SATC_ADD, rangef1, SATC_FLAGIFFOVERFLOW);
 
 	BooleanEdge overflow = solver->getBooleanVar(2);
 	Element *e3 = solver->applyFunction(f1, inputs, 2, overflow);
 	Element *e4 = solver->getElementConst(5, 3);
-	Set *domain2[] = {rangef1,rangef1};
-	Predicate *equal2 = solver->createPredicateOperator(SATC_EQUALS, domain2, 2);
+	Predicate *equal2 = solver->createPredicateOperator(SATC_EQUALS);
 	Element *inputs2 [] = {e4, e3};
 	BooleanEdge pred = solver->applyPredicate(equal2, inputs2, 2);
 	solver->addConstraint(pred);

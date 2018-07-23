@@ -13,8 +13,7 @@ int main(int numargs, char **argv) {
 	Set *s3 = solver->createSet(0, set3, 4);
 	Element *e1 = solver->getElementConst(4, 5);
 	Element *e2 = solver->getElementVar(s3);
-	Set *domain2[] = {s1, s3};
-	Predicate *lt = solver->createPredicateOperator(SATC_LT, domain2, 2);
+	Predicate *lt = solver->createPredicateOperator(SATC_LT);
 	Element *inputs2[] = {e1, e2};
 	BooleanEdge b = solver->applyPredicate(lt, inputs2, 2);
 	solver->addConstraint(b);

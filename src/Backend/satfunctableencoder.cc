@@ -92,7 +92,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 		break;
 	}
 	bool generateNegation = constraint->encoding.type == ENUMERATEIMPLICATIONSNEGATE;
-	uint numDomains = predicate->table->numDomains();
+	uint numDomains = constraint->inputs.getSize();
 
 	if (generateNegation)
 		polarity = negatePolarity(polarity);
@@ -105,7 +105,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = predicate->table->getDomain(i);
+		Set *set = constraint->inputs.get(i)->getRange();
 		vals[i] = set->getElement(indices[i]);
 	}
 	bool hasOverflow = false;
@@ -159,7 +159,7 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = predicate->table->getDomain(i);
+			Set *set = constraint->inputs.get(i)->getRange();
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);
@@ -254,14 +254,14 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		break;
 	}
 
-	uint numDomains = function->table->numDomains();
+	uint numDomains = elemFunc->inputs.getSize();
 
 	uint indices[numDomains];	//setup indices
 	bzero(indices, sizeof(uint) * numDomains);
 
 	uint64_t vals[numDomains];//setup value array
 	for (uint i = 0; i < numDomains; i++) {
-		Set *set = function->table->getDomain(i);
+		Set *set = elemFunc->inputs.get(i)->getRange();
 		vals[i] = set->getElement(indices[i]);
 	}
 
@@ -324,7 +324,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		notfinished = false;
 		for (uint i = 0; i < numDomains; i++) {
 			uint index = ++indices[i];
-			Set *set = function->table->getDomain(i);
+			Set *set = elemFunc->inputs.get(i)->getRange();
 
 			if (index < set->getSize()) {
 				vals[i] = set->getElement(index);

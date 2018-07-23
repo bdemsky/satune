@@ -263,14 +263,14 @@ Element *CSolver::applyFunction(Function *function, Element **array, uint numArr
 	}
 }
 
-Function *CSolver::createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,OverFlowBehavior overflowbehavior) {
-	Function *function = new FunctionOperator(op, domain, numDomain, range, overflowbehavior);
+Function *CSolver::createFunctionOperator(ArithOp op, Set *range, OverFlowBehavior overflowbehavior) {
+	Function *function = new FunctionOperator(op, range, overflowbehavior);
 	allFunctions.push(function);
 	return function;
 }
 
-Predicate *CSolver::createPredicateOperator(CompOp op, Set **domain, uint numDomain) {
-	Predicate *predicate = new PredicateOperator(op, domain,numDomain);
+Predicate *CSolver::createPredicateOperator(CompOp op) {
+	Predicate *predicate = new PredicateOperator(op);
 	allPredicates.push(predicate);
 	return predicate;
 }
@@ -281,14 +281,14 @@ Predicate *CSolver::createPredicateTable(Table *table, UndefinedBehavior behavio
 	return predicate;
 }
 
-Table *CSolver::createTable(Set **domains, uint numDomain, Set *range) {
-	Table *table = new Table(domains,numDomain,range);
+Table *CSolver::createTable(Set *range) {
+	Table *table = new Table(range);
 	allTables.push(table);
 	return table;
 }
 
-Table *CSolver::createTableForPredicate(Set **domains, uint numDomain) {
-	return createTable(domains, numDomain, NULL);
+Table *CSolver::createTableForPredicate() {
+	return createTable(NULL);
 }
 
 void CSolver::addTableEntry(Table *table, uint64_t *inputs, uint inputSize, uint64_t result) {

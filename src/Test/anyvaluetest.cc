@@ -12,8 +12,7 @@ int main(int numargs, char **argv) {
 	solver->mustHaveValue(e1);
 	solver->mustHaveValue(e2);
 	
-	Set *domain[] = {s1, s2};
-	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS, domain, 2);
+	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS);
 	Element *inputs[] = {e1, e2};
 	BooleanEdge b = solver->applyPredicate(equals, inputs, 2);
 	b = solver->applyLogicalOperation(SATC_NOT, b);

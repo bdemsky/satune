@@ -22,17 +22,16 @@ int main(int numargs, char **argv) {
 	Set *setbig = solver->createSet(0, setbigarray, 5);
 	Element *e1 = solver->getElementVar(s);
 	Element *e2 = solver->getElementVar(s);
-	Set *domain[] = {s, s};
-	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS, domain, 2);
+	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS);
 	Element *inputs[] = {e1, e2};
 	BooleanEdge b = solver->applyPredicate(equals, inputs, 2);
 	solver->addConstraint(b);
 
 	uint64_t set2[] = {2, 3};
 	Set *rangef1 = solver->createSet(1, set2, 2);
-	Function *f1 = solver->createFunctionOperator(SATC_ADD, domain, 2, setbig, SATC_IGNORE);
+	Function *f1 = solver->createFunctionOperator(SATC_ADD, setbig, SATC_IGNORE);
 
-	Table *table = solver->createTable(domain, 2, s);
+	Table *table = solver->createTable(s);
 	uint64_t row1[] = {0, 1};
 	uint64_t row2[] = {1, 1};
 	uint64_t row3[] = {2, 1};
@@ -45,8 +44,7 @@ int main(int numargs, char **argv) {
 	BooleanEdge overflow = solver->getBooleanVar(2);
 	Element *e3 = solver->applyFunction(f1, inputs, 2, overflow);
 	Element *e4 = solver->applyFunction(f2, inputs, 2, overflow);
-	Set *domain2[] = {s,rangef1};
-	Predicate *equal2 = solver->createPredicateOperator(SATC_EQUALS, domain2, 2);
+	Predicate *equal2 = solver->createPredicateOperator(SATC_EQUALS);
 	Element *inputs2 [] = {e4, e3};
 	BooleanEdge pred = solver->applyPredicate(equal2, inputs2, 2);
 	solver->addConstraint(pred);

@@ -6,7 +6,7 @@
 
 class Table {
 public:
-	Table(Set **domains, uint numDomain, Set *range);
+	Table(Set *range);
 	void addNewTableEntry(uint64_t *inputs, uint inputSize, uint64_t result);
 	TableEntry *getTableEntry(uint64_t *inputs, uint inputSize);
 	Table *clone(CSolver *solver, CloneMap *map);
@@ -15,16 +15,12 @@ public:
 	~Table();
 	Set *getRange() {return range;}
 
-	Set *getDomain(uint i) {return domains.get(i);}
-	uint numDomains() {return domains.getSize();}
-
 	SetIteratorTableEntry *getEntries() {return entries->iterator();}
 	uint getSize() {return entries->getSize();}
 
 	CMEMALLOC;
 
 private:
-	Array<Set *> domains;
 	Set *range;
 	HashsetTableEntry *entries;
 };

@@ -11,8 +11,7 @@ int main (int num, char** args){
         void *s2 = createSet(solver,0, set2, 3);
         void *e1 = getElementVar(solver,s1);
         void *e2 = getElementVar(solver,s2);
-        void *domain[] = {s1, s2};
-        void *equals = createPredicateOperator(solver,SATC_EQUALS, domain, 2);
+        void *equals = createPredicateOperator(solver,SATC_EQUALS);
         void *inputs[] = {e1, e2};
         void* b = applyPredicate(solver,equals, inputs, 2);
         addConstraint(solver,b);

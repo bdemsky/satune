@@ -42,7 +42,7 @@ void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool & memo) {
 						if (generateNegation)
 							tpolarity = negatePolarity(tpolarity);
 						PredicateOperator *predicate = (PredicateOperator *)pred->predicate;
-						uint numDomains = predicate->domains.getSize();
+						uint numDomains = pred->inputs.getSize();
 						bool isConstant = true;
 						for (uint i = 0; i < numDomains; i++) {
 							Element *e = pred->inputs.get(i);

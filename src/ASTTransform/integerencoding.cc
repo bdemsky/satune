@@ -45,8 +45,7 @@ void IntegerEncodingTransform::orderIntegerEncodingSATEncoder(BooleanOrder *bool
 	//getting two elements and using LT predicate ...
 	Element *elem1 = ierec->getOrderIntegerElement(solver, boolOrder->first);
 	Element *elem2 = ierec->getOrderIntegerElement(solver, boolOrder->second);
-	Set *sarray[] = {ierec->getSecondarySet(), ierec->getSecondarySet()};
-	Predicate *predicate = solver->createPredicateOperator(SATC_LT, sarray, 2);
+	Predicate *predicate = solver->createPredicateOperator(SATC_LT);
 	Element *parray[] = {elem1, elem2};
 	BooleanEdge boolean = solver->applyPredicate(predicate, parray, 2);
 	updateEdgePolarity(boolean, boolOrder);

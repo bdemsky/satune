@@ -4,7 +4,7 @@
 #include "table.h"
 #include "csolver.h"
 
-PredicateOperator::PredicateOperator(CompOp _op, Set **domain, uint numDomain) : Predicate(OPERATORPRED), domains(domain, numDomain), op(_op) {
+PredicateOperator::PredicateOperator(CompOp _op) : Predicate(OPERATORPRED), op(_op) {
 }
 
 PredicateTable::PredicateTable(Table *_table, UndefinedBehavior _undefBehavior) : Predicate(TABLEPRED), table(_table), undefinedbehavior(_undefBehavior) {
@@ -32,11 +32,7 @@ Predicate *PredicateOperator::clone(CSolver *solver, CloneMap *map) {
 	if (p != NULL)
 		return p;
 
-	Set *array[domains.getSize()];
-	for (uint i = 0; i < domains.getSize(); i++)
-		array[i] = domains.get(i)->clone(solver, map);
-
-	p = solver->createPredicateOperator(op, array, domains.getSize());
+	p = solver->createPredicateOperator(op);
 	map->put(this, p);
 	return p;
 }
@@ -77,22 +73,11 @@ void PredicateOperator::serialize(Serializer *serializer) {
 		return;
 	serializer->addObject(this);
 
-	uint size = domains.getSize();
-	for (uint i = 0; i < size; i++) {
-		Set *domain = domains.get(i);
-		domain->serialize(serializer);
-	}
-
 	ASTNodeType type = PREDOPERTYPE;
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	PredicateOperator *This = this;
 	serializer->mywrite(&This, sizeof(PredicateOperator *));
 	serializer->mywrite(&op, sizeof(CompOp));
-	serializer->mywrite(&size, sizeof(uint));
-	for (uint i = 0; i < size; i++) {
-		Set *domain = domains.get(i);
-		serializer->mywrite(&domain, sizeof(Set *));
-	}
 }
 
 void PredicateOperator::print() {

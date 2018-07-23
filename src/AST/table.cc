@@ -7,8 +7,7 @@
 #include "csolver.h"
 #include "serializer.h"
 
-Table::Table(Set **_domains, uint numDomain, Set *_range) :
-	domains(_domains, numDomain),
+Table::Table(Set *_range) :
 	range(_range) {
 	entries = new HashsetTableEntry();
 }
@@ -34,12 +33,9 @@ Table *Table::clone(CSolver *solver, CloneMap *map) {
 	Table *t = (Table *) map->get(this);
 	if (t != NULL)
 		return t;
-	Set *array[domains.getSize()];
-	for (uint i = 0; i < domains.getSize(); i++) {
-		array[i] = domains.get(i)->clone(solver, map);
-	}
+
 	Set *rcopy = range != NULL ? range->clone(solver, map) : NULL;
-	t = solver->createTable(array, domains.getSize(), rcopy);
+	t = solver->createTable(rcopy);
 	SetIteratorTableEntry *entryit = entries->iterator();
 	while (entryit->hasNext()) {
 		TableEntry *te = entryit->next();
@@ -59,18 +55,11 @@ Table::~Table() {
 	delete entries;
 }
 
-
-
 void Table::serialize(Serializer *serializer) {
 	if (serializer->isSerialized(this))
 		return;
 	serializer->addObject(this);
 
-	uint size = domains.getSize();
-	for (uint i = 0; i < size; i++) {
-		Set *domain = domains.get(i);
-		domain->serialize(serializer);
-	}
 	if (range != NULL)
 		range->serialize(serializer);
 
@@ -78,13 +67,8 @@ void Table::serialize(Serializer *serializer) {
 	serializer->mywrite(&type, sizeof(ASTNodeType));
 	Table *This = this;
 	serializer->mywrite(&This, sizeof(Table *));
-	serializer->mywrite(&size, sizeof(uint));
-	for (uint i = 0; i < size; i++) {
-		Set *domain = domains.get(i);
-		serializer->mywrite(&domain, sizeof(Set *));
-	}
 	serializer->mywrite(&range, sizeof(Set *));
-	size = entries->getSize();
+	uint size = entries->getSize();
 	serializer->mywrite(&size, sizeof(uint));
 	SetIteratorTableEntry *iterator = getEntries();
 	while (iterator->hasNext()) {
@@ -95,7 +79,6 @@ void Table::serialize(Serializer *serializer) {
 	}
 	delete iterator;
 }
-
 
 void Table::print() {
 	model_print("{Table<%p>:\n", this);

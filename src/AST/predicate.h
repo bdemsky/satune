@@ -20,12 +20,11 @@ public:
 
 class PredicateOperator : public Predicate {
 public:
-	PredicateOperator(CompOp op, Set **domain, uint numDomain);
+	PredicateOperator(CompOp op);
 	bool evalPredicateOperator(uint64_t *inputs);
 	Predicate *clone(CSolver *solver, CloneMap *map);
 	virtual void serialize(Serializer *serializer);
 	virtual void print();
-	Array<Set *> domains;
 	CompOp getOp() {return op;}
 	CMEMALLOC;
 private:

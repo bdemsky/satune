@@ -11,6 +11,7 @@ public:
 
 	CMEMALLOC;
 private:
+	void processPredicate(BooleanPredicate *);
 };
 
 #endif

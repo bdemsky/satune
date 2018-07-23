@@ -25,9 +25,8 @@ int main(int numargs, char **argv) {
 	Element *e1 = solver->getElementVar(s1);
 	Element *e2 = solver->getElementVar(s2);
 	Element *e3 = solver->getElementVar(s3);
-	Set *d2[] = {s1, s2, s3};
 	//change the overflow flag
-	Table *t1 = solver->createTableForPredicate(d2, 3);
+	Table *t1 = solver->createTableForPredicate();
 	uint64_t row1[] = {1, 5, 6};
 	uint64_t row2[] = {2, 3, 19};
 	uint64_t row3[] = {1, 3, 19};
@@ -46,14 +45,12 @@ int main(int numargs, char **argv) {
 	BooleanEdge b1 = solver->applyPredicateTable(p1, tmparray, 3, undef);
 	solver->addConstraint(b1);
 
-	Set *deq[] = {s3,s2};
-	Predicate *gte = solver->createPredicateOperator(SATC_GTE, deq, 2);
+	Predicate *gte = solver->createPredicateOperator(SATC_GTE);
 	Element *inputs2 [] = {e3, e2};
 	BooleanEdge pred = solver->applyPredicate(gte, inputs2, 2);
 	solver->addConstraint(pred);
 
-	Set *d1[] = {s1, s2};
-	Predicate *eq = solver->createPredicateOperator(SATC_EQUALS, d1, 2);
+	Predicate *eq = solver->createPredicateOperator(SATC_EQUALS);
 	Element *tmparray2[] = {e1, e2};
 	BooleanEdge pred2 = solver->applyPredicate(eq, tmparray2, 2);
 	solver->addConstraint(pred2);

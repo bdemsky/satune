@@ -69,20 +69,20 @@ public:
 
 	/** This function creates a function operator. */
 
-	Function *createFunctionOperator(ArithOp op, Set **domain, uint numDomain, Set *range,
+	Function *createFunctionOperator(ArithOp op, Set *range,
 																	 OverFlowBehavior overflowbehavior);
 
 	/** This function creates a predicate operator. */
 
-	Predicate *createPredicateOperator(CompOp op, Set **domain, uint numDomain);
+	Predicate *createPredicateOperator(CompOp op);
 
 	Predicate *createPredicateTable(Table *table, UndefinedBehavior behavior);
 
 	/** This function creates an empty instance table.*/
 
-	Table *createTable(Set **domains, uint numDomain, Set *range);
+	Table *createTable(Set *range);
 
-	Table *createTableForPredicate(Set **domains, uint numDomain);
+	Table *createTableForPredicate();
 	/** This function adds an input output relation to a table. */
 
 	void addTableEntry(Table *table, uint64_t *inputs, uint inputSize, uint64_t result);
