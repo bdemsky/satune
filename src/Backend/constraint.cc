@@ -784,6 +784,10 @@ Edge generateLTValueConstraint(CNF *cnf, uint numvars, Edge *vars, uint value) {
 	}
 }
 
+void generateAddConstraint(CNF *cnf, uint nSum, Edge *sum, uint nVar1, Edge *var1, uint nVar2, Edge *var2) {
+  //TO WRITE....
+}
+
 Edge generateEquivNVConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2) {
 	if (numvars == 0)
 		return E_True;
