@@ -237,4 +237,20 @@ inline CompOp flipOp(CompOp op) {
 	}
 	ASSERT(0);
 }
+
+inline CompOp negateOp(CompOp op) {
+	switch (op) {
+	case SATC_EQUALS:
+		ASSERT(0);
+	case SATC_LT:
+		return SATC_GTE;
+	case SATC_GT:
+		return SATC_LTE;
+	case SATC_LTE:
+		return SATC_GT;
+	case SATC_GTE:
+		return SATC_LT;
+	}
+	ASSERT(0);
+}
 #endif

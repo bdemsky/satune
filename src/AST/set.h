@@ -35,6 +35,7 @@ protected:
 	uint64_t low;	//also used to count unique items
 	uint64_t high;
 	Vector<uint64_t> *members;
+	friend class ElementOpt;
 };
 
 int intcompare(const void *p1, const void *p2);

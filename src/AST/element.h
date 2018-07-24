@@ -35,7 +35,7 @@ public:
 	Set *getRange() {return set;}
 protected:
 	Set *set;
-
+	friend class ElementOpt;
 };
 
 class ElementConst : public ElementSet {

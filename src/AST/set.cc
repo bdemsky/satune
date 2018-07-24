@@ -59,7 +59,7 @@ uint64_t Set::getElement(uint index) {
 		return low + index;
 	else
 		return members->get(index);
-        }
+}
 
 uint Set::getSize() {
 	if (isRange) {

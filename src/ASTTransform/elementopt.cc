@@ -5,9 +5,11 @@
 #include "boolean.h"
 #include "element.h"
 #include "predicate.h"
+#include "set.h"
 
 ElementOpt::ElementOpt(CSolver *_solver)
-	: Transform(_solver)
+	: Transform(_solver),
+		updateSets(solver->getTuner()->getTunable(ELEMENTOPTSETS, &onoff) == 1)
 {
 }
 
@@ -59,7 +61,7 @@ void ElementOpt::processPredicate(BooleanPredicate * pred) {
 	
 	if (op == SATC_EQUALS) {
 		handlePredicateEquals(pred, (ElementSet *) left, (ElementConst *) right);
-	} else {
+	} else if (updateSets) {
 		handlePredicateInequality(pred, (ElementSet *) left, (ElementConst *) right);
 	}
 }
@@ -67,13 +69,97 @@ void ElementOpt::processPredicate(BooleanPredicate * pred) {
 void ElementOpt::handlePredicateEquals(BooleanPredicate *pred, ElementSet *left, ElementConst *right) {
 	if (pred->isTrue()) {
 		replaceVarWithConst(pred, left, right);
-	} else if (pred->isFalse()) {
-		
+	} else if (pred->isFalse() && updateSets) {
+		constrainVarWithConst(pred, left, right);
 	} else ASSERT(0);
 }
 
-void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *left, ElementConst *right) {
+void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *var, ElementConst *value) {
+	Predicate * p = pred->getPredicate();
+	PredicateOperator * pop = (PredicateOperator *) p;
+	CompOp op = pop->getOp();
 
+	if (pred->isFalse()) {
+		op = negateOp(op);
+	} else if (!pred->isTrue()) {
+		ASSERT(0);
+	}
+
+	Set * s = var->getRange();
+	if (s->isRange)
+		return;
+	
+	uint size = s->getSize();
+	uint64_t elemArray[size];
+	uint count = 0;
+	uint64_t cvalue = value->value;
+
+	switch(op) {
+	case SATC_LT: {
+		for(uint i=0; i<size; i++) {
+			uint64_t val = s->getElement(i);
+			if (val >= cvalue)
+				elemArray[count++] = val;
+		}
+		break;
+	}
+	case SATC_GT: {
+		for(uint i=0; i<size; i++) {
+			uint64_t val = s->getElement(i);
+			if (val <= cvalue)
+				elemArray[count++] = val;
+		}
+		break;
+	}
+	case SATC_LTE: {
+		for(uint i=0; i<size; i++) {
+			uint64_t val = s->getElement(i);
+			if (val > cvalue)
+				elemArray[count++] = val;
+		}
+		break;
+	}
+	case SATC_GTE: {
+		for(uint i=0; i<size; i++) {
+			uint64_t val = s->getElement(i);
+			if (val < cvalue)
+				elemArray[count++] = val;
+		}
+		break;
+	}
+		
+	default:
+		ASSERT(0);
+	}
+	if (size == count)
+		return;
+	
+	Set *newset = solver->createSet(s->type, elemArray, count);
+	solver->elemMap.remove(var);
+	var->set = newset;
+	solver->elemMap.put(var, var);
+}
+
+void ElementOpt::constrainVarWithConst(BooleanPredicate *pred, ElementSet *var, ElementConst *value) {
+	Set * s = var->getRange();
+	if (s->isRange)
+		return;
+	uint size = s->getSize();
+	uint64_t elemArray[size];
+	uint count = 0;
+	uint64_t cvalue = value->value;
+	for(uint i=0; i<size; i++) {
+		uint64_t val = s->getElement(i);
+		if (val != cvalue)
+			elemArray[count++] = val;
+	}
+	if (size == count)
+		return;
+
+	Set *newset = solver->createSet(s->type, elemArray, count);
+	solver->elemMap.remove(var);
+	var->set = newset;
+	solver->elemMap.put(var, var);
 }
 
 void ElementOpt::replaceVarWithConst(BooleanPredicate * pred, ElementSet *var, ElementConst * value) {
