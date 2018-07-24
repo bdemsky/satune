@@ -273,8 +273,6 @@ void SATEncoder::generateElementEncoding(Element *element) {
 void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding){
 	if(encoding->numVars == 0)
 		return;
-	Edge carray[encoding->numVars];
-	int size = 0;
 	int index = -1;
 	for(uint i= encoding->encArraySize-1; i>=0; i--){
 		if(encoding->isinUseElement(i)){
@@ -285,16 +283,13 @@ void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding){
 		}
 	}
 	if( index != -1 ){
-		carray[size++] = generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index);
+		addConstraintCNF(cnf, generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index));
 	}
 	index = index == -1? encoding->encArraySize-1 : index-1;
-	for(int i= index; i>=0; i--){
+	for(int i= index; i>=0; i--) {
 		if (!encoding->isinUseElement(i)){
-			carray[size++] = constraintNegate( generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i));
+			addConstraintCNF(cnf, constraintNegate( generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i)));
 		}
-	}
-	if(size > 0){
-		addConstraintCNF(cnf, constraintAND(cnf, size, carray));
 	}
 }
 
@@ -304,6 +299,7 @@ void SATEncoder::generateAnyValueBinaryValueEncoding(ElementEncoding *encoding){
 	model_print("This is minvalueminus offset: %lu", minvalueminusoffset);
 	Edge lowerbound = generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, maxvalueminusoffset);
 	Edge upperbound = constraintNegate(generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, minvalueminusoffset));
-	addConstraintCNF(cnf, constraintAND2(cnf, lowerbound, upperbound));
+	addConstraintCNF(cnf, lowerbound);
+	addConstraintCNF(cnf, upperbound);
 }
 
