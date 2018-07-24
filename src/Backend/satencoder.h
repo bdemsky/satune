@@ -61,7 +61,6 @@ private:
 	Edge encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint);
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
 	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
-        void generateAnyValueOneHotEncoding(ElementEncoding *encoding);
 	void generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding);
 	void generateAnyValueBinaryValueEncoding(ElementEncoding *encoding);
 	CNF *cnf;

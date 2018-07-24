@@ -234,9 +234,8 @@ void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
 			addConstraintCNF(cnf, constraintNegate(constraintAND2(cnf, encoding->variables[i], encoding->variables[j])));
 		}
 	}
-	addConstraintCNF(cnf, constraintOR(cnf, encoding->numVars, encoding->variables));
 	if(encoding->anyValue)
-		generateAnyValueOneHotEncoding(encoding);
+		addConstraintCNF(cnf, constraintOR(cnf, encoding->numVars, encoding->variables));
 }
 
 void SATEncoder::generateUnaryEncodingVars(ElementEncoding *encoding) {
@@ -268,21 +267,6 @@ void SATEncoder::generateElementEncoding(Element *element) {
 		return;
 	default:
 		ASSERT(0);
-	}
-}
-
-void SATEncoder::generateAnyValueOneHotEncoding(ElementEncoding *encoding){
-	if(encoding->numVars == 0)
-		return;
-	Edge carray[encoding->numVars];
-	int size = 0;
-	for (uint i = 0; i < encoding->encArraySize; i++) {
-		if (encoding->isinUseElement(i)){
-			carray[size++] = encoding->variables[i];
-		}
-	}
-	if(size > 0){
-		addConstraintCNF(cnf, constraintOR(cnf, size, carray));
 	}
 }
 
