@@ -27,8 +27,6 @@ int main(int numargs, char **argv) {
 	BooleanEdge b = solver->applyPredicate(equals, inputs, 2);
 	solver->addConstraint(b);
 
-	uint64_t set2[] = {2, 3};
-	Set *rangef1 = solver->createSet(1, set2, 2);
 	Function *f1 = solver->createFunctionOperator(SATC_ADD, setbig, SATC_IGNORE);
 
 	Table *table = solver->createTable(s);
