@@ -138,6 +138,11 @@ void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *v
 	solver->elemMap.remove(var);
 	var->set = newset;
 	solver->elemMap.put(var, var);
+
+	if (count == 1) {
+		ElementConst * elemconst = (ElementConst *) solver->getElementConst(s->type, elemArray[0]);
+		replaceVarWithConst(pred, var, elemconst);
+	}
 }
 
 void ElementOpt::constrainVarWithConst(BooleanPredicate *pred, ElementSet *var, ElementConst *value) {
@@ -160,6 +165,11 @@ void ElementOpt::constrainVarWithConst(BooleanPredicate *pred, ElementSet *var, 
 	solver->elemMap.remove(var);
 	var->set = newset;
 	solver->elemMap.put(var, var);
+
+	if (count == 1) {
+		ElementConst * elemconst = (ElementConst *) solver->getElementConst(s->type, elemArray[0]);
+		replaceVarWithConst(pred, var, elemconst);
+	}
 }
 
 void ElementOpt::replaceVarWithConst(BooleanPredicate * pred, ElementSet *var, ElementConst * value) {
