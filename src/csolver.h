@@ -57,7 +57,7 @@ public:
 
 	Set *getElementRange (Element *element);
 
-        void mustHaveValue(Element *element);
+	void mustHaveValue(Element *element);
         
 	BooleanEdge getBooleanTrue();
 
@@ -159,7 +159,6 @@ public:
 	void replaceBooleanWithFalse(BooleanEdge bexpr);
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
-//        Set* addItemsToRange(Element* element, uint num, ...);
 	void serialize();
 	static CSolver *deserialize(const char *file);
 	void autoTune(uint budget);
@@ -220,5 +219,22 @@ private:
 	bool unsat;
 	Tuner *tuner;
 	long long elapsedTime;
+	friend class ElementOpt;
 };
+
+inline CompOp flipOp(CompOp op) {
+	switch (op) {
+	case SATC_EQUALS:
+		return SATC_EQUALS;
+	case SATC_LT:
+		return SATC_GT;
+	case SATC_GT:
+		return SATC_LT;
+	case SATC_LTE:
+		return SATC_GTE;
+	case SATC_GTE:
+		return SATC_LTE;
+	}
+	ASSERT(0);
+}
 #endif
