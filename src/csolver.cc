@@ -25,6 +25,7 @@
 #include "ordergraph.h"
 #include "orderedge.h"
 #include "orderanalysis.h"
+#include "elementopt.h"
 #include <time.h>
 #include <stdarg.h>
 
@@ -605,6 +606,9 @@ int CSolver::solve() {
 	IntegerEncodingTransform iet(this);
 	iet.doTransform();
 
+	ElementOpt eop(this);
+	eop.doTransform();
+	
 	EncodingGraph eg(this);
 	eg.buildGraph();
 	eg.encode();
