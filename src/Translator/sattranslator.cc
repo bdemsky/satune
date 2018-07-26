@@ -37,22 +37,30 @@ uint64_t getElementValueBinaryValueSATTranslator(CSolver *This, ElementEncoding 
 
 uint64_t getElementValueOneHotSATTranslator(CSolver *This, ElementEncoding *elemEnc) {
 	uint index = 0;
+	bool overflow = true;
 	for (uint i = 0; i < elemEnc->numVars; i++) {
-		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] )))
+		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] ))){
 			index = i;
+			overflow = false;
+		}
 	}
+	if(overflow)
+		model_print("WARNING: Element has undefined value!\n");
 	ASSERT(elemEnc->encArraySize > index && elemEnc->isinUseElement(index));
 	return elemEnc->encodingArray[index];
 }
 
 uint64_t getElementValueUnarySATTranslator(CSolver *This, ElementEncoding *elemEnc) {
 	uint i;
+	bool overflow = true;
 	for (i = 0; i < elemEnc->numVars; i++) {
 		if (!getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] )) ) {
+			overflow = false;
 			break;
 		}
 	}
-
+	if(overflow)
+		model_print("WARNING: Element has undefined value!\n");
 	return elemEnc->encodingArray[i];
 }
 
