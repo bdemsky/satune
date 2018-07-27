@@ -38,7 +38,7 @@ public:
 
 static TunableDesc onoff(0, 1, 1);
 static TunableDesc offon(0, 1, 0);
-static TunableDesc proxyparameter(1, 20, 2);
+static TunableDesc proxyparameter(1, 5, 2);
 
 enum Tunables {DECOMPOSEORDER, MUSTREACHGLOBAL, MUSTREACHLOCAL, MUSTREACHPRUNE, OPTIMIZEORDERSTRUCTURE, ORDERINTEGERENCODING, PREPROCESS, NODEENCODING, EDGEENCODING, MUSTEDGEPRUNE, ELEMENTOPT, ELEMENTOPTSETS, PROXYVARIABLE};
 typedef enum Tunables Tunables;
