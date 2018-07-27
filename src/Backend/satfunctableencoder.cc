@@ -49,17 +49,17 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 			row = constraintAND(cnf, inputNum, carray);
 			break;
 		case SATC_FLAGFORCEUNDEFINED: {
-			if(solver->getTuner()->getTunable(PROXYVARIABLE, &offon) == 1){
+			row = constraintAND(cnf, inputNum, carray);
+			uint pSize = constraint->parents.getSize();
+			if(!edgeIsVarConst(row) && pSize > (uint)solver->getTuner()->getTunable(PROXYVARIABLE, &proxyparameter)){
 				Edge proxy = constraintNewVar(cnf);
-				generateProxy(cnf, constraintAND(cnf, inputNum, carray), proxy, P_BOTHTRUEFALSE);
+				generateProxy(cnf, row, proxy, P_BOTHTRUEFALSE);
 				Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
 				addConstraintCNF(cnf, constraintIMPLIES(cnf, proxy,  constraintNegate(undefConst)));
 				if (generateNegation == (entry->output != 0)) {
 					continue;
 				}
 				row = proxy;
-			}else {
-				row = constraintAND(cnf, inputNum, carray);
 			}
 			break;
 		}

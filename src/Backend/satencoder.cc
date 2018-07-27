@@ -74,8 +74,8 @@ Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 	}
 	Polarity p = constraint->polarity;
 	uint pSize = constraint->parents.getSize();
-	if (solver->getTuner()->getTunable(PROXYVARIABLE, &offon) == 1) {
-//	if ((pSize > 1 && p != P_BOTHTRUEFALSE ) || pSize > 2) {
+
+	if ( !edgeIsVarConst(result) && pSize > (uint)solver->getTuner()->getTunable(PROXYVARIABLE, &proxyparameter) ) {
 		Edge e = getNewVarSATEncoder();
 		generateProxy(cnf, result, e, p);
 		booledgeMap.put(constraint, e.node_ptr);
