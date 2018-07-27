@@ -9,6 +9,8 @@
 #include "set.h"
 #include "element.h"
 #include "common.h"
+#include "tunable.h"
+#include "csolver.h"
 
 Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *constraint) {
 	ASSERT(constraint->predicate->type == TABLEPRED);
@@ -47,14 +49,18 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 			row = constraintAND(cnf, inputNum, carray);
 			break;
 		case SATC_FLAGFORCEUNDEFINED: {
-			Edge proxy = constraintNewVar(cnf);
-			generateProxy(cnf, constraintAND(cnf, inputNum, carray), proxy, P_BOTHTRUEFALSE);
-			Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
-			addConstraintCNF(cnf, constraintIMPLIES(cnf, proxy,  constraintNegate(undefConst)));
-			if (generateNegation == (entry->output != 0)) {
-				continue;
+			if(solver->getTuner()->getTunable(PROXYVARIABLE, &offon) == 1){
+				Edge proxy = constraintNewVar(cnf);
+				generateProxy(cnf, constraintAND(cnf, inputNum, carray), proxy, P_BOTHTRUEFALSE);
+				Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, proxy,  constraintNegate(undefConst)));
+				if (generateNegation == (entry->output != 0)) {
+					continue;
+				}
+				row = proxy;
+			}else {
+				row = constraintAND(cnf, inputNum, carray);
 			}
-			row = proxy;
 			break;
 		}
 		default:

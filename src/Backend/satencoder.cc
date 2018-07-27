@@ -11,6 +11,7 @@
 #include "order.h"
 #include "predicate.h"
 #include "set.h"
+#include "tunable.h"
 
 SATEncoder::SATEncoder(CSolver *_solver) :
 	cnf(createCNF()),
@@ -73,11 +74,14 @@ Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 	}
 	Polarity p = constraint->polarity;
 	uint pSize = constraint->parents.getSize();
-	if ((pSize > 1 && p != P_BOTHTRUEFALSE ) || pSize > 2) {
+	if (solver->getTuner()->getTunable(PROXYVARIABLE, &offon) == 1) {
+//	if ((pSize > 1 && p != P_BOTHTRUEFALSE ) || pSize > 2) {
 		Edge e = getNewVarSATEncoder();
 		generateProxy(cnf, result, e, p);
 		booledgeMap.put(constraint, e.node_ptr);
 		result = e;
+	} else{
+		booledgeMap.put(constraint, result.node_ptr);
 	}
 
 	return c.isNegated() ? constraintNegate(result) : result;
