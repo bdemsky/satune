@@ -512,7 +512,6 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 	if (isTrue(constraint))
 		return;
 	else if (isFalse(constraint)) {
-		int t = 0;
 		setUnSAT();
 	}
 	else {
@@ -608,7 +607,7 @@ int CSolver::solve() {
 
 	ElementOpt eop(this);
 	eop.doTransform();
-	
+
 	EncodingGraph eg(this);
 	eg.buildGraph();
 	eg.encode();
@@ -639,10 +638,7 @@ void CSolver::printConstraints() {
 	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
 		BooleanEdge b = it->next();
-		if (b.isNegated())
-			model_print("!");
-		b->print();
-		model_print("\n");
+		b.print();
 	}
 	delete it;
 }
@@ -692,20 +688,4 @@ void CSolver::autoTune(uint budget) {
 	delete autotuner;
 }
 
-//Set* CSolver::addItemsToRange(Element* element, uint num, ...){
-//        va_list args;
-//        va_start(args, num);
-//        element->getRange()
-//        uint setSize = set->getSize();
-//        uint newSize = setSize+ num;
-//        uint64_t members[newSize];
-//        for(uint i=0; i<setSize; i++){
-//                members[i] = set->getElement(i);
-//        }
-//        for( uint i=0; i< num; i++){
-//                uint64_t arg = va_arg(args, uint64_t);
-//                members[setSize+i] = arg;
-//        }
-//        va_end(args);
-//        return createSet(set->getType(), members, newSize);
-//}
+

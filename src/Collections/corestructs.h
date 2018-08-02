@@ -23,9 +23,12 @@ public:
 	operator bool() {
 		return getBoolean() != NULL;
 	}
+        void print();
 private:
 	Boolean *b;
 };
+
+
 
 inline bool boolEdgeEquals(BooleanEdge b1, BooleanEdge b2) {
 	return b1 == b2;
