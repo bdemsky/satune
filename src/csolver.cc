@@ -650,10 +650,7 @@ void CSolver::printConstraints() {
 }
 
 void CSolver::printConstraint(BooleanEdge b) {
-	if (b.isNegated())
-		model_print("!");
-	b->print();
-	model_print("\n");
+	b.print();
 }
 
 uint64_t CSolver::getElementValue(Element *element) {
