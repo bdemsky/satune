@@ -520,8 +520,14 @@ void CSolver::addConstraint(BooleanEdge constraint) {
 			BooleanLogic *b = (BooleanLogic *) constraint.getBoolean();
 			if (!constraint.isNegated()) {
 				if (b->op == SATC_AND) {
-					for (uint i = 0; i < b->inputs.getSize(); i++) {
-						addConstraint(b->inputs.get(i));
+					uint size = b->inputs.getSize();
+					//Handle potential concurrent modification
+					BooleanEdge array[size];
+					for (uint i = 0; i < size; i++) {
+						array[i] = b->inputs.get(i);
+					}
+					for (uint i = 0; i < size; i++) {
+						addConstraint(array[i]);
 					}
 					return;
 				}
