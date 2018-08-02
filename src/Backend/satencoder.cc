@@ -80,8 +80,6 @@ Edge SATEncoder::encodeConstraintSATEncoder(BooleanEdge c) {
 		generateProxy(cnf, result, e, p);
 		booledgeMap.put(constraint, e.node_ptr);
 		result = e;
-	} else{
-		booledgeMap.put(constraint, result.node_ptr);
 	}
 
 	return c.isNegated() ? constraintNegate(result) : result;
