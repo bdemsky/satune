@@ -23,7 +23,7 @@ public:
 	operator bool() {
 		return getBoolean() != NULL;
 	}
-        void print();
+	void print();
 private:
 	Boolean *b;
 };

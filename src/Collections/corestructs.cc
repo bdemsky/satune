@@ -5,6 +5,6 @@
 void BooleanEdge::print(){
 	if (isNegated())
 		model_print("!");
-	b->print();
+	getBoolean()->print();
 	model_print("\n");
 }
