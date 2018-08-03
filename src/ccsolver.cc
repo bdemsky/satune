@@ -144,3 +144,7 @@ void serialize(void* solver){
 void mustHaveValue(void *solver, void *element){
 	CCSOLVER(solver)->mustHaveValue( (Element*) element);
 }
+
+void* clone(void * solver){
+	return CCSOLVER(solver)->clone();
+}
