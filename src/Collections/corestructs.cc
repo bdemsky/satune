@@ -2,7 +2,7 @@
 #include "corestructs.h"
 #include "boolean.h"
 
-void BooleanEdge::print(){
+void BooleanEdge::print() {
 	if (isNegated())
 		model_print("!");
 	getBoolean()->print();

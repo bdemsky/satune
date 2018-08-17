@@ -16,7 +16,7 @@
 SATEncoder::SATEncoder(CSolver *_solver) :
 	cnf(createCNF()),
 	solver(_solver),
-  vector(allocDefVectorEdge()) {
+	vector(allocDefVectorEdge()) {
 }
 
 SATEncoder::~SATEncoder() {

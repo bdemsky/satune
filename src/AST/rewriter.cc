@@ -51,7 +51,7 @@ void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 	}
 }
 
-void CSolver::handleFunction(ElementFunction * ef, BooleanEdge child) {
+void CSolver::handleFunction(ElementFunction *ef, BooleanEdge child) {
 	BooleanEdge childNegate = child.negate();
 	elemMap.remove(ef);
 	if (ef->overflowstatus == child) {
@@ -106,7 +106,7 @@ void CSolver::replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb) {
 		} else {
 			BooleanLogic *logicop = (BooleanLogic *) parent;
 			boolMap.remove(logicop);	//could change parent's hash
-			
+
 			uint parentsize = logicop->inputs.getSize();
 			for (uint j = 0; j < parentsize; j++) {
 				BooleanEdge b = logicop->inputs.get(j);

@@ -48,7 +48,7 @@ Edge SATEncoder::encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constra
 	}
 
 	bool notfinished = true;
-        Edge carray[numDomains];
+	Edge carray[numDomains];
 	while (notfinished) {
 		if (predicate->evalPredicateOperator(vals) != generateNegation) {
 			//Include this in the set of terms
@@ -110,7 +110,7 @@ void SATEncoder::encodeOperatorElementFunctionSATEncoder(ElementFunction *func) 
 	}
 
 	bool notfinished = true;
-        Edge carray[numDomains + 1];
+	Edge carray[numDomains + 1];
 	while (notfinished) {
 		uint64_t result = function->applyFunctionOperator(numDomains, vals);
 		bool isInRange = ((FunctionOperator *)func->getFunction())->isInRangeFunction(result);

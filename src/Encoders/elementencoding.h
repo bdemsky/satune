@@ -33,7 +33,7 @@ public:
 	}
 	void print();
 
-        bool anyValue;
+	bool anyValue;
 	ElementEncodingType type;
 	Element *element;
 	Edge *variables;/* List Variables Used To Encode Element */
@@ -41,8 +41,8 @@ public:
 		struct {
 			uint64_t *encodingArray;	/* List the Variables in the appropriate order */
 			uint64_t *inUseArray;	/* Bitmap to track variables in use */
-			Edge * edgeArray;
-			Polarity * polarityArray;
+			Edge *edgeArray;
+			Polarity *polarityArray;
 			uint encArraySize;
 			ElemEnc encoding;
 		};

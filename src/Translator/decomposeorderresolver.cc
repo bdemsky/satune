@@ -25,12 +25,12 @@ DecomposeOrderResolver::~DecomposeOrderResolver() {
 
 void DecomposeOrderResolver::mustOrderEdge(uint64_t first, uint64_t second) {
 	DOREdge edge(first, second, 0, first, second);
-	DOREdge *oldedge=edges.get(&edge);
+	DOREdge *oldedge = edges.get(&edge);
 	if (oldedge != NULL) {
-		oldedge->mustbetrue=true;
+		oldedge->mustbetrue = true;
 	} else {
 		DOREdge *newedge = new DOREdge(first, second, 0, first, second);
-		newedge->mustbetrue=true;
+		newedge->mustbetrue = true;
 		edges.add(newedge);
 	}
 }
@@ -84,7 +84,7 @@ void DecomposeOrderResolver::buildGraph() {
 		DOREdge *doredge = iterator->next();
 		if (doredge->mustbetrue) {
 			graph->addEdge(doredge->origfirst, doredge->origsecond);
-			if (doredge->newfirst != doredge->origfirst || doredge->newsecond!=doredge->origsecond) {
+			if (doredge->newfirst != doredge->origfirst || doredge->newsecond != doredge->origsecond) {
 				graph->addEdge(doredge->newfirst, doredge->newsecond);
 			}
 		} else if (doredge->orderindex != 0) {

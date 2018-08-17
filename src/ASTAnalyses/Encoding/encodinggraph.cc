@@ -79,8 +79,8 @@ void EncodingGraph::encode() {
 					EncodingSubGraph *subgraph = graphMap.get(n);
 					DEBUG("graphMap.get(subgraph=%p, n=%p)\n", subgraph, n);
 					if (subgraph == NULL) {
-					  encoding->encodingArrayInitialization();
-					  continue;
+						encoding->encodingArrayInitialization();
+						continue;
 					}
 					uint encodingSize = subgraph->getEncodingMaxVal(n) + 1;
 					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
@@ -255,9 +255,9 @@ void EncodingGraph::decideEdges() {
 			return;
 
 		EncodingSubGraph *leftGraph = graphMap.get(left);
-                DEBUG("graphMap.get(left=%p, leftgraph=%p)\n", left, leftGraph);
+		DEBUG("graphMap.get(left=%p, leftgraph=%p)\n", left, leftGraph);
 		EncodingSubGraph *rightGraph = graphMap.get(right);
-                DEBUG("graphMap.get(right=%p, rightgraph=%p)\n", right, rightGraph);
+		DEBUG("graphMap.get(right=%p, rightgraph=%p)\n", right, rightGraph);
 		if (leftGraph == NULL && rightGraph != NULL) {
 			EncodingNode *tmp = left; left = right; right = tmp;
 			EncodingSubGraph *tmpsg = leftGraph; leftGraph = rightGraph; rightGraph = tmpsg;

@@ -22,7 +22,7 @@ public:
 
 	CMEMALLOC;
 private:
-	void shouldMemoize(Element *elem, uint64_t val, bool & memo);
+	void shouldMemoize(Element *elem, uint64_t val, bool &memo);
 	Edge getNewVarSATEncoder();
 	void getArrayNewVarsSATEncoder(uint num, Edge *carray);
 	Edge encodeVarSATEncoder(BooleanVar *constraint);

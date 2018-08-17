@@ -11,13 +11,13 @@ int main(int numargs, char **argv) {
 	Element *e2 = solver->getElementVar(s2);
 	solver->mustHaveValue(e1);
 	solver->mustHaveValue(e2);
-	
+
 	Predicate *equals = solver->createPredicateOperator(SATC_EQUALS);
 	Element *inputs[] = {e1, e2};
 	BooleanEdge b = solver->applyPredicate(equals, inputs, 2);
 	b = solver->applyLogicalOperation(SATC_NOT, b);
 	solver->addConstraint(b);
-	
+
 	if (solver->solve() == 1)
 		printf("e1=%" PRIu64 "e2=%" PRIu64 "\n", solver->getElementValue(e1), solver->getElementValue(e2));
 	else

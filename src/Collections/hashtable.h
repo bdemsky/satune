@@ -57,7 +57,7 @@ inline bool defaultEquals(_Key key1, _Key key2) {
  *                 manipulation and storage.
  * @tparam _Shift  Logical shift to apply to all keys. Default 0.
  */
-template<typename _Key, typename _Val, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function) (_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals) (_Key, _Key) = defaultEquals<_Key> >
+template<typename _Key, typename _Val, typename _KeyInt, int _Shift = 0, unsigned int (*hash_function)(_Key) = defaultHashFunction<_Key, _Shift, _KeyInt>, bool (*equals)(_Key, _Key) = defaultEquals<_Key> >
 class Hashtable {
 public:
 	/**

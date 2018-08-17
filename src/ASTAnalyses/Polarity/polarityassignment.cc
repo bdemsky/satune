@@ -24,7 +24,7 @@ void updateEdgePolarity(BooleanEdge dst, Polarity p) {
 	Boolean *bdst = dst.getBoolean();
 	bool isNegated = dst.isNegated();
 	if (isNegated)
-		p=negatePolarity(p);
+		p = negatePolarity(p);
 	updatePolarity(bdst, p);
 }
 
@@ -60,8 +60,8 @@ void computePredicatePolarity(BooleanPredicate *This) {
 	if (This->undefStatus) {
 		computePolarity(This->undefStatus.getBoolean(), P_BOTHTRUEFALSE);
 	}
-	for(uint i=0; i < This->inputs.getSize(); i++) {
-		Element * e = This->inputs.get(i);
+	for (uint i = 0; i < This->inputs.getSize(); i++) {
+		Element *e = This->inputs.get(i);
 		computeElement(e);
 	}
 }
@@ -74,10 +74,10 @@ void computeElement(Element *e) {
 			computePolarity(ef->overflowstatus.getBoolean(), P_BOTHTRUEFALSE);
 		}
 
-		for(uint i=0; i < ef->inputs.getSize(); i++) {
-			Element * echild = ef->inputs.get(i);
+		for (uint i = 0; i < ef->inputs.getSize(); i++) {
+			Element *echild = ef->inputs.get(i);
 			computeElement(echild);
-		}	
+		}
 	}
 }
 
