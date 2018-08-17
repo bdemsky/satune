@@ -20,5 +20,6 @@ int main (int num, char** args){
         else
                 printf("UNSAT\n");
         deleteCCSolver(solver);
+	return 0;
 }
 

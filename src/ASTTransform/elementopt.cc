@@ -98,7 +98,7 @@ void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *v
 	case SATC_LT: {
 		for(uint i=0; i<size; i++) {
 			uint64_t val = s->getElement(i);
-			if (val >= cvalue)
+			if (val < cvalue)
 				elemArray[count++] = val;
 		}
 		break;
@@ -106,7 +106,7 @@ void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *v
 	case SATC_GT: {
 		for(uint i=0; i<size; i++) {
 			uint64_t val = s->getElement(i);
-			if (val <= cvalue)
+			if (val > cvalue)
 				elemArray[count++] = val;
 		}
 		break;
@@ -114,7 +114,7 @@ void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *v
 	case SATC_LTE: {
 		for(uint i=0; i<size; i++) {
 			uint64_t val = s->getElement(i);
-			if (val > cvalue)
+			if (val <= cvalue)
 				elemArray[count++] = val;
 		}
 		break;
@@ -122,7 +122,7 @@ void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *v
 	case SATC_GTE: {
 		for(uint i=0; i<size; i++) {
 			uint64_t val = s->getElement(i);
-			if (val < cvalue)
+			if (val >= cvalue)
 				elemArray[count++] = val;
 		}
 		break;
