@@ -78,8 +78,7 @@ void EncodingGraph::encode() {
 				} else if (encodetype == BINARYINDEX) {
 					EncodingSubGraph *subgraph = graphMap.get(n);
                                         DEBUG("graphMap.get(subgraph=%p, n=%p)\n", subgraph, n);
-					if (subgraph == NULL){
-                                                encoding->encodingArrayInitialization();
+					if (subgraph == NULL) {
 						continue;
                                         }
 					uint encodingSize = subgraph->getEncodingMaxVal(n) + 1;
@@ -168,9 +167,9 @@ void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 		delete graph2;
 	} else {
 		ASSERT(graph1 != NULL && graph2 == NULL);
-		graph1->addNode(first);
+		graph1->addNode(second);
                 DEBUG("graphMap.put(first=%p, graph1=%p)\n", first, graph1);
-		graphMap.put(first, graph1);
+		graphMap.put(second, graph1);
 	}
 }
 
@@ -292,7 +291,7 @@ void EncodingGraph::decideEdges() {
 									(newSize - rightSize) * rightGraph->numElements;
 		}
 		double conversionfactor = 0.5;
-		if (leftGraph != rightGraph && (totalCost * conversionfactor) < eeValue) {
+		if ((totalCost * conversionfactor) < eeValue) {
 			//add the edge
 			mergeNodes(left, right);
 		}
