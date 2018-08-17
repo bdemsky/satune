@@ -37,6 +37,12 @@ const char* tunableParameterToString(Tunables tunable){
                         return "EDGEENCODING";
                 case MUSTEDGEPRUNE:
                         return "MUSTEDGEPRUNE";
+		case ELEMENTOPT: 
+			return "ELEMENTOPT";
+		case ELEMENTOPTSETS:
+			return "ELEMENTOPTSETS";
+		case PROXYVARIABLE:
+			return "PROXYVARIABLE";
                 default:
                         ASSERT(0);
         }

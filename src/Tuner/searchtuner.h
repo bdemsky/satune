@@ -3,6 +3,9 @@
 #include "classlist.h"
 #include "tunable.h"
 #include "structs.h"
+#include <ostream>
+using namespace std;
+#define TUNEFILE "tune.conf"
 
 class TunableSetting {
 public:
@@ -12,6 +15,7 @@ public:
 	TunableSetting(TunableSetting *ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
 	void print();
+        friend std::ostream& operator<< (std::ostream& stream, const TunableSetting& matrix);
 	CMEMALLOC;
 private:
 	bool hasVar;
@@ -45,7 +49,8 @@ public:
 	uint getSize() { return usedSettings.getSize();}
 	void print();
 	void printUsed();
-
+        void serialize();
+        
 	CMEMALLOC;
 private:
 	/** Used Settings keeps track of settings that were actually used by
@@ -55,4 +60,6 @@ private:
 	/** Settings contains all settings. */
 	HashsetTunableSetting settings;
 };
+
+
 #endif

@@ -71,7 +71,7 @@ void ElementOpt::handlePredicateEquals(BooleanPredicate *pred, ElementSet *left,
 		replaceVarWithConst(pred, left, right);
 	} else if (pred->isFalse() && updateSets) {
 		constrainVarWithConst(pred, left, right);
-	} else ASSERT(0);
+	}
 }
 
 void ElementOpt::handlePredicateInequality(BooleanPredicate *pred, ElementSet *var, ElementConst *value) {

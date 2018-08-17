@@ -1,4 +1,7 @@
 #include "searchtuner.h"
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 TunableSetting::TunableSetting(VarType _type, TunableParam _param) :
 	hasVar(true),
@@ -59,7 +62,39 @@ bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
 				 setting1->param == setting2->param;
 }
 
+ostream& operator<<(ostream& os, const TunableSetting& ts)  
+{  
+    os << ts.hasVar <<" " << ts.type1 <<" " << ts.type2 << " " << ts.param << " " << ts.lowValue <<" " 
+            << ts.highValue << " " << ts.defaultValue << " " << ts.selectedValue;  
+    return os;  
+}  
+
+
 SearchTuner::SearchTuner() {
+	ifstream myfile;
+	myfile.open (TUNEFILE, ios::in);
+	if(myfile.is_open()){
+		bool hasVar;
+		VarType type1;
+		VarType type2;
+		TunableParam param;
+		int lowValue;
+		int highValue;
+		int defaultValue;
+		int selectedValue;
+		while(myfile >> hasVar >> type1 >> type2 >> param >> lowValue >> highValue >> defaultValue >> selectedValue){
+			TunableSetting *setting;
+			
+			if(hasVar){
+				setting = new TunableSetting(type1, type2, param);
+			}else{
+				setting = new TunableSetting(param);
+			}
+			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);
+			usedSettings.add(setting);
+		}
+		myfile.close();
+	}
 }
 
 SearchTuner *SearchTuner::copyUsed() {
@@ -138,6 +173,18 @@ void SearchTuner::print() {
 	}
 	delete iterator;
 
+}
+
+void SearchTuner::serialize() {
+	ofstream myfile;
+	myfile.open (TUNEFILE, ios::out | ios::trunc);
+	SetIteratorTunableSetting *iterator = settings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
+		myfile << *setting << endl;
+	}
+	myfile.close();
+	delete iterator;
 }
 
 void SearchTuner::printUsed() {
