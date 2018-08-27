@@ -14,7 +14,7 @@ private:
 	void processPredicate(BooleanPredicate *);
 	void handlePredicateEquals(BooleanPredicate *pred, ElementSet *left, ElementConst *right);
 	void handlePredicateInequality(BooleanPredicate *pred, ElementSet *left, ElementConst *right);
-	void replaceVarWithConst(BooleanPredicate * pred, ElementSet *var, ElementConst * value);
+	void replaceVarWithConst(BooleanPredicate *pred, ElementSet *var, ElementConst *value);
 	void constrainVarWithConst(BooleanPredicate *pred, ElementSet *var, ElementConst *value);
 
 	Vector<BooleanPredicate *> workList;

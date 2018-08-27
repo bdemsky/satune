@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
 		printf("You should specify file names ...");
 		exit(-1);
 	}
-        //usleep(20000000);
+	//usleep(20000000);
 	for (int i = 1; i < argc; i++) {
 		CSolver *solver = CSolver::deserialize(argv[i]);
 		int value = solver->solve();

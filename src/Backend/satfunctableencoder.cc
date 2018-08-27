@@ -25,7 +25,7 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 	bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
 	if (generateNegation)
 		polarity = negatePolarity(polarity);
-	if (undefStatus ==SATC_FLAGFORCEUNDEFINED)
+	if (undefStatus == SATC_FLAGFORCEUNDEFINED)
 		polarity = P_BOTHTRUEFALSE;
 
 	Edge constraints[size];
@@ -51,7 +51,7 @@ Edge SATEncoder::encodeEnumEntriesTablePredicateSATEncoder(BooleanPredicate *con
 		case SATC_FLAGFORCEUNDEFINED: {
 			row = constraintAND(cnf, inputNum, carray);
 			uint pSize = constraint->parents.getSize();
-			if(!edgeIsVarConst(row) && pSize > (uint)solver->getTuner()->getTunable(PROXYVARIABLE, &proxyparameter)){
+			if (!edgeIsVarConst(row) && pSize > (uint)solver->getTuner()->getTunable(PROXYVARIABLE, &proxyparameter)) {
 				Edge proxy = constraintNewVar(cnf);
 				generateProxy(cnf, row, proxy, P_BOTHTRUEFALSE);
 				Edge undefConst = encodeConstraintSATEncoder(constraint->undefStatus);
@@ -102,8 +102,8 @@ Edge SATEncoder::encodeEnumTablePredicateSATEncoder(BooleanPredicate *constraint
 
 	if (generateNegation)
 		polarity = negatePolarity(polarity);
-	
-        ASSERT(numDomains != 0);
+
+	ASSERT(numDomains != 0);
 	VectorEdge *clauses = allocDefVectorEdge();
 
 	uint indices[numDomains];	//setup indices
@@ -214,20 +214,20 @@ void SATEncoder::encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *func)
 		Edge output = getElementValueConstraint(func, P_TRUE, entry->output);
 		switch (undefStatus ) {
 		case SATC_IGNOREBEHAVIOR: {
-                        if(inputNum == 0){
-                                addConstraintCNF(cnf, output);
-                        }else{
-                                addConstraintCNF(cnf, constraintIMPLIES(cnf,constraintAND(cnf, inputNum, carray), output));
-                        }
+			if (inputNum == 0) {
+				addConstraintCNF(cnf, output);
+			} else {
+				addConstraintCNF(cnf, constraintIMPLIES(cnf,constraintAND(cnf, inputNum, carray), output));
+			}
 			break;
 		}
 		case SATC_FLAGFORCEUNDEFINED: {
 			Edge undefConst = encodeConstraintSATEncoder(func->overflowstatus);
-                        if(inputNum ==0){
-                                addConstraintCNF(cnf, constraintAND2(cnf, output, constraintNegate(undefConst)));
-                        }else{
-                                addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, inputNum, carray), constraintAND2(cnf, output, constraintNegate(undefConst))));
-                        }
+			if (inputNum == 0) {
+				addConstraintCNF(cnf, constraintAND2(cnf, output, constraintNegate(undefConst)));
+			} else {
+				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, inputNum, carray), constraintAND2(cnf, output, constraintNegate(undefConst))));
+			}
 			break;
 		}
 		default:
@@ -243,7 +243,7 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 	model_print("Enumeration Table functions ...\n");
 #endif
 	ASSERT(elemFunc->getFunction()->type == TABLEFUNC);
-	
+
 	//First encode children
 	Array<Element *> *elements = &elemFunc->inputs;
 	for (uint i = 0; i < elements->getSize(); i++) {
@@ -288,11 +288,11 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		switch (function->undefBehavior) {
 		case SATC_UNDEFINEDSETSFLAG: {
 			if (isInRange) {
-                                if(numDomains == 0){
-                                        addConstraintCNF(cnf,carray[numDomains]);
-                                }else{
-                                        addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]));
-                                }
+				if (numDomains == 0) {
+					addConstraintCNF(cnf,carray[numDomains]);
+				} else {
+					addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), carray[numDomains]));
+				}
 			} else {
 				Edge undefConstraint = encodeConstraintSATEncoder(elemFunc->overflowstatus);
 				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), undefConstraint));
@@ -302,15 +302,15 @@ void SATEncoder::encodeEnumTableElemFunctionSATEncoder(ElementFunction *elemFunc
 		case SATC_FLAGIFFUNDEFINED: {
 			Edge undefConstraint = encodeConstraintSATEncoder(elemFunc->overflowstatus);
 			if (isInRange) {
-                                if(numDomains == 0){
-                                        addConstraintCNF(cnf, constraintAND2(cnf,carray[numDomains], constraintNegate(undefConstraint)) );
-                                }else{
-                                        Edge freshvar = constraintNewVar(cnf);
-                                        addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), freshvar ));
-                                        addConstraintCNF(cnf, constraintIMPLIES(cnf, freshvar, constraintNegate(undefConstraint) ));
-                                        addConstraintCNF(cnf, constraintIMPLIES(cnf, freshvar, carray[numDomains]));
-                                }
-				
+				if (numDomains == 0) {
+					addConstraintCNF(cnf, constraintAND2(cnf,carray[numDomains], constraintNegate(undefConstraint)) );
+				} else {
+					Edge freshvar = constraintNewVar(cnf);
+					addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), freshvar ));
+					addConstraintCNF(cnf, constraintIMPLIES(cnf, freshvar, constraintNegate(undefConstraint) ));
+					addConstraintCNF(cnf, constraintIMPLIES(cnf, freshvar, carray[numDomains]));
+				}
+
 			} else {
 				addConstraintCNF(cnf, constraintIMPLIES(cnf, constraintAND(cnf, numDomains, carray), undefConstraint));
 			}

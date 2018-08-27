@@ -39,12 +39,12 @@ uint64_t getElementValueOneHotSATTranslator(CSolver *This, ElementEncoding *elem
 	uint index = 0;
 	bool overflow = true;
 	for (uint i = 0; i < elemEnc->numVars; i++) {
-		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] ))){
+		if (getValueSolver(This->getSATEncoder()->getCNF()->solver, getEdgeVar( elemEnc->variables[i] ))) {
 			index = i;
 			overflow = false;
 		}
 	}
-	if(overflow)
+	if (overflow)
 		model_print("WARNING: Element has undefined value!\n");
 	ASSERT(elemEnc->encArraySize > index && elemEnc->isinUseElement(index));
 	return elemEnc->encodingArray[index];

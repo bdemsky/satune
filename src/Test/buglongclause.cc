@@ -1,10 +1,10 @@
 #include "csolver.h"
 
 /**
- * !b1 AND 
+ * !b1 AND
  * !b2 OR b1 or (!b3 and b4) AND
  * b7 OR (!b1 AND (b5 or !b6))
- * 
+ *
  */
 int main(int numargs, char **argv) {
 	CSolver *solver = new CSolver();
@@ -41,10 +41,10 @@ int main(int numargs, char **argv) {
 	solver->printConstraints();
 	if (solver->solve() == 1)
 		printf("b1=%d\nb2=%d\nb3=%d\nb4=%d\nb5=%d\nb6=%d\nb7=%d\n",
-					solver->getBooleanValue(b1), solver->getBooleanValue(b2),
-					solver->getBooleanValue(b3), solver->getBooleanValue(b4),
-					solver->getBooleanValue(b5), solver->getBooleanValue(b6),
-					solver->getBooleanValue(b7));
+					 solver->getBooleanValue(b1), solver->getBooleanValue(b2),
+					 solver->getBooleanValue(b3), solver->getBooleanValue(b4),
+					 solver->getBooleanValue(b5), solver->getBooleanValue(b6),
+					 solver->getBooleanValue(b7));
 	else
 		printf("UNSAT\n");
 	delete solver;

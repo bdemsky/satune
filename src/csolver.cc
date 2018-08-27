@@ -184,8 +184,8 @@ Set *CSolver::createRangeSet(VarType type, uint64_t lowrange, uint64_t highrange
 	return set;
 }
 
-bool CSolver::itemExistInSet(Set *set, uint64_t item){
-        return set->exists(item);
+bool CSolver::itemExistInSet(Set *set, uint64_t item) {
+	return set->exists(item);
 }
 
 VarType CSolver::getSetVarType(Set *set) {
@@ -223,7 +223,7 @@ Element *CSolver::getElementVar(Set *set) {
 	return element;
 }
 
-void CSolver::mustHaveValue(Element *element){
+void CSolver::mustHaveValue(Element *element) {
 	element->getElementEncoding()->anyValue = true;
 }
 

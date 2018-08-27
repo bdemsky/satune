@@ -7,7 +7,7 @@
 #include "predicate.h"
 
 
-void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool & memo) {
+void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool &memo) {
 	uint numParents = elem->parents.getSize();
 	uint posPolarity = 0;
 	uint negPolarity = 0;
@@ -15,10 +15,10 @@ void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool & memo) {
 	if (elem->type == ELEMFUNCRETURN) {
 		memo = true;
 	}
-	for(uint i = 0; i < numParents; i++) {
-		ASTNode * node = elem->parents.get(i);
+	for (uint i = 0; i < numParents; i++) {
+		ASTNode *node = elem->parents.get(i);
 		if (node->type == PREDICATEOP) {
-			BooleanPredicate * pred = (BooleanPredicate *) node;
+			BooleanPredicate *pred = (BooleanPredicate *) node;
 			Polarity polarity = pred->polarity;
 			FunctionEncodingType encType = pred->encoding.type;
 			bool generateNegation = encType == ENUMERATEIMPLICATIONSNEGATE;
@@ -27,49 +27,49 @@ void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool & memo) {
 
 				UndefinedBehavior undefStatus = ((PredicateTable *)pred->predicate)->undefinedbehavior;
 
-				Polarity tpolarity=polarity;
+				Polarity tpolarity = polarity;
 				if (generateNegation)
 					tpolarity = negatePolarity(tpolarity);
-				if (undefStatus ==SATC_FLAGFORCEUNDEFINED)
+				if (undefStatus == SATC_FLAGFORCEUNDEFINED)
 					tpolarity = P_BOTHTRUEFALSE;
 				if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_TRUE)
 					memo = true;
 				if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_FALSE)
 					memo = true;
 			} else if (pred->predicate->type == OPERATORPRED) {
-					if (pred->encoding.type == ENUMERATEIMPLICATIONS || pred->encoding.type == ENUMERATEIMPLICATIONSNEGATE) {
-						Polarity tpolarity = polarity;
-						if (generateNegation)
-							tpolarity = negatePolarity(tpolarity);
-						PredicateOperator *predicate = (PredicateOperator *)pred->predicate;
-						uint numDomains = pred->inputs.getSize();
-						bool isConstant = true;
-						for (uint i = 0; i < numDomains; i++) {
-							Element *e = pred->inputs.get(i);
-							if (elem != e && e->type != ELEMCONST) {
-								isConstant = false;
-							}
+				if (pred->encoding.type == ENUMERATEIMPLICATIONS || pred->encoding.type == ENUMERATEIMPLICATIONSNEGATE) {
+					Polarity tpolarity = polarity;
+					if (generateNegation)
+						tpolarity = negatePolarity(tpolarity);
+					PredicateOperator *predicate = (PredicateOperator *)pred->predicate;
+					uint numDomains = pred->inputs.getSize();
+					bool isConstant = true;
+					for (uint i = 0; i < numDomains; i++) {
+						Element *e = pred->inputs.get(i);
+						if (elem != e && e->type != ELEMCONST) {
+							isConstant = false;
 						}
-						if (predicate->getOp() == SATC_EQUALS) {
+					}
+					if (predicate->getOp() == SATC_EQUALS) {
+						if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_TRUE)
+							posPolarity++;
+						if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_FALSE)
+							negPolarity++;
+					} else {
+						if (isConstant) {
 							if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_TRUE)
 								posPolarity++;
 							if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_FALSE)
 								negPolarity++;
 						} else {
-							if (isConstant) {
-								if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_TRUE)
-									posPolarity++;
-								if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_FALSE)
-									negPolarity++;
-							} else {
-								if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_TRUE)
-									memo = true;
-								if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_FALSE)
-									memo = true;							
-							}
+							if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_TRUE)
+								memo = true;
+							if (tpolarity == P_BOTHTRUEFALSE || tpolarity == P_FALSE)
+								memo = true;
 						}
 					}
-				} else {
+				}
+			} else {
 				ASSERT(0);
 			}
 		} else if (node->type == ELEMFUNCRETURN) {
@@ -130,7 +130,7 @@ Edge SATEncoder::getElementValueBinaryIndexConstraint(Element *elem, Polarity p,
 		if (elemEnc->isinUseElement(i) && elemEnc->encodingArray[i] == value) {
 			if (elemEnc->numVars == 0)
 				return E_True;
-			
+
 			if (elemEnc->encoding != EENC_NONE && elemEnc->numVars > 1) {
 				if (impliesPolarity(elemEnc->polarityArray[i], p)) {
 					return elemEnc->edgeArray[i];
@@ -142,11 +142,11 @@ Edge SATEncoder::getElementValueBinaryIndexConstraint(Element *elem, Polarity p,
 						generateProxy(cnf, generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, i), elemEnc->edgeArray[i], P_BOTHTRUEFALSE);
 						elemEnc->polarityArray[i] = p;
 					} else if (!impliesPolarity(elemEnc->polarityArray[i], P_TRUE)  && impliesPolarity(p, P_TRUE)) {
-						generateProxy(cnf, generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, i), elemEnc->edgeArray[i], P_TRUE);			
-						elemEnc->polarityArray[i] = (Polarity) (((int) elemEnc->polarityArray[i])| ((int)P_TRUE));
-					}	else if (!impliesPolarity(elemEnc->polarityArray[i], P_FALSE)  && impliesPolarity(p, P_FALSE)) {
-						generateProxy(cnf, generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, i), elemEnc->edgeArray[i], P_FALSE);			
-						elemEnc->polarityArray[i] = (Polarity) (((int) elemEnc->polarityArray[i])| ((int)P_FALSE));
+						generateProxy(cnf, generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, i), elemEnc->edgeArray[i], P_TRUE);
+						elemEnc->polarityArray[i] = (Polarity) (((int) elemEnc->polarityArray[i]) | ((int)P_TRUE));
+					} else if (!impliesPolarity(elemEnc->polarityArray[i], P_FALSE)  && impliesPolarity(p, P_FALSE)) {
+						generateProxy(cnf, generateBinaryConstraint(cnf, elemEnc->numVars, elemEnc->variables, i), elemEnc->edgeArray[i], P_FALSE);
+						elemEnc->polarityArray[i] = (Polarity) (((int) elemEnc->polarityArray[i]) | ((int)P_FALSE));
 					}
 					return elemEnc->edgeArray[i];
 				}
@@ -214,7 +214,7 @@ void SATEncoder::generateBinaryValueEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYVAL);
 	allocElementConstraintVariables(encoding, encoding->numBits);
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
-	if(encoding->anyValue)
+	if (encoding->anyValue)
 		generateAnyValueBinaryValueEncoding(encoding);
 }
 
@@ -222,7 +222,7 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
-	if(encoding->anyValue)
+	if (encoding->anyValue)
 		generateAnyValueBinaryIndexEncoding(encoding);
 }
 
@@ -234,7 +234,7 @@ void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
 			addConstraintCNF(cnf, constraintNegate(constraintAND2(cnf, encoding->variables[i], encoding->variables[j])));
 		}
 	}
-	if(encoding->anyValue)
+	if (encoding->anyValue)
 		addConstraintCNF(cnf, constraintOR(cnf, encoding->numVars, encoding->variables));
 }
 
@@ -270,30 +270,30 @@ void SATEncoder::generateElementEncoding(Element *element) {
 	}
 }
 
-void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding){
-	if(encoding->numVars == 0)
+void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) {
+	if (encoding->numVars == 0)
 		return;
 	int index = -1;
-	for(uint i= encoding->encArraySize-1; i>=0; i--){
-		if(encoding->isinUseElement(i)){
-			if(i+1 < encoding->encArraySize){
-				index = i+1;
+	for (uint i = encoding->encArraySize - 1; i >= 0; i--) {
+		if (encoding->isinUseElement(i)) {
+			if (i + 1 < encoding->encArraySize) {
+				index = i + 1;
 			}
 			break;
 		}
 	}
-	if( index != -1 ){
+	if ( index != -1 ) {
 		addConstraintCNF(cnf, generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index));
 	}
-	index = index == -1? encoding->encArraySize-1 : index-1;
-	for(int i= index; i>=0; i--) {
-		if (!encoding->isinUseElement(i)){
+	index = index == -1 ? encoding->encArraySize - 1 : index - 1;
+	for (int i = index; i >= 0; i--) {
+		if (!encoding->isinUseElement(i)) {
 			addConstraintCNF(cnf, constraintNegate( generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i)));
 		}
 	}
 }
 
-void SATEncoder::generateAnyValueBinaryValueEncoding(ElementEncoding *encoding){
+void SATEncoder::generateAnyValueBinaryValueEncoding(ElementEncoding *encoding) {
 	uint64_t minvalueminusoffset = encoding->low - encoding->offset;
 	uint64_t maxvalueminusoffset = encoding->high - encoding->offset;
 	model_print("This is minvalueminus offset: %lu", minvalueminusoffset);

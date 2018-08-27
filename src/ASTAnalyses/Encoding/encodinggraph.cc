@@ -77,11 +77,11 @@ void EncodingGraph::encode() {
 					encoding->encodingArrayInitialization();
 				} else if (encodetype == BINARYINDEX) {
 					EncodingSubGraph *subgraph = graphMap.get(n);
-                                        DEBUG("graphMap.get(subgraph=%p, n=%p)\n", subgraph, n);
-					if (subgraph == NULL){
-                                                encoding->encodingArrayInitialization();
+					DEBUG("graphMap.get(subgraph=%p, n=%p)\n", subgraph, n);
+					if (subgraph == NULL) {
+						encoding->encodingArrayInitialization();
 						continue;
-                                        }
+					}
 					uint encodingSize = subgraph->getEncodingMaxVal(n) + 1;
 					uint paddedSize = encoding->getSizeEncodingArray(encodingSize);
 					encoding->allocInUseArrayElement(paddedSize);
@@ -132,9 +132,9 @@ void EncodingGraph::encodeParent(Element *e) {
 
 void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 	EncodingSubGraph *graph1 = graphMap.get(first);
-        DEBUG("graphMap.get(first=%p, graph1=%p)\n", first, graph1);
+	DEBUG("graphMap.get(first=%p, graph1=%p)\n", first, graph1);
 	EncodingSubGraph *graph2 = graphMap.get(second);
-        DEBUG("graphMap.get(second=%p, graph2=%p)\n", second, graph2);
+	DEBUG("graphMap.get(second=%p, graph2=%p)\n", second, graph2);
 	if (graph1 == NULL)
 		first->setEncoding(BINARYINDEX);
 	if (graph2 == NULL)
@@ -143,7 +143,7 @@ void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 	if (graph1 == NULL && graph2 == NULL) {
 		graph1 = new EncodingSubGraph();
 		subgraphs.add(graph1);
-                DEBUG("graphMap.put(first=%p, graph1=%p)\n", first, graph1);
+		DEBUG("graphMap.put(first=%p, graph1=%p)\n", first, graph1);
 		graphMap.put(first, graph1);
 		graph1->addNode(first);
 	}
@@ -159,18 +159,18 @@ void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 		while (nodeit->hasNext()) {
 			EncodingNode *node = nodeit->next();
 			graph1->addNode(node);
-                        DEBUG("graphMap.put(node=%p, graph1=%p)\n", node, graph1);
+			DEBUG("graphMap.put(node=%p, graph1=%p)\n", node, graph1);
 			graphMap.put(node, graph1);
 		}
 		subgraphs.remove(graph2);
 		delete nodeit;
-                DEBUG("Deleting graph2 =%p \n", graph2);
+		DEBUG("Deleting graph2 =%p \n", graph2);
 		delete graph2;
 	} else {
 		ASSERT(graph1 != NULL && graph2 == NULL);
-		graph1->addNode(first);
-                DEBUG("graphMap.put(first=%p, graph1=%p)\n", first, graph1);
-		graphMap.put(first, graph1);
+		graph1->addNode(second);
+		DEBUG("graphMap.put(first=%p, graph1=%p)\n", first, graph1);
+		graphMap.put(second, graph1);
 	}
 }
 
@@ -255,9 +255,9 @@ void EncodingGraph::decideEdges() {
 			return;
 
 		EncodingSubGraph *leftGraph = graphMap.get(left);
-                DEBUG("graphMap.get(left=%p, leftgraph=%p)\n", left, leftGraph);
+		DEBUG("graphMap.get(left=%p, leftgraph=%p)\n", left, leftGraph);
 		EncodingSubGraph *rightGraph = graphMap.get(right);
-                DEBUG("graphMap.get(right=%p, rightgraph=%p)\n", right, rightGraph);
+		DEBUG("graphMap.get(right=%p, rightgraph=%p)\n", right, rightGraph);
 		if (leftGraph == NULL && rightGraph != NULL) {
 			EncodingNode *tmp = left; left = right; right = tmp;
 			EncodingSubGraph *tmpsg = leftGraph; leftGraph = rightGraph; rightGraph = tmpsg;
@@ -283,6 +283,11 @@ void EncodingGraph::decideEdges() {
 									(newSize - rightSize) * right->elements.getSize();
 		} else {
 			//Neither are null
+
+			//Are we already merged?
+			if (leftGraph == rightGraph)
+				continue;
+
 			leftSize = convertSize(leftGraph->encodingSize);
 			rightSize = convertSize(rightGraph->encodingSize);
 			newSize = convertSize(leftGraph->estimateNewSize(rightGraph));
@@ -292,7 +297,7 @@ void EncodingGraph::decideEdges() {
 									(newSize - rightSize) * rightGraph->numElements;
 		}
 		double conversionfactor = 0.5;
-		if (leftGraph != rightGraph && (totalCost * conversionfactor) < eeValue) {
+		if ((totalCost * conversionfactor) < eeValue) {
 			//add the edge
 			mergeNodes(left, right);
 		}

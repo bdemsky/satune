@@ -18,14 +18,14 @@ void AutoTuner::addProblem(CSolver *solver) {
 long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
-        model_print("**********************\n");
+	model_print("**********************\n");
 	int sat = copy->solve();
-        if(result == UNSETVALUE)
-                result = sat;
-        else if(result != sat){
-                model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
-                copy->printConstraints();
-        }
+	if (result == UNSETVALUE)
+		result = sat;
+	else if (result != sat) {
+		model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
+		copy->printConstraints();
+	}
 	//model_print("SAT %d\n", result);
 	long long elapsedTime = copy->getElapsedTime();
 //	long long encodeTime = copy->getEncodeTime();

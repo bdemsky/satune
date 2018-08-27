@@ -43,5 +43,5 @@ static TunableDesc proxyparameter(1, 5, 2);
 enum Tunables {DECOMPOSEORDER, MUSTREACHGLOBAL, MUSTREACHLOCAL, MUSTREACHPRUNE, OPTIMIZEORDERSTRUCTURE, ORDERINTEGERENCODING, PREPROCESS, NODEENCODING, EDGEENCODING, MUSTEDGEPRUNE, ELEMENTOPT, ELEMENTOPTSETS, PROXYVARIABLE};
 typedef enum Tunables Tunables;
 
-const char* tunableParameterToString(Tunables tunable);
+const char *tunableParameterToString(Tunables tunable);
 #endif
