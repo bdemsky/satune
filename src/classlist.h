@@ -68,6 +68,7 @@ class DecomposeOrderResolver;
 class EncodingGraph;
 class EncodingNode;
 class EncodingEdge;
+class EncodingSubGraph;
 
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;

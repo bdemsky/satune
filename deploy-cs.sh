@@ -8,6 +8,7 @@ SERVERS="dc-8.calit2.uci.edu dc-9.calit2.uci.edu dc-10.calit2.uci.edu dc-11.cali
 REMOTEDIR="/scratch/hamed/"
 INFILE="constraint_compiler/"
 SRC="constraint_compiler/src/"
+SHAREDDIR="~/"
 OUTFILE=csolver.tar.gz
 USER=hamed
 
@@ -17,6 +18,6 @@ rm -f $OUTFILE
 tar -czvf $OUTFILE $INFILE
 
 for SERVER in $SERVERS; do
-	scp $OUTFILE "$USER@$SERVER:$REMOTEDIR"
-	ssh $USER@$SERVER "cd $REMOTEDIR; sudo rm -r $SRC; tar -xzvf $OUTFILE; cd $SRC; make clean; ./setup.sh"
+	cp $OUTFILE $SHAREDDIR
+	ssh $USER@$SERVER "mv $SHAREDDIR$OUTFILE $REMOTEDIR; cd $REMOTEDIR; sudo rm -r $SRC; tar -xzvf $OUTFILE; cd $SRC; make clean; ./setup.sh"
 done

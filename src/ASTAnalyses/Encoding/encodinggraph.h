@@ -10,6 +10,7 @@ public:
 	~EncodingGraph();
 	void buildGraph();
 	void encode();
+	void validate();
 
 	CMEMALLOC;
 private:

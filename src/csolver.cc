@@ -620,6 +620,8 @@ int CSolver::solve() {
 	eg.encode();
 
 	naiveEncodingDecision(this);
+//	eg.validate();
+	
 	long long time5 = getTimeNano();
 	model_print("Encoding Graph Time: %f\n", (time5 - time4) / NANOSEC);
 
