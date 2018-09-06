@@ -17,7 +17,7 @@ public:
 	void allocInUseArrayElement(uint size);
 	uint numEncodingVars() {return numVars;}
 	bool isinUseElement(uint offset) { return (inUseArray[(offset >> 6)] >> (offset & 63)) & 0x1;}
-	void setInUseElement(uint offset) {inUseArray[(offset >> 6)] |= 1 << (offset & 63);}
+	void setInUseElement(uint offset) {inUseArray[(offset >> 6)] |= ((uint64_t)1) << (offset & 63);}
 	void encodingArrayInitialization();
 	uint getSizeEncodingArray(uint setSize) {
 		switch (type) {
@@ -55,7 +55,7 @@ public:
 		};
 	};
 	uint numVars;	/* Number of variables */
-	CMEMALLOC;
+        CMEMALLOC;
 };
 
 
