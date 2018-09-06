@@ -8,7 +8,7 @@ SERVERS="dc-8.calit2.uci.edu dc-9.calit2.uci.edu dc-10.calit2.uci.edu dc-11.cali
 REMOTEDIR="/scratch/hamed/"
 INFILE="constraint_compiler/"
 SRC="constraint_compiler/src/"
-SHAREDDIR="~/"
+SHAREDDIR=~/
 OUTFILE=csolver.tar.gz
 USER=hamed
 
