@@ -61,7 +61,6 @@ void EncodingSubGraph::solveEquals() {
 		SetIteratorEncodingValue *conflictIt = ev->notequals.iterator();
 		while (conflictIt->hasNext()) {
 			EncodingValue *conflict = conflictIt->next();
-			ASSERT(conflict->value != ev->value);
 			if (conflict->assigned) {
 				encodingArray.setExpand(conflict->encoding, true);
 			}
@@ -240,7 +239,6 @@ void EncodingSubGraph::generateEquals(EncodingNode *left, EncodingNode *right) {
 			NodeValuePair nvp2(right, rVal);
 			EncodingValue *rev = map.get(&nvp2);
 			if (lev != rev) {
-				ASSERT(lVal != rVal);
 				if (lev->inComparison && rev->inComparison) {
 					//Need to assign during comparison stage...
 					//Thus promote to comparison
@@ -353,24 +351,19 @@ void EncodingSubGraph::traverseValue(EncodingNode *node, uint64_t value) {
 	while (tovisit.getSize() != 0) {
 		EncodingNode *n = tovisit.last();tovisit.pop();
 		//Add encoding node to structures
-		NodeValuePair *nvp = new NodeValuePair(n, value);
-		if(map.contains(nvp))
-			continue;
 		ecv->nodes.add(n);
+		NodeValuePair *nvp = new NodeValuePair(n, value);
 		map.put(nvp, ecv);
-		ASSERT(node != NULL);
 		SetIteratorEncodingEdge *edgeit = n->edges.iterator();
 		while (edgeit->hasNext()) {
 			EncodingEdge *ee = edgeit->next();
 			if (!discovered.contains(ee->left) && nodes.contains(ee->left) && ee->left->s->exists(value)) {
 				tovisit.push(ee->left);
 				discovered.add(ee->left);
-				ASSERT(discovered.contains(ee->left));
 			}
 			if (!discovered.contains(ee->right) && nodes.contains(ee->right) && ee->right->s->exists(value)) {
 				tovisit.push(ee->right);
 				discovered.add(ee->right);
-				ASSERT(discovered.contains(ee->right));
 			}
 		}
 		delete edgeit;
