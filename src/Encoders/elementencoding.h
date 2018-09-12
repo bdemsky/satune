@@ -33,7 +33,6 @@ public:
 	}
 	void print();
 
-	bool anyValue;
 	ElementEncodingType type;
 	Element *element;
 	Edge *variables;/* List Variables Used To Encode Element */

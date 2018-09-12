@@ -315,26 +315,36 @@ void Deserializer::deserializeTable() {
 
 
 void Deserializer::deserializeElementSet() {
+	bool anyValue = false;
+	myread(&anyValue, sizeof(bool));
 	ElementSet *es_ptr;
 	myread(&es_ptr, sizeof(ElementSet *));
 	Set *set;
 	myread(&set, sizeof(Set *));
 	ASSERT(map.contains(set));
 	set  = (Set *) map.get(set);
-	map.put(es_ptr, solver->getElementVar(set));
+	Element *newEl = solver->getElementVar(set);
+	newEl->anyValue = anyValue;
+	map.put(es_ptr, newEl);
 }
 
 void Deserializer::deserializeElementConst() {
+	bool anyValue = false;
+	myread(&anyValue, sizeof(bool));
 	ElementSet *es_ptr;
 	myread(&es_ptr, sizeof(ElementSet *));
 	VarType type;
 	myread(&type, sizeof(VarType));
 	uint64_t value;
 	myread(&value, sizeof(uint64_t));
-	map.put(es_ptr, solver->getElementConst(type, value));
+	Element *newEl = solver->getElementConst(type, value);
+	newEl->anyValue = anyValue;
+	map.put(es_ptr, newEl);
 }
 
 void Deserializer::deserializeElementFunction() {
+	bool anyValue = false;
+	myread(&anyValue, sizeof(bool));
 	ElementFunction *ef_ptr;
 	myread(&ef_ptr, sizeof(ElementFunction *));
 	Function *function;
@@ -360,7 +370,9 @@ void Deserializer::deserializeElementFunction() {
 	overflowstatus = (Boolean *) map.get(tmp.getBoolean());
 	BooleanEdge res(overflowstatus);
 	BooleanEdge undefStatus = isNegated ? res.negate() : res;
-	map.put(ef_ptr, solver->applyFunction(function, members.expose(), size, undefStatus));
+	Element *newEl = solver->applyFunction(function, members.expose(), size, undefStatus);
+	newEl->anyValue = anyValue;
+	map.put(ef_ptr, newEl);
 }
 
 

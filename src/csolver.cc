@@ -224,7 +224,7 @@ Element *CSolver::getElementVar(Set *set) {
 }
 
 void CSolver::mustHaveValue(Element *element) {
-	element->getElementEncoding()->anyValue = true;
+	element->anyValue = true;
 }
 
 Set *CSolver::getElementRange (Element *element) {
@@ -577,7 +577,7 @@ void CSolver::inferFixedOrders() {
 
 #define NANOSEC 1000000000.0
 int CSolver::solve() {
-	long long starttime = getTimeNano();
+	long long startTime = getTimeNano();
 	bool deleteTuner = false;
 	if (tuner == NULL) {
 		tuner = new DefaultTuner();
@@ -597,17 +597,17 @@ int CSolver::solve() {
 		delete orderit;
 	}
 	computePolarities(this);
-	long long time2 = getTimeNano();
-	model_print("Polarity time: %f\n", (time2 - starttime) / NANOSEC);
+	long long time1 = getTimeNano();
+	model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
 	Preprocess pp(this);
 	pp.doTransform();
-	long long time3 = getTimeNano();
-	model_print("Preprocess time: %f\n", (time3 - time2) / NANOSEC);
+	long long time2 = getTimeNano();
+	model_print("Preprocess time: %f\n", (time2 - time1) / NANOSEC);
 
 	DecomposeOrderTransform dot(this);
 	dot.doTransform();
-	long long time4 = getTimeNano();
-	model_print("Decompose Order: %f\n", (time4 - time3) / NANOSEC);
+	time1 = getTimeNano();
+	model_print("Decompose Order: %f\n", (time1 - time2) / NANOSEC);
 
 	IntegerEncodingTransform iet(this);
 	iet.doTransform();
@@ -615,27 +615,27 @@ int CSolver::solve() {
 	ElementOpt eop(this);
 	eop.doTransform();
 
-	EncodingGraph eg(this);
-	eg.buildGraph();
-	eg.encode();
+//	EncodingGraph eg(this);
+//	eg.buildGraph();
+//	eg.encode();
 
 	naiveEncodingDecision(this);
 //	eg.validate();
 	
-	long long time5 = getTimeNano();
-	model_print("Encoding Graph Time: %f\n", (time5 - time4) / NANOSEC);
+	time2 = getTimeNano();
+	model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
 
-	long long startTime = getTimeNano();
 	satEncoder->encodeAllSATEncoder(this);
-	long long endTime = getTimeNano();
+	time1 = getTimeNano();
 
-	elapsedTime = endTime - startTime;
-	model_print("Elapse Encode time: %f\n", elapsedTime / NANOSEC);
-
+	model_print("Elapse Encode time: %f\n", (time1- startTime) / NANOSEC);
+	
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve();
-	model_print("Result Computed in SAT solver: %d\n", result);
-
+	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT? "SAT" : " UNSAT");
+	time2 = getTimeNano();
+	elapsedTime = time2 - startTime;
+	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
 	if (deleteTuner) {
 		delete tuner;
 		tuner = NULL;

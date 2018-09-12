@@ -8,7 +8,8 @@
 
 Element::Element(ASTNodeType _type) :
 	ASTNode(_type),
-	encoding(this) {
+	encoding(this),
+	anyValue(false){
 }
 
 ElementSet::ElementSet(Set *s) :
@@ -35,7 +36,9 @@ ElementConst::ElementConst(uint64_t _value, Set *_set) :
 }
 
 Element *ElementConst::clone(CSolver *solver, CloneMap *map) {
-	return solver->getElementConst(type, value);
+	Element* e= solver->getElementConst(type, value);
+	e->anyValue = anyValue;
+	return e;
 }
 
 Element *ElementSet::clone(CSolver *solver, CloneMap *map) {
@@ -44,6 +47,7 @@ Element *ElementSet::clone(CSolver *solver, CloneMap *map) {
 		return e;
 	e = solver->getElementVar(set->clone(solver, map));
 	map->put(this, e);
+	e->anyValue = anyValue;
 	return e;
 }
 
@@ -54,6 +58,7 @@ Element *ElementFunction::clone(CSolver *solver, CloneMap *map) {
 	}
 	BooleanEdge ofstatus = overflowstatus ? cloneEdge(solver, map, overflowstatus) : BooleanEdge();
 	Element *e = solver->applyFunction(function->clone(solver, map), array, inputs.getSize(), ofstatus);
+	e->anyValue = anyValue;
 	return e;
 }
 
@@ -75,6 +80,7 @@ void ElementSet::serialize(Serializer *serializer) {
 	set->serialize(serializer);
 
 	serializer->mywrite(&type, sizeof(ASTNodeType));
+	serializer->mywrite(&anyValue, sizeof(bool));
 	ElementSet *This = this;
 	serializer->mywrite(&This, sizeof(ElementSet *));
 	serializer->mywrite(&set, sizeof(Set *));
@@ -96,6 +102,7 @@ void ElementConst::serialize(Serializer *serializer) {
 	set->serialize(serializer);
 
 	serializer->mywrite(&type, sizeof(ASTNodeType));
+	serializer->mywrite(&anyValue, sizeof(bool));
 	ElementSet *This = this;
 	serializer->mywrite(&This, sizeof(ElementSet *));
 	VarType type = set->getType();
@@ -121,6 +128,7 @@ void ElementFunction::serialize(Serializer *serializer) {
 	serializeBooleanEdge(serializer, overflowstatus);
 
 	serializer->mywrite(&type, sizeof(ASTNodeType));
+	serializer->mywrite(&anyValue, sizeof(bool));
 	ElementFunction *This = this;
 	serializer->mywrite(&This, sizeof(ElementFunction *));
 	serializer->mywrite(&function, sizeof(Function *));

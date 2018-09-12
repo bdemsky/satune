@@ -214,7 +214,7 @@ void SATEncoder::generateBinaryValueEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYVAL);
 	allocElementConstraintVariables(encoding, encoding->numBits);
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
-	if (encoding->anyValue)
+	if (encoding->element->anyValue)
 		generateAnyValueBinaryValueEncoding(encoding);
 }
 
@@ -222,7 +222,7 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
-	if (encoding->anyValue)
+	if (encoding->element->anyValue)
 		generateAnyValueBinaryIndexEncoding(encoding);
 }
 
@@ -234,7 +234,7 @@ void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
 			addConstraintCNF(cnf, constraintNegate(constraintAND2(cnf, encoding->variables[i], encoding->variables[j])));
 		}
 	}
-	if (encoding->anyValue)
+	if (encoding->element->anyValue)
 		addConstraintCNF(cnf, constraintOR(cnf, encoding->numVars, encoding->variables));
 }
 
