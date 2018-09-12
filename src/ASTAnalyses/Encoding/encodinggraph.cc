@@ -295,7 +295,7 @@ void EncodingGraph::processPredicate(BooleanPredicate *b) {
 }
 
 uint convertSize(uint cost) {
-	cost = 1.2 * cost;// fudge factor
+	cost = FUDGEFACTOR * cost;// fudge factor
 	return NEXTPOW2(cost);
 }
 
@@ -357,8 +357,8 @@ void EncodingGraph::decideEdges() {
 			totalCost = (newSize - leftSize) * leftGraph->numElements +
 									(newSize - rightSize) * rightGraph->numElements;
 		}
-		double conversionfactor = 0.5;
-		if ((totalCost * conversionfactor) < eeValue) {
+		
+		if ((totalCost * CONVERSIONFACTOR) < eeValue) {
 			//add the edge
 			mergeNodes(left, right);
 		}

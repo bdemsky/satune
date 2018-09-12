@@ -4,6 +4,9 @@
 #include "vector.h"
 
 typedef int Literal;
+#define LITCAPACITY 4
+#define MERGESIZE 5
+#define MERGETHRESHOLD 2
 
 
 struct LitVector {

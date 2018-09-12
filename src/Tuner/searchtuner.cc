@@ -163,6 +163,9 @@ void SearchTuner::randomMutate() {
 		randomSetting->selectedValue = randomchoice;
 	else
 		randomSetting->selectedValue = randomchoice + 1;
+	model_print("&&&&&&&&Mutating&&&&&&&\n");
+	randomSetting->print();
+	model_print("&&&&&&&&&&&&&&&&&&&&&&&\n");
 }
 
 void SearchTuner::print() {

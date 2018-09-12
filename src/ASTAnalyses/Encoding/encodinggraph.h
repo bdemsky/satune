@@ -4,6 +4,9 @@
 #include "structs.h"
 #include "graphstructs.h"
 
+#define FUDGEFACTOR 1.2 
+#define CONVERSIONFACTOR  0.5
+
 class EncodingGraph {
 public:
 	EncodingGraph(CSolver *solver);

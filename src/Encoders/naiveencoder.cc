@@ -65,8 +65,9 @@ void naiveEncodingPredicate(BooleanPredicate *This) {
 void naiveEncodingElement(Element *This) {
 	ElementEncoding *encoding = This->getElementEncoding();
 	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
-		if(This->type != ELEMCONST)
+		if(This->type != ELEMCONST){
 			model_print("INFO: naive encoder is making the decision about element %p....\n", This);
+		}
 		encoding->setElementEncodingType(BINARYINDEX);
 		encoding->encodingArrayInitialization();
 	}

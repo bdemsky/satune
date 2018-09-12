@@ -3,6 +3,9 @@
 #include "classlist.h"
 #include "structs.h"
 
+#define AUTOTUNERFACTOR 0.3
+
+
 class AutoTuner {
 public:
 	AutoTuner(uint budget);

@@ -36,8 +36,6 @@
    C port of CNF SAT Conversion Copyright Brian Demsky 2017.
  */
 
-#define LITCAPACITY 4
-#define MERGESIZE 5
 
 VectorImpl(LitVector, LitVector *, 4)
 
@@ -289,7 +287,7 @@ void disjoinCNFLit(CNFExpr *This, Literal l) {
 	This->litSize = litSize;
 }
 
-#define MERGETHRESHOLD 2
+
 LitVector *mergeLitVectors(LitVector *This, LitVector *expr) {
 	uint maxsize = This->size + expr->size + MERGETHRESHOLD;
 	LitVector *merged = (LitVector *)ourmalloc(sizeof(LitVector));
