@@ -184,7 +184,8 @@ void ElementOpt::replaceVarWithConst(BooleanPredicate *pred, ElementSet *var, El
 					solver->boolMap.remove(newpred);
 					newpred->inputs.set(j, value);
 					solver->boolMap.put(newpred, newpred);
-					workList.push(newpred);
+					if (newpred->isTrue() || newpred->isFalse())
+						workList.push(newpred);
 					break;
 				}
 			}
