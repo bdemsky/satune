@@ -58,7 +58,7 @@ ${OBJ_DIR}/$(LIB_SO): $(OBJECTS)
 	$(CXX) -g $(SHARED) -o ${OBJ_DIR}/$(LIB_SO) $+ $(LDFLAGS)
 
 ${OBJ_DIR}/%.o: %.cc
-	$(CXX) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable
+	$(CXX) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable -std=c++1y -pthread
 
 ${OBJ_DIR}/%.o: %.c
 	$(CC) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable

@@ -46,6 +46,7 @@ typedef struct Node Node;
 
 struct CNF {
 	uint varcount;
+        uint clausecount;
 	uint asize;
 	IncrementalSolver *solver;
 	int *array;
@@ -180,7 +181,7 @@ void freeEdgeRec(Edge e);
 void outputCNF(CNF *cnf, Edge cnfform);
 void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar);
 void generateProxy(CNF *cnf, Edge expression, Edge proxy, Polarity p);
-
+void addClause(CNF *cnf, uint numliterals, int *literals);
 Edge generateBinaryConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateLTValueConstraint(CNF *cnf, uint numvars, Edge *vars, uint value);
 Edge generateEquivNVConstraint(CNF *cnf, uint numvars, Edge *var1, Edge *var2);

@@ -18,6 +18,7 @@ Edge E_NULL = {(Node *)NULL};
 CNF *createCNF() {
 	CNF *cnf = (CNF *) ourmalloc(sizeof(CNF));
 	cnf->varcount = 1;
+	cnf->clausecount = 0;
 	cnf->solver = allocIncrementalSolver();
 	cnf->solveTime = 0;
 	cnf->encodeTime = 0;
@@ -36,6 +37,7 @@ void deleteCNF(CNF *cnf) {
 void resetCNF(CNF *cnf) {
 	resetSolver(cnf->solver);
 	cnf->varcount = 1;
+	cnf->clausecount = 0;
 	cnf->solveTime = 0;
 	cnf->encodeTime = 0;
 	cnf->unsat = false;
@@ -571,6 +573,14 @@ Edge simplifyCNF(CNF *cnf, Edge input) {
 	}
 }
 
+void addClause(CNF *cnf, uint numliterals, int *literals){
+	cnf->clausecount++;
+	for(uint i=0; i< numliterals; i++)
+		model_print("%d ", literals[i]);
+	model_print("\n");
+	addArrayClauseLiteral(cnf->solver, numliterals, literals);
+}
+
 void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar) {
 	Node *andNode = cnfform.node_ptr;
 	int orvar = getEdgeVar(eorvar);
@@ -581,7 +591,7 @@ void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar) {
 		if (edgeIsVarConst(e)) {
 			int array[2] = {getEdgeVar(e), orvar};
 			ASSERT(array[0] != 0);
-			addArrayClauseLiteral(cnf->solver, 2, array);
+			addClause(cnf, 2, array);
 		} else {
 			Node *clause = e.node_ptr;
 			uint cnumEdges = clause->numEdges + 1;
@@ -596,7 +606,7 @@ void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar) {
 				ASSERT(array[j] != 0);
 			}
 			array[cnumEdges - 1] = orvar;
-			addArrayClauseLiteral(cnf->solver, cnumEdges, array);
+			addClause(cnf, cnumEdges, array);
 		}
 	}
 }
@@ -609,7 +619,7 @@ void outputCNF(CNF *cnf, Edge cnfform) {
 		if (edgeIsVarConst(e)) {
 			int array[1] = {getEdgeVar(e)};
 			ASSERT(array[0] != 0);
-			addArrayClauseLiteral(cnf->solver, 1, array);
+			addClause(cnf, 1, array);
 		} else {
 			Node *clause = e.node_ptr;
 			uint cnumEdges = clause->numEdges;
@@ -623,7 +633,7 @@ void outputCNF(CNF *cnf, Edge cnfform) {
 				array[j] = getEdgeVar(clause->edges[j]);
 				ASSERT(array[j] != 0);
 			}
-			addArrayClauseLiteral(cnf->solver, cnumEdges, array);
+			addClause(cnf, cnumEdges, array);
 		}
 	}
 }
@@ -633,17 +643,23 @@ void generateProxy(CNF *cnf, Edge expression, Edge proxy, Polarity p) {
 	if (p == P_TRUE || p == P_BOTHTRUEFALSE) {
 		// proxy => expression
 		Edge cnfexpr = simplifyCNF(cnf, expression);
+		Edge cnfnegexpr = simplifyCNF(cnf, constraintNegate(expression));
 		if (p == P_TRUE)
 			freeEdgeRec(expression);
 		outputCNFOR(cnf, cnfexpr, constraintNegate(proxy));
+		outputCNFOR(cnf, cnfnegexpr, proxy);
 		freeEdgeCNF(cnfexpr);
+		freeEdgeCNF(cnfnegexpr);
 	}
 	if (p == P_FALSE || p == P_BOTHTRUEFALSE) {
 		// expression => proxy
 		Edge cnfnegexpr = simplifyCNF(cnf, constraintNegate(expression));
+		Edge cnfexpr = simplifyCNF(cnf, expression);
 		freeEdgeRec(expression);
 		outputCNFOR(cnf, cnfnegexpr, proxy);
+		outputCNFOR(cnf, cnfexpr, constraintNegate(proxy));
 		freeEdgeCNF(cnfnegexpr);
+		freeEdgeCNF(cnfexpr);
 	}
 }
 
@@ -681,6 +697,7 @@ int solveCNF(CNF *cnf) {
 	long long startTime = getTimeNano();
 	finishedClauses(cnf->solver);
 	long long startSolve = getTimeNano();
+	model_print("#Clauses = %u\t#Vars = %u\n", cnf->clausecount, cnf->varcount);
 	int result = cnf->unsat ? IS_UNSAT : solve(cnf->solver);
 	long long finishTime = getTimeNano();
 	cnf->encodeTime = startSolve - startTime;
