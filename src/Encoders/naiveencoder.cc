@@ -68,7 +68,7 @@ void naiveEncodingElement(Element *This) {
 		if(This->type != ELEMCONST){
 			model_print("INFO: naive encoder is making the decision about element %p....\n", This);
 		}
-		encoding->setElementEncodingType(BINARYINDEX);
+		encoding->setElementEncodingType(UNARY);
 		encoding->encodingArrayInitialization();
 	}
 

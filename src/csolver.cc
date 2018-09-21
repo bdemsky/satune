@@ -615,9 +615,9 @@ int CSolver::solve() {
 	ElementOpt eop(this);
 	eop.doTransform();
 
-//	EncodingGraph eg(this);
-//	eg.buildGraph();
-//	eg.encode();
+	EncodingGraph eg(this);
+	eg.buildGraph();
+	eg.encode();
 
 	naiveEncodingDecision(this);
 //	eg.validate();

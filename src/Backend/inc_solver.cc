@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include "common.h"
 #include <string.h>
+#include <stdexcept>
 
 IncrementalSolver *allocIncrementalSolver() {
 	IncrementalSolver *This = (IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
@@ -119,7 +120,7 @@ void readSolver(IncrementalSolver *This, void *tmp, ssize_t size) {
 		ssize_t n = read(This->from_solver_fd, &((char *)result)[bytesread], bytestoread);
 		if (n == -1) {
 			model_print("Read failure\n");
-			exit(-1);
+			throw std::runtime_error("Read failure\n");
 		}
 		bytestoread -= n;
 		bytesread += n;

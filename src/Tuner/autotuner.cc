@@ -4,8 +4,51 @@
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
+#include <iostream>
+#include <chrono>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
+#define TIMEOUT 1000s
 #define UNSETVALUE -1
+#define POSINFINITY 9999999999L
+
+using namespace std::chrono_literals;
+
+int solve(CSolver *solver)
+{
+	try{
+		return solver->solve();
+	}
+	catch(std::runtime_error& e) {
+		return UNSETVALUE;
+	}
+}
+
+int solveWrapper(CSolver *solver)
+{
+	std::mutex m;
+	std::condition_variable cv;
+	int retValue;
+
+	std::thread t([&cv, &retValue, solver]()
+	{
+		retValue = solve(solver);
+		cv.notify_one();
+	});
+
+	t.detach();
+
+	{
+		std::unique_lock<std::mutex> l(m);
+		if(cv.wait_for(l, TIMEOUT) == std::cv_status::timeout)
+			throw std::runtime_error("Timeout");
+	}
+
+	return retValue;
+}
+
 
 AutoTuner::AutoTuner(uint _budget) :
 	budget(_budget), result(UNSETVALUE) {
@@ -19,21 +62,22 @@ long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
 	model_print("**********************\n");
-	int sat = copy->solve();
-	if (result == UNSETVALUE)
-		result = sat;
-	else if (result != sat) {
-		model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
-		copy->printConstraints();
+	long long metric = 0L;
+	try {
+		int sat = solveWrapper(copy);
+		if (result == UNSETVALUE)
+			result = sat;
+		else if (result != sat) {
+			model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
+			copy->printConstraints();
+		}
+		metric = copy->getElapsedTime();
 	}
-	//model_print("SAT %d\n", result);
-	long long elapsedTime = copy->getElapsedTime();
-//	long long encodeTime = copy->getEncodeTime();
-//	long long solveTime = copy->getSolveTime();
-	long long metric = elapsedTime;
-//	model_print("Elapsed Time: %llu\n", elapsedTime);
-//	model_print("Encode Time: %llu\n", encodeTime);
-//	model_print("Solve Time: %llu\n", solveTime);
+	catch(std::runtime_error& e) {
+		metric = POSINFINITY;
+		model_print("TimeOut has hit\n");
+	}
+	
 	delete copy;
 	return metric;
 }
