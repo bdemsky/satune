@@ -184,8 +184,11 @@ void EncodingGraph::encodeParent(Element *e) {
 				if (left == NULL || right == NULL)
 					return;
 				EncodingEdge *edge = getEdge(left, right, NULL);
-				if (edge != NULL && edge->getEncoding() == EDGE_MATCH) {
-					fenc->setFunctionEncodingType(CIRCUIT);
+				if (edge != NULL) {
+					EncodingSubGraph *leftGraph = graphMap.get(left);
+					if (leftGraph != NULL && leftGraph == graphMap.get(right)) {
+						fenc->setFunctionEncodingType(CIRCUIT);
+					}
 				}
 			}
 		}
@@ -217,6 +220,9 @@ void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 		first = tmp;
 	}
 	if (graph1 != NULL && graph2 != NULL) {
+		if (graph1 == graph2)
+			return;
+
 		SetIteratorEncodingNode *nodeit = graph2->nodeIterator();
 		while (nodeit->hasNext()) {
 			EncodingNode *node = nodeit->next();
@@ -357,9 +363,6 @@ void EncodingGraph::decideEdges() {
 			}
 		} else {
 			//Neither are null
-			//Are we already merged?
-			if (leftGraph == rightGraph)
-				continue;
 			leftSize = convertSize(leftGraph->encodingSize);
 			rightSize = convertSize(rightGraph->encodingSize);
 			newSize = convertSize(leftGraph->estimateNewSize(rightGraph));
