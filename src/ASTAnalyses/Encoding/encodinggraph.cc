@@ -155,6 +155,9 @@ void EncodingGraph::encode() {
 						ASSERT(encoding->isinUseElement(encodingIndex));
 						encoding->encodingArray[encodingIndex] = value;
 					}
+				} else{
+					model_print("DAMN in encode()\n");
+					e->print();
 				}
 			}
 			break;
@@ -330,8 +333,8 @@ void EncodingGraph::decideEdges() {
 			EncodingNode *tmp = left; left = right; right = tmp;
 			EncodingSubGraph *tmpsg = leftGraph; leftGraph = rightGraph; rightGraph = tmpsg;
 		}
-
-		uint leftSize = 0, rightSize = 0, newSize = 0;
+		//model_print("Right=%p RGraph=%p\tLeft=%p LGraph=%p\n", right, rightGraph, left, leftGraph);
+		uint leftSize = 0, rightSize = 0, newSize = 0, max=0;
 		uint64_t totalCost = 0;
 		bool merge = false;
 //		model_print("**************decideEdge*************\n");
@@ -347,7 +350,9 @@ void EncodingGraph::decideEdges() {
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			totalCost = (newSize - leftSize) * left->elements.getSize() +
 									(newSize - rightSize) * right->elements.getSize();
-			if(leftSize == newSize && rightSize == newSize){
+			//model_print("leftSize=%u\trighSize=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
+			max = rightSize > leftSize? rightSize : leftSize;
+			if(newSize == max){
 				merge = true;
 			}
 		} else if (leftGraph != NULL && rightGraph == NULL) {
@@ -358,7 +363,9 @@ void EncodingGraph::decideEdges() {
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			totalCost = (newSize - leftSize) * leftGraph->numElements +
 									(newSize - rightSize) * right->elements.getSize();
-			if(leftSize == newSize && rightSize == newSize){
+			//model_print("leftSize=%u\trighSize=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
+			max = rightSize > leftSize? rightSize : leftSize;
+			if(newSize == max){
 				merge = true;
 			}
 		} else {
