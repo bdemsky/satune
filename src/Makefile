@@ -13,6 +13,7 @@ HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wi
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CFLAGS := -Wall -O0 -g
+CXXFLAGS := -std=c++1y -pthread
 CFLAGS += -IAST -IASTTransform -IASTAnalyses -IASTAnalyses/Polarity -IASTAnalyses/Order -IASTAnalyses/Encoding -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner -ISerialize
 LDFLAGS := -ldl -lrt -rdynamic -g
 SHARED := -shared
@@ -58,7 +59,7 @@ ${OBJ_DIR}/$(LIB_SO): $(OBJECTS)
 	$(CXX) -g $(SHARED) -o ${OBJ_DIR}/$(LIB_SO) $+ $(LDFLAGS)
 
 ${OBJ_DIR}/%.o: %.cc
-	$(CXX) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable -std=c++1y -pthread
+	$(CXX) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable $(CXXFLAGS)
 
 ${OBJ_DIR}/%.o: %.c
 	$(CC) -fPIC -c $< -o $@ $(CFLAGS) -Wno-unused-variable

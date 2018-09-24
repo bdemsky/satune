@@ -575,9 +575,6 @@ Edge simplifyCNF(CNF *cnf, Edge input) {
 
 void addClause(CNF *cnf, uint numliterals, int *literals){
 	cnf->clausecount++;
-	for(uint i=0; i< numliterals; i++)
-		model_print("%d ", literals[i]);
-	model_print("\n");
 	addArrayClauseLiteral(cnf->solver, numliterals, literals);
 }
 
@@ -643,23 +640,17 @@ void generateProxy(CNF *cnf, Edge expression, Edge proxy, Polarity p) {
 	if (p == P_TRUE || p == P_BOTHTRUEFALSE) {
 		// proxy => expression
 		Edge cnfexpr = simplifyCNF(cnf, expression);
-		Edge cnfnegexpr = simplifyCNF(cnf, constraintNegate(expression));
 		if (p == P_TRUE)
 			freeEdgeRec(expression);
 		outputCNFOR(cnf, cnfexpr, constraintNegate(proxy));
-		outputCNFOR(cnf, cnfnegexpr, proxy);
 		freeEdgeCNF(cnfexpr);
-		freeEdgeCNF(cnfnegexpr);
 	}
 	if (p == P_FALSE || p == P_BOTHTRUEFALSE) {
 		// expression => proxy
 		Edge cnfnegexpr = simplifyCNF(cnf, constraintNegate(expression));
-		Edge cnfexpr = simplifyCNF(cnf, expression);
 		freeEdgeRec(expression);
 		outputCNFOR(cnf, cnfnegexpr, proxy);
-		outputCNFOR(cnf, cnfexpr, constraintNegate(proxy));
 		freeEdgeCNF(cnfnegexpr);
-		freeEdgeCNF(cnfexpr);
 	}
 }
 

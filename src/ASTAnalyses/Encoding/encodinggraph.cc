@@ -114,7 +114,7 @@ void EncodingGraph::validate() {
 
 void EncodingGraph::encode() {
 	SetIteratorEncodingSubGraph *itesg = subgraphs.iterator();
-	model_print("#SubGraph = %u", subgraphs.getSize());
+	DEBUG("#SubGraph = %u", subgraphs.getSize());
 	while (itesg->hasNext()) {
 		EncodingSubGraph *sg = itesg->next();
 		sg->encode();
@@ -155,9 +155,6 @@ void EncodingGraph::encode() {
 						ASSERT(encoding->isinUseElement(encodingIndex));
 						encoding->encodingArray[encodingIndex] = value;
 					}
-				} else{
-					model_print("DAMN in encode()\n");
-					e->print();
 				}
 			}
 			break;
@@ -333,15 +330,10 @@ void EncodingGraph::decideEdges() {
 			EncodingNode *tmp = left; left = right; right = tmp;
 			EncodingSubGraph *tmpsg = leftGraph; leftGraph = rightGraph; rightGraph = tmpsg;
 		}
-		//model_print("Right=%p RGraph=%p\tLeft=%p LGraph=%p\n", right, rightGraph, left, leftGraph);
+		
 		uint leftSize = 0, rightSize = 0, newSize = 0, max=0;
 		uint64_t totalCost = 0;
 		bool merge = false;
-//		model_print("**************decideEdge*************\n");
-//		model_print("LeftNode Size = %u\n", left->getSize());
-//		model_print("rightNode Size = %u\n", right->getSize());
-//		model_print("UnionSize = %u\n", left->s->getUnionSize(right->s));
-			
 		if (leftGraph == NULL && rightGraph == NULL) {
 			leftSize = convertSize(left->getSize());
 			rightSize = convertSize(right->getSize());
@@ -350,7 +342,6 @@ void EncodingGraph::decideEdges() {
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			totalCost = (newSize - leftSize) * left->elements.getSize() +
 									(newSize - rightSize) * right->elements.getSize();
-			//model_print("leftSize=%u\trighSize=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
 			max = rightSize > leftSize? rightSize : leftSize;
 			if(newSize == max){
 				merge = true;
@@ -363,7 +354,6 @@ void EncodingGraph::decideEdges() {
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			totalCost = (newSize - leftSize) * leftGraph->numElements +
 									(newSize - rightSize) * right->elements.getSize();
-			//model_print("leftSize=%u\trighSize=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
 			max = rightSize > leftSize? rightSize : leftSize;
 			if(newSize == max){
 				merge = true;
@@ -377,14 +367,10 @@ void EncodingGraph::decideEdges() {
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			totalCost = (newSize - leftSize) * leftGraph->numElements +
 									(newSize - rightSize) * rightGraph->numElements;
-//			model_print("LeftGraph size=%u\n", leftGraph->encodingSize);
-//			model_print("RightGraph size=%u\n", rightGraph->encodingSize);
-//			model_print("UnionGraph size = %u\n", leftGraph->estimateNewSize(rightGraph));
 			if(rightSize < 64 && leftSize < 64){
 				merge = true;
 			}
 		}
-//		model_print("******************************\n");
 		if (merge) {
 			//add the edge
 			mergeNodes(left, right);
