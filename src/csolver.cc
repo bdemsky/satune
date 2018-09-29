@@ -34,7 +34,8 @@ CSolver::CSolver() :
 	boolFalse(boolTrue.negate()),
 	unsat(false),
 	tuner(NULL),
-	elapsedTime(0)
+	elapsedTime(0),
+	satsolverTimeout(NOTIMEOUT)
 {
 	satEncoder = new SATEncoder(this);
 }
@@ -615,9 +616,8 @@ int CSolver::solve() {
 	ElementOpt eop(this);
 	eop.doTransform();
 
-//	EncodingGraph eg(this);
-//	eg.buildGraph();
-//	eg.encode();
+	EncodingGraph eg(this);
+	eg.encode();
 
 	naiveEncodingDecision(this);
 //	eg.validate();
@@ -631,8 +631,8 @@ int CSolver::solve() {
 	model_print("Elapse Encode time: %f\n", (time1- startTime) / NANOSEC);
 	
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
-	int result = unsat ? IS_UNSAT : satEncoder->solve();
-	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT? "SAT" : " UNSAT");
+	int result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
+	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT? "SAT" : result == IS_INDETER? "INDETERMINATE" : " UNSAT");
 	time2 = getTimeNano();
 	elapsedTime = time2 - startTime;
 	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);

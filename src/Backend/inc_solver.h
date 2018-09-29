@@ -18,6 +18,8 @@
 #include "solver_interface.h"
 #include "classlist.h"
 
+#define NOTIMEOUT -1
+
 struct IncrementalSolver {
 	int *buffer;
 	int *solution;
@@ -26,6 +28,7 @@ struct IncrementalSolver {
 	pid_t solver_pid;
 	int to_solver_fd;
 	int from_solver_fd;
+        long timeout;
 };
 
 IncrementalSolver *allocIncrementalSolver();
@@ -43,5 +46,6 @@ void createSolver(IncrementalSolver *This);
 void killSolver(IncrementalSolver *This);
 void flushBufferSolver(IncrementalSolver *This);
 int readIntSolver(IncrementalSolver *This);
+int readStatus(IncrementalSolver *This);
 void readSolver(IncrementalSolver *This, void *buffer, ssize_t size);
 #endif

@@ -12,7 +12,6 @@
 #include <fcntl.h>
 #include "common.h"
 #include <string.h>
-#include <stdexcept>
 
 IncrementalSolver *allocIncrementalSolver() {
 	IncrementalSolver *This = (IncrementalSolver *)ourmalloc(sizeof(IncrementalSolver));
@@ -20,6 +19,7 @@ IncrementalSolver *allocIncrementalSolver() {
 	This->solution = NULL;
 	This->solutionsize = 0;
 	This->offset = 0;
+	This->timeout = NOTIMEOUT;
 	createSolver(This);
 	return This;
 }
@@ -91,7 +91,7 @@ void startSolve(IncrementalSolver *This) {
 }
 
 int getSolution(IncrementalSolver *This) {
-	int result = readIntSolver(This);
+	int result = readStatus(This);
 	if (result == IS_SAT) {
 		int numVars = readIntSolver(This);
 		if (numVars > This->solutionsize) {
@@ -112,6 +112,33 @@ int readIntSolver(IncrementalSolver *This) {
 	return value;
 }
 
+int readStatus(IncrementalSolver *This) {
+	int retval;
+	fd_set rfds;
+	FD_ZERO(&rfds);
+	FD_SET(This->from_solver_fd, &rfds);
+	fd_set * temp;
+	if(This->timeout == NOTIMEOUT){
+		retval = select(This->from_solver_fd+1, &rfds, NULL, NULL, NULL);
+	}else {
+		struct timeval tv;
+		tv.tv_sec = This->timeout;
+		tv.tv_usec = 0;
+		retval = select(This->from_solver_fd+1, &rfds, NULL, NULL, &tv);
+	}
+	if(retval == -1){
+		perror("Error in select()");
+		exit(EXIT_FAILURE);
+	}
+	else if (retval){
+		printf("Data is available now.\n");
+		return readIntSolver(This);
+	}else{
+		printf("Timeout for the solver\n");
+		return IS_INDETER;
+	}
+}
+
 void readSolver(IncrementalSolver *This, void *tmp, ssize_t size) {
 	char *result = (char *) tmp;
 	ssize_t bytestoread = size;
@@ -120,7 +147,7 @@ void readSolver(IncrementalSolver *This, void *tmp, ssize_t size) {
 		ssize_t n = read(This->from_solver_fd, &((char *)result)[bytesread], bytestoread);
 		if (n == -1) {
 			model_print("Read failure\n");
-			throw std::runtime_error("Read failure\n");
+			exit(-1);
 		}
 		bytestoread -= n;
 		bytesread += n;

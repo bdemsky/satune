@@ -29,7 +29,8 @@ void SATEncoder::resetSATEncoder() {
 	booledgeMap.reset();
 }
 
-int SATEncoder::solve() {
+int SATEncoder::solve(long timeout) {
+	cnf->solver->timeout = timeout;
 	return solveCNF(cnf);
 }
 

@@ -10,8 +10,8 @@
  */
 
 void naiveEncodingDecision(CSolver *csolver);
-void naiveEncodingConstraint(Boolean *This);
-void naiveEncodingLogicOp(BooleanLogic *This);
-void naiveEncodingPredicate(BooleanPredicate *This);
-void naiveEncodingElement(Element *This);
+void naiveEncodingConstraint(CSolver *csolver, Boolean *This);
+void naiveEncodingLogicOp(CSolver *csolver, BooleanLogic *This);
+void naiveEncodingPredicate(CSolver *csolver, BooleanPredicate *This);
+void naiveEncodingElement(CSolver *csolver, Element *This);
 #endif

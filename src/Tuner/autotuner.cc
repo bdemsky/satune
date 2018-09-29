@@ -4,52 +4,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 
-#define TIMEOUT 1000s
 #define UNSETVALUE -1
-#define POSINFINITY 9999999999L
-
-using namespace std::chrono_literals;
-
-int solve(CSolver *solver)
-{
-	try{
-		return solver->solve();
-	}
-	catch(std::runtime_error& e) {
-		return UNSETVALUE;
-	}
-}
-
-int solveWrapper(CSolver *solver)
-{
-	std::mutex m;
-	std::condition_variable cv;
-	int retValue;
-
-	std::thread t([&cv, &retValue, solver]()
-	{
-		retValue = solve(solver);
-		cv.notify_one();
-	});
-
-	t.detach();
-
-	{
-		std::unique_lock<std::mutex> l(m);
-		if(cv.wait_for(l, TIMEOUT) == std::cv_status::timeout)
-			throw std::runtime_error("Timeout");
-	}
-
-	return retValue;
-}
-
-
+#define TIMEOUTSEC 60
 AutoTuner::AutoTuner(uint _budget) :
 	budget(_budget), result(UNSETVALUE) {
 }
@@ -61,23 +18,16 @@ void AutoTuner::addProblem(CSolver *solver) {
 long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 	CSolver *copy = problem->clone();
 	copy->setTuner(tuner);
+	copy->setSatSolverTimeout(TIMEOUTSEC);
 	model_print("**********************\n");
-	long long metric = 0L;
-	try {
-		int sat = solveWrapper(copy);
-		if (result == UNSETVALUE)
-			result = sat;
-		else if (result != sat) {
-			model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
-			copy->printConstraints();
-		}
-		metric = copy->getElapsedTime();
+	int sat = copy->solve();
+	if (result == UNSETVALUE && sat != IS_INDETER)
+		result = sat;
+	else if (result != sat && sat != IS_INDETER) {
+		model_print("&&&&&&&&&&&&&&&&&& Result has changed &&&&&&&&&&&&&\n");
+		copy->printConstraints();
 	}
-	catch(std::runtime_error& e) {
-		metric = POSINFINITY;
-		model_print("TimeOut has hit\n");
-	}
-	
+	long long metric = copy->getElapsedTime();
 	delete copy;
 	return metric;
 }

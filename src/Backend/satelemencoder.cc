@@ -5,7 +5,8 @@
 #include "element.h"
 #include "set.h"
 #include "predicate.h"
-
+#include "csolver.h"
+#include "tunable.h"
 
 void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool &memo) {
 	uint numParents = elem->parents.getSize();
@@ -222,8 +223,16 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
-	if (encoding->element->anyValue)
+	if (encoding->element->anyValue){
+		uint setSize = encoding->element->getRange()->getSize();
+		uint encArraySize = encoding->encArraySize;
+		model_print("setSize=%u\tencArraySize=%u\n", setSize, encArraySize);
+		if(setSize < encArraySize * (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex)/10){
+			generateAnyValueBinaryIndexEncodingPositive(encoding);
+		} else {
 		generateAnyValueBinaryIndexEncoding(encoding);
+		}
+	}
 }
 
 void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
@@ -291,6 +300,20 @@ void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) 
 			addConstraintCNF(cnf, constraintNegate( generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i)));
 		}
 	}
+}
+
+void SATEncoder::generateAnyValueBinaryIndexEncodingPositive(ElementEncoding *encoding) {
+	if (encoding->numVars == 0)
+		return;
+	Edge carray[encoding->encArraySize];
+	uint size = 0;
+	for (uint i = 0; i < encoding->encArraySize; i++) {
+		if (encoding->isinUseElement(i)) {
+			carray[size] = generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i);
+			size++;
+		}
+	}
+	addConstraintCNF(cnf, constraintOR(cnf, size, carray));
 }
 
 void SATEncoder::generateAnyValueBinaryValueEncoding(ElementEncoding *encoding) {

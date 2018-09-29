@@ -43,6 +43,10 @@ const char* tunableParameterToString(Tunables tunable){
 			return "ELEMENTOPTSETS";
 		case PROXYVARIABLE:
 			return "PROXYVARIABLE";
+		case ENCODINGGRAPHOPT:
+			return "ENCODINGGRAPHOPT";
+		case NAIVEENCODER:
+			return "NAIVEENCODER";
                 default:
                         ASSERT(0);
         }

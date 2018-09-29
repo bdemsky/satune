@@ -10,7 +10,7 @@ typedef Hashtable<Boolean *, Node *, uintptr_t, 4> BooleanToEdgeMap;
 
 class SATEncoder {
 public:
-	int solve();
+	int solve(long timeout);
 	SATEncoder(CSolver *solver);
 	~SATEncoder();
 	void resetSATEncoder();
@@ -62,6 +62,7 @@ private:
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
 	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
 	void generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding);
+	void generateAnyValueBinaryIndexEncodingPositive(ElementEncoding *encoding);
 	void generateAnyValueBinaryValueEncoding(ElementEncoding *encoding);
 	CNF *cnf;
 	CSolver *solver;

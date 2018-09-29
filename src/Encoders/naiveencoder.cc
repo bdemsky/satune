@@ -11,18 +11,19 @@
 #include "table.h"
 #include "tableentry.h"
 #include "order.h"
+#include "tunable.h"
 #include <strings.h>
 
 void naiveEncodingDecision(CSolver *This) {
 	SetIteratorBooleanEdge *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge b = iterator->next();
-		naiveEncodingConstraint(b.getBoolean());
+		naiveEncodingConstraint(This, b.getBoolean());
 	}
 	delete iterator;
 }
 
-void naiveEncodingConstraint(Boolean *This) {
+void naiveEncodingConstraint(CSolver *csolver, Boolean *This) {
 	switch (This->type) {
 	case BOOLEANVAR: {
 		return;
@@ -33,11 +34,11 @@ void naiveEncodingConstraint(Boolean *This) {
 		return;
 	}
 	case LOGICOP: {
-		naiveEncodingLogicOp((BooleanLogic *) This);
+		naiveEncodingLogicOp(csolver, (BooleanLogic *) This);
 		return;
 	}
 	case PREDICATEOP: {
-		naiveEncodingPredicate((BooleanPredicate *) This);
+		naiveEncodingPredicate(csolver, (BooleanPredicate *) This);
 		return;
 	}
 	default:
@@ -45,30 +46,30 @@ void naiveEncodingConstraint(Boolean *This) {
 	}
 }
 
-void naiveEncodingLogicOp(BooleanLogic *This) {
+void naiveEncodingLogicOp(CSolver *csolver, BooleanLogic *This) {
 	for (uint i = 0; i < This->inputs.getSize(); i++) {
-		naiveEncodingConstraint(This->inputs.get(i).getBoolean());
+		naiveEncodingConstraint(csolver, This->inputs.get(i).getBoolean());
 	}
 }
 
-void naiveEncodingPredicate(BooleanPredicate *This) {
+void naiveEncodingPredicate(CSolver *csolver, BooleanPredicate *This) {
 	FunctionEncoding *encoding = This->getFunctionEncoding();
 	if (encoding->getFunctionEncodingType() == FUNC_UNASSIGNED)
 		This->getFunctionEncoding()->setFunctionEncodingType(ENUMERATEIMPLICATIONS);
 
 	for (uint i = 0; i < This->inputs.getSize(); i++) {
 		Element *element = This->inputs.get(i);
-		naiveEncodingElement(element);
+		naiveEncodingElement(csolver, element);
 	}
 }
 
-void naiveEncodingElement(Element *This) {
+void naiveEncodingElement(CSolver *csolver, Element *This) {
 	ElementEncoding *encoding = This->getElementEncoding();
 	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
 		if(This->type != ELEMCONST){
 			model_print("INFO: naive encoder is making the decision about element %p....\n", This);
 		}
-		encoding->setElementEncodingType(BINARYINDEX);
+		encoding->setElementEncodingType((ElementEncodingType)csolver->getTuner()->getVarTunable(This->getRange()->getType(), NAIVEENCODER, &NaiveEncodingDesc));
 		encoding->encodingArrayInitialization();
 	}
 
@@ -76,7 +77,7 @@ void naiveEncodingElement(Element *This) {
 		ElementFunction *function = (ElementFunction *) This;
 		for (uint i = 0; i < function->inputs.getSize(); i++) {
 			Element *element = function->inputs.get(i);
-			naiveEncodingElement(element);
+			naiveEncodingElement(csolver, element);
 		}
 		FunctionEncoding *encoding = function->getElementFunctionEncoding();
 		if (encoding->getFunctionEncodingType() == FUNC_UNASSIGNED)

@@ -44,11 +44,12 @@ void TunableSetting::setDecision(int _low, int _high, int _default, int _selecti
 }
 
 void TunableSetting::print() {
+	model_print("Param %s = %u \t range=[%u,%u]", tunableParameterToString( (Tunables)param), selectedValue, lowValue, highValue);
 	if (hasVar) {
-		model_print("VarType1 %" PRIu64 ", ", type1);
+		model_print("\tVarType1 %" PRIu64 ", ", type1);
 		model_print("VarType2 %" PRIu64 ", ", type2);
 	}
-	model_print("Param %s = %u \t range=[%u,%u]\n", tunableParameterToString( (Tunables)param), selectedValue, lowValue, highValue);
+	model_print("\n");
 }
 
 unsigned int tunableSettingHash(TunableSetting *setting) {

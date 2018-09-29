@@ -113,8 +113,11 @@ void EncodingGraph::validate() {
 
 
 void EncodingGraph::encode() {
+	if (solver->getTuner()->getTunable(ENCODINGGRAPHOPT, &offon) == 0)
+		return;
+	buildGraph();
 	SetIteratorEncodingSubGraph *itesg = subgraphs.iterator();
-	DEBUG("#SubGraph = %u", subgraphs.getSize());
+	model_print("#SubGraph = %u\n", subgraphs.getSize());
 	while (itesg->hasNext()) {
 		EncodingSubGraph *sg = itesg->next();
 		sg->encode();
@@ -332,7 +335,6 @@ void EncodingGraph::decideEdges() {
 		}
 		
 		uint leftSize = 0, rightSize = 0, newSize = 0, max=0;
-		uint64_t totalCost = 0;
 		bool merge = false;
 		if (leftGraph == NULL && rightGraph == NULL) {
 			leftSize = convertSize(left->getSize());
@@ -340,36 +342,29 @@ void EncodingGraph::decideEdges() {
 			newSize = convertSize(left->s->getUnionSize(right->s));
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-			totalCost = (newSize - leftSize) * left->elements.getSize() +
-									(newSize - rightSize) * right->elements.getSize();
 			max = rightSize > leftSize? rightSize : leftSize;
-			if(newSize == max){
-				merge = true;
-			}
+//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", left->measureSimilarity(right));
+			merge = left->measureSimilarity(right) > 1.5 || max == newSize;
 		} else if (leftGraph != NULL && rightGraph == NULL) {
 			leftSize = convertSize(leftGraph->encodingSize);
 			rightSize = convertSize(right->getSize());
 			newSize = convertSize(leftGraph->estimateNewSize(right));
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-			totalCost = (newSize - leftSize) * leftGraph->numElements +
-									(newSize - rightSize) * right->elements.getSize();
 			max = rightSize > leftSize? rightSize : leftSize;
-			if(newSize == max){
-				merge = true;
-			}
+//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(right));
+			merge = leftGraph->measureSimilarity(right) > 1.5 || max == newSize;
 		} else {
 			//Neither are null
 			leftSize = convertSize(leftGraph->encodingSize);
 			rightSize = convertSize(rightGraph->encodingSize);
 			newSize = convertSize(leftGraph->estimateNewSize(rightGraph));
+//			model_print("MergingSubGraphs: left=%u\tright=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-			totalCost = (newSize - leftSize) * leftGraph->numElements +
-									(newSize - rightSize) * rightGraph->numElements;
-			if(rightSize < 64 && leftSize < 64){
-				merge = true;
-			}
+//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(rightGraph));
+			max = rightSize > leftSize? rightSize : leftSize;
+			merge = leftGraph->measureSimilarity(right) > 1.5 || max == newSize;
 		}
 		if (merge) {
 			//add the edge
@@ -427,11 +422,33 @@ uint EncodingNode::getSize() const {
 	return s->getSize();
 }
 
+uint64_t EncodingNode::getIndex(uint index){
+	return s->getElement(index);
+}
+
 VarType EncodingNode::getType() const {
 	return s->getType();
 }
 
-static TunableDesc NodeEncodingDesc(ELEM_UNASSIGNED, BINARYINDEX, ELEM_UNASSIGNED);
+bool EncodingNode::itemExists(uint64_t item){
+	for(uint i=0; i< s->getSize(); i++){
+		if(item == s->getElement(i))
+			return true;
+	}
+	return false;
+}
+
+double EncodingNode::measureSimilarity(EncodingNode *node){
+	uint common = 0;
+	for(uint i=0; i < s->getSize(); i++){
+		uint64_t item = s->getElement(i);
+		if(node->itemExists(item)){
+			common++;
+		}
+	}
+//	model_print("common=%u\tsize1=%u\tsize2=%u\tsim1=%f\tsim2=%f\n", common, s->getSize(), node->getSize(), 1.0*common/s->getSize(), 1.0*common/node->getSize());
+	return common*1.0/s->getSize() + common*1.0/node->getSize();
+}
 
 EncodingNode *EncodingGraph::createNode(Element *e) {
 	if (e->type == ELEMCONST)
