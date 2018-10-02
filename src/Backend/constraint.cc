@@ -575,9 +575,6 @@ Edge simplifyCNF(CNF *cnf, Edge input) {
 
 void addClause(CNF *cnf, uint numliterals, int *literals){
 	cnf->clausecount++;
-	for(uint i=0; i< numliterals; i++)
-		model_print("%d ", literals[i]);
-	model_print("\n");
 	addArrayClauseLiteral(cnf->solver, numliterals, literals);
 }
 
