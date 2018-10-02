@@ -6,7 +6,7 @@
 #include <float.h>
 
 #define UNSETVALUE -1
-#define TIMEOUTSEC 60
+#define TIMEOUTSEC 5000
 AutoTuner::AutoTuner(uint _budget) :
 	budget(_budget), result(UNSETVALUE) {
 }
