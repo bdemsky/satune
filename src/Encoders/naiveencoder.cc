@@ -66,7 +66,7 @@ void naiveEncodingPredicate(CSolver *csolver, BooleanPredicate *This) {
 void naiveEncodingElement(CSolver *csolver, Element *This) {
 	ElementEncoding *encoding = This->getElementEncoding();
 	if (encoding->getElementEncodingType() == ELEM_UNASSIGNED) {
-		if(This->type != ELEMCONST){
+		if (This->type != ELEMCONST) {
 			model_print("INFO: naive encoder is making the decision about element %p....\n", This);
 		}
 		encoding->setElementEncodingType((ElementEncodingType)csolver->getTuner()->getVarTunable(This->getRange()->getType(), NAIVEENCODER, &NaiveEncodingDesc));

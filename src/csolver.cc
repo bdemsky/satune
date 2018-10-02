@@ -621,15 +621,15 @@ int CSolver::solve() {
 
 	naiveEncodingDecision(this);
 //	eg.validate();
-	
+
 	time2 = getTimeNano();
 	model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
 
 	satEncoder->encodeAllSATEncoder(this);
 	time1 = getTimeNano();
 
-	model_print("Elapse Encode time: %f\n", (time1- startTime) / NANOSEC);
-	
+	model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
+
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
 	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT? "SAT" : result == IS_INDETER? "INDETERMINATE" : " UNSAT");

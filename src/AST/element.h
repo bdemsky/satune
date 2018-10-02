@@ -21,7 +21,7 @@ public:
 	virtual void updateParents() {}
 	virtual Set *getRange() = 0;
 	CMEMALLOC;
-        bool anyValue;
+	bool anyValue;
 };
 
 class ElementSet : public Element {

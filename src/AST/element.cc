@@ -9,7 +9,7 @@
 Element::Element(ASTNodeType _type) :
 	ASTNode(_type),
 	encoding(this),
-	anyValue(false){
+	anyValue(false) {
 }
 
 ElementSet::ElementSet(Set *s) :
@@ -36,7 +36,7 @@ ElementConst::ElementConst(uint64_t _value, Set *_set) :
 }
 
 Element *ElementConst::clone(CSolver *solver, CloneMap *map) {
-	Element* e= solver->getElementConst(type, value);
+	Element *e = solver->getElementConst(type, value);
 	e->anyValue = anyValue;
 	return e;
 }

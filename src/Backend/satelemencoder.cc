@@ -230,7 +230,7 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 		if(setSize < encArraySize * (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex)/10){
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
 		} else {
-		generateAnyValueBinaryIndexEncoding(encoding);
+			generateAnyValueBinaryIndexEncoding(encoding);
 		}
 	}
 }

@@ -54,32 +54,32 @@ void EncodingGraph::buildGraph() {
 
 
 void EncodingGraph::validate() {
-	SetIteratorBooleanEdge* it= solver->getConstraints();
-	while(it->hasNext()){
+	SetIteratorBooleanEdge *it = solver->getConstraints();
+	while (it->hasNext()) {
 		BooleanEdge be = it->next();
-		if(be->type == PREDICATEOP){
+		if (be->type == PREDICATEOP) {
 			BooleanPredicate *b = (BooleanPredicate *)be.getBoolean();
-			if(b->predicate->type == OPERATORPRED){
-				PredicateOperator* predicate = (PredicateOperator*) b->predicate;
-				if(predicate->getOp() == SATC_EQUALS){
+			if (b->predicate->type == OPERATORPRED) {
+				PredicateOperator *predicate = (PredicateOperator *) b->predicate;
+				if (predicate->getOp() == SATC_EQUALS) {
 					ASSERT(b->inputs.getSize() == 2);
-					Element* e1= b->inputs.get(0);
-					Element* e2= b->inputs.get(1);
-					if(e1->type == ELEMCONST || e1->type == ELEMCONST)
+					Element *e1 = b->inputs.get(0);
+					Element *e2 = b->inputs.get(1);
+					if (e1->type == ELEMCONST || e1->type == ELEMCONST)
 						continue;
 					ElementEncoding *enc1 = e1->getElementEncoding();
 					ElementEncoding *enc2 = e2->getElementEncoding();
 					ASSERT(enc1->getElementEncodingType() != ELEM_UNASSIGNED);
 					ASSERT(enc2->getElementEncodingType() != ELEM_UNASSIGNED);
-					if(enc1->getElementEncodingType() == enc2->getElementEncodingType() && enc1->getElementEncodingType() == BINARYINDEX && b->getFunctionEncoding()->type == CIRCUIT){
-						for(uint i=0; i<enc1->encArraySize; i++){
-							if(enc1->isinUseElement(i)){
+					if (enc1->getElementEncodingType() == enc2->getElementEncodingType() && enc1->getElementEncodingType() == BINARYINDEX && b->getFunctionEncoding()->type == CIRCUIT) {
+						for (uint i = 0; i < enc1->encArraySize; i++) {
+							if (enc1->isinUseElement(i)) {
 								uint64_t val1 = enc1->encodingArray[i];
-								if(enc2->isinUseElement(i)){
+								if (enc2->isinUseElement(i)) {
 									ASSERT(val1 == enc2->encodingArray[i]);
-								}else{
-									for(uint j=0; j< enc2->encArraySize; j++){
-										if(enc2->isinUseElement(j)){
+								} else {
+									for (uint j = 0; j < enc2->encArraySize; j++) {
+										if (enc2->isinUseElement(j)) {
 											ASSERT(val1 != enc2->encodingArray[j]);
 										}
 									}
@@ -88,15 +88,15 @@ void EncodingGraph::validate() {
 						}
 					}
 					//Now make sure that all the elements in the set are appeared in the encoding array!
-					for(uint k=0; k< b->inputs.getSize(); k++){
+					for (uint k = 0; k < b->inputs.getSize(); k++) {
 						Element *e = b->inputs.get(k);
 						ElementEncoding *enc = e->getElementEncoding();
 						Set *s = e->getRange();
 						for (uint i = 0; i < s->getSize(); i++) {
 							uint64_t value = s->getElement(i);
-							bool exist=false;
-							for(uint j=0; j< enc->encArraySize; j++){
-								if(enc->isinUseElement(j) && enc->encodingArray[j] == value){
+							bool exist = false;
+							for (uint j = 0; j < enc->encArraySize; j++) {
+								if (enc->isinUseElement(j) && enc->encodingArray[j] == value) {
 									exist = true;
 									break;
 								}
@@ -207,7 +207,7 @@ void EncodingGraph::mergeNodes(EncodingNode *first, EncodingNode *second) {
 		first->setEncoding(BINARYINDEX);
 	if (graph2 == NULL)
 		second->setEncoding(BINARYINDEX);
-	
+
 	if (graph1 == NULL && graph2 == NULL) {
 		graph1 = new EncodingSubGraph();
 		subgraphs.add(graph1);
@@ -342,9 +342,6 @@ void EncodingGraph::decideEdges() {
 			newSize = convertSize(left->s->getUnionSize(right->s));
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-			max = rightSize > leftSize? rightSize : leftSize;
-//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", left->measureSimilarity(right));
-			merge = left->measureSimilarity(right) > 1.5 || max == newSize;
 		} else if (leftGraph != NULL && rightGraph == NULL) {
 			leftSize = convertSize(leftGraph->encodingSize);
 			rightSize = convertSize(right->getSize());
@@ -352,8 +349,8 @@ void EncodingGraph::decideEdges() {
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			max = rightSize > leftSize? rightSize : leftSize;
-//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(right));
-			merge = leftGraph->measureSimilarity(right) > 1.5 || max == newSize;
+//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", left->measureSimilarity(right));
+			merge = left->measureSimilarity(right) > 1.5 || max == newSize;
 		} else {
 			//Neither are null
 			leftSize = convertSize(leftGraph->encodingSize);
@@ -362,8 +359,8 @@ void EncodingGraph::decideEdges() {
 //			model_print("MergingSubGraphs: left=%u\tright=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(rightGraph));
 			max = rightSize > leftSize? rightSize : leftSize;
+//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(right));
 			merge = leftGraph->measureSimilarity(right) > 1.5 || max == newSize;
 		}
 		if (merge) {

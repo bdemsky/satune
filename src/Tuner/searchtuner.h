@@ -15,7 +15,7 @@ public:
 	TunableSetting(TunableSetting *ts);
 	void setDecision(int _low, int _high, int _default, int _selection);
 	void print();
-        friend std::ostream& operator<< (std::ostream& stream, const TunableSetting& matrix);
+	friend std ::ostream &operator<< (std::ostream &stream, const TunableSetting &matrix);
 	CMEMALLOC;
 private:
 	bool hasVar;
@@ -49,8 +49,8 @@ public:
 	uint getSize() { return usedSettings.getSize();}
 	void print();
 	void printUsed();
-        void serialize();
-        
+	void serialize();
+
 	CMEMALLOC;
 private:
 	/** Used Settings keeps track of settings that were actually used by
