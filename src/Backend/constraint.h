@@ -46,7 +46,7 @@ typedef struct Node Node;
 
 struct CNF {
 	uint varcount;
-        uint clausecount;
+	uint clausecount;
 	uint asize;
 	IncrementalSolver *solver;
 	int *array;

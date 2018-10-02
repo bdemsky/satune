@@ -62,18 +62,18 @@ bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
 				 setting1->param == setting2->param;
 }
 
-ostream& operator<<(ostream& os, const TunableSetting& ts)  
-{  
-    os << ts.hasVar <<" " << ts.type1 <<" " << ts.type2 << " " << ts.param << " " << ts.lowValue <<" " 
-            << ts.highValue << " " << ts.defaultValue << " " << ts.selectedValue;  
-    return os;  
-}  
+ostream &operator<<(ostream &os, const TunableSetting &ts)
+{
+	os << ts.hasVar << " " << ts.type1 << " " << ts.type2 << " " << ts.param << " " << ts.lowValue << " "
+		 << ts.highValue << " " << ts.defaultValue << " " << ts.selectedValue;
+	return os;
+}
 
 
 SearchTuner::SearchTuner() {
 	ifstream myfile;
 	myfile.open (TUNEFILE, ios::in);
-	if(myfile.is_open()){
+	if (myfile.is_open()) {
 		bool hasVar;
 		VarType type1;
 		VarType type2;
@@ -82,12 +82,12 @@ SearchTuner::SearchTuner() {
 		int highValue;
 		int defaultValue;
 		int selectedValue;
-		while(myfile >> hasVar >> type1 >> type2 >> param >> lowValue >> highValue >> defaultValue >> selectedValue){
+		while (myfile >> hasVar >> type1 >> type2 >> param >> lowValue >> highValue >> defaultValue >> selectedValue) {
 			TunableSetting *setting;
-			
-			if(hasVar){
+
+			if (hasVar) {
 				setting = new TunableSetting(type1, type2, param);
-			}else{
+			} else {
 				setting = new TunableSetting(param);
 			}
 			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);

@@ -573,7 +573,7 @@ Edge simplifyCNF(CNF *cnf, Edge input) {
 	}
 }
 
-void addClause(CNF *cnf, uint numliterals, int *literals){
+void addClause(CNF *cnf, uint numliterals, int *literals) {
 	cnf->clausecount++;
 	addArrayClauseLiteral(cnf->solver, numliterals, literals);
 }

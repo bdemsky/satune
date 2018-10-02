@@ -21,7 +21,7 @@ int solve(CSolver *solver)
 	try{
 		return solver->solve();
 	}
-	catch(std::runtime_error& e) {
+	catch (std::runtime_error &e) {
 		return UNSETVALUE;
 	}
 }
@@ -33,16 +33,16 @@ int solveWrapper(CSolver *solver)
 	int retValue;
 
 	std::thread t([&cv, &retValue, solver]()
-	{
-		retValue = solve(solver);
-		cv.notify_one();
-	});
+		{
+								retValue = solve(solver);
+								cv.notify_one();
+		});
 
 	t.detach();
 
 	{
 		std::unique_lock<std::mutex> l(m);
-		if(cv.wait_for(l, TIMEOUT) == std::cv_status::timeout)
+		if (cv.wait_for(l, TIMEOUT) == std::cv_status::timeout)
 			throw std::runtime_error("Timeout");
 	}
 
@@ -73,11 +73,11 @@ long long AutoTuner::evaluate(CSolver *problem, SearchTuner *tuner) {
 		}
 		metric = copy->getElapsedTime();
 	}
-	catch(std::runtime_error& e) {
+	catch (std::runtime_error &e) {
 		metric = POSINFINITY;
 		model_print("TimeOut has hit\n");
 	}
-	
+
 	delete copy;
 	return metric;
 }
