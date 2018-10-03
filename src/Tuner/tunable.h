@@ -39,7 +39,7 @@ public:
 static TunableDesc onoff(0, 1, 1);
 static TunableDesc offon(0, 1, 0);
 static TunableDesc proxyparameter(1, 5, 2);
-static TunableDesc mustValueBinaryIndex(1, 9, 5);
+static TunableDesc mustValueBinaryIndex(5, 9, 8);
 static TunableDesc NodeEncodingDesc(ELEM_UNASSIGNED, BINARYINDEX, ELEM_UNASSIGNED);
 static TunableDesc NaiveEncodingDesc(ONEHOT, BINARYINDEX, ONEHOT);
 

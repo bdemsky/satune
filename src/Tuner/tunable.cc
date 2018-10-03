@@ -16,7 +16,7 @@ int DefaultTuner::getVarTunable(VarType vartype1, VarType vartype2, TunableParam
 }
 
 const char* tunableParameterToString(Tunables tunable){
-        switch(tunable){
+	switch(tunable){
                 case DECOMPOSEORDER:
                         return "DECOMPOSEORDER";
                 case MUSTREACHGLOBAL:
@@ -47,6 +47,8 @@ const char* tunableParameterToString(Tunables tunable){
 			return "ENCODINGGRAPHOPT";
 		case NAIVEENCODER:
 			return "NAIVEENCODER";
+		case MUSTVALUE:
+			return "MUSTVALUE";
                 default:
                         ASSERT(0);
         }
