@@ -154,7 +154,7 @@ CSolver *CSolver::clone() {
 }
 
 CSolver *CSolver::deserialize(const char *file) {
-	model_print("deserializing ...\n");
+	model_print("deserializing %s ...\n", file);
 	Deserializer deserializer(file);
 	return deserializer.deserialize();
 }

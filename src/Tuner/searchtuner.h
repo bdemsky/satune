@@ -59,6 +59,12 @@ private:
 	HashsetTunableSetting usedSettings;
 	/** Settings contains all settings. */
 	HashsetTunableSetting settings;
+#ifdef STATICENCGEN
+        bool graphEncoding;
+        ElementEncodingType naiveEncoding;
+public:
+        int nextStaticTuner();
+#endif
 };
 
 

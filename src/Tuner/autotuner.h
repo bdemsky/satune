@@ -16,7 +16,9 @@ private:
 	long long evaluate(CSolver *problem, SearchTuner *tuner);
 	double evaluateAll(SearchTuner *tuner);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
-
+#ifdef STATICENCGEN
+	SearchTuner *mutateTuner(SearchTuner *oldTuner);
+#endif
 	Vector<CSolver *> solvers;
 	uint budget;
 	int result;

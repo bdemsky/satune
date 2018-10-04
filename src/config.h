@@ -19,6 +19,7 @@
 //#define CONFIG_DEBUG
 #endif
 
+//#define STATICENCGEN
 
 #ifndef CONFIG_ASSERT
 #define CONFIG_ASSERT

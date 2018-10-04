@@ -226,7 +226,6 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	if (encoding->element->anyValue){
 		uint setSize = encoding->element->getRange()->getSize();
 		uint encArraySize = encoding->encArraySize;
-		model_print("setSize=%u\tencArraySize=%u\n", setSize, encArraySize);
 		if(setSize < encArraySize * (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex)/10){
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
 		} else {

@@ -72,6 +72,10 @@ ostream &operator<<(ostream &os, const TunableSetting &ts)
 
 
 SearchTuner::SearchTuner() {
+#ifdef STATICENCGEN
+        graphEncoding =false;
+        naiveEncoding = ELEM_UNASSIGNED;
+#endif
 	ifstream myfile;
 	myfile.open (TUNEFILE, ios::in);
 	if (myfile.is_open()) {
@@ -106,6 +110,12 @@ SearchTuner *SearchTuner::copyUsed() {
 		TunableSetting *copy = new TunableSetting(setting);
 		tuner->settings.add(copy);
 	}
+#ifdef STATICENCGEN
+	if(naiveEncoding != ELEM_UNASSIGNED){
+		tuner->graphEncoding = graphEncoding;
+		tuner->naiveEncoding = naiveEncoding;
+	}
+#endif
 	delete iterator;
 	return tuner;
 }
@@ -168,6 +178,50 @@ void SearchTuner::randomMutate() {
 	randomSetting->print();
 	model_print("&&&&&&&&&&&&&&&&&&&&&&&\n");
 }
+
+#ifdef STATICENCGEN
+int SearchTuner::nextStaticTuner() {
+	if(naiveEncoding == ELEM_UNASSIGNED){
+		naiveEncoding = ONEHOT;
+		SetIteratorTunableSetting *iter = settings.iterator();
+		while(iter->hasNext()){
+			TunableSetting *setting = iter->next();
+			if (setting->param == NAIVEENCODER){
+				setting->selectedValue = ONEHOT;
+			} else if(setting->param == ENCODINGGRAPHOPT){
+				setting->selectedValue = false;
+			}
+		}
+		delete iter;
+		return EXIT_FAILURE;
+	}
+	int result=EXIT_FAILURE;
+	if(naiveEncoding == BINARYINDEX && graphEncoding){
+		model_print("Best tuner\n");
+		return EXIT_SUCCESS;
+	}else if (naiveEncoding == BINARYINDEX && !graphEncoding){
+		naiveEncoding = ONEHOT;
+		graphEncoding = true;
+	}else {
+		naiveEncoding = (ElementEncodingType)((int)naiveEncoding + 1);
+	}
+	SetIteratorTunableSetting *iter = settings.iterator();
+	uint count = 0;
+	while(iter->hasNext()){
+		TunableSetting * setting = iter->next();
+		if (setting->param == NAIVEENCODER){
+			setting->selectedValue = naiveEncoding;
+			count++;
+		} else if(setting->param == ENCODINGGRAPHOPT){
+			setting->selectedValue = graphEncoding;
+			count++;
+		}
+	}
+	model_print("Mutating %u settings\n", count);
+	delete iter;
+	return result;
+}
+#endif
 
 void SearchTuner::print() {
 	SetIteratorTunableSetting *iterator = settings.iterator();

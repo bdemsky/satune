@@ -55,6 +55,13 @@ SearchTuner *AutoTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
 	return newTuner;
 }
 
+#ifdef STATICENCGEN
+SearchTuner *AutoTuner::mutateTuner(SearchTuner *oldTuner) {
+	SearchTuner *newTuner = oldTuner->copyUsed();
+	result = newTuner->nextStaticTuner();
+	return result==EXIT_FAILURE? newTuner: NULL;
+}
+#endif
 
 void AutoTuner::tune() {
 	SearchTuner *bestTuner = NULL;
@@ -64,6 +71,20 @@ void AutoTuner::tune() {
 	double base_temperature = evaluateAll(oldTuner);
 	double oldScore = base_temperature;
 
+#ifdef STATICENCGEN
+	while(true){
+		SearchTuner *newTuner = mutateTuner(oldTuner);
+		if(newTuner == NULL)
+			return;
+		double newScore = evaluateAll(newTuner);
+		newTuner->printUsed();
+		model_print("Received score %f\n", newScore);
+		delete oldTuner;
+		oldScore = newScore;
+		oldTuner = newTuner;
+	}
+#endif
+	
 	for (uint i = 0; i < budget; i++) {
 		SearchTuner *newTuner = mutateTuner(oldTuner, i);
 		double newScore = evaluateAll(newTuner);
