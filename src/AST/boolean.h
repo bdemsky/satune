@@ -35,7 +35,7 @@ public:
 	Boolean *clone(CSolver *solver, CloneMap *map);
 	bool isTrue() {return istrue;}
 	bool isFalse() {return !istrue;}
-	void serialize(Serializer *serializer ) {};
+	void serialize(Serializer *serializer );
 	virtual void print();
 	bool istrue;
 	CMEMALLOC;

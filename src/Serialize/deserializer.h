@@ -26,6 +26,7 @@ private:
 	ssize_t myread (void *__buf, size_t __nbytes);
 	void deserializeBooleanEdge();
 	void deserializeBooleanVar();
+	void deserializeBooleanConst();
 	void deserializeBooleanOrder();
 	void deserializeOrder();
 	void deserializeSet();

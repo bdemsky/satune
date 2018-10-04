@@ -116,6 +116,16 @@ void BooleanVar::serialize(Serializer *serializer) {
 	serializer->mywrite(&vtype, sizeof(VarType));
 }
 
+void BooleanConst::serialize(Serializer *serializer) {
+	if (serializer->isSerialized(this))
+		return;
+	serializer->addObject(this);
+	serializer->mywrite(&type, sizeof(ASTNodeType));
+	BooleanConst *This = this;
+	serializer->mywrite(&This, sizeof(BooleanConst *));
+	serializer->mywrite(&istrue, sizeof(bool));
+}
+
 void BooleanVar::print() {
 	model_print("BooleanVar<%p>\n", this);
 }

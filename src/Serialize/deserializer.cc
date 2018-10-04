@@ -76,6 +76,9 @@ CSolver *Deserializer::deserialize() {
 		case BOOLEANVAR:
 			deserializeBooleanVar();
 			break;
+		case BOOLCONST:
+			deserializeBooleanConst();
+			break;
 		case ORDERCONST:
 			deserializeBooleanOrder();
 			break;
@@ -143,6 +146,15 @@ void Deserializer::deserializeBooleanVar() {
 	VarType vtype;
 	myread(&vtype, sizeof(VarType));
 	map.put(b, solver->getBooleanVar(vtype).getBoolean());
+}
+
+void Deserializer::deserializeBooleanConst() {
+	BooleanVar *b;
+	myread(&b, sizeof(BooleanVar *));
+	bool istrue;
+	myread(&istrue, sizeof(bool));
+	map.put(b, istrue?solver->getBooleanTrue().getBoolean():
+			solver->getBooleanFalse().getBoolean());
 }
 
 void Deserializer::deserializeBooleanOrder() {
