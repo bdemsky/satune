@@ -7,6 +7,7 @@
 #include "orderelement.h"
 #include "structs.h"
 #include "decomposeorderresolver.h"
+#include "tunabledependent.h"
 
 #define HASHNEXT(hash, newval) {hash += newval; hash += hash << 10; hash ^= hash >> 6;}
 #define HASHFINAL(hash) {hash += hash << 3; hash ^= hash >> 11; hash += hash << 15;}
@@ -27,6 +28,14 @@ bool table_entry_equals(TableEntry *key1, TableEntry *key2) {
 		if (key1->inputs[i] != key2->inputs[i])
 			return false;
 	return true;
+}
+
+unsigned int tunable_dependent_hash_function(TunableDependent *This){
+	return (uint)This->dependent;
+}
+
+bool tunable_dependent_equals(TunableDependent *key1, TunableDependent *key2){
+	return key1->dependent == key2->dependent;
 }
 
 unsigned int order_node_hash_function(OrderNodeKey *This) {

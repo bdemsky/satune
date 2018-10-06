@@ -53,6 +53,8 @@ public:
 
 	CMEMALLOC;
 private:
+        bool validTunableSetting(TunableSetting* setting);
+        static HashsetTunableDep tunableDependency;
 	/** Used Settings keeps track of settings that were actually used by
 	   the example. Mutating settings may cause the Constraint Compiler
 	   not to query other settings.*/

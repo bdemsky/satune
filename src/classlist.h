@@ -61,6 +61,7 @@ class SearchTuner;
 class TunableSetting;
 
 class TunableDesc;
+class TunableDependent;
 
 class OrderResolver;
 class DecomposeOrderResolver;

@@ -1,7 +1,25 @@
 #include "searchtuner.h"
+#include "tunabledependent.h"
 #include <iostream>
 #include <fstream>
+#include <valarray>
 using namespace std;
+
+HashsetTunableDep initializeTunableDependencies()
+{
+  HashsetTunableDep dep;
+  dep.add(new TunableDependent(MUSTREACHGLOBAL, DECOMPOSEORDER));
+  dep.add(new TunableDependent(MUSTREACHLOCAL, DECOMPOSEORDER));
+  dep.add(new TunableDependent(MUSTREACHPRUNE, DECOMPOSEORDER));
+  dep.add(new TunableDependent(MUSTEDGEPRUNE, DECOMPOSEORDER));
+  dep.add(new TunableDependent(NODEENCODING, ENCODINGGRAPHOPT));
+  dep.add(new TunableDependent(EDGEENCODING, ENCODINGGRAPHOPT));
+  dep.add(new TunableDependent(ELEMENTOPTSETS, ELEMENTOPT));
+  return dep;
+}
+
+
+HashsetTunableDep SearchTuner::tunableDependency = initializeTunableDependencies();
 
 TunableSetting::TunableSetting(VarType _type, TunableParam _param) :
 	hasVar(true),
@@ -166,8 +184,35 @@ int SearchTuner::getVarTunable(VarType vartype1, VarType vartype2, TunableParam 
 	return result->selectedValue;
 }
 
+bool SearchTuner::validTunableSetting(TunableSetting* setting){
+	TunableDependent tuneDep((Tunables)setting->param);
+	bool result = true;
+	while(tunableDependency.contains(&tuneDep)){
+		TunableDependent *dependent = tunableDependency.get(&tuneDep);
+		TunableSetting p(dependent->parent);
+		if(!settings.contains(&p)){
+			SetIteratorTunableSetting *iter = settings.iterator();
+			while(iter->hasNext()){
+				model_print("*******************\n");
+				iter->next()->print();
+			}
+			delete iter;
+		}
+		ASSERT(settings.contains(&p));
+		TunableSetting *parent = settings.get(&p);
+		if(!(bool)parent->selectedValue){ //Check parent config is already off
+			return false;
+		}
+		tuneDep.dependent = dependent->parent;
+	}
+	return result;
+}
+
 void SearchTuner::randomMutate() {
-	TunableSetting *randomSetting = settings.getRandomElement();
+	TunableSetting *randomSetting;
+	do{
+		randomSetting= settings.getRandomElement();
+	}while(!validTunableSetting(randomSetting));
 	int range = randomSetting->highValue - randomSetting->lowValue;
 	int randomchoice = (random() % range) + randomSetting->lowValue;
 	if (randomchoice < randomSetting->selectedValue)
