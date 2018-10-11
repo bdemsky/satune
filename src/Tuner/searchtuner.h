@@ -29,6 +29,7 @@ private:
 	friend unsigned int tunableSettingHash(TunableSetting *setting);
 	friend bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 	friend class SearchTuner;
+  	friend class StaticSearchTuner;
 };
 
 unsigned int tunableSettingHash(TunableSetting *setting);
@@ -52,20 +53,13 @@ public:
 	void serialize();
 
 	CMEMALLOC;
-private:
+protected:
 	/** Used Settings keeps track of settings that were actually used by
 	   the example. Mutating settings may cause the Constraint Compiler
 	   not to query other settings.*/
 	HashsetTunableSetting usedSettings;
 	/** Settings contains all settings. */
 	HashsetTunableSetting settings;
-#ifdef STATICENCGEN
-        bool graphEncoding;
-        ElementEncodingType naiveEncoding;
-public:
-        int nextStaticTuner();
-#endif
 };
-
 
 #endif

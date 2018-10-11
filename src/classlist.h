@@ -60,6 +60,9 @@ class AutoTuner;
 class SearchTuner;
 class TunableSetting;
 
+class StaticAutoTuner;
+class StaticSearchTuner;
+
 class TunableDesc;
 
 class OrderResolver;
