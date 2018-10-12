@@ -20,6 +20,12 @@ public:
 		memcpy(array, _array, capacity * sizeof(type));
 	}
 
+	Vector(Vector<type> *v) :
+		size(v->size),
+		capacity(v->capacity),
+		array((type *) ourmalloc(sizeof(type) * v->capacity)) {
+		memcpy(array, v->array, capacity * sizeof(type));
+	}
 	void pop() {
 		size--;
 	}

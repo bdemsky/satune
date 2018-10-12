@@ -46,7 +46,7 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 	tuner->serialize(buffer);
 
 	//Do run
-	snprintf(buffer, sizeof(buffer), "deserializerun %s %u tuner%u result%s%u", problem->getProblem(), timeout, execnum, problem->getProblem(), execnum);
+	snprintf(buffer, sizeof(buffer), "deserializerun %s %u tuner%u result%s%u > log%u", problem->getProblem(), timeout, execnum, problem->getProblem(), execnum, execnum);
 	int status = system(buffer);
 
 	long long metric = -1;
@@ -74,6 +74,33 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 		model_print("******** Result has changed ********\n");
 	}
 	return metric;
+}
+
+void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
+	for (uint i = 0; i < problems.getSize(); i++) {
+		Problem *problem = problems.get(i);
+		TunerRecord *bestTuner = NULL;
+		long long bestscore = 0;
+		for (uint j = 0; j < tunerV->getSize(); j++) {
+			TunerRecord *tuner = tunerV->get(j);
+			long long metric = evaluate(problem, tuner->getTuner());
+			if ((bestTuner == NULL && metric != -1) ||
+					(metric < bestscore && metric != -1)) {
+				bestTuner = tuner;
+				bestscore = metric;
+			}
+		}
+		if (bestTuner != NULL)
+			bestTuner->problems.push(problem);
+	}
+}
+
+
+void MultiTuner::tuneK() {
+	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
+
+
+	delete tunerV;
 }
 
 double MultiTuner::evaluateAll(SearchTuner *tuner) {

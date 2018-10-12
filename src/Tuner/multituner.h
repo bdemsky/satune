@@ -20,9 +20,10 @@ private:
 class TunerRecord {
 public:
 	TunerRecord(SearchTuner *_tuner) : tuner(_tuner) {}
-
+	SearchTuner *getTuner() {return tuner;}
 private:
 	SearchTuner *tuner;
+	Vector<Problem *> problems;
 	friend class MultiTuner;
 };
 
@@ -32,12 +33,15 @@ public:
 	~MultiTuner();
 	void addProblem(const char *filename);
 	void addTuner(SearchTuner *tuner);
-	virtual void tune();
+	void tune();
+	void tuneK();
 	CMEMALLOC;
 protected:
 	long long evaluate(Problem *problem, SearchTuner *tuner);
 	double evaluateAll(SearchTuner *tuner);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
+	void mapProblemsToTuners(Vector<TunerRecord *> *tunerV);
+
 	Vector<Problem *> problems;
 	Vector<TunerRecord *> tuners;
 	uint budget;

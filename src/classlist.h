@@ -57,6 +57,7 @@ class OrderEdge;
 class DOREdge;
 
 class AutoTuner;
+class MultiTuner;
 class SearchTuner;
 class TunableSetting;
 
