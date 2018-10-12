@@ -26,6 +26,7 @@
 #include "orderedge.h"
 #include "orderanalysis.h"
 #include "elementopt.h"
+#include "varorderingopt.h"
 #include <time.h>
 #include <stdarg.h>
 
@@ -622,9 +623,12 @@ int CSolver::solve() {
 	naiveEncodingDecision(this);
 //	eg.validate();
 
+	VarOrderingOpt bor(this, satEncoder);
+	bor.doTransform();
+	
 	time2 = getTimeNano();
 	model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
-
+	
 	satEncoder->encodeAllSATEncoder(this);
 	time1 = getTimeNano();
 
