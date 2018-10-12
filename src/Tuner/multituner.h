@@ -21,9 +21,13 @@ class TunerRecord {
 public:
 	TunerRecord(SearchTuner *_tuner) : tuner(_tuner) {}
 	SearchTuner *getTuner() {return tuner;}
+	TunerRecord *changeTuner(SearchTuner *_newtuner);
+	long long getTime(Problem *problem);
+	void setTime(Problem *problem, long long time);
 private:
 	SearchTuner *tuner;
 	Vector<Problem *> problems;
+	Hashtable<Problem *, long long, uint64_t> timetaken;
 	friend class MultiTuner;
 	friend void clearVector(Vector<TunerRecord *> *tunerV);
 };
@@ -34,18 +38,18 @@ public:
 	~MultiTuner();
 	void addProblem(const char *filename);
 	void addTuner(SearchTuner *tuner);
-
 	void tuneK();
 	CMEMALLOC;
 protected:
 	long long evaluate(Problem *problem, SearchTuner *tuner);
-	double evaluateAll(SearchTuner *tuner, Vector<Problem *> *tProblems);
+	double evaluateAll(TunerRecord *tuner);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
 	void mapProblemsToTuners(Vector<TunerRecord *> *tunerV);
 	void improveTuners(Vector<TunerRecord *> *tunerV);
-	SearchTuner *tune(SearchTuner *tuner, Vector<Problem *> *tProblems);
+	TunerRecord *tune(TunerRecord *tuner);
+	void tuneComp();
 
-
+	Vector<TunerRecord *> allTuners;
 	Vector<Problem *> problems;
 	Vector<TunerRecord *> tuners;
 	uint budget;

@@ -22,6 +22,24 @@ Problem::~Problem() {
 	ourfree(problem);
 }
 
+void TunerRecord::setTime(Problem *problem, long long time) {
+	timetaken.put(problem, time);
+}
+
+long long TunerRecord::getTime(Problem *problem) {
+	if (timetaken.contains(problem))
+		return timetaken.get(problem);
+	else return -1;
+}
+
+TunerRecord *TunerRecord::changeTuner(SearchTuner *_newtuner) {
+	TunerRecord *tr = new TunerRecord(_newtuner);
+	for (uint i = 0; i < problems.getSize(); i++) {
+		tr->problems.push(problems.get(i));
+	}
+	return tr;
+}
+
 MultiTuner::MultiTuner(uint _budget, uint _rounds, uint _timeout) :
 	budget(_budget), rounds(_rounds), timeout(_timeout), execnum(0) {
 }
@@ -76,6 +94,16 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 	return metric;
 }
 
+void MultiTuner::tuneComp() {
+	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
+	for (uint i = 0; i < problems.getSize(); i++) {
+		Problem *problem = problems.get(i);
+
+
+	}
+
+}
+
 void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
 	for (uint i = 0; i < problems.getSize(); i++) {
 		Problem *problem = problems.get(i);
@@ -83,7 +111,12 @@ void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
 		long long bestscore = 0;
 		for (uint j = 0; j < tunerV->getSize(); j++) {
 			TunerRecord *tuner = tunerV->get(j);
-			long long metric = evaluate(problem, tuner->getTuner());
+			long long metric = tuner->getTime(problem);
+			if (metric == -1) {
+				metric = evaluate(problem, tuner->getTuner());
+				if (metric != -1)
+					tuner->setTime(problem, metric);
+			}
 			if ((bestTuner == NULL && metric != -1) ||
 					(metric < bestscore && metric != -1)) {
 				bestTuner = tuner;
@@ -123,18 +156,26 @@ void MultiTuner::tuneK() {
 void MultiTuner::improveTuners(Vector<TunerRecord *> *tunerV) {
 	for (uint j = 0; j < tunerV->getSize(); j++) {
 		TunerRecord *tuner = tunerV->get(j);
-		SearchTuner *newtuner = tune(tuner->getTuner(), &tuner->problems);
+		TunerRecord *newtuner = tune(tuner);
+		tunerV->set(j, newtuner);
 	}
 }
 
-double MultiTuner::evaluateAll(SearchTuner *tuner, Vector<Problem *> *tProblems) {
+double MultiTuner::evaluateAll(TunerRecord *tuner) {
 	double product = 1;
-	for (uint i = 0; i < tProblems->getSize(); i++) {
-		Problem *problem = tProblems->get(i);
-		double score = evaluate(problem, tuner);
+	for (uint i = 0; i < tuner->problems.getSize(); i++) {
+		Problem *problem = tuner->problems.get(i);
+		long long metric = tuner->getTime(problem);
+		if (metric == -1) {
+			metric = evaluate(problem, tuner->getTuner());
+			if (metric != -1)
+				tuner->setTime(problem, metric);
+		}
+
+		double score = metric;
 		product *= score;
 	}
-	return pow(product, 1 / ((double)tProblems->getSize()));
+	return pow(product, 1 / ((double)tuner->problems.getSize()));
 }
 
 SearchTuner *MultiTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
@@ -150,25 +191,24 @@ SearchTuner *MultiTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
 	return newTuner;
 }
 
-SearchTuner *MultiTuner::tune(SearchTuner *tuner, Vector<Problem *> *tProblems) {
-	SearchTuner *bestTuner = NULL;
+TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
+	TunerRecord *bestTuner = NULL;
 	double bestScore = DBL_MAX;
 
-	SearchTuner *oldTuner = tuner->copyUsed();
-	double base_temperature = evaluateAll(oldTuner, tProblems);
+	TunerRecord *oldTuner = tuner;
+	double base_temperature = evaluateAll(oldTuner);
 	double oldScore = base_temperature;
 
 	for (uint i = 0; i < budget; i++) {
-		SearchTuner *newTuner = mutateTuner(oldTuner, i);
-		double newScore = evaluateAll(newTuner, tProblems);
-		newTuner->printUsed();
+		SearchTuner *tmpTuner = mutateTuner(oldTuner->getTuner(), i);
+		TunerRecord *newTuner = oldTuner->changeTuner(tmpTuner);
+		double newScore = evaluateAll(newTuner);
+		newTuner->tuner->printUsed();
 		model_print("Received score %f\n", newScore);
 		double scoreDiff = newScore - oldScore;	//smaller is better
 		if (newScore < bestScore) {
-			if (bestTuner != NULL)
-				delete bestTuner;
 			bestScore = newScore;
-			bestTuner = newTuner->copyUsed();
+			bestTuner = newTuner;
 		}
 
 		double acceptanceP;
@@ -180,11 +220,8 @@ SearchTuner *MultiTuner::tune(SearchTuner *tuner, Vector<Problem *> *tProblems) 
 		}
 		double ran = ((double)random()) / RAND_MAX;
 		if (ran <= acceptanceP) {
-			delete oldTuner;
 			oldScore = newScore;
 			oldTuner = newTuner;
-		} else {
-			delete newTuner;
 		}
 	}
 
