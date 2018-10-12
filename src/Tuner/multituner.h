@@ -30,7 +30,7 @@ private:
 
 class MultiTuner {
 public:
-	MultiTuner(uint budget, uint timeout);
+	MultiTuner(uint budget, uint rounds, uint timeout);
 	~MultiTuner();
 	void addProblem(const char *filename);
 	void addTuner(SearchTuner *tuner);
@@ -49,6 +49,7 @@ protected:
 	Vector<Problem *> problems;
 	Vector<TunerRecord *> tuners;
 	uint budget;
+	uint rounds;
 	uint timeout;
 	int execnum;
 };

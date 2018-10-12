@@ -22,8 +22,8 @@ Problem::~Problem() {
 	ourfree(problem);
 }
 
-MultiTuner::MultiTuner(uint _budget, uint _timeout) :
-	budget(_budget), timeout(_timeout), execnum(0) {
+MultiTuner::MultiTuner(uint _budget, uint _rounds, uint _timeout) :
+	budget(_budget), rounds(_rounds), timeout(_timeout), execnum(0) {
 }
 
 MultiTuner::~MultiTuner() {
@@ -104,12 +104,19 @@ void clearVector(Vector<TunerRecord *> *tunerV) {
 
 void MultiTuner::tuneK() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
-	while (true) {
+	for (uint i = 0; i < rounds; i++) {
 		clearVector(tunerV);
 		mapProblemsToTuners(tunerV);
 		improveTuners(tunerV);
 	}
-
+	model_print("Best tuners\n");
+	for (uint j = 0; j < tunerV->getSize(); j++) {
+		TunerRecord *tuner = tunerV->get(j);
+		char buffer[256];
+		sprintf(buffer, "tuner%u.conf", j);
+		tuner->getTuner()->serialize(buffer);
+		tuner->getTuner()->print();
+	}
 	delete tunerV;
 }
 
