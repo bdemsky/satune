@@ -13,7 +13,7 @@ StaticAutoTuner::StaticAutoTuner(uint _budget) : AutoTuner(_budget) {
 StaticSearchTuner *StaticAutoTuner::mutateTuner(StaticSearchTuner *oldTuner) {
 	StaticSearchTuner *newTuner = oldTuner->copyUsed();
 	result = newTuner->nextStaticTuner();
-	return result==EXIT_FAILURE? newTuner: NULL;
+	return result == EXIT_FAILURE ? newTuner : NULL;
 }
 
 void StaticAutoTuner::tune() {
@@ -24,9 +24,9 @@ void StaticAutoTuner::tune() {
 	double base_temperature = evaluateAll(oldTuner);
 	double oldScore = base_temperature;
 
-	while(true){
+	while (true) {
 		StaticSearchTuner *newTuner = mutateTuner(oldTuner);
-		if(newTuner == NULL)
+		if (newTuner == NULL)
 			return;
 		double newScore = evaluateAll(newTuner);
 		newTuner->printUsed();

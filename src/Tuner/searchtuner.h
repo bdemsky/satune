@@ -5,7 +5,6 @@
 #include "structs.h"
 #include <ostream>
 using namespace std;
-#define TUNEFILE "tune.conf"
 
 class TunableSetting {
 public:
@@ -29,7 +28,7 @@ private:
 	friend unsigned int tunableSettingHash(TunableSetting *setting);
 	friend bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 	friend class SearchTuner;
-  	friend class StaticSearchTuner;
+	friend class StaticSearchTuner;
 };
 
 unsigned int tunableSettingHash(TunableSetting *setting);
@@ -41,6 +40,7 @@ typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableS
 class SearchTuner : public Tuner {
 public:
 	SearchTuner();
+	SearchTuner(const char *filename);
 	~SearchTuner();
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
@@ -50,7 +50,7 @@ public:
 	uint getSize() { return usedSettings.getSize();}
 	void print();
 	void printUsed();
-	void serialize();
+	void serialize(const char *file);
 
 	CMEMALLOC;
 protected:

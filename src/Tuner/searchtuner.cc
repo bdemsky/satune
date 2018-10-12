@@ -72,8 +72,11 @@ ostream &operator<<(ostream &os, const TunableSetting &ts)
 
 
 SearchTuner::SearchTuner() {
+}
+
+SearchTuner::SearchTuner(const char *filename) {
 	ifstream myfile;
-	myfile.open (TUNEFILE, ios::in);
+	myfile.open (filename, ios::in);
 	if (myfile.is_open()) {
 		bool hasVar;
 		VarType type1;
@@ -179,9 +182,9 @@ void SearchTuner::print() {
 
 }
 
-void SearchTuner::serialize() {
+void SearchTuner::serialize(const char *filename) {
 	ofstream myfile;
-	myfile.open (TUNEFILE, ios::out | ios::trunc);
+	myfile.open (filename, ios::out | ios::trunc);
 	SetIteratorTunableSetting *iterator = settings.iterator();
 	while (iterator->hasNext()) {
 		TunableSetting *setting = iterator->next();

@@ -6,8 +6,8 @@
 class StaticAutoTuner : public AutoTuner {
 public:
 	StaticAutoTuner(uint budget);
-  virtual void tune();
-  	CMEMALLOC;
+	virtual void tune();
+	CMEMALLOC;
 private:
 	StaticSearchTuner *mutateTuner(StaticSearchTuner *oldTuner);
 };

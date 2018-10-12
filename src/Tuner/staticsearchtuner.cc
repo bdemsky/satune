@@ -4,8 +4,8 @@
 using namespace std;
 
 StaticSearchTuner::StaticSearchTuner() {
-        graphEncoding =false;
-        naiveEncoding = ELEM_UNASSIGNED;
+	graphEncoding = false;
+	naiveEncoding = ELEM_UNASSIGNED;
 	ifstream myfile;
 	myfile.open (TUNEFILE, ios::in);
 	if (myfile.is_open()) {
@@ -40,7 +40,7 @@ StaticSearchTuner *StaticSearchTuner::copyUsed() {
 		TunableSetting *copy = new TunableSetting(setting);
 		tuner->settings.add(copy);
 	}
-	if(naiveEncoding != ELEM_UNASSIGNED){
+	if (naiveEncoding != ELEM_UNASSIGNED) {
 		tuner->graphEncoding = graphEncoding;
 		tuner->naiveEncoding = naiveEncoding;
 	}
@@ -58,38 +58,38 @@ StaticSearchTuner::~StaticSearchTuner() {
 }
 
 int StaticSearchTuner::nextStaticTuner() {
-	if(naiveEncoding == ELEM_UNASSIGNED){
+	if (naiveEncoding == ELEM_UNASSIGNED) {
 		naiveEncoding = ONEHOT;
 		SetIteratorTunableSetting *iter = settings.iterator();
-		while(iter->hasNext()){
+		while (iter->hasNext()) {
 			TunableSetting *setting = iter->next();
-			if (setting->param == NAIVEENCODER){
+			if (setting->param == NAIVEENCODER) {
 				setting->selectedValue = ONEHOT;
-			} else if(setting->param == ENCODINGGRAPHOPT){
+			} else if (setting->param == ENCODINGGRAPHOPT) {
 				setting->selectedValue = false;
 			}
 		}
 		delete iter;
 		return EXIT_FAILURE;
 	}
-	int result=EXIT_FAILURE;
-	if(naiveEncoding == BINARYINDEX && graphEncoding){
+	int result = EXIT_FAILURE;
+	if (naiveEncoding == BINARYINDEX && graphEncoding) {
 		model_print("Best tuner\n");
 		return EXIT_SUCCESS;
-	}else if (naiveEncoding == BINARYINDEX && !graphEncoding){
+	} else if (naiveEncoding == BINARYINDEX && !graphEncoding) {
 		naiveEncoding = ONEHOT;
 		graphEncoding = true;
-	}else {
+	} else {
 		naiveEncoding = (ElementEncodingType)((int)naiveEncoding + 1);
 	}
 	SetIteratorTunableSetting *iter = settings.iterator();
 	uint count = 0;
-	while(iter->hasNext()){
-		TunableSetting * setting = iter->next();
-		if (setting->param == NAIVEENCODER){
+	while (iter->hasNext()) {
+		TunableSetting *setting = iter->next();
+		if (setting->param == NAIVEENCODER) {
 			setting->selectedValue = naiveEncoding;
 			count++;
-		} else if(setting->param == ENCODINGGRAPHOPT){
+		} else if (setting->param == ENCODINGGRAPHOPT) {
 			setting->selectedValue = graphEncoding;
 			count++;
 		}

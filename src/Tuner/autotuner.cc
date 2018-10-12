@@ -94,7 +94,7 @@ void AutoTuner::tune() {
 	}
 	model_print("Best tuner:\n");
 	bestTuner->print();
-	bestTuner->serialize();
+	bestTuner->serialize("TUNER.conf");
 	model_print("Received score %f\n", bestScore);
 	if (bestTuner != NULL)
 		delete bestTuner;
