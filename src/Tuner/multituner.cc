@@ -95,22 +95,39 @@ void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
 	}
 }
 
+void clearVector(Vector<TunerRecord *> *tunerV) {
+	for (uint j = 0; j < tunerV->getSize(); j++) {
+		TunerRecord *tuner = tunerV->get(j);
+		tuner->problems.clear();
+	}
+}
 
 void MultiTuner::tuneK() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
-
+	while (true) {
+		clearVector(tunerV);
+		mapProblemsToTuners(tunerV);
+		improveTuners(tunerV);
+	}
 
 	delete tunerV;
 }
 
-double MultiTuner::evaluateAll(SearchTuner *tuner) {
+void MultiTuner::improveTuners(Vector<TunerRecord *> *tunerV) {
+	for (uint j = 0; j < tunerV->getSize(); j++) {
+		TunerRecord *tuner = tunerV->get(j);
+		SearchTuner *newtuner = tune(tuner->getTuner(), &tuner->problems);
+	}
+}
+
+double MultiTuner::evaluateAll(SearchTuner *tuner, Vector<Problem *> *tProblems) {
 	double product = 1;
-	for (uint i = 0; i < problems.getSize(); i++) {
-		Problem *problem = problems.get(i);
+	for (uint i = 0; i < tProblems->getSize(); i++) {
+		Problem *problem = tProblems->get(i);
 		double score = evaluate(problem, tuner);
 		product *= score;
 	}
-	return pow(product, 1 / ((double)problems.getSize()));
+	return pow(product, 1 / ((double)tProblems->getSize()));
 }
 
 SearchTuner *MultiTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
@@ -126,17 +143,17 @@ SearchTuner *MultiTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
 	return newTuner;
 }
 
-void MultiTuner::tune() {
+SearchTuner *MultiTuner::tune(SearchTuner *tuner, Vector<Problem *> *tProblems) {
 	SearchTuner *bestTuner = NULL;
 	double bestScore = DBL_MAX;
 
-	SearchTuner *oldTuner = new SearchTuner();
-	double base_temperature = evaluateAll(oldTuner);
+	SearchTuner *oldTuner = tuner->copyUsed();
+	double base_temperature = evaluateAll(oldTuner, tProblems);
 	double oldScore = base_temperature;
 
 	for (uint i = 0; i < budget; i++) {
 		SearchTuner *newTuner = mutateTuner(oldTuner, i);
-		double newScore = evaluateAll(newTuner);
+		double newScore = evaluateAll(newTuner, tProblems);
 		newTuner->printUsed();
 		model_print("Received score %f\n", newScore);
 		double scoreDiff = newScore - oldScore;	//smaller is better
@@ -163,10 +180,7 @@ void MultiTuner::tune() {
 			delete newTuner;
 		}
 	}
-	model_print("Best tuner:\n");
-	bestTuner->print();
-	model_print("Received score %f\n", bestScore);
-	if (bestTuner != NULL)
-		delete bestTuner;
-	delete oldTuner;
+
+	return bestTuner;
 }
+
