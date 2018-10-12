@@ -8,9 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-
 #define UNSETVALUE -1
-#define TIMEOUTSEC 5000
 
 Problem::Problem(const char *_problem) : result(UNSETVALUE) {
 	uint len = strlen(_problem);
@@ -54,7 +52,9 @@ void MultiTuner::addProblem(const char *filename) {
 }
 
 void MultiTuner::addTuner(SearchTuner *tuner) {
-	tuners.push(new TunerRecord(tuner));
+	TunerRecord *t = new TunerRecord(tuner);
+	tuners.push(t);
+	allTuners.push(t);
 }
 
 long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
@@ -202,6 +202,7 @@ TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
 	for (uint i = 0; i < budget; i++) {
 		SearchTuner *tmpTuner = mutateTuner(oldTuner->getTuner(), i);
 		TunerRecord *newTuner = oldTuner->changeTuner(tmpTuner);
+		allTuners.push(newTuner);
 		double newScore = evaluateAll(newTuner);
 		newTuner->tuner->printUsed();
 		model_print("Received score %f\n", newScore);
