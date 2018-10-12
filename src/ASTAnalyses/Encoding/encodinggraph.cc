@@ -333,8 +333,8 @@ void EncodingGraph::decideEdges() {
 			EncodingNode *tmp = left; left = right; right = tmp;
 			EncodingSubGraph *tmpsg = leftGraph; leftGraph = rightGraph; rightGraph = tmpsg;
 		}
-		
-		uint leftSize = 0, rightSize = 0, newSize = 0, max=0;
+
+		uint leftSize = 0, rightSize = 0, newSize = 0, max = 0;
 		bool merge = false;
 		if (leftGraph == NULL && rightGraph == NULL) {
 			leftSize = convertSize(left->getSize());
@@ -348,7 +348,7 @@ void EncodingGraph::decideEdges() {
 			newSize = convertSize(leftGraph->estimateNewSize(right));
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-			max = rightSize > leftSize? rightSize : leftSize;
+			max = rightSize > leftSize ? rightSize : leftSize;
 //			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", left->measureSimilarity(right));
 			merge = left->measureSimilarity(right) > 1.5 || max == newSize;
 		} else {
@@ -359,7 +359,7 @@ void EncodingGraph::decideEdges() {
 //			model_print("MergingSubGraphs: left=%u\tright=%u\tnewSize=%u\n", leftSize, rightSize, newSize);
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
-			max = rightSize > leftSize? rightSize : leftSize;
+			max = rightSize > leftSize ? rightSize : leftSize;
 //			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(right));
 			merge = leftGraph->measureSimilarity(right) > 1.5 || max == newSize;
 		}
@@ -419,7 +419,7 @@ uint EncodingNode::getSize() const {
 	return s->getSize();
 }
 
-uint64_t EncodingNode::getIndex(uint index){
+uint64_t EncodingNode::getIndex(uint index) {
 	return s->getElement(index);
 }
 
@@ -427,24 +427,24 @@ VarType EncodingNode::getType() const {
 	return s->getType();
 }
 
-bool EncodingNode::itemExists(uint64_t item){
-	for(uint i=0; i< s->getSize(); i++){
-		if(item == s->getElement(i))
+bool EncodingNode::itemExists(uint64_t item) {
+	for (uint i = 0; i < s->getSize(); i++) {
+		if (item == s->getElement(i))
 			return true;
 	}
 	return false;
 }
 
-double EncodingNode::measureSimilarity(EncodingNode *node){
+double EncodingNode::measureSimilarity(EncodingNode *node) {
 	uint common = 0;
-	for(uint i=0; i < s->getSize(); i++){
+	for (uint i = 0; i < s->getSize(); i++) {
 		uint64_t item = s->getElement(i);
-		if(node->itemExists(item)){
+		if (node->itemExists(item)) {
 			common++;
 		}
 	}
 //	model_print("common=%u\tsize1=%u\tsize2=%u\tsim1=%f\tsim2=%f\n", common, s->getSize(), node->getSize(), 1.0*common/s->getSize(), 1.0*common/node->getSize());
-	return common*1.0/s->getSize() + common*1.0/node->getSize();
+	return common * 1.0 / s->getSize() + common * 1.0 / node->getSize();
 }
 
 EncodingNode *EncodingGraph::createNode(Element *e) {

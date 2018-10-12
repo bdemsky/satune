@@ -117,23 +117,23 @@ int readStatus(IncrementalSolver *This) {
 	fd_set rfds;
 	FD_ZERO(&rfds);
 	FD_SET(This->from_solver_fd, &rfds);
-	fd_set * temp;
-	if(This->timeout == NOTIMEOUT){
-		retval = select(This->from_solver_fd+1, &rfds, NULL, NULL, NULL);
-	}else {
+	fd_set *temp;
+	if (This->timeout == NOTIMEOUT) {
+		retval = select(This->from_solver_fd + 1, &rfds, NULL, NULL, NULL);
+	} else {
 		struct timeval tv;
 		tv.tv_sec = This->timeout;
 		tv.tv_usec = 0;
-		retval = select(This->from_solver_fd+1, &rfds, NULL, NULL, &tv);
+		retval = select(This->from_solver_fd + 1, &rfds, NULL, NULL, &tv);
 	}
-	if(retval == -1){
+	if (retval == -1) {
 		perror("Error in select()");
 		exit(EXIT_FAILURE);
 	}
-	else if (retval){
+	else if (retval) {
 		printf("Data is available now.\n");
 		return readIntSolver(This);
-	}else{
+	} else {
 		printf("Timeout for the solver\n");
 		return IS_INDETER;
 	}

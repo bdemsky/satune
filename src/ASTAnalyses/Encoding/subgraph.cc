@@ -127,18 +127,18 @@ double EncodingSubGraph::measureSimilarity(EncodingNode *node) {
 	SetIteratorEncodingNode *nit = nodes.iterator();
 	while (nit->hasNext()) {
 		EncodingNode *en = nit->next();
-		for(uint i=0; i < en->getSize(); i++){
+		for (uint i = 0; i < en->getSize(); i++) {
 			intSet.add(en->getIndex(i));
 		}
 	}
-	for(uint i=0; i < node->getSize(); i++){
-		if(intSet.contains( node->getIndex(i) )){
+	for (uint i = 0; i < node->getSize(); i++) {
+		if (intSet.contains( node->getIndex(i) )) {
 			common++;
 		}
 	}
 //	model_print("measureSimilarity:139: common=%u\t GraphSize=%u\tnodeSize=%u\tGraphSim=%f\tnodeSim=%f\n", common, intSet.getSize(), node->getSize(), 1.0*common/intSet.getSize(), 1.0*common/node->getSize());
 	delete nit;
-	return common*1.0/intSet.getSize() + common*1.0/node->getSize();
+	return common * 1.0 / intSet.getSize() + common * 1.0 / node->getSize();
 }
 
 double EncodingSubGraph::measureSimilarity(EncodingSubGraph *sg) {
@@ -148,7 +148,7 @@ double EncodingSubGraph::measureSimilarity(EncodingSubGraph *sg) {
 	SetIteratorEncodingNode *nit = nodes.iterator();
 	while (nit->hasNext()) {
 		EncodingNode *en = nit->next();
-		for(uint i=0; i < en->getSize(); i++){
+		for (uint i = 0; i < en->getSize(); i++) {
 			set1.add(en->getIndex(i));
 		}
 	}
@@ -156,21 +156,21 @@ double EncodingSubGraph::measureSimilarity(EncodingSubGraph *sg) {
 	nit = sg->nodes.iterator();
 	while (nit->hasNext()) {
 		EncodingNode *en = nit->next();
-		for(uint i=0; i < en->getSize(); i++){
+		for (uint i = 0; i < en->getSize(); i++) {
 			set2.add(en->getIndex(i));
 		}
 	}
 	delete nit;
 	SetIterator64Int *setIter1 = set1.iterator();
-	while(setIter1->hasNext()){
+	while (setIter1->hasNext()) {
 		uint64_t item1 = setIter1->next();
-		if( set2.contains(item1)){
+		if ( set2.contains(item1)) {
 			common++;
 		}
 	}
 	delete setIter1;
 //	model_print("measureSimilarity:139: common=%u\tGraphSize1=%u\tGraphSize2=%u\tGraphSize1=%f\tGraphSize2=%f\n", common, set1.getSize(), set2.getSize(), 1.0*common/set1.getSize(), 1.0*common/set2.getSize());
-	return common*1.0/set1.getSize() + common*1.0/set2.getSize();
+	return common * 1.0 / set1.getSize() + common * 1.0 / set2.getSize();
 }
 
 uint EncodingSubGraph::estimateNewSize(EncodingNode *n) {

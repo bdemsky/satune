@@ -632,7 +632,7 @@ int CSolver::solve() {
 
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
 	int result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
-	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT? "SAT" : result == IS_INDETER? "INDETERMINATE" : " UNSAT");
+	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
 	time2 = getTimeNano();
 	elapsedTime = time2 - startTime;
 	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);

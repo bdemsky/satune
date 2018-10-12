@@ -45,8 +45,8 @@ public:
 	void encode();
 	uint getEncoding(EncodingNode *n, uint64_t val);
 	uint getEncodingMaxVal(EncodingNode *n) { return maxEncodingVal;}
-        double measureSimilarity(EncodingNode *n);
-        double measureSimilarity(EncodingSubGraph *sg);
+	double measureSimilarity(EncodingNode *n);
+	double measureSimilarity(EncodingSubGraph *sg);
 	CMEMALLOC;
 private:
 	uint estimateNewSize(EncodingNode *n);

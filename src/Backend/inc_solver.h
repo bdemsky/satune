@@ -28,7 +28,7 @@ struct IncrementalSolver {
 	pid_t solver_pid;
 	int to_solver_fd;
 	int from_solver_fd;
-        long timeout;
+	long timeout;
 };
 
 IncrementalSolver *allocIncrementalSolver();

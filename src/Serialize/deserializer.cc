@@ -153,8 +153,8 @@ void Deserializer::deserializeBooleanConst() {
 	myread(&b, sizeof(BooleanVar *));
 	bool istrue;
 	myread(&istrue, sizeof(bool));
-	map.put(b, istrue?solver->getBooleanTrue().getBoolean():
-			solver->getBooleanFalse().getBoolean());
+	map.put(b, istrue ? solver->getBooleanTrue().getBoolean() :
+					solver->getBooleanFalse().getBoolean());
 }
 
 void Deserializer::deserializeBooleanOrder() {

@@ -139,7 +139,7 @@ public:
 	bool isFalse(BooleanEdge b);
 
 	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
-        void setSatSolverTimeout(long seconds){ satsolverTimeout = seconds;}
+	void setSatSolverTimeout(long seconds) { satsolverTimeout = seconds;}
 	bool isUnSAT() { return unsat; }
 
 	void printConstraint(BooleanEdge boolean);
@@ -220,7 +220,7 @@ private:
 	bool unsat;
 	Tuner *tuner;
 	long long elapsedTime;
-        long satsolverTimeout;
+	long satsolverTimeout;
 	friend class ElementOpt;
 };
 

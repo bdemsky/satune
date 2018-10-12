@@ -223,10 +223,10 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
-	if (encoding->element->anyValue){
+	if (encoding->element->anyValue) {
 		uint setSize = encoding->element->getRange()->getSize();
 		uint encArraySize = encoding->encArraySize;
-		if(setSize < encArraySize * (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex)/10){
+		if (setSize < encArraySize * (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) / 10) {
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
 		} else {
 			generateAnyValueBinaryIndexEncoding(encoding);

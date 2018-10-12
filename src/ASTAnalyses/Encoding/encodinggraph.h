@@ -44,10 +44,10 @@ public:
 	uint getSize() const;
 	uint64_t getIndex(uint index);
 	VarType getType() const;
-        double measureSimilarity(EncodingNode *node);
+	double measureSimilarity(EncodingNode *node);
 	void setEncoding(ElementEncodingType e) {encoding = e;}
 	ElementEncodingType getEncoding() {return encoding;}
-        bool itemExists(uint64_t item);
+	bool itemExists(uint64_t item);
 	bool couldBeBinaryIndex() {return encoding == BINARYINDEX || encoding == ELEM_UNASSIGNED;}
 	CMEMALLOC;
 private:
