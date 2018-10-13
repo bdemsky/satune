@@ -99,7 +99,6 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 void MultiTuner::tuneComp() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
 	for (uint b = 0; b < budget; b++) {
-
 		uint tSize = tunerV->getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
@@ -127,10 +126,10 @@ void MultiTuner::tuneComp() {
 					places.insertAt(k, tuner);
 				}
 			}
-			int points = 4;
+			int points = 9;
 			for (uint k = 0; k < places.getSize() && points; k++) {
 				TunerRecord *tuner = places.get(k);
-				points = points / 2;
+				points = points / 3;
 				int currScore = 0;
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
@@ -154,6 +153,13 @@ void MultiTuner::tuneComp() {
 					break;
 			}
 			ranking.insertAt(j, tuner);
+		}
+		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
+		  TunerRecord * tuner = ranking.get(i);
+		  for(uint j = 0; j < tunerV->getSize(); j++) {
+		    if (tunerV->get(j) == tuner)
+		      tunerV->removeAt(j);
+		  }
 		}
 	}
 }
