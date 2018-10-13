@@ -222,7 +222,7 @@ private:
 	long long elapsedTime;
 	long satsolverTimeout;
 	friend class ElementOpt;
-        friend class VarOrderingOpt;
+	friend class VarOrderingOpt;
 };
 
 inline CompOp flipOp(CompOp op) {

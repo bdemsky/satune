@@ -69,7 +69,7 @@ private:
 	CSolver *solver;
 	BooleanToEdgeMap booledgeMap;
 	VectorEdge *vector;
-        friend class VarOrderingOpt;
+	friend class VarOrderingOpt;
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);
