@@ -69,6 +69,21 @@ public:
 		array[index] = item;
 	}
 
+	void insertAt(uint index, type item) {
+		setSize(size + 1);
+		for (uint i = size - 1; i > index; i--) {
+			set(i, get(i - 1));
+		}
+		array[index] = item;
+	}
+
+	void removeAt(uint index) {
+		for (uint i = index; (i + 1) < size; i++) {
+			set(i, get(i + 1));
+		}
+		setSize(size - 1);
+	}
+
 	inline uint getSize() const {
 		return size;
 	}

@@ -45,6 +45,8 @@ MultiTuner::MultiTuner(uint _budget, uint _rounds, uint _timeout) :
 MultiTuner::~MultiTuner() {
 	for (uint i = 0; i < problems.getSize(); i++)
 		ourfree(problems.get(i));
+	for (uint i = 0; i < allTuners.getSize(); i++)
+		delete allTuners.get(i);
 }
 
 void MultiTuner::addProblem(const char *filename) {
@@ -96,12 +98,64 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 
 void MultiTuner::tuneComp() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
-	for (uint i = 0; i < problems.getSize(); i++) {
-		Problem *problem = problems.get(i);
+	for (uint b = 0; b < budget; b++) {
 
+		uint tSize = tunerV->getSize();
+		for (uint i = 0; i < tSize; i++) {
+			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
+			tunerV->push(new TunerRecord(tmpTuner));
+		}
 
+		Hashtable<TunerRecord *, int, uint64_t> scores;
+		for (uint i = 0; i < problems.getSize(); i++) {
+			Problem *problem = problems.get(i);
+			Vector<TunerRecord *> places;
+			for (uint j = 0; j < tunerV->getSize(); j++) {
+				TunerRecord *tuner = tunerV->get(j);
+				long long metric = tuner->getTime(problem);
+				if (metric == -1) {
+					metric = evaluate(problem, tuner->getTuner());
+					if (metric != -1)
+						tuner->setTime(problem, metric);
+				}
+				if (metric != -1) {
+					uint k = 0;
+					for (; k < places.getSize(); k++) {
+						if (metric < places.get(k)->getTime(problem))
+							break;
+					}
+					places.insertAt(k, tuner);
+				}
+			}
+			int points = 4;
+			for (uint k = 0; k < places.getSize() && points; k++) {
+				TunerRecord *tuner = places.get(k);
+				points = points / 2;
+				int currScore = 0;
+				if (scores.contains(tuner))
+					currScore = scores.get(tuner);
+				currScore += points;
+				scores.put(tuner, currScore);
+			}
+		}
+		Vector<TunerRecord *> ranking;
+		for (uint i = 0; i < tunerV->getSize(); i++) {
+			TunerRecord *tuner = tunerV->get(i);
+			int score = 0;
+			if (scores.contains(tuner))
+				score = scores.get(tuner);
+			uint j = 0;
+			for (; j < ranking.getSize(); j++) {
+				TunerRecord *t = ranking.get(j);
+				int tscore = 0;
+				if (scores.contains(t))
+					tscore = scores.get(t);
+				if (score > tscore)
+					break;
+			}
+			ranking.insertAt(j, tuner);
+		}
 	}
-
 }
 
 void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
