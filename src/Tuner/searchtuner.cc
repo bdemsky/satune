@@ -122,6 +122,24 @@ SearchTuner::~SearchTuner() {
 	delete iterator;
 }
 
+void SearchTuner::setTunable(TunableParam param, TunableDesc *descriptor, uint value) {
+	TunableSetting *result = new TunableSetting(param);
+	result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
+	settings.add(result);
+	usedSettings.add(result);
+}
+
+void SearchTuner::setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value) {
+	setVarTunable(vartype, 0, param, descriptor, value);
+}
+
+void SearchTuner::setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value) {
+	TunableSetting *result = new TunableSetting(vartype1, vartype2, param);
+	result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
+	settings.add(result);
+	usedSettings.add(result);
+}
+
 int SearchTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
 	TunableSetting setting(param);
 	TunableSetting *result = usedSettings.get(&setting);

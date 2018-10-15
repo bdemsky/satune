@@ -69,7 +69,10 @@ void naiveEncodingElement(CSolver *csolver, Element *This) {
 		if (This->type != ELEMCONST) {
 			model_print("INFO: naive encoder is making the decision about element %p....\n", This);
 		}
-		encoding->setElementEncodingType((ElementEncodingType)csolver->getTuner()->getVarTunable(This->getRange()->getType(), NAIVEENCODER, &NaiveEncodingDesc));
+		uint enc = csolver->getTuner()->getVarTunable(This->getRange()->getType(), NODEENCODING, &NodeEncodingDesc);
+		if (enc == ELEM_UNASSIGNED)
+			enc = csolver->getTuner()->getTunable(NAIVEENCODER, &NaiveEncodingDesc);
+		encoding->setElementEncodingType((ElementEncodingType)enc);
 		encoding->encodingArrayInitialization();
 	}
 

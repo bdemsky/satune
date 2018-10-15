@@ -45,6 +45,9 @@ public:
 	int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor);
+	void setTunable(TunableParam param, TunableDesc *descriptor, uint value);
+	void setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value);
+	void setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value);
 	SearchTuner *copyUsed();
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}

@@ -155,11 +155,11 @@ void MultiTuner::tuneComp() {
 			ranking.insertAt(j, tuner);
 		}
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
-		  TunerRecord * tuner = ranking.get(i);
-		  for(uint j = 0; j < tunerV->getSize(); j++) {
-		    if (tunerV->get(j) == tuner)
-		      tunerV->removeAt(j);
-		  }
+			TunerRecord *tuner = ranking.get(i);
+			for (uint j = 0; j < tunerV->getSize(); j++) {
+				if (tunerV->get(j) == tuner)
+					tunerV->removeAt(j);
+			}
 		}
 	}
 }
