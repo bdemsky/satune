@@ -66,7 +66,7 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 	tuner->serialize(buffer);
 
 	//Do run
-	snprintf(buffer, sizeof(buffer), "deserializerun %s %u tuner%u result%s%u > log%u", problem->getProblem(), timeout, execnum, problem->getProblem(), execnum, execnum);
+	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%s%u > log%u", problem->getProblem(), timeout, execnum, problem->getProblem(), execnum, execnum);
 	int status = system(buffer);
 
 	long long metric = -1;

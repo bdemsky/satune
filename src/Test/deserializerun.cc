@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
 		printf("You only specify the name of the file ...");
 		exit(-1);
 	}
+	char buffer[512];
 	CSolver *solver = CSolver::deserialize(argv[1]);
 	uint timeout;
 	sscanf(argv[2], "%u", &timeout);
@@ -22,6 +23,10 @@ int main(int argc, char **argv) {
 	myfile << metric;
 	myfile << sat;
 	myfile.close();
+	//serialize out the tuner we used
+	snprintf(buffer, sizeof(buffer), "%sused", argv[3]);
+	tuner->serialize(buffer);
+
 	delete solver;
 	return 0;
 }
