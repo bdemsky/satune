@@ -59,11 +59,11 @@ void MultiTuner::addTuner(SearchTuner *tuner) {
 	allTuners.push(t);
 }
 
-long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
+long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	char buffer[512];
 	//Write out the tuner
 	snprintf(buffer, sizeof(buffer), "tuner%u", execnum);
-	tuner->serialize(buffer);
+	tuner->getTuner()->serialize(buffer);
 
 	//Do run
 	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%s%u > log%u", problem->getProblem(), timeout, execnum, problem->getProblem(), execnum, execnum);
@@ -71,6 +71,7 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 
 	long long metric = -1;
 	int sat = IS_INDETER;
+
 	if (status == 0) {
 		//Read data in from results file
 		snprintf(buffer, sizeof(buffer), "result%s%u", problem->getProblem(), execnum);
@@ -84,6 +85,12 @@ long long MultiTuner::evaluate(Problem *problem, SearchTuner *tuner) {
 			myfile >> sat;
 			myfile.close();
 		}
+
+		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
+		SearchTuner *usedtuner = new SearchTuner(buffer);
+		delete tuner->getTuner();
+		tuner->updateTuner(usedtuner);
+
 	}
 	//Increment execution count
 	execnum++;
@@ -113,7 +120,7 @@ void MultiTuner::tuneComp() {
 				TunerRecord *tuner = tunerV->get(j);
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
-					metric = evaluate(problem, tuner->getTuner());
+					metric = evaluate(problem, tuner);
 					if (metric != -1)
 						tuner->setTime(problem, metric);
 				}
@@ -173,7 +180,7 @@ void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
 			TunerRecord *tuner = tunerV->get(j);
 			long long metric = tuner->getTime(problem);
 			if (metric == -1) {
-				metric = evaluate(problem, tuner->getTuner());
+				metric = evaluate(problem, tuner);
 				if (metric != -1)
 					tuner->setTime(problem, metric);
 			}
@@ -227,7 +234,7 @@ double MultiTuner::evaluateAll(TunerRecord *tuner) {
 		Problem *problem = tuner->problems.get(i);
 		long long metric = tuner->getTime(problem);
 		if (metric == -1) {
-			metric = evaluate(problem, tuner->getTuner());
+			metric = evaluate(problem, tuner);
 			if (metric != -1)
 				tuner->setTime(problem, metric);
 		}

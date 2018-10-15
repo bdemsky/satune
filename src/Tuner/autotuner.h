@@ -9,6 +9,7 @@
 class AutoTuner {
 public:
 	AutoTuner(uint budget);
+	virtual ~AutoTuner();
 	void addProblem(CSolver *solver);
 	virtual void tune();
 	CMEMALLOC;

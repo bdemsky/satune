@@ -11,6 +11,8 @@ AutoTuner::AutoTuner(uint _budget) :
 	budget(_budget), result(UNSETVALUE) {
 }
 
+AutoTuner::~AutoTuner() {}
+
 void AutoTuner::addProblem(CSolver *solver) {
 	solvers.push(solver);
 }

@@ -22,6 +22,7 @@ public:
 	TunerRecord(SearchTuner *_tuner) : tuner(_tuner) {}
 	SearchTuner *getTuner() {return tuner;}
 	TunerRecord *changeTuner(SearchTuner *_newtuner);
+	void updateTuner(SearchTuner *_newtuner) {tuner = _newtuner;}
 	long long getTime(Problem *problem);
 	void setTime(Problem *problem, long long time);
 private:
@@ -42,7 +43,7 @@ public:
 	void tuneComp();
 	CMEMALLOC;
 protected:
-	long long evaluate(Problem *problem, SearchTuner *tuner);
+	long long evaluate(Problem *problem, TunerRecord *tuner);
 	double evaluateAll(TunerRecord *tuner);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
 	void mapProblemsToTuners(Vector<TunerRecord *> *tunerV);
