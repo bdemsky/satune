@@ -49,6 +49,8 @@ const char *tunableParameterToString(Tunables tunable) {
 		return "NAIVEENCODER";
 	case MUSTVALUE:
 		return "MUSTVALUE";
+	case VARIABLEORDER:
+		return "VARIABLEORDER";
 	default:
 		ASSERT(0);
 	}
