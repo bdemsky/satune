@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 	myfile.close();
 	//serialize out the tuner we used
 	snprintf(buffer, sizeof(buffer), "%sused", argv[3]);
-	tuner->serialize(buffer);
+	tuner->serializeUsed(buffer);
 
 	delete solver;
 	return 0;

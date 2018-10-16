@@ -54,6 +54,8 @@ public:
 	void print();
 	void printUsed();
 	void serialize(const char *file);
+	void serializeUsed(const char *file);
+	void addUsed(const char *file);
 
 	CMEMALLOC;
 protected:
