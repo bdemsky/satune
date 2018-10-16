@@ -19,9 +19,9 @@ int main(int argc, char **argv) {
 	int sat = solver->solve();
 	long long metric = solver->getElapsedTime();
 	ofstream myfile;
-	myfile.open (argv[4], ios::out);
-	myfile << metric;
-	myfile << sat;
+	myfile.open (argv[4], ios::out | ios::trunc);
+	myfile << metric << endl;
+	myfile << sat << endl;
 	myfile.close();
 	//serialize out the tuner we used
 	snprintf(buffer, sizeof(buffer), "%sused", argv[3]);
