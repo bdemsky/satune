@@ -66,7 +66,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	tuner->getTuner()->serialize(buffer);
 
 	//Do run
-	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%s%u > log%u", problem->getProblem(), timeout, execnum, problem->getProblem(), execnum, execnum);
+	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), timeout, execnum, execnum, execnum);
 	int status = system(buffer);
 
 	long long metric = -1;
@@ -74,7 +74,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 
 	if (status == 0) {
 		//Read data in from results file
-		snprintf(buffer, sizeof(buffer), "result%s%u", problem->getProblem(), execnum);
+		snprintf(buffer, sizeof(buffer), "result%u", execnum);
 
 		ifstream myfile;
 		myfile.open (buffer, ios::in);
@@ -87,10 +87,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 		}
 
 		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
-		SearchTuner *usedtuner = new SearchTuner(buffer);
-		delete tuner->getTuner();
-		tuner->updateTuner(usedtuner);
-
+		tuner->getTuner()->addUsed(buffer);
 	}
 	//Increment execution count
 	execnum++;

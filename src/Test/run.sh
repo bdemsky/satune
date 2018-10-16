@@ -5,5 +5,5 @@ export LD_LIBRARY_PATH=../bin
 export DYLD_LIBRARY_PATH=../bin
 # For sat_solver
 export PATH=.:$PATH
-
+echo $@
 $@
