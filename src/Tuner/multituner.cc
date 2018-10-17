@@ -83,19 +83,55 @@ void MultiTuner::readData(uint numRuns) {
 	for (uint i = 0; i < numRuns; i++) {
 		ifstream myfile;
 		char buffer[512];
-		uint tunernum;
+		uint tunernumber;
 		snprintf(buffer, sizeof(buffer), "tunernum%u", i);
 		myfile.open (buffer, ios::in);
-		myfile >> tunernum;
+		myfile >> tunernumber;
 		myfile.close();
+		if (allTuners.getSize() <= tunernumber)
+			allTuners.setSize(tunernumber + 1);
+		if (allTuners.get(tunernumber) == NULL) {
+			snprintf(buffer, sizeof(buffer), "tuner%u", i);
+			allTuners.set(tunernumber, new TunerRecord(new SearchTuner(buffer)));
+		}
+		//Add any new used records
+		snprintf(buffer, sizeof(buffer), "tuner%uused", i);
+		TunerRecord *tuner = allTuners.get(tunernumber);
+		tuner->getTuner()->addUsed(buffer);
 
 		char problemname[512];
+		uint problemnumber;
 		snprintf(buffer, sizeof(buffer), "problem%u", i);
 		myfile.open(buffer, ios::in);
 		myfile.getline(problemname, sizeof(problemname));
+		myfile >> problemnumber;
 		myfile.close();
+		if (problems.getSize() <= problemnumber)
+			problems.setSize(problemnumber + 1);
+		if (problems.get(problemnumber) == NULL)
+			problems.set(problemnumber, new Problem(problemname));
+		Problem *problem = problems.get(problemnumber);
+		long long metric = -1;
+		int sat = IS_INDETER;
+		//Read data in from results file
+		snprintf(buffer, sizeof(buffer), "result%u", execnum);
+
+		myfile.open (buffer, ios::in);
 
 
+		if (myfile.is_open()) {
+			myfile >> metric;
+			myfile >> sat;
+			myfile.close();
+		}
+		if (problem->result == UNSETVALUE && sat != IS_INDETER) {
+			problem->result = sat;
+		} else if (problem->result != sat && sat != IS_INDETER) {
+			model_print("******** Result has changed ********\n");
+		}
+
+		if (metric != -1)
+			tuner->setTime(problem, metric);
 
 
 	}
