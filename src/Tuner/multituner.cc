@@ -231,8 +231,11 @@ void MultiTuner::tuneComp() {
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
-					if (tuner->getTime(problem) == -1)
+					if (tuner->getTime(problem) == -1){
 						tuner->problems.push(problem);
+					}
+					DEBUG("%u.Problem<%s>\tTuner<%p>\tMetric<%lld>\n", i, problem->problem,tuner, metric);
+					DEBUG("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
 				}
@@ -242,18 +245,21 @@ void MultiTuner::tuneComp() {
 						if (metric < places.get(k)->getTime(problem))
 							break;
 					}
+					DEBUG("place[%u]=Tuner<%p>\n", k, tuner);
 					places.insertAt(k, tuner);
 				}
 			}
 			int points = 9;
 			for (uint k = 0; k < places.getSize() && points; k++) {
 				TunerRecord *tuner = places.get(k);
-				points = points / 3;
 				int currScore = 0;
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
 				currScore += points;
+				DEBUG("Problem<%s>\tTuner<%p>\tmetric<%d>\n", problem->problem, tuner, currScore);
+				DEBUG("**************************\n");
 				scores.put(tuner, currScore);
+				points = points / 3;
 			}
 		}
 		Vector<TunerRecord *> ranking;
@@ -271,8 +277,11 @@ void MultiTuner::tuneComp() {
 				if (score < tscore)
 					break;
 			}
+			DEBUG("ranking[%u]=tuner<%p>(Score=%d)\n", j, tuner, score);
+			DEBUG("************************\n");
 			ranking.insertAt(j, tuner);
 		}
+		DEBUG("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
 			for (uint j = 0; j < tunerV->getSize(); j++) {
