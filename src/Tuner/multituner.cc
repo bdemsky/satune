@@ -217,6 +217,7 @@ void MultiTuner::tuneComp() {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
 			TunerRecord *tmp = new TunerRecord(tmpTuner);
 			tmp->tunernumber = allTuners.getSize();
+			model_print("Mutated tuner %u to generate tuner %u\n", tunerV->get(i)->tunernumber, tmp->tunernumber);
 			allTuners.push(tmp);
 			tunerV->push(tmp);
 		}
@@ -275,6 +276,7 @@ void MultiTuner::tuneComp() {
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
 			for (uint j = 0; j < tunerV->getSize(); j++) {
+				model_print("Removing tuner %u\n", tuner->tunernumber);
 				if (tunerV->get(j) == tuner)
 					tunerV->removeAt(j);
 			}
