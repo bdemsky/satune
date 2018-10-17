@@ -61,6 +61,19 @@ void MultiTuner::addTuner(SearchTuner *tuner) {
 
 long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	char buffer[512];
+	{
+		snprintf(buffer, sizeof(buffer), "problem%u", execnum);
+
+		ofstream myfile;
+		myfile.open (buffer, ios::out);
+
+
+		if (myfile.is_open()) {
+			myfile << problem->getProblem() << endl;
+			myfile.close();
+		}
+	}
+
 	//Write out the tuner
 	snprintf(buffer, sizeof(buffer), "tuner%u", execnum);
 	tuner->getTuner()->serialize(buffer);
@@ -106,7 +119,9 @@ void MultiTuner::tuneComp() {
 		uint tSize = tunerV->getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
-			tunerV->push(new TunerRecord(tmpTuner));
+			TunerRecord *tmp = new TunerRecord(tmpTuner);
+			allTuners.push(tmp);
+			tunerV->push(tmp);
 		}
 
 		Hashtable<TunerRecord *, int, uint64_t> scores;
@@ -153,7 +168,7 @@ void MultiTuner::tuneComp() {
 				int tscore = 0;
 				if (scores.contains(t))
 					tscore = scores.get(t);
-				if (score > tscore)
+				if (score < tscore)
 					break;
 			}
 			ranking.insertAt(j, tuner);
