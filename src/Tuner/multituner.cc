@@ -209,6 +209,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 void MultiTuner::tuneComp() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
 	for (uint b = 0; b < budget; b++) {
+		model_print("Round %u of %u\n", b, budget);
 		uint tSize = tunerV->getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);

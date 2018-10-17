@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
 
 	MultiTuner *multituner = new MultiTuner(0, 0, 0);
 	multituner->readData(numruns);
+	multituner->printData();
 	delete multituner;
 	return 0;
 }
