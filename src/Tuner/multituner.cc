@@ -234,7 +234,7 @@ void MultiTuner::tuneComp() {
 					if (tuner->getTime(problem) == -1) {
 						tuner->problems.push(problem);
 					}
-					LOG("%u.Problem<%s>\tTuner<%d\tMetric<%lld>\n", i, problem->problem,tuner->tunernumber, metric);
+					LOG("%u.Problem<%s>\tTuner<%d>\tMetric<%lld>\n", i, problem->problem,tuner->tunernumber, metric);
 					LOG("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
