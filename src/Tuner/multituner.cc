@@ -10,7 +10,7 @@
 
 #define UNSETVALUE -1
 
-Problem::Problem(const char *_problem) : result(UNSETVALUE) {
+Problem::Problem(const char *_problem) : problemnumber(-1), result(UNSETVALUE) {
 	uint len = strlen(_problem);
 	problem = (char *) ourmalloc(len + 1);
 	memcpy(problem, _problem, len + 1);
@@ -50,17 +50,125 @@ MultiTuner::~MultiTuner() {
 }
 
 void MultiTuner::addProblem(const char *filename) {
-	problems.push(new Problem(filename));
+	Problem *p = new Problem(filename);
+	p->problemnumber = problems.getSize();
+	problems.push(p);
+}
+
+void MultiTuner::printData() {
+	model_print("*********** DATA DUMP ***********\n");
+	for (uint i = 0; i < allTuners.getSize(); i++) {
+		TunerRecord *tuner = allTuners.get(i);
+		SearchTuner *stun = tuner->getTuner();
+		model_print("Tuner %u\n", i);
+		stun->print();
+		model_print("----------------------------------\n\n\n");
+		for (uint j = 0; j < tuner->problems.getSize(); j++) {
+			Problem *problem = tuner->problems.get(j);
+			model_print("Problem %s\n", problem->getProblem());
+			model_print("Time = %lld\n", tuner->getTime(problem));
+		}
+	}
 }
 
 void MultiTuner::addTuner(SearchTuner *tuner) {
 	TunerRecord *t = new TunerRecord(tuner);
 	tuners.push(t);
+	t->tunernumber = allTuners.getSize();
 	allTuners.push(t);
+}
+
+
+void MultiTuner::readData(uint numRuns) {
+	for (uint i = 0; i < numRuns; i++) {
+		ifstream myfile;
+		char buffer[512];
+		uint tunernumber;
+		snprintf(buffer, sizeof(buffer), "tunernum%u", i);
+		myfile.open (buffer, ios::in);
+		myfile >> tunernumber;
+		myfile.close();
+		if (allTuners.getSize() <= tunernumber)
+			allTuners.setSize(tunernumber + 1);
+		if (allTuners.get(tunernumber) == NULL) {
+			snprintf(buffer, sizeof(buffer), "tuner%u", i);
+			allTuners.set(tunernumber, new TunerRecord(new SearchTuner(buffer)));
+		}
+		//Add any new used records
+		snprintf(buffer, sizeof(buffer), "tuner%uused", i);
+		TunerRecord *tuner = allTuners.get(tunernumber);
+		tuner->getTuner()->addUsed(buffer);
+
+		char problemname[512];
+		uint problemnumber;
+		snprintf(buffer, sizeof(buffer), "problem%u", i);
+		myfile.open(buffer, ios::in);
+		myfile.getline(problemname, sizeof(problemname));
+		myfile >> problemnumber;
+		myfile.close();
+		if (problems.getSize() <= problemnumber)
+			problems.setSize(problemnumber + 1);
+		if (problems.get(problemnumber) == NULL)
+			problems.set(problemnumber, new Problem(problemname));
+		Problem *problem = problems.get(problemnumber);
+		long long metric = -1;
+		int sat = IS_INDETER;
+		//Read data in from results file
+		snprintf(buffer, sizeof(buffer), "result%u", i);
+
+		myfile.open (buffer, ios::in);
+
+
+		if (myfile.is_open()) {
+			myfile >> metric;
+			myfile >> sat;
+			myfile.close();
+		}
+		if (problem->result == UNSETVALUE && sat != IS_INDETER) {
+			problem->result = sat;
+		} else if (problem->result != sat && sat != IS_INDETER) {
+			model_print("******** Result has changed ********\n");
+		}
+
+		if (metric != -1) {
+			if (tuner->getTime(problem) == -1)
+				tuner->problems.push(problem);
+			tuner->setTime(problem, metric);
+		}
+
+	}
+
 }
 
 long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	char buffer[512];
+	{
+		snprintf(buffer, sizeof(buffer), "problem%u", execnum);
+
+		ofstream myfile;
+		myfile.open (buffer, ios::out);
+
+
+		if (myfile.is_open()) {
+			myfile << problem->getProblem() << endl;
+			myfile << problem->problemnumber << endl;
+			myfile.close();
+		}
+	}
+
+	{
+		snprintf(buffer, sizeof(buffer), "tunernum%u", execnum);
+
+		ofstream myfile;
+		myfile.open (buffer, ios::out);
+
+
+		if (myfile.is_open()) {
+			myfile << tuner->tunernumber << endl;
+			myfile.close();
+		}
+	}
+
 	//Write out the tuner
 	snprintf(buffer, sizeof(buffer), "tuner%u", execnum);
 	tuner->getTuner()->serialize(buffer);
@@ -103,12 +211,14 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 void MultiTuner::tuneComp() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
 	for (uint b = 0; b < budget; b++) {
+		model_print("Round %u of %u\n", b, budget);
 		uint tSize = tunerV->getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
-			TunerRecord * tmp = new TunerRecord(tmpTuner);
-			tunerV->push(tmp);
+			TunerRecord *tmp = new TunerRecord(tmpTuner);
+			tmp->tunernumber = allTuners.getSize();
 			allTuners.push(tmp);
+			tunerV->push(tmp);
 		}
 
 		Hashtable<TunerRecord *, int, uint64_t> scores;
@@ -120,8 +230,9 @@ void MultiTuner::tuneComp() {
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
-					tuner->problems.push(problem);
-					tuner->timetaken.put(problem, metric);
+					if (tuner->getTime(problem) == -1){
+						tuner->problems.push(problem);
+					}
 					DEBUG("%u.Problem<%s>\tTuner<%p>\tMetric<%lld>\n", i, problem->problem,tuner, metric);
 					DEBUG("*****************************\n");
 					if (metric != -1)
@@ -162,14 +273,14 @@ void MultiTuner::tuneComp() {
 				int tscore = 0;
 				if (scores.contains(t))
 					tscore = scores.get(t);
-				if (score > tscore)
+				if (score < tscore)
 					break;
 			}
 			DEBUG("ranking[%u]=tuner<%p>(Score=%d)\n", j, tuner, score);
 			DEBUG("************************\n");
 			ranking.insertAt(j, tuner);
 		}
-		model_print("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
+		DEBUG("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
 			for (uint j = 0; j < tunerV->getSize(); j++) {
@@ -178,16 +289,7 @@ void MultiTuner::tuneComp() {
 			}
 		}
 	}
-//	model_print("Done with the learning...\n");
-//	for(uint i=0; i<allTuners.getSize(); i++){
-//		TunerRecord *tuner = allTuners.get(i);
-//		for(uint j=0; j<tuner->problems.getSize(); j++){
-//			Problem *problem = tuner->problems.get(j);
-//			DEBUG("******Problem<%p>\tscore=%llu\n", problem, tuner->timetaken.get(problem));
-//		}
-//		DEBUG("*********Problems.size=%u********************\n", tuner->problems.getSize());
-//		
-//	}
+	printData();
 }
 
 void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
@@ -288,6 +390,7 @@ TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
 	for (uint i = 0; i < budget; i++) {
 		SearchTuner *tmpTuner = mutateTuner(oldTuner->getTuner(), i);
 		TunerRecord *newTuner = oldTuner->changeTuner(tmpTuner);
+		newTuner->tunernumber = allTuners.getSize();
 		allTuners.push(newTuner);
 		double newScore = evaluateAll(newTuner);
 		newTuner->tuner->printUsed();
