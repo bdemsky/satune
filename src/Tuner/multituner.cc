@@ -106,7 +106,9 @@ void MultiTuner::tuneComp() {
 		uint tSize = tunerV->getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
-			tunerV->push(new TunerRecord(tmpTuner));
+			TunerRecord * tmp = new TunerRecord(tmpTuner);
+			tunerV->push(tmp);
+			allTuners.push(tmp);
 		}
 
 		Hashtable<TunerRecord *, int, uint64_t> scores;
@@ -118,6 +120,10 @@ void MultiTuner::tuneComp() {
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
+					tuner->problems.push(problem);
+					tuner->timetaken.put(problem, metric);
+					DEBUG("%u.Problem<%s>\tTuner<%p>\tMetric<%lld>\n", i, problem->problem,tuner, metric);
+					DEBUG("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
 				}
@@ -127,18 +133,21 @@ void MultiTuner::tuneComp() {
 						if (metric < places.get(k)->getTime(problem))
 							break;
 					}
+					DEBUG("place[%u]=Tuner<%p>\n", k, tuner);
 					places.insertAt(k, tuner);
 				}
 			}
 			int points = 9;
 			for (uint k = 0; k < places.getSize() && points; k++) {
 				TunerRecord *tuner = places.get(k);
-				points = points / 3;
 				int currScore = 0;
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
 				currScore += points;
+				DEBUG("Problem<%s>\tTuner<%p>\tmetric<%d>\n", problem->problem, tuner, currScore);
+				DEBUG("**************************\n");
 				scores.put(tuner, currScore);
+				points = points / 3;
 			}
 		}
 		Vector<TunerRecord *> ranking;
@@ -156,8 +165,11 @@ void MultiTuner::tuneComp() {
 				if (score > tscore)
 					break;
 			}
+			DEBUG("ranking[%u]=tuner<%p>(Score=%d)\n", j, tuner, score);
+			DEBUG("************************\n");
 			ranking.insertAt(j, tuner);
 		}
+		model_print("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
 			for (uint j = 0; j < tunerV->getSize(); j++) {
@@ -166,6 +178,16 @@ void MultiTuner::tuneComp() {
 			}
 		}
 	}
+//	model_print("Done with the learning...\n");
+//	for(uint i=0; i<allTuners.getSize(); i++){
+//		TunerRecord *tuner = allTuners.get(i);
+//		for(uint j=0; j<tuner->problems.getSize(); j++){
+//			Problem *problem = tuner->problems.get(j);
+//			DEBUG("******Problem<%p>\tscore=%llu\n", problem, tuner->timetaken.get(problem));
+//		}
+//		DEBUG("*********Problems.size=%u********************\n", tuner->problems.getSize());
+//		
+//	}
 }
 
 void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
