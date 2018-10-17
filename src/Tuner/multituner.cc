@@ -231,7 +231,7 @@ void MultiTuner::tuneComp() {
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
-					if (tuner->getTime(problem) == -1){
+					if (tuner->getTime(problem) == -1) {
 						tuner->problems.push(problem);
 					}
 					DEBUG("%u.Problem<%s>\tTuner<%p>\tMetric<%lld>\n", i, problem->problem,tuner, metric);
@@ -284,8 +284,8 @@ void MultiTuner::tuneComp() {
 		DEBUG("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
+			model_print("Removing tuner %u\n", tuner->tunernumber);
 			for (uint j = 0; j < tunerV->getSize(); j++) {
-				model_print("Removing tuner %u\n", tuner->tunernumber);
 				if (tunerV->get(j) == tuner)
 					tunerV->removeAt(j);
 			}
