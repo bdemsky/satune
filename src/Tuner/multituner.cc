@@ -114,7 +114,7 @@ void MultiTuner::readData(uint numRuns) {
 		long long metric = -1;
 		int sat = IS_INDETER;
 		//Read data in from results file
-		snprintf(buffer, sizeof(buffer), "result%u", execnum);
+		snprintf(buffer, sizeof(buffer), "result%u", i);
 
 		myfile.open (buffer, ios::in);
 
@@ -130,9 +130,11 @@ void MultiTuner::readData(uint numRuns) {
 			model_print("******** Result has changed ********\n");
 		}
 
-		if (metric != -1)
+		if (metric != -1) {
+			if (tuner->getTime(problem) == -1)
+				tuner->problems.push(problem);
 			tuner->setTime(problem, metric);
-
+		}
 
 	}
 
@@ -228,6 +230,8 @@ void MultiTuner::tuneComp() {
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
+					if (tuner->getTime(problem) == -1)
+						tuner->problems.push(problem);
 					if (metric != -1)
 						tuner->setTime(problem, metric);
 				}
