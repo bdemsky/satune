@@ -10,7 +10,7 @@
 
 #define UNSETVALUE -1
 
-Problem::Problem(const char *_problem) : result(UNSETVALUE) {
+Problem::Problem(const char *_problem) : problemnumber(-1), result(UNSETVALUE) {
 	uint len = strlen(_problem);
 	problem = (char *) ourmalloc(len + 1);
 	memcpy(problem, _problem, len + 1);
@@ -50,7 +50,9 @@ MultiTuner::~MultiTuner() {
 }
 
 void MultiTuner::addProblem(const char *filename) {
-	problems.push(new Problem(filename));
+	Problem *p = new Problem(filename);
+	p->problemnumber = problems.getSize();
+	problems.push(p);
 }
 
 void MultiTuner::printData() {
@@ -76,6 +78,30 @@ void MultiTuner::addTuner(SearchTuner *tuner) {
 	allTuners.push(t);
 }
 
+
+void MultiTuner::readData(uint numRuns) {
+	for (uint i = 0; i < numRuns; i++) {
+		ifstream myfile;
+		char buffer[512];
+		uint tunernum;
+		snprintf(buffer, sizeof(buffer), "tunernum%u", i);
+		myfile.open (buffer, ios::in);
+		myfile >> tunernum;
+		myfile.close();
+
+		char problemname[512];
+		snprintf(buffer, sizeof(buffer), "problem%u", i);
+		myfile.open(buffer, ios::in);
+		myfile.getline(problemname, sizeof(problemname));
+		myfile.close();
+
+
+
+
+	}
+
+}
+
 long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	char buffer[512];
 	{
@@ -87,6 +113,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 
 		if (myfile.is_open()) {
 			myfile << problem->getProblem() << endl;
+			myfile << problem->problemnumber << endl;
 			myfile.close();
 		}
 	}

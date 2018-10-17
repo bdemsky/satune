@@ -12,6 +12,7 @@ public:
 	~Problem();
 	CMEMALLOC;
 private:
+	int problemnumber;
 	int result;
 	char *problem;
 	friend class MultiTuner;
@@ -40,6 +41,7 @@ public:
 	~MultiTuner();
 	void addProblem(const char *filename);
 	void addTuner(SearchTuner *tuner);
+	void readData(uint numRuns);
 	void tuneK();
 	void tuneComp();
 	void printData();
