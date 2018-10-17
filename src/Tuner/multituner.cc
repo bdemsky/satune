@@ -274,7 +274,7 @@ void MultiTuner::tuneComp() {
 				int tscore = 0;
 				if (scores.contains(t))
 					tscore = scores.get(t);
-				if (score < tscore)
+				if (score > tscore)
 					break;
 			}
 			LOG("ranking[%u]=tuner<%p>(Score=%d)\n", j, tuner, score);
