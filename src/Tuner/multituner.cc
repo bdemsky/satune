@@ -53,6 +53,22 @@ void MultiTuner::addProblem(const char *filename) {
 	problems.push(new Problem(filename));
 }
 
+void MultiTuner::printData() {
+	model_print("*********** DATA DUMP ***********\n");
+	for (uint i = 0; i < allTuners.getSize(); i++) {
+		TunerRecord *tuner = allTuners.get(i);
+		SearchTuner *stun = tuner->getTuner();
+		model_print("Tuner %u\n", i);
+		stun->print();
+		model_print("----------------------------------\n\n\n");
+		for (uint j = 0; j < tuner->problems.getSize(); j++) {
+			Problem *problem = tuner->problems.get(j);
+			model_print("Problem %s\n", problem->getProblem());
+			model_print("Time = %lld\n", tuner->getTime(problem));
+		}
+	}
+}
+
 void MultiTuner::addTuner(SearchTuner *tuner) {
 	TunerRecord *t = new TunerRecord(tuner);
 	tuners.push(t);
@@ -181,6 +197,7 @@ void MultiTuner::tuneComp() {
 			}
 		}
 	}
+	printData();
 }
 
 void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {

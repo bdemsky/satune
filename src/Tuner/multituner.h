@@ -41,6 +41,7 @@ public:
 	void addTuner(SearchTuner *tuner);
 	void tuneK();
 	void tuneComp();
+	void printData();
 	CMEMALLOC;
 protected:
 	long long evaluate(Problem *problem, TunerRecord *tuner);
@@ -49,7 +50,6 @@ protected:
 	void mapProblemsToTuners(Vector<TunerRecord *> *tunerV);
 	void improveTuners(Vector<TunerRecord *> *tunerV);
 	TunerRecord *tune(TunerRecord *tuner);
-
 
 	Vector<TunerRecord *> allTuners;
 	Vector<Problem *> problems;
