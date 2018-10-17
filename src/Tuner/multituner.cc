@@ -234,7 +234,7 @@ void MultiTuner::tuneComp() {
 					if (tuner->getTime(problem) == -1) {
 						tuner->problems.push(problem);
 					}
-					DEBUG("%u.Problem<%s>\tTuner<%p>\tMetric<%lld>\n", i, problem->problem,tuner, metric);
+					DEBUG("%u.Problem<%s>\tTuner<%p, %d>\tMetric<%lld>\n", i, problem->problem,tuner, tuner->tunernumber, metric);
 					DEBUG("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
@@ -256,7 +256,7 @@ void MultiTuner::tuneComp() {
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
 				currScore += points;
-				DEBUG("Problem<%s>\tTuner<%p>\tmetric<%d>\n", problem->problem, tuner, currScore);
+				DEBUG("Problem<%s>\tTuner<%p,%d>\tmetric<%d>\n", problem->problem, tuner, tuner->tunernumber,  currScore);
 				DEBUG("**************************\n");
 				scores.put(tuner, currScore);
 				points = points / 3;
@@ -277,7 +277,7 @@ void MultiTuner::tuneComp() {
 				if (score > tscore)
 					break;
 			}
-			DEBUG("ranking[%u]=tuner<%p>(Score=%d)\n", j, tuner, score);
+			DEBUG("ranking[%u]=tuner<%p,%u>(Score=%d)\n", j, tuner, tuner->tunernumber, score);
 			DEBUG("************************\n");
 			ranking.insertAt(j, tuner);
 		}
