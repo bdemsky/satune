@@ -72,6 +72,7 @@ void MultiTuner::printData() {
 void MultiTuner::addTuner(SearchTuner *tuner) {
 	TunerRecord *t = new TunerRecord(tuner);
 	tuners.push(t);
+	t->tunernumber = allTuners.getSize();
 	allTuners.push(t);
 }
 
@@ -86,6 +87,19 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 
 		if (myfile.is_open()) {
 			myfile << problem->getProblem() << endl;
+			myfile.close();
+		}
+	}
+
+	{
+		snprintf(buffer, sizeof(buffer), "tunernum%u", execnum);
+
+		ofstream myfile;
+		myfile.open (buffer, ios::out);
+
+
+		if (myfile.is_open()) {
+			myfile << tuner->tunernumber << endl;
 			myfile.close();
 		}
 	}
@@ -136,6 +150,7 @@ void MultiTuner::tuneComp() {
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
 			TunerRecord *tmp = new TunerRecord(tmpTuner);
+			tmp->tunernumber = allTuners.getSize();
 			allTuners.push(tmp);
 			tunerV->push(tmp);
 		}
@@ -298,6 +313,7 @@ TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
 	for (uint i = 0; i < budget; i++) {
 		SearchTuner *tmpTuner = mutateTuner(oldTuner->getTuner(), i);
 		TunerRecord *newTuner = oldTuner->changeTuner(tmpTuner);
+		newTuner->tunernumber = allTuners.getSize();
 		allTuners.push(newTuner);
 		double newScore = evaluateAll(newTuner);
 		newTuner->tuner->printUsed();

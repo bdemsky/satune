@@ -19,7 +19,7 @@ private:
 
 class TunerRecord {
 public:
-	TunerRecord(SearchTuner *_tuner) : tuner(_tuner) {}
+	TunerRecord(SearchTuner *_tuner) : tuner(_tuner), tunernumber(-1) {}
 	SearchTuner *getTuner() {return tuner;}
 	TunerRecord *changeTuner(SearchTuner *_newtuner);
 	void updateTuner(SearchTuner *_newtuner) {tuner = _newtuner;}
@@ -29,6 +29,7 @@ private:
 	SearchTuner *tuner;
 	Vector<Problem *> problems;
 	Hashtable<Problem *, long long, uint64_t> timetaken;
+	int tunernumber;
 	friend class MultiTuner;
 	friend void clearVector(Vector<TunerRecord *> *tunerV);
 };
