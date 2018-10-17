@@ -245,7 +245,7 @@ void MultiTuner::tuneComp() {
 						if (metric < places.get(k)->getTime(problem))
 							break;
 					}
-					DEBUG("place[%u]=Tuner<%p>\n", k, tuner);
+					DEBUG("place[%u]=Tuner<%p,%d>\n", k, tuner, tuner->tunernumber);
 					places.insertAt(k, tuner);
 				}
 			}
