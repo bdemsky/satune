@@ -18,6 +18,7 @@
 #include "config.h"
 #include "time.h"
 
+#define NANOSEC 1000000000.0
 
 #if 0
 extern int model_out;

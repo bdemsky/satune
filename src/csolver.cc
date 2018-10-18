@@ -577,7 +577,6 @@ void CSolver::inferFixedOrders() {
 	}
 }
 
-#define NANOSEC 1000000000.0
 int CSolver::solve() {
 	long long startTime = getTimeNano();
 	bool deleteTuner = false;
