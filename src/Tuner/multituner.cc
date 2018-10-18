@@ -225,6 +225,7 @@ void MultiTuner::updateTimeout(long long metric){
 	if(adoptive < timeout){
 		timeout = adoptive;
 	}
+	LOG("Timeout=%u\tadoptive%u\tcurrentTime=%f\n", timeout, adoptive, currentTime);
 }
 
 void MultiTuner::tuneComp() {
@@ -253,8 +254,8 @@ void MultiTuner::tuneComp() {
 					if (tuner->getTime(problem) == -1) {
 						tuner->problems.push(problem);
 					}
-					DEBUG("%u.Problem<%s>\tTuner<%p, %d>\tMetric<%lld>\n", i, problem->problem,tuner, tuner->tunernumber, metric);
-					DEBUG("*****************************\n");
+					LOG("%u.Problem<%s>\tTuner<%p, %d>\tMetric<%lld>\n", i, problem->problem,tuner, tuner->tunernumber, metric);
+					LOG("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
 				}
@@ -264,7 +265,7 @@ void MultiTuner::tuneComp() {
 						if (metric < places.get(k)->getTime(problem))
 							break;
 					}
-					DEBUG("place[%u]=Tuner<%p,%d>\n", k, tuner, tuner->tunernumber);
+					LOG("place[%u]=Tuner<%p,%d>\n", k, tuner, tuner->tunernumber);
 					places.insertAt(k, tuner);
 				}
 			}
@@ -275,8 +276,8 @@ void MultiTuner::tuneComp() {
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
 				currScore += points;
-				DEBUG("Problem<%s>\tTuner<%p,%d>\tmetric<%d>\n", problem->problem, tuner, tuner->tunernumber,  currScore);
-				DEBUG("**************************\n");
+				LOG("Problem<%s>\tTuner<%p,%d>\tmetric<%d>\n", problem->problem, tuner, tuner->tunernumber,  currScore);
+				LOG("**************************\n");
 				scores.put(tuner, currScore);
 				points = points / 3;
 			}
@@ -296,14 +297,14 @@ void MultiTuner::tuneComp() {
 				if (score > tscore)
 					break;
 			}
-			DEBUG("ranking[%u]=tuner<%p,%u>(Score=%d)\n", j, tuner, tuner->tunernumber, score);
-			DEBUG("************************\n");
+			LOG("ranking[%u]=tuner<%p,%u>(Score=%d)\n", j, tuner, tuner->tunernumber, score);
+			LOG("************************\n");
 			ranking.insertAt(j, tuner);
 		}
 		LOG("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
-			model_print("Removing tuner %u\n", tuner->tunernumber);
+			LOG("Removing tuner %u\n", tuner->tunernumber);
 			for (uint j = 0; j < tunerV->getSize(); j++) {
 				if (tunerV->get(j) == tuner)
 					tunerV->removeAt(j);
