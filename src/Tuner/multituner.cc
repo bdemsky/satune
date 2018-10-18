@@ -7,10 +7,11 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <limits>
 
 #define UNSETVALUE -1
 
-Problem::Problem(const char *_problem) : problemnumber(-1), result(UNSETVALUE) {
+Problem::Problem(const char *_problem) : problemnumber(-1), result(UNSETVALUE) , besttime(std::numeric_limits<double>::infinity()){
 	uint len = strlen(_problem);
 	problem = (char *) ourmalloc(len + 1);
 	memcpy(problem, _problem, len + 1);
@@ -39,7 +40,7 @@ TunerRecord *TunerRecord::changeTuner(SearchTuner *_newtuner) {
 }
 
 MultiTuner::MultiTuner(uint _budget, uint _rounds, uint _timeout) :
-	budget(_budget), rounds(_rounds), timeout(_timeout), besttime(_timeout), execnum(0) {
+	budget(_budget), rounds(_rounds), timeout(_timeout), execnum(0) {
 }
 
 MultiTuner::~MultiTuner() {
@@ -193,7 +194,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 			myfile >> sat;
 			myfile.close();
 		}
-		updateTimeout(metric);
+		updateTimeout(problem, metric);
 		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
 		tuner->getTuner()->addUsed(buffer);
 	}
@@ -211,14 +212,14 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	return metric;
 }
 
-void MultiTuner::updateTimeout(long long metric){
+void MultiTuner::updateTimeout(Problem *problem, long long metric){
 	double currentTime= metric / NANOSEC;
-	if(currentTime < besttime){
-		besttime = currentTime;
+	if(currentTime < problem->besttime){
+		problem->besttime = currentTime;
 	}
 	uint adoptive;
-	if(besttime > 30){
-		adoptive = besttime * 5;
+	if(problem->besttime > 30){
+		adoptive = problem->besttime * 5;
 	}else {
 		adoptive = 150;
 	}

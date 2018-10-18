@@ -15,6 +15,7 @@ private:
 	int problemnumber;
 	int result;
 	char *problem;
+        double besttime;
 	friend class MultiTuner;
 };
 
@@ -42,7 +43,7 @@ public:
 	void addProblem(const char *filename);
 	void addTuner(SearchTuner *tuner);
 	void readData(uint numRuns);
-        void updateTimeout(long long metric);
+        void updateTimeout(Problem *problem, long long metric);
 	void tuneK();
 	void tuneComp();
 	void printData();
@@ -61,7 +62,6 @@ protected:
 	uint budget;
 	uint rounds;
 	uint timeout;
-	double besttime;
 	int execnum;
 };
 #endif
