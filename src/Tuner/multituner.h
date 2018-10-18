@@ -7,7 +7,7 @@
 
 class Problem {
 public:
-	Problem(const char *problem);
+	Problem(const char *problem, uint timeout);
 	char *getProblem() {return problem;}
 	~Problem();
 	CMEMALLOC;
@@ -16,6 +16,7 @@ private:
 	int result;
 	char *problem;
         double besttime;
+        uint timeout;
 	friend class MultiTuner;
 };
 

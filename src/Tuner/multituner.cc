@@ -11,7 +11,12 @@
 
 #define UNSETVALUE -1
 
-Problem::Problem(const char *_problem) : problemnumber(-1), result(UNSETVALUE) , besttime(std::numeric_limits<double>::infinity()){
+Problem::Problem(const char *_problem, uint _timeout) : 
+	problemnumber(-1),
+	result(UNSETVALUE) , 
+	besttime(std::numeric_limits<double>::infinity()),
+	timeout(_timeout)
+{
 	uint len = strlen(_problem);
 	problem = (char *) ourmalloc(len + 1);
 	memcpy(problem, _problem, len + 1);
@@ -51,7 +56,7 @@ MultiTuner::~MultiTuner() {
 }
 
 void MultiTuner::addProblem(const char *filename) {
-	Problem *p = new Problem(filename);
+	Problem *p = new Problem(filename, timeout);
 	p->problemnumber = problems.getSize();
 	problems.push(p);
 }
@@ -110,7 +115,7 @@ void MultiTuner::readData(uint numRuns) {
 		if (problems.getSize() <= problemnumber)
 			problems.setSize(problemnumber + 1);
 		if (problems.get(problemnumber) == NULL)
-			problems.set(problemnumber, new Problem(problemname));
+			problems.set(problemnumber, new Problem(problemname, timeout));
 		Problem *problem = problems.get(problemnumber);
 		long long metric = -1;
 		int sat = IS_INDETER;
@@ -175,7 +180,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	tuner->getTuner()->serialize(buffer);
 
 	//Do run
-	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), timeout, execnum, execnum, execnum);
+	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), problem->timeout, execnum, execnum, execnum);
 	int status = system(buffer);
 
 	long long metric = -1;
@@ -223,10 +228,10 @@ void MultiTuner::updateTimeout(Problem *problem, long long metric){
 	}else {
 		adoptive = 150;
 	}
-	if(adoptive < timeout){
-		timeout = adoptive;
+	if(adoptive < problem->timeout){
+		problem->timeout = adoptive;
 	}
-	LOG("Timeout=%u\tadoptive%u\tcurrentTime=%f\n", timeout, adoptive, currentTime);
+	LOG("Timeout=%u\tadoptive%u\tcurrentTime=%f\n", problem->timeout, adoptive, currentTime);
 }
 
 void MultiTuner::tuneComp() {
