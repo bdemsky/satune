@@ -7,7 +7,7 @@
 
 class Problem {
 public:
-	Problem(const char *problem, uint timeout);
+	Problem(const char *problem);
 	char *getProblem() {return problem;}
 	~Problem();
 	CMEMALLOC;
@@ -15,8 +15,7 @@ private:
 	int problemnumber;
 	int result;
 	char *problem;
-        double besttime;
-        uint timeout;
+	long long besttime;
 	friend class MultiTuner;
 };
 
@@ -44,7 +43,7 @@ public:
 	void addProblem(const char *filename);
 	void addTuner(SearchTuner *tuner);
 	void readData(uint numRuns);
-        void updateTimeout(Problem *problem, long long metric);
+	void updateTimeout(Problem *problem, long long metric);
 	void tuneK();
 	void tuneComp();
 	void printData();

@@ -41,7 +41,7 @@ extern int switch_alloc;
 #ifdef CONFIG_DEBUG
 #define DEBUG(fmt, ...) do { model_print("*** %15s:%-4d %25s() *** " fmt, __FILE__, __LINE__, __func__, ## __VA_ARGS__); } while (0)
 #define DBG() DEBUG("\n")
-#define LOG(fmt, ...) do{model_print(fmt, ## __VA_ARGS__);}while(0)
+#define LOG(fmt, ...) do {model_print(fmt, ## __VA_ARGS__);} while (0)
 #define DBG_ENABLED() (1)
 #else
 #define DEBUG(fmt, ...)

@@ -11,11 +11,10 @@
 
 #define UNSETVALUE -1
 
-Problem::Problem(const char *_problem, uint _timeout) : 
+Problem::Problem(const char *_problem) :
 	problemnumber(-1),
-	result(UNSETVALUE) , 
-	besttime(std::numeric_limits<double>::infinity()),
-	timeout(_timeout)
+	result(UNSETVALUE),
+	besttime(LLONG_MAX)
 {
 	uint len = strlen(_problem);
 	problem = (char *) ourmalloc(len + 1);
@@ -56,7 +55,7 @@ MultiTuner::~MultiTuner() {
 }
 
 void MultiTuner::addProblem(const char *filename) {
-	Problem *p = new Problem(filename, timeout);
+	Problem *p = new Problem(filename);
 	p->problemnumber = problems.getSize();
 	problems.push(p);
 }
@@ -115,7 +114,7 @@ void MultiTuner::readData(uint numRuns) {
 		if (problems.getSize() <= problemnumber)
 			problems.setSize(problemnumber + 1);
 		if (problems.get(problemnumber) == NULL)
-			problems.set(problemnumber, new Problem(problemname, timeout));
+			problems.set(problemnumber, new Problem(problemname));
 		Problem *problem = problems.get(problemnumber);
 		long long metric = -1;
 		int sat = IS_INDETER;
@@ -179,8 +178,13 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	snprintf(buffer, sizeof(buffer), "tuner%u", execnum);
 	tuner->getTuner()->serialize(buffer);
 
+	//compute timeout
+	uint timeinsecs = problem->besttime / NANOSEC;
+	uint adaptive = (timeinsecs > 30) ? timeinsecs * 5 : 150;
+	uint maxtime = (adaptive < timeout) ? adaptive : timeout;
+
 	//Do run
-	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), problem->timeout, execnum, execnum, execnum);
+	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), maxtime, execnum, execnum, execnum);
 	int status = system(buffer);
 
 	long long metric = -1;
@@ -211,27 +215,16 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	} else if (problem->result != sat && sat != IS_INDETER) {
 		model_print("******** Result has changed ********\n");
 	}
-	if(sat == IS_INDETER && metric != -1){ //The case when we have a timeout
-		metric = -1; 
+	if (sat == IS_INDETER && metric != -1) {//The case when we have a timeout
+		metric = -1;
 	}
 	return metric;
 }
 
-void MultiTuner::updateTimeout(Problem *problem, long long metric){
-	double currentTime= metric / NANOSEC;
-	if(currentTime < problem->besttime){
-		problem->besttime = currentTime;
+void MultiTuner::updateTimeout(Problem *problem, long long metric) {
+	if (metric < problem->besttime) {
+		problem->besttime = metric;
 	}
-	uint adoptive;
-	if(problem->besttime > 30){
-		adoptive = problem->besttime * 5;
-	}else {
-		adoptive = 150;
-	}
-	if(adoptive < problem->timeout){
-		problem->timeout = adoptive;
-	}
-	LOG("Timeout=%u\tadoptive%u\tcurrentTime=%f\n", problem->timeout, adoptive, currentTime);
 }
 
 void MultiTuner::tuneComp() {
