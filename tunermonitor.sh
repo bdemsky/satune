@@ -5,6 +5,7 @@
 
 SATSOLVER=sat_solver
 CSOLVER=runcomptuner
+DESERALIZE=deserializerun
 MONITOR=tunermonitor
 SLEEPTIME=10
 FILE=monitor.log
@@ -17,6 +18,7 @@ while true; do
 	free >> $FILE
 	ps aux | grep $SATSOLVER | grep -v "grep" >> $FILE
 	ps aux | grep $CSOLVER | grep -v "run.sh" | grep -v "grep" >> $FILE
+	ps aux | grep $DESERALIZE | grep -v "run.sh" | grep -v "grep" >> $FILE
 	ps aux | grep $MONITOR | grep -v "grep" >> $FILE
 	echo "*************************" >> $FILE
 	sleep $SLEEPTIME
