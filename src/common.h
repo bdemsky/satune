@@ -45,6 +45,7 @@ extern int switch_alloc;
 #define DBG_ENABLED() (1)
 #else
 #define DEBUG(fmt, ...)
+#define LOG(fmt, ...)
 #define DBG()
 #define DBG_ENABLED() (0)
 #endif
