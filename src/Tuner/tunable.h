@@ -39,9 +39,9 @@ public:
 static TunableDesc onoff(0, 1, 1);
 static TunableDesc offon(0, 1, 0);
 static TunableDesc proxyparameter(1, 5, 2);
-static TunableDesc mustValueBinaryIndex(5, 9, 8);
+static TunableDesc mustValueBinaryIndex(0, 6, 3);
 static TunableDesc NodeEncodingDesc(ELEM_UNASSIGNED, BINARYINDEX, ELEM_UNASSIGNED);
-static TunableDesc NaiveEncodingDesc(ONEHOT, BINARYINDEX, ONEHOT);
+static TunableDesc NaiveEncodingDesc(ONEHOT, BINARYINDEX, BINARYINDEX);
 static TunableDesc boolVarOrderingDesc(CONSTRAINTORDERING, REVERSEORDERING, REVERSEORDERING);
 
 enum Tunables {DECOMPOSEORDER, MUSTREACHGLOBAL, MUSTREACHLOCAL, MUSTREACHPRUNE, OPTIMIZEORDERSTRUCTURE, ORDERINTEGERENCODING, PREPROCESS, NODEENCODING, EDGEENCODING, MUSTEDGEPRUNE, ELEMENTOPT,

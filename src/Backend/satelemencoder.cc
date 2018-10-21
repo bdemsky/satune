@@ -7,6 +7,7 @@
 #include "predicate.h"
 #include "csolver.h"
 #include "tunable.h"
+#include <cmath>
 
 void SATEncoder::shouldMemoize(Element *elem, uint64_t val, bool &memo) {
 	uint numParents = elem->parents.getSize();
@@ -226,7 +227,8 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	if (encoding->element->anyValue) {
 		uint setSize = encoding->element->getRange()->getSize();
 		uint encArraySize = encoding->encArraySize;
-		if (setSize < encArraySize * (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) / 10) {
+		double metric = encArraySize == setSize?setSize:setSize/(encArraySize-setSize);
+		if ( log(metric) <  pow(1.9, (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) - 4)) {
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
 		} else {
 			generateAnyValueBinaryIndexEncoding(encoding);
