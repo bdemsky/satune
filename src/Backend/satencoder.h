@@ -63,6 +63,7 @@ private:
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
 	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
 	void generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding);
+	int getMaximumUsedIndex(ElementEncoding *encoding);
 	void generateAnyValueBinaryIndexEncodingPositive(ElementEncoding *encoding);
 	void generateAnyValueBinaryValueEncoding(ElementEncoding *encoding);
 	CNF *cnf;

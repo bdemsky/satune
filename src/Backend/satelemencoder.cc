@@ -226,9 +226,8 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
 	if (encoding->element->anyValue) {
 		uint setSize = encoding->element->getRange()->getSize();
-		uint encArraySize = encoding->encArraySize;
-		double metric = encArraySize == setSize?setSize:setSize/(encArraySize-setSize);
-		if ( log(metric) <  pow(1.9, (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) - 4)) {
+		int maxIndex = getMaximumUsedIndex(encoding);
+		if (maxIndex !=-1 && (maxIndex - setSize) != 0 && (setSize/(maxIndex-setSize)) <  pow(1.9, (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) - 4)) {
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
 		} else {
 			generateAnyValueBinaryIndexEncoding(encoding);
@@ -280,9 +279,7 @@ void SATEncoder::generateElementEncoding(Element *element) {
 	}
 }
 
-void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) {
-	if (encoding->numVars == 0)
-		return;
+int SATEncoder::getMaximumUsedIndex(ElementEncoding *encoding){
 	int index = -1;
 	for (uint i = encoding->encArraySize - 1; i >= 0; i--) {
 		if (encoding->isinUseElement(i)) {
@@ -292,6 +289,13 @@ void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) 
 			break;
 		}
 	}
+	return index;
+}
+
+void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) {
+	if (encoding->numVars == 0)
+		return;
+	int index = getMaximumUsedIndex(encoding);
 	if ( index != -1 ) {
 		addConstraintCNF(cnf, generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index));
 	}
