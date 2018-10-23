@@ -113,7 +113,7 @@ void EncodingGraph::validate() {
 
 
 void EncodingGraph::encode() {
-	if (solver->getTuner()->getTunable(ENCODINGGRAPHOPT, &offon) == 0)
+	if (solver->getTuner()->getTunable(ENCODINGGRAPHOPT, &onoff) == 0)
 		return;
 	buildGraph();
 	SetIteratorEncodingSubGraph *itesg = subgraphs.iterator();
@@ -350,8 +350,8 @@ void EncodingGraph::decideEdges() {
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			min = rightSize > leftSize ? leftSize : rightSize;
-//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", left->measureSimilarity(right));
 			merge = leftGraph->measureSimilarity(right) > 1.5 || min == newSize;
+//			model_print("Merge=%s\tsimilarity=%f\n", merge?"TRUE":"FALSE", leftGraph->measureSimilarity(right));
 		} else {
 			//Neither are null
 			leftSize = convertSize(leftGraph->numValues());
@@ -361,8 +361,8 @@ void EncodingGraph::decideEdges() {
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
 			min = rightSize > leftSize ? leftSize : rightSize;
-//			model_print("Merge=%s\tsimilarity=%f\n", max==newSize?"TRUE":"FALSE", leftGraph->measureSimilarity(right));
 			merge = leftGraph->measureSimilarity(rightGraph) > 1.5 || min == newSize;
+//			model_print("Merge=%s\tsimilarity=%f\n", merge?"TRUE":"FALSE", leftGraph->measureSimilarity(rightGraph));
 		}
 		if (merge) {
 			//add the edge
