@@ -77,28 +77,28 @@ void MultiTuner::printData() {
 }
 
 void MultiTuner::findBestThreeTuners() {
-	if(allTuners.getSize() < 3){
+	if (allTuners.getSize() < 3) {
 		printData();
 		return;
 	}
-	TunerRecord * bestTuners[3];
+	TunerRecord *bestTuners[3];
 	double score = DBL_MAX;
-	for (uint i = 0; i < allTuners.getSize()-2; i++) {
-		for(uint j=i+1; j< allTuners.getSize()-1; j++){
-			for(uint k=j+1; k<allTuners.getSize(); k++){
+	for (uint i = 0; i < allTuners.getSize() - 2; i++) {
+		for (uint j = i + 1; j < allTuners.getSize() - 1; j++) {
+			for (uint k = j + 1; k < allTuners.getSize(); k++) {
 				TunerRecord *tuner1 = allTuners.get(i);
 				TunerRecord *tuner2 = allTuners.get(j);
 				TunerRecord *tuner3 = allTuners.get(k);
 				double mintimes[problems.getSize()];
-				for(uint l=0; l < problems.getSize(); l++){
+				for (uint l = 0; l < problems.getSize(); l++) {
 					Problem *problem = problems.get(l);
 					mintimes[l] = pow(min(tuner1->getTime(problem), tuner2->getTime(problem), tuner3->getTime(problem)), (double)1 / problems.getSize());
 				}
-				double result=1;
-				for(uint l=0; l< problems.getSize(); l++){
+				double result = 1;
+				for (uint l = 0; l < problems.getSize(); l++) {
 					result *= mintimes[l];
 				}
-				if(result < score){
+				if (result < score) {
 					score = result;
 					bestTuners[0] = tuner1;
 					bestTuners[1] = tuner2;
@@ -108,8 +108,8 @@ void MultiTuner::findBestThreeTuners() {
 		}
 	}
 	model_print("Best 3 tuners:\n");
-	for(uint i=0; i<3; i++){
-		TunerRecord * tuner = bestTuners[i];
+	for (uint i = 0; i < 3; i++) {
+		TunerRecord *tuner = bestTuners[i];
 		SearchTuner *stun = tuner->getTuner();
 		model_print("Tuner %u\n", tuner->tunernumber);
 		stun->print();

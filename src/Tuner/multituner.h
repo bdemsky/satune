@@ -56,11 +56,6 @@ protected:
 	void mapProblemsToTuners(Vector<TunerRecord *> *tunerV);
 	void improveTuners(Vector<TunerRecord *> *tunerV);
 	TunerRecord *tune(TunerRecord *tuner);
-        inline long long min(long long num1, long long num2, long long num3){
-                return num1 < num2 && num1 < num3? num1:
-                        num2 < num3? num2 : num3;
-        }
-        
 	Vector<TunerRecord *> allTuners;
 	Vector<Problem *> problems;
 	Vector<TunerRecord *> tuners;
@@ -69,4 +64,10 @@ protected:
 	uint timeout;
 	int execnum;
 };
+
+inline long long min(long long num1, long long num2, long long num3) {
+	return num1 < num2 && num1 < num3 ? num1 :
+				 num2 < num3 ? num2 : num3;
+}
+
 #endif
