@@ -227,7 +227,8 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	if (encoding->element->anyValue) {
 		uint setSize = encoding->element->getRange()->getSize();
 		int maxIndex = getMaximumUsedIndex(encoding);
-		if (maxIndex != -1 && (maxIndex - setSize) != 0 && (setSize / (maxIndex - setSize)) <  pow(1.9, (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) - 4)) {
+//		model_print("maxIndex=%d\tsetSize=%u\tmetric=%f\n", maxIndex, setSize, (maxIndex - setSize) == 0? -1.0 : (setSize*1.0/(maxIndex-setSize)) );
+		if (maxIndex != -1 && (maxIndex - setSize) != 0 && (setSize * 1.0 / (maxIndex - setSize)) <  pow(1.9, (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) - 4)) {
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
 		} else {
 			generateAnyValueBinaryIndexEncoding(encoding);
