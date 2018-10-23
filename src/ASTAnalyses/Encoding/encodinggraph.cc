@@ -342,6 +342,8 @@ void EncodingGraph::decideEdges() {
 			newSize = convertSize(left->s->getUnionSize(right->s));
 			newSize = (leftSize > newSize) ? leftSize : newSize;
 			newSize = (rightSize > newSize) ? rightSize : newSize;
+			max = rightSize > leftSize ? rightSize : leftSize;
+			merge = left->measureSimilarity(right) > 1.5 || max == newSize;
 		} else if (leftGraph != NULL && rightGraph == NULL) {
 			leftSize = convertSize(leftGraph->encodingSize);
 			rightSize = convertSize(right->getSize());
