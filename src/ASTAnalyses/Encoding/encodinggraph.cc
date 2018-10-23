@@ -113,7 +113,7 @@ void EncodingGraph::validate() {
 
 
 void EncodingGraph::encode() {
-	if (solver->getTuner()->getTunable(ENCODINGGRAPHOPT, &onoff) == 0)
+	if (solver->getTuner()->getTunable(ENCODINGGRAPHOPT, &offon) == 0)
 		return;
 	buildGraph();
 	SetIteratorEncodingSubGraph *itesg = subgraphs.iterator();

@@ -226,12 +226,11 @@ void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	getArrayNewVarsSATEncoder(encoding->numVars, encoding->variables);
 	if (encoding->element->anyValue) {
 		uint setSize = encoding->element->getRange()->getSize();
-		int maxIndex = getMaximumUsedIndex(encoding);
-		maxIndex = maxIndex == -1? (int)encoding->encArraySize : maxIndex;
-		if(setSize == encoding->encArraySize && maxIndex == (int)setSize){
+		int maxIndex = getMaximumUsedSize(encoding);
+		if (setSize == encoding->encArraySize && maxIndex == (int)setSize) {
 			return;
 		}
-		double ratio = (setSize*(1+2*encoding->numVars))/ (encoding->numVars*(encoding->numVars + maxIndex*1.0 - setSize));
+		double ratio = (setSize * (1 + 2 * encoding->numVars)) / (encoding->numVars * (encoding->numVars + maxIndex * 1.0 - setSize));
 //		model_print("encArraySize=%u\tmaxIndex=%d\tsetSize=%u\tmetric=%f\tnumBits=%u\n", encoding->encArraySize, maxIndex, setSize, ratio, encoding->numVars);
 		if ( ratio <  pow(2, (uint)solver->getTuner()->getTunable(MUSTVALUE, &mustValueBinaryIndex) - 3)) {
 			generateAnyValueBinaryIndexEncodingPositive(encoding);
@@ -285,28 +284,23 @@ void SATEncoder::generateElementEncoding(Element *element) {
 	}
 }
 
-int SATEncoder::getMaximumUsedIndex(ElementEncoding *encoding) {
-	int index = -1;
-	for (uint i = encoding->encArraySize - 1; i >= 0; i--) {
-		if (encoding->isinUseElement(i)) {
-			if (i + 1 < encoding->encArraySize) {
-				index = i + 1;
-			}
-			break;
-		}
+int SATEncoder::getMaximumUsedSize(ElementEncoding *encoding) {
+	for (int i = encoding->encArraySize - 1; i >= 0; i--) {
+		if (encoding->isinUseElement(i))
+			return i + 1;
 	}
-	return index;
+	ASSERT(false);
+	return -1;
 }
 
 void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) {
 	if (encoding->numVars == 0)
 		return;
-	int index = getMaximumUsedIndex(encoding);
-	if ( index != -1 ) {
+	int index = getMaximumUsedSize(encoding);
+	if ( index != encoding->encArraySize ) {
 		addConstraintCNF(cnf, generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index));
 	}
-	index = index == -1 ? encoding->encArraySize - 1 : index - 1;
-	for (int i = index; i >= 0; i--) {
+	for (int i = index - 1; i >= 0; i--) {
 		if (!encoding->isinUseElement(i)) {
 			addConstraintCNF(cnf, constraintNegate( generateBinaryConstraint(cnf, encoding->numVars, encoding->variables, i)));
 		}
