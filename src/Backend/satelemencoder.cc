@@ -297,7 +297,7 @@ void SATEncoder::generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding) 
 	if (encoding->numVars == 0)
 		return;
 	int index = getMaximumUsedSize(encoding);
-	if ( index != encoding->encArraySize ) {
+	if ( index != (int)encoding->encArraySize ) {
 		addConstraintCNF(cnf, generateLTValueConstraint(cnf, encoding->numVars, encoding->variables, index));
 	}
 	for (int i = index - 1; i >= 0; i--) {

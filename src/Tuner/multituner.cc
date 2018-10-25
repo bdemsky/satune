@@ -111,6 +111,9 @@ void MultiTuner::findBestThreeTuners() {
 	for (uint i = 0; i < 3; i++) {
 		TunerRecord *tuner = bestTuners[i];
 		SearchTuner *stun = tuner->getTuner();
+		char buffer[512];
+		snprintf(buffer, sizeof(buffer), "best%u.tuner", i);
+		stun->serialize(buffer);
 		model_print("Tuner %u\n", tuner->tunernumber);
 		stun->print();
 		for (uint j = 0; j < tuner->problems.getSize(); j++) {
