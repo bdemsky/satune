@@ -22,6 +22,7 @@ private:
 class TunerRecord {
 public:
 	TunerRecord(SearchTuner *_tuner) : tuner(_tuner), tunernumber(-1) {}
+	TunerRecord(SearchTuner *_tuner, int _tunernumber) : tuner(_tuner), tunernumber(_tunernumber) {}
 	SearchTuner *getTuner() {return tuner;}
 	TunerRecord *changeTuner(SearchTuner *_newtuner);
 	void updateTuner(SearchTuner *_newtuner) {tuner = _newtuner;}
