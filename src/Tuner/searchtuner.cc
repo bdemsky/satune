@@ -99,6 +99,8 @@ SearchTuner::SearchTuner(const char *filename) {
 			usedSettings.add(setting);
 		}
 		myfile.close();
+	} else{
+		model_print("Warning: Tuner couldn't be loaded ... Using default tuner instead ....\n");
 	}
 }
 
