@@ -61,8 +61,7 @@ class MultiTuner;
 class SearchTuner;
 class TunableSetting;
 
-class StaticAutoTuner;
-class StaticSearchTuner;
+class SerializeTuner;
 
 class TunableDesc;
 

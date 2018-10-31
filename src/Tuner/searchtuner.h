@@ -28,7 +28,7 @@ private:
 	friend unsigned int tunableSettingHash(TunableSetting *setting);
 	friend bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 	friend class SearchTuner;
-	friend class StaticSearchTuner;
+	friend class SerializeTuner;
 };
 
 unsigned int tunableSettingHash(TunableSetting *setting);
@@ -42,9 +42,9 @@ public:
 	SearchTuner();
 	SearchTuner(const char *filename);
 	~SearchTuner();
-	int getTunable(TunableParam param, TunableDesc *descriptor);
+	virtual int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
-	int getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor);
+	virtual int getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor);
 	void setTunable(TunableParam param, TunableDesc *descriptor, uint value);
 	void setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value);
 	void setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value);

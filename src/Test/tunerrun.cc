@@ -1,5 +1,5 @@
 #include "csolver.h"
-#include "searchtuner.h"
+#include "serializetuner.h"
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 	CSolver *solver = CSolver::deserialize(argv[1]);
 	uint timeout;
 	sscanf(argv[2], "%u", &timeout);
-	SearchTuner *tuner = new SearchTuner(argv[3]);
+	SerializeTuner *tuner = new SerializeTuner(argv[3]);
 	solver->setTuner(tuner);
 	solver->setSatSolverTimeout(timeout);
 	int sat = solver->solve();
