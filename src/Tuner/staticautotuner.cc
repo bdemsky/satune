@@ -13,26 +13,27 @@ StaticAutoTuner::StaticAutoTuner(uint _budget) : AutoTuner(_budget) {
 StaticSearchTuner *StaticAutoTuner::mutateTuner(StaticSearchTuner *oldTuner) {
 	StaticSearchTuner *newTuner = oldTuner->copyUsed();
 	result = newTuner->nextStaticTuner();
-	return result == EXIT_FAILURE ? newTuner : NULL;
+	if( result == EXIT_FAILURE) {
+		return newTuner;
+	}else {
+		delete newTuner;
+		return NULL;
+	}
 }
 
 void StaticAutoTuner::tune() {
-	StaticSearchTuner *bestTuner = NULL;
-	double bestScore = DBL_MAX;
-
 	StaticSearchTuner *oldTuner = new StaticSearchTuner();
-	double base_temperature = evaluateAll(oldTuner);
-	double oldScore = base_temperature;
-
+	evaluateAll(oldTuner);
 	while (true) {
 		StaticSearchTuner *newTuner = mutateTuner(oldTuner);
-		if (newTuner == NULL)
-			return;
+		if (newTuner == NULL){
+			break;
+		}
 		double newScore = evaluateAll(newTuner);
 		newTuner->printUsed();
 		model_print("Received score %f\n", newScore);
 		delete oldTuner;
-		oldScore = newScore;
 		oldTuner = newTuner;
 	}
+	delete oldTuner;
 }
