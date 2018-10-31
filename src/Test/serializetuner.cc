@@ -14,6 +14,12 @@ int main(int argc, char **argv) {
 	elem_bin->serialize("binarytuner.conf");
 	elem_onehot->serialize("onehottuner.conf");
 	elem_unary->serialize("unarytuner.conf");
+	elem_bin->setTunable(ENCODINGGRAPHOPT, &onoff, 1);
+	elem_onehot->setTunable(ENCODINGGRAPHOPT, &onoff, 1);
+	elem_unary->setTunable(ENCODINGGRAPHOPT, &onoff, 1);
+	elem_bin->serialize("circuitbinarytuner.conf");
+	elem_onehot->serialize("circuitgraphonehottuner.conf");
+	elem_unary->serialize("circuitgraphunarytuner.conf");
 	delete elem_bin;
 	delete elem_onehot;
 	delete elem_unary;
