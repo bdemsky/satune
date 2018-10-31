@@ -13,9 +13,9 @@ StaticAutoTuner::StaticAutoTuner(uint _budget) : AutoTuner(_budget) {
 StaticSearchTuner *StaticAutoTuner::mutateTuner(StaticSearchTuner *oldTuner) {
 	StaticSearchTuner *newTuner = oldTuner->copyUsed();
 	result = newTuner->nextStaticTuner();
-	if( result == EXIT_FAILURE) {
+	if ( result == EXIT_FAILURE) {
 		return newTuner;
-	}else {
+	} else {
 		delete newTuner;
 		return NULL;
 	}
@@ -26,7 +26,7 @@ void StaticAutoTuner::tune() {
 	evaluateAll(oldTuner);
 	while (true) {
 		StaticSearchTuner *newTuner = mutateTuner(oldTuner);
-		if (newTuner == NULL){
+		if (newTuner == NULL) {
 			break;
 		}
 		double newScore = evaluateAll(newTuner);

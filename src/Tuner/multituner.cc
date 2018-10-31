@@ -171,7 +171,7 @@ void MultiTuner::readData(uint numRuns) {
 		snprintf(buffer, sizeof(buffer), "result%u", i);
 
 		myfile.open (buffer, ios::in);
- 
+
 
 		if (myfile.is_open()) {
 			myfile >> metric;
@@ -306,8 +306,10 @@ void MultiTuner::tuneComp() {
 					model_print("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
+					else
+						tuner->setTime(problem, -2);
 				}
-				if (metric != -1) {
+				if (metric >= 0) {
 					uint k = 0;
 					for (; k < places.getSize(); k++) {
 						if (metric < places.get(k)->getTime(problem))
@@ -374,9 +376,11 @@ void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
 				metric = evaluate(problem, tuner);
 				if (metric != -1)
 					tuner->setTime(problem, metric);
+				else
+					tuner->setTime(problem, -2);
 			}
-			if ((bestTuner == NULL && metric != -1) ||
-					(metric < bestscore && metric != -1)) {
+			if ((bestTuner == NULL && metric >= 0) ||
+					(metric < bestscore && metric >= 0)) {
 				bestTuner = tuner;
 				bestscore = metric;
 			}
@@ -428,9 +432,13 @@ double MultiTuner::evaluateAll(TunerRecord *tuner) {
 			metric = evaluate(problem, tuner);
 			if (metric != -1)
 				tuner->setTime(problem, metric);
+			else
+				tuner->setTime(problem, -2);
 		}
 
 		double score = metric;
+		if (metric < 0)
+			score = timeout;
 		product *= score;
 	}
 	return pow(product, 1 / ((double)tuner->problems.getSize()));
