@@ -47,6 +47,7 @@ public:
 	void readData(uint numRuns);
 	void updateTimeout(Problem *problem, long long metric);
 	void tuneK();
+	bool finishTunerExist(TunerRecord *tuner);
 	void tuneComp();
 	void printData();
 	void findBestThreeTuners();
