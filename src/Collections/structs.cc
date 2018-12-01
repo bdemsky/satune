@@ -7,6 +7,7 @@
 #include "orderelement.h"
 #include "structs.h"
 #include "decomposeorderresolver.h"
+#include "searchtuner.h"
 
 #define HASHNEXT(hash, newval) {hash += newval; hash += hash << 10; hash ^= hash >> 6;}
 #define HASHFINAL(hash) {hash += hash << 3; hash ^= hash >> 11; hash += hash << 15;}
@@ -80,4 +81,15 @@ unsigned int doredge_hash_function(DOREdge *key) {
 bool doredge_equals(DOREdge *key1, DOREdge *key2) {
 	return key1->newfirst == key2->newfirst &&
 				 key1->newsecond == key2->newsecond;
+}
+
+unsigned int tunableSettingHash(TunableSetting *setting) {
+	return setting->hasVar ^ setting->type1 ^ setting->type2 ^ setting->param;
+}
+
+bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
+	return setting1->hasVar == setting2->hasVar &&
+				 setting1->type1 == setting2->type1 &&
+				 setting1->type2 == setting2->type2 &&
+				 setting1->param == setting2->param;
 }

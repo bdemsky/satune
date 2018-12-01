@@ -52,16 +52,6 @@ void TunableSetting::print() {
 	model_print("\n");
 }
 
-unsigned int tunableSettingHash(TunableSetting *setting) {
-	return setting->hasVar ^ setting->type1 ^ setting->type2 ^ setting->param;
-}
-
-bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
-	return setting1->hasVar == setting2->hasVar &&
-				 setting1->type1 == setting2->type1 &&
-				 setting1->type2 == setting2->type2 &&
-				 setting1->param == setting2->param;
-}
 
 ostream &operator<<(ostream &os, const TunableSetting &ts)
 {
@@ -139,6 +129,23 @@ void SearchTuner::addUsed(const char *filename) {
 		}
 		myfile.close();
 	}
+}
+
+bool SearchTuner::isSubTunerof(SearchTuner *newTuner){
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
+		if(!newTuner->settings.contains(setting)){
+			return false;
+		} else{
+			TunableSetting *newSetting = newTuner->settings.get(setting);
+			if(newSetting->selectedValue != setting->selectedValue){
+				return false;
+			}
+		}
+	}
+	delete iterator;
+	return true;
 }
 
 SearchTuner *SearchTuner::copyUsed() {

@@ -28,6 +28,7 @@ public:
 	void updateTuner(SearchTuner *_newtuner) {tuner = _newtuner;}
 	long long getTime(Problem *problem);
 	void setTime(Problem *problem, long long time);
+        void print();
 private:
 	SearchTuner *tuner;
 	Vector<Problem *> problems;
@@ -54,10 +55,12 @@ protected:
 	long long evaluate(Problem *problem, TunerRecord *tuner);
 	double evaluateAll(TunerRecord *tuner);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
+	bool hasExplored(SearchTuner *newTuner);
 	void mapProblemsToTuners(Vector<TunerRecord *> *tunerV);
 	void improveTuners(Vector<TunerRecord *> *tunerV);
 	TunerRecord *tune(TunerRecord *tuner);
 	Vector<TunerRecord *> allTuners;
+	Vector<TunerRecord *> explored;
 	Vector<Problem *> problems;
 	Vector<TunerRecord *> tuners;
 	uint budget;

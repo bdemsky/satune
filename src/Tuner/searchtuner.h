@@ -31,12 +31,6 @@ private:
 	friend class SerializeTuner;
 };
 
-unsigned int tunableSettingHash(TunableSetting *setting);
-bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
-
-typedef Hashset<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashsetTunableSetting;
-typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> SetIteratorTunableSetting;
-
 class SearchTuner : public Tuner {
 public:
 	SearchTuner();
@@ -49,6 +43,7 @@ public:
 	void setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value);
 	void setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value);
 	SearchTuner *copyUsed();
+        bool isSubTunerof(SearchTuner *newTuner);
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}
 	void print();

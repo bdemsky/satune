@@ -29,6 +29,14 @@ void TunerRecord::setTime(Problem *problem, long long time) {
 	timetaken.put(problem, time);
 }
 
+void TunerRecord::print(){
+	model_print("*************TUNER NUMBER=%d***********\n", tunernumber);
+	tuner->print();
+	model_print("&&&&&&&&&&&&&USED SETTINGS &&&&&&&&&&&&\n");
+	tuner->printUsed();
+	model_print("\n");
+}
+
 long long TunerRecord::getTime(Problem *problem) {
 	if (timetaken.contains(problem))
 		return timetaken.get(problem);
@@ -255,6 +263,7 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 		updateTimeout(problem, metric);
 		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
 		tuner->getTuner()->addUsed(buffer);
+		explored.push(tuner);
 	}
 	//Increment execution count
 	execnum++;
@@ -453,8 +462,22 @@ SearchTuner *MultiTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
 	model_print("Mutating %u settings\n", settingsToMutate);
 	while (settingsToMutate-- != 0) {
 		newTuner->randomMutate();
+		if(hasExplored(newTuner)){
+			model_print("Note:A repetitive tuner has found\n");
+			settingsToMutate++;
+		}
 	}
 	return newTuner;
+}
+
+bool MultiTuner::hasExplored(SearchTuner *newTuner){
+	for (uint i=0; i< explored.getSize(); i++){
+		SearchTuner *tuner = explored.get(i)->getTuner();
+		if(tuner->isSubTunerof(newTuner)){
+			return true;
+		}
+	}
+	return false;
 }
 
 TunerRecord *MultiTuner::tune(TunerRecord *tuner) {

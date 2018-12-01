@@ -20,7 +20,7 @@ class AutoTunerArgParser:
 TUNABLEHEADER = ["DECOMPOSEORDER", "MUSTREACHGLOBAL", "MUSTREACHLOCAL", "MUSTREACHPRUNE", "OPTIMIZEORDERSTRUCTURE",
                 "ORDERINTEGERENCODING", "PREPROCESS", "NODEENCODING", "EDGEENCODING", "MUSTEDGEPRUNE", "ELEMENTOPT",
                 "ENCODINGGRAPHOPT", "ELEMENTOPTSETS", "PROXYVARIABLE", "MUSTVALUE", "NAIVEENCODER", "VARIABLEORDER",
-                "PROBLEM","SATTIME", "EXECTIME"]
+                "PROBLEM","SATTIME", "EXECTIME","TUNERNUMBER"]
 
 configs = {"EXECTIME": "-",
 		"SATTIME":"-",
@@ -91,12 +91,14 @@ def loadSolverTime(row, filename):
 def loadProblemName(row,filename):
 	with open(filename) as f:
 		row["PROBLEM"] = f.readline().replace("\n","")
-
-def main():
+def loadTunerNumber(row, filename):
+	with open(filename) as f:
+		row["TUNERNUMBER"] = f.readline().replace("\n","")
+def analyzeLogs(file):
 	global configs
 	argprocess = AutoTunerArgParser()
-	file = open("tuner.csv", "w") 
 	printHeader(file)
+	rows = []
 	for i in range(argprocess.getRunNumber()):
 		row = {"DECOMPOSEORDER" : "",
 			"MUSTREACHGLOBAL" : "",
@@ -117,12 +119,43 @@ def main():
 			"VARIABLEORDER" : "",
 			"PROBLEM":"",
 			"SATTIME":"",
-			"EXECTIME": ""
+			"EXECTIME": "",
+			"TUNERNUMBER":""
 		}
+		loadTunerNumber(row, argprocess.getFolder() + "/tunernum" + str(i))
 		loadTunerInfo(row, argprocess.getFolder()+"/tuner"+str(i)+"used")
 		loadSolverTime(row, argprocess.getFolder()+"/log"+str(i))
 		loadProblemName(row, argprocess.getFolder()+"/problem"+str(i))
 		dump(file, row)
+		rows.append(row)
+	return rows
+
+def tunerNumberAnalysis(file, rows):
+	global TUNABLEHEADER
+	tunercount = {}
+	tunernumber = {}
+	for row in rows:
+		mystr=""
+		for i in range(18):
+			mystr+=row[TUNABLEHEADER[i]]
+		if mystr not in tunercount:
+			tunercount.update({mystr : 1})
+			tunernumber.update({mystr : str(row["TUNERNUMBER"])})
+		else :
+			tunercount[mystr] += 1
+			tunernumber[mystr] += "-" + str(row["TUNERNUMBER"])
+
+	problems = set(map(lambda x: x["PROBLEM"], rows))
+	print "Number of repititive tuners"
+	for key in tunercount:
+		if tunercount[key] > 1:
+			print key + "(ids:" + tunernumber[key]  + ") = #" + str(tunercount[key])
+
+
+def main():
+	file = open("tuner.csv", "w")
+	rows = analyzeLogs(file)
+	tunerNumberAnalysis(file, rows)
 	file.close()
 	return
 

@@ -18,7 +18,7 @@ cd $BIN
 for d in $DUMP; do
 	if [[ $d = *$1* ]]; then
 		echo $d
-		./run.sh deserializerun "."$d $2 "../"$3 out.out
+		./run.sh tunerrun "."$d $2 "../"$3 out.out
 		echo "Best tuner"
 	fi
 done
