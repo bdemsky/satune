@@ -141,7 +141,7 @@ public:
 	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
 	void setSatSolverTimeout(long seconds) { satsolverTimeout = seconds;}
 	bool isUnSAT() { return unsat; }
-
+        bool isBooleanVarUsed(){return booleanVarUsed;}
 	void printConstraint(BooleanEdge boolean);
 	void printConstraints();
 
@@ -218,7 +218,8 @@ private:
 
 	SATEncoder *satEncoder;
 	bool unsat;
-	Tuner *tuner;
+        bool booleanVarUsed;
+        Tuner *tuner;
 	long long elapsedTime;
 	long satsolverTimeout;
 	friend class ElementOpt;

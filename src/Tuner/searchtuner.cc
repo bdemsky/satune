@@ -94,6 +94,29 @@ SearchTuner::SearchTuner(const char *filename) {
 	}
 }
 
+bool SearchTuner::equalUsed(SearchTuner* tuner){
+	if(tuner->usedSettings.getSize() != usedSettings.getSize()){
+		return false;
+	}
+	bool result = true;
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
+	while(iterator->hasNext()){
+		TunableSetting *setting = iterator->next();
+		if(!tuner->usedSettings.contains(setting)){
+			result = false;
+			break;
+		}else{
+			TunableSetting *tunerSetting = tuner->usedSettings.get(setting);
+			if(tunerSetting->selectedValue != setting->selectedValue){
+				result = false;
+				break;
+			}
+		}
+	}
+	delete iterator;
+	return result;
+}
+
 void SearchTuner::addUsed(const char *filename) {
 	ifstream myfile;
 	myfile.open (filename, ios::in);

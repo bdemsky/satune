@@ -34,6 +34,7 @@ CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
 	boolFalse(boolTrue.negate()),
 	unsat(false),
+	booleanVarUsed(false),
 	tuner(NULL),
 	elapsedTime(0),
 	satsolverTimeout(NOTIMEOUT)
@@ -136,6 +137,7 @@ void CSolver::resetSolver() {
 	boolTrue = BooleanEdge(new BooleanConst(true));
 	boolFalse = boolTrue.negate();
 	unsat = false;
+	booleanVarUsed = false;
 	elapsedTime = 0;
 	tuner = NULL;
 	satEncoder->resetSATEncoder();
@@ -308,6 +310,8 @@ Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 BooleanEdge CSolver::getBooleanVar(VarType type) {
 	Boolean *boolean = new BooleanVar(type);
 	allBooleans.push(boolean);
+	if(!booleanVarUsed)
+		booleanVarUsed = true;
 	return BooleanEdge(boolean);
 }
 

@@ -133,6 +133,15 @@ void MultiTuner::findBestThreeTuners() {
 	}
 }
 
+bool MultiTuner::finishTunerExist(TunerRecord *tunerRec){
+	SearchTuner *tuner = tunerRec->getTuner();
+	for(uint i=0; i< explored.getSize(); i++){
+		if(explored.get(i)->getTuner()->equalUsed(tuner))
+			return true;
+	}
+	return false;
+}
+
 void MultiTuner::addTuner(SearchTuner *tuner) {
 	TunerRecord *t = new TunerRecord(tuner);
 	tuners.push(t);
@@ -263,7 +272,9 @@ long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 		updateTimeout(problem, metric);
 		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
 		tuner->getTuner()->addUsed(buffer);
-		explored.push(tuner);
+		if(!finishTunerExist(tuner)){
+			explored.push(tuner);
+		}
 	}
 	//Increment execution count
 	execnum++;

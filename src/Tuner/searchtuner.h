@@ -51,7 +51,7 @@ public:
 	void serialize(const char *file);
 	void serializeUsed(const char *file);
 	void addUsed(const char *file);
-
+        bool equalUsed(SearchTuner *tuner);
 	CMEMALLOC;
 protected:
 	/** Used Settings keeps track of settings that were actually used by
