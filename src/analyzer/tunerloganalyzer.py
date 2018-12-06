@@ -2,7 +2,7 @@ import re
 import argparse
 import sys
 import os
-
+import plot as pl
 
 class AutoTunerArgParser:
 	def __init__(self):
@@ -60,10 +60,13 @@ def printHeader(file):
 def dump(file, row):
 	global TUNABLEHEADER
 	mystr=""
+	data = []
 	for i in range(len(TUNABLEHEADER)):
 		mystr += row[TUNABLEHEADER[i]]+ ","
-	print "mystr is:"+ mystr
+		data.append(row[TUNABLEHEADER[i]])
+	print ("mystr is:"+ mystr)
 	print >>file, mystr
+	return data
 
 def loadTunerInfo(row, filename):
 	with open(filename) as f:
@@ -99,6 +102,7 @@ def analyzeLogs(file):
 	argprocess = AutoTunerArgParser()
 	printHeader(file)
 	rows = []
+	data = []
 	for i in range(argprocess.getRunNumber()):
 		row = {"DECOMPOSEORDER" : "",
 			"MUSTREACHGLOBAL" : "",
@@ -126,9 +130,9 @@ def analyzeLogs(file):
 		loadTunerInfo(row, argprocess.getFolder()+"/tuner"+str(i)+"used")
 		loadSolverTime(row, argprocess.getFolder()+"/log"+str(i))
 		loadProblemName(row, argprocess.getFolder()+"/problem"+str(i))
-		dump(file, row)
+		data.append(dump(file, row))
 		rows.append(row)
-	return rows
+	return rows, data
 
 def tunerNumberAnalysis(file, rows):
 	global TUNABLEHEADER
@@ -146,17 +150,21 @@ def tunerNumberAnalysis(file, rows):
 			tunernumber[mystr] += "-" + str(row["TUNERNUMBER"])
 
 	problems = set(map(lambda x: x["PROBLEM"], rows))
-	print "Number of repititive tuners"
+	print ("Number of repititive tuners")
 	for key in tunercount:
 		if tunercount[key] > 1:
-			print key + "(ids:" + tunernumber[key]  + ") = #" + str(tunercount[key])
+			print (key + "(ids:" + tunernumber[key]  + ") = #" + str(tunercount[key]))
 
-
+def transformDataset(rows):
+	print(rows)
 def main():
+	global TUNABLEHEADER
 	file = open("tuner.csv", "w")
-	rows = analyzeLogs(file)
+	rows, data = analyzeLogs(file)
 	tunerNumberAnalysis(file, rows)
 	file.close()
+	#transformDataset(data)
+	pl.plot(data, TUNABLEHEADER)
 	return
 
 if __name__ == "__main__":
