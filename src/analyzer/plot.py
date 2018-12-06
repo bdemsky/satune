@@ -21,8 +21,6 @@ def generateScatterPlot(X, Y, header):
 			geomean.append(a.prod())
 		plt.plot(feature, Y, 'r.')
 		for ii in range(0, len(geomean)-1):
-			print(values[ii:ii + 2])
-			print(geomean[ii:ii + 2])
 			plt.plot(values[ii:ii + 2], geomean[ii:ii + 2], 'bo-')
 		plt.savefig(IMAGEDIR + header[i] + "-scat.pdf")
 		plt.clf()
