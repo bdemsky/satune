@@ -86,7 +86,6 @@ SearchTuner::SearchTuner(const char *filename) {
 			}
 			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);
 			settings.add(setting);
-			usedSettings.add(setting);
 		}
 		myfile.close();
 	} else {
