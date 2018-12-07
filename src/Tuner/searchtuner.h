@@ -34,7 +34,7 @@ private:
 class SearchTuner : public Tuner {
 public:
 	SearchTuner();
-	SearchTuner(const char *filename);
+	SearchTuner(const char *filename, bool addused = false);
 	~SearchTuner();
 	virtual int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);

@@ -64,7 +64,7 @@ ostream &operator<<(ostream &os, const TunableSetting &ts)
 SearchTuner::SearchTuner() {
 }
 
-SearchTuner::SearchTuner(const char *filename) {
+SearchTuner::SearchTuner(const char *filename, bool addused) {
 	ifstream myfile;
 	myfile.open (filename, ios::in);
 	if (myfile.is_open()) {
@@ -86,6 +86,9 @@ SearchTuner::SearchTuner(const char *filename) {
 			}
 			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);
 			settings.add(setting);
+			if(addused){
+				usedSettings.add(setting);
+			}
 		}
 		myfile.close();
 	} else {

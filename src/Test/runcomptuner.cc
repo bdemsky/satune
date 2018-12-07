@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 			else
 				multituner->addProblem(argv[i]);
 		} else
-			multituner->addTuner(new SearchTuner(argv[i]));
+			multituner->addTuner(new SearchTuner(argv[i], true )); //add settings to usedsettigs
 	}
 
 	if (!tunerfiles) {
