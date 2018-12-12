@@ -17,6 +17,7 @@ private:
 	char *problem;
 	long long besttime;
 	friend class MultiTuner;
+        friend class RandomTuner;
 };
 
 class TunerRecord {
@@ -35,6 +36,7 @@ private:
 	Hashtable<Problem *, long long, uint64_t> timetaken;
 	int tunernumber;
 	friend class MultiTuner;
+        friend class RandomTuner;
 	friend void clearVector(Vector<TunerRecord *> *tunerV);
 };
 

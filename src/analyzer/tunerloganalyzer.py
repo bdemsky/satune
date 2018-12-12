@@ -130,14 +130,17 @@ def analyzeLogs(file):
 		rows.append(row)
 	return rows
 
-def tunerNumberAnalysis(file, rows):
+def tunerCountAnalysis(file, rows):
 	global TUNABLEHEADER
 	tunercount = {}
 	tunernumber = {}
 	for row in rows:
 		mystr=""
 		for i in range(18):
-			mystr+=row[TUNABLEHEADER[i]]
+			if not row[TUNABLEHEADER[i]]:
+				mystr += "."
+			else:
+				mystr+=row[TUNABLEHEADER[i]]
 		if mystr not in tunercount:
 			tunercount.update({mystr : 1})
 			tunernumber.update({mystr : str(row["TUNERNUMBER"])})
@@ -155,7 +158,7 @@ def tunerNumberAnalysis(file, rows):
 def main():
 	file = open("tuner.csv", "w")
 	rows = analyzeLogs(file)
-	tunerNumberAnalysis(file, rows)
+	tunerCountAnalysis(file, rows)
 	file.close()
 	return
 
