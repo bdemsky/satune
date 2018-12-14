@@ -17,6 +17,8 @@ class AutoTunerArgParser:
 	def getRunNumber(self):
 		return self.args.number[0]
 
+PROBLEMS = []
+
 TUNABLEHEADER = ["DECOMPOSEORDER", "MUSTREACHGLOBAL", "MUSTREACHLOCAL", "MUSTREACHPRUNE", "OPTIMIZEORDERSTRUCTURE",
                 "ORDERINTEGERENCODING", "PREPROCESS", "NODEENCODING", "EDGEENCODING", "MUSTEDGEPRUNE", "ELEMENTOPT",
                 "ENCODINGGRAPHOPT", "ELEMENTOPTSETS", "PROXYVARIABLE", "MUSTVALUE", "NAIVEENCODER", "VARIABLEORDER",
@@ -89,8 +91,16 @@ def loadSolverTime(row, filename):
 	row["EXECTIME"] = configs["EXECTIME"]
 
 def loadProblemName(row,filename):
+	global PROBLEMS
 	with open(filename) as f:
-		row["PROBLEM"] = f.readline().replace("\n","")
+		problem = f.readline().replace("\n","")
+		probNumber = int(f.readline())
+		if probNumber >= len(PROBLEMS):
+			PROBLEMS.insert(probNumber,problem)
+		elif PROBLEMS[probNumber] != problem:
+			PROBLEMS[probNumber] = problem
+		row["PROBLEM"] = problem
+
 def loadTunerNumber(row, filename):
 	with open(filename) as f:
 		row["TUNERNUMBER"] = f.readline().replace("\n","")
@@ -132,6 +142,7 @@ def analyzeLogs(file):
 
 def tunerCountAnalysis(file, rows):
 	global TUNABLEHEADER
+	global PROBLEMS
 	tunercount = {}
 	tunernumber = {}
 	for row in rows:
@@ -154,11 +165,24 @@ def tunerCountAnalysis(file, rows):
 		if tunercount[key] > 1:
 			print key + "(ids:" + tunernumber[key]  + ") = #" + str(tunercount[key])
 
+def combineRowForEachTuner(rows):
+	global PROBLEMS
+	newRows = []
+	combined = None
+	for row in rows:
+		if row["PROBLEM"] == PROBLEMS[0]:
+			combined = row
+		for key in row:
+			if row[key]:
+				combined[key] = row[key]
+		if row["PROBLEM"] == PROBLEMS[len(PROBLEMS)-1]:
+			newRows.append(combined)
+	return newRows
 
 def main():
 	file = open("tuner.csv", "w")
 	rows = analyzeLogs(file)
-	tunerCountAnalysis(file, rows)
+	tunerCountAnalysis(file, combineRowForEachTuner(rows) )
 	file.close()
 	return
 

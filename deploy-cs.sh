@@ -17,7 +17,7 @@ cd $BASE
 rm -f $OUTFILE
 tar -czvf $OUTFILE $INFILE
 
+cp $OUTFILE $SHAREDDIR
 for SERVER in $SERVERS; do
-	cp $OUTFILE $SHAREDDIR
-	ssh $USER@$SERVER "mv $SHAREDDIR$OUTFILE $REMOTEDIR; cd $REMOTEDIR; sudo rm -r $SRC; tar -xzvf $OUTFILE; cd $SRC; make clean; ./setup.sh"
+	ssh $USER@$SERVER "cp $SHAREDDIR$OUTFILE $REMOTEDIR; cd $REMOTEDIR; sudo rm -r $SRC; tar -xzvf $OUTFILE; cd $SRC; make clean; ./setup.sh"
 done

@@ -147,6 +147,7 @@ void RandomTuner::tune() {
 		model_print("Round %u of %u\n", r, budget);
 		for (uint i = 0; i < tuners.getSize(); i++){
 			TunerRecord *tuner = tuners.get(i);
+			bool isNew = true;
 			for (uint j = 0; j < problems.getSize(); j++){
 				Problem *problem = problems.get(j);
 				long long metric = tuner->getTime(problem);
@@ -159,15 +160,18 @@ void RandomTuner::tune() {
 						tuner->setTime(problem, metric);
 					else
 						tuner->setTime(problem, -2);
-					if(j == 0 && tunerExists(tuner->getTuner())){
+					if(tunerExists(tuner->getTuner())){
 						//Solving the first problem and noticing the tuner
 						//already exists
+						isNew = false;
 						break;
-					} else if(j == 0 && !tunerExists(tuner->getTuner())){
-						explored.push(tuner);
 					}
 				}
 			}
+			if(isNew){
+				explored.push(tuner);
+			}
+			
 		}
 		uint tSize = tuners.getSize();
 		for (uint i = 0; i < tSize; i++) {
