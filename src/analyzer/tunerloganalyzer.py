@@ -8,14 +8,10 @@ class AutoTunerArgParser:
 	def __init__(self):
 		self.parser = argparse.ArgumentParser(description='Parsing the output log of the CSolver auto tuner ...')
 		self.parser.add_argument('--folder', '-f', metavar='bin', type=str, nargs=1,help='output log of running the autotuner ...')
-		self.parser.add_argument('--number', '-n', metavar='122', type=int, nargs=1,help='Number of runs ...')
 		self.args = self.parser.parse_args()
 
 	def getFolder(self):
 		return self.args.folder[0]
-
-	def getRunNumber(self):
-		return self.args.number[0]
 
 PROBLEMS = []
 
@@ -57,7 +53,8 @@ def printHeader(file):
 	mystr=""
 	for header in TUNABLEHEADER:
 		 mystr+=str(header)+","
-	print >>file, mystr
+	file.write(mystr)
+	file.write("\n")
 
 def dump(file, row):
 	global TUNABLEHEADER
@@ -67,14 +64,15 @@ def dump(file, row):
 		mystr += row[TUNABLEHEADER[i]]+ ","
 		data.append(row[TUNABLEHEADER[i]])
 	print ("mystr is:"+ mystr)
-	print >>file, mystr
+	file.write(mystr)
+	file.write("\n")
 	return data
 
 def loadTunerInfo(row, filename):
 	with open(filename) as f:
 		for line in f:
 			numbers = re.findall('\d+',line)
-			numbers = map(int,numbers)
+			numbers = list(map(int,numbers))
 			row[TUNABLEHEADER[numbers[3]]] = row[TUNABLEHEADER[numbers[3]]] + str(numbers[7])
 
 def loadSolverTime(row, filename):
@@ -113,7 +111,8 @@ def analyzeLogs(file):
 	printHeader(file)
 	rows = []
 	data = []
-	for i in range(argprocess.getRunNumber()):
+	i = 0
+	while True :
 		row = {"DECOMPOSEORDER" : "",
 			"MUSTREACHGLOBAL" : "",
 			"MUSTREACHLOCAL" : "",
@@ -136,12 +135,16 @@ def analyzeLogs(file):
 			"EXECTIME": "",
 			"TUNERNUMBER":""
 		}
-		loadTunerNumber(row, argprocess.getFolder() + "/tunernum" + str(i))
-		loadTunerInfo(row, argprocess.getFolder()+"/tuner"+str(i)+"used")
-		loadSolverTime(row, argprocess.getFolder()+"/log"+str(i))
-		loadProblemName(row, argprocess.getFolder()+"/problem"+str(i))
-		data.append(dump(file, row))
-		rows.append(row)
+		try:
+			loadTunerNumber(row, argprocess.getFolder() + "/tunernum" + str(i))
+			loadTunerInfo(row, argprocess.getFolder()+"/tuner"+str(i)+"used")
+			loadSolverTime(row, argprocess.getFolder()+"/log"+str(i))
+			loadProblemName(row, argprocess.getFolder()+"/problem"+str(i))
+			data.append(dump(file, row))
+			rows.append(row)
+		except IOError:
+			break
+		i += 1
 	return rows, data
 
 def tunerCountAnalysis(file, rows):
@@ -167,7 +170,7 @@ def tunerCountAnalysis(file, rows):
 	print ("Number of repititive tuners")
 	for key in tunercount:
 		if tunercount[key] > 1:
-			print key + "(ids:" + tunernumber[key]  + ") = #" + str(tunercount[key])
+			print( key + "(ids:" + tunernumber[key]  + ") = #" + str(tunercount[key]) )
 
 def combineRowForEachTuner(rows):
 	global PROBLEMS

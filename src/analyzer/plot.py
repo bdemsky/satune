@@ -17,7 +17,7 @@ def generateScatterPlot(X, Y, header):
 		geomean = []
 		for value in values:
 			a =Y[np.where(feature == value)]
-			a = np.array(map(lambda x :  x**(1.0/len(a)), a))
+			a = np.array(list(map(lambda x :  x**(1.0/len(a)), a)))
 			geomean.append(a.prod())
 		plt.plot(feature, Y, 'r.')
 		for ii in range(0, len(geomean)-1):
