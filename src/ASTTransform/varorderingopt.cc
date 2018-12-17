@@ -32,7 +32,7 @@ void VarOrderingOpt::doTransform() {
 	}
 
 	uint size = solver->allElements.getSize();
-	if (direction == CHORONOLOGICALORDERING) {
+	if (direction == ELEMENTORDERING) {
 		for (uint i = 0; i < size; i++) {
 			Element *el = solver->allElements.get(i);
 			ElementEncoding *encoding = el->getElementEncoding();

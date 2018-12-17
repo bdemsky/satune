@@ -25,7 +25,7 @@ enum ElementEncodingType {
 
 typedef enum ElementEncodingType ElementEncodingType;
 
-enum BooleanVarOrdering {CONSTRAINTORDERING=0, CHORONOLOGICALORDERING=1, REVERSEORDERING=2};
+enum BooleanVarOrdering {CONSTRAINTORDERING=0, ELEMENTORDERING=1, REVERSEORDERING=2};
 typedef enum BooleanVarOrdering BooleanVarOrdering;
 
 Polarity negatePolarity(Polarity This);
