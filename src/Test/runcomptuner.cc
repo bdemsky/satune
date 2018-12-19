@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 		exit(-1);
 	}
 
-	multituner->tuneComp();
+	multituner->tune();
 	delete multituner;
 	return 0;
 }

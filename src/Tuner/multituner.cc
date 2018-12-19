@@ -1,87 +1,15 @@
 #include "multituner.h"
-#include "csolver.h"
-#include "searchtuner.h"
-#include <math.h>
-#include <stdlib.h>
 #include <float.h>
-#include <string.h>
+#include <math.h>
+#include "searchtuner.h"
 #include <iostream>
 #include <fstream>
-#include <limits>
-
-#define UNSETVALUE -1
-
-Problem::Problem(const char *_problem) :
-	problemnumber(-1),
-	result(UNSETVALUE),
-	besttime(LLONG_MAX)
-{
-	uint len = strlen(_problem);
-	problem = (char *) ourmalloc(len + 1);
-	memcpy(problem, _problem, len + 1);
-}
-
-Problem::~Problem() {
-	ourfree(problem);
-}
-
-void TunerRecord::setTime(Problem *problem, long long time) {
-	timetaken.put(problem, time);
-}
-
-void TunerRecord::print(){
-	model_print("*************TUNER NUMBER=%d***********\n", tunernumber);
-	tuner->print();
-	model_print("&&&&&&&&&&&&&USED SETTINGS &&&&&&&&&&&&\n");
-	tuner->printUsed();
-	model_print("\n");
-}
-
-long long TunerRecord::getTime(Problem *problem) {
-	if (timetaken.contains(problem))
-		return timetaken.get(problem);
-	else return -1;
-}
-
-TunerRecord *TunerRecord::changeTuner(SearchTuner *_newtuner) {
-	TunerRecord *tr = new TunerRecord(_newtuner);
-	for (uint i = 0; i < problems.getSize(); i++) {
-		tr->problems.push(problems.get(i));
-	}
-	return tr;
-}
+#include "solver_interface.h"
 
 MultiTuner::MultiTuner(uint _budget, uint _rounds, uint _timeout) :
-	budget(_budget), rounds(_rounds), timeout(_timeout), execnum(0) {
-}
-
-MultiTuner::~MultiTuner() {
-	for (uint i = 0; i < problems.getSize(); i++)
-		ourfree(problems.get(i));
-	for (uint i = 0; i < allTuners.getSize(); i++)
-		delete allTuners.get(i);
-}
-
-void MultiTuner::addProblem(const char *filename) {
-	Problem *p = new Problem(filename);
-	p->problemnumber = problems.getSize();
-	problems.push(p);
-}
-
-void MultiTuner::printData() {
-	model_print("*********** DATA DUMP ***********\n");
-	for (uint i = 0; i < allTuners.getSize(); i++) {
-		TunerRecord *tuner = allTuners.get(i);
-		SearchTuner *stun = tuner->getTuner();
-		model_print("Tuner %u\n", i);
-		stun->print();
-		model_print("----------------------------------\n\n\n");
-		for (uint j = 0; j < tuner->problems.getSize(); j++) {
-			Problem *problem = tuner->problems.get(j);
-			model_print("Problem %s\n", problem->getProblem());
-			model_print("Time = %lld\n", tuner->getTime(problem));
-		}
-	}
+	BasicTuner(_budget, _timeout),
+	rounds(_rounds)
+{
 }
 
 void MultiTuner::findBestThreeTuners() {
@@ -122,33 +50,12 @@ void MultiTuner::findBestThreeTuners() {
 		char buffer[512];
 		snprintf(buffer, sizeof(buffer), "best%u.tuner", i);
 		stun->serialize(buffer);
-		model_print("Tuner %u\n", tuner->tunernumber);
+		model_print("Tuner %u\n", tuner->getTunerNumber());
 		stun->print();
-		for (uint j = 0; j < tuner->problems.getSize(); j++) {
-			Problem *problem = tuner->problems.get(j);
-			model_print("Problem %s\n", problem->getProblem());
-			model_print("Time = %lld\n", tuner->getTime(problem));
-		}
+		tuner->printProblemsInfo();
 		model_print("----------------------------------\n\n\n");
 	}
 }
-
-bool MultiTuner::finishTunerExist(TunerRecord *tunerRec){
-	SearchTuner *tuner = tunerRec->getTuner();
-	for(uint i=0; i< explored.getSize(); i++){
-		if(explored.get(i)->getTuner()->equalUsed(tuner))
-			return true;
-	}
-	return false;
-}
-
-void MultiTuner::addTuner(SearchTuner *tuner) {
-	TunerRecord *t = new TunerRecord(tuner);
-	tuners.push(t);
-	t->tunernumber = allTuners.getSize();
-	allTuners.push(t);
-}
-
 
 void MultiTuner::readData(uint numRuns) {
 	for (uint i = 0; i < numRuns; i++) {
@@ -195,15 +102,15 @@ void MultiTuner::readData(uint numRuns) {
 			myfile >> sat;
 			myfile.close();
 		}
-		if (problem->result == UNSETVALUE && sat != IS_INDETER) {
-			problem->result = sat;
-		} else if (problem->result != sat && sat != IS_INDETER) {
+		if (problem->getResult() == TUNERUNSETVALUE && sat != IS_INDETER) {
+			problem->setResult(sat);
+		} else if (problem->getResult() != sat && sat != IS_INDETER) {
 			model_print("******** Result has changed ********\n");
 		}
 
 		if (metric != -1) {
 			if (tuner->getTime(problem) == -1)
-				tuner->problems.push(problem);
+				tuner->addProblem(problem);
 			tuner->setTime(problem, metric);
 		}
 
@@ -211,92 +118,7 @@ void MultiTuner::readData(uint numRuns) {
 
 }
 
-long long MultiTuner::evaluate(Problem *problem, TunerRecord *tuner) {
-	char buffer[512];
-	{
-		snprintf(buffer, sizeof(buffer), "problem%u", execnum);
-
-		ofstream myfile;
-		myfile.open (buffer, ios::out);
-
-
-		if (myfile.is_open()) {
-			myfile << problem->getProblem() << endl;
-			myfile << problem->problemnumber << endl;
-			myfile.close();
-		}
-	}
-
-	{
-		snprintf(buffer, sizeof(buffer), "tunernum%u", execnum);
-
-		ofstream myfile;
-		myfile.open (buffer, ios::out);
-
-
-		if (myfile.is_open()) {
-			myfile << tuner->tunernumber << endl;
-			myfile.close();
-		}
-	}
-
-	//Write out the tuner
-	snprintf(buffer, sizeof(buffer), "tuner%u", execnum);
-	tuner->getTuner()->serialize(buffer);
-
-	//compute timeout
-	uint timeinsecs = problem->besttime / NANOSEC;
-	uint adaptive = (timeinsecs > 30) ? timeinsecs * 5 : 150;
-	uint maxtime = (adaptive < timeout) ? adaptive : timeout;
-
-	//Do run
-	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), maxtime, execnum, execnum, execnum);
-	int status = system(buffer);
-
-	long long metric = -1;
-	int sat = IS_INDETER;
-
-	if (status == 0) {
-		//Read data in from results file
-		snprintf(buffer, sizeof(buffer), "result%u", execnum);
-
-		ifstream myfile;
-		myfile.open (buffer, ios::in);
-
-
-		if (myfile.is_open()) {
-			myfile >> metric;
-			myfile >> sat;
-			myfile.close();
-		}
-		updateTimeout(problem, metric);
-		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
-		tuner->getTuner()->addUsed(buffer);
-		if(!finishTunerExist(tuner)){
-			explored.push(tuner);
-		}
-	}
-	//Increment execution count
-	execnum++;
-
-	if (problem->result == UNSETVALUE && sat != IS_INDETER) {
-		problem->result = sat;
-	} else if (problem->result != sat && sat != IS_INDETER) {
-		model_print("******** Result has changed ********\n");
-	}
-	if (sat == IS_INDETER && metric != -1) {//The case when we have a timeout
-		metric = -1;
-	}
-	return metric;
-}
-
-void MultiTuner::updateTimeout(Problem *problem, long long metric) {
-	if (metric < problem->besttime) {
-		problem->besttime = metric;
-	}
-}
-
-void MultiTuner::tuneComp() {
+void MultiTuner::tune() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
 	for (uint b = 0; b < budget; b++) {
 		model_print("Round %u of %u\n", b, budget);
@@ -304,8 +126,8 @@ void MultiTuner::tuneComp() {
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
 			TunerRecord *tmp = new TunerRecord(tmpTuner);
-			tmp->tunernumber = allTuners.getSize();
-			model_print("Mutated tuner %u to generate tuner %u\n", tunerV->get(i)->tunernumber, tmp->tunernumber);
+			tmp->setTunerNumber(allTuners.getSize());
+			model_print("Mutated tuner %u to generate tuner %u\n", tunerV->get(i)->getTunerNumber(), tmp->getTunerNumber());
 			allTuners.push(tmp);
 			tunerV->push(tmp);
 		}
@@ -320,9 +142,9 @@ void MultiTuner::tuneComp() {
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
 					if (tuner->getTime(problem) == -1) {
-						tuner->problems.push(problem);
+						tuner->addProblem(problem);
 					}
-					model_print("%u.Problem<%s>\tTuner<%p, %d>\tMetric<%lld>\n", i, problem->problem,tuner, tuner->tunernumber, metric);
+					model_print("%u.Problem<%s>\tTuner<%p, %d>\tMetric<%lld>\n", i, problem->getProblem(),tuner, tuner->getTunerNumber(), metric);
 					model_print("*****************************\n");
 					if (metric != -1)
 						tuner->setTime(problem, metric);
@@ -335,7 +157,7 @@ void MultiTuner::tuneComp() {
 						if (metric < places.get(k)->getTime(problem))
 							break;
 					}
-					model_print("place[%u]=Tuner<%p,%d>\n", k, tuner, tuner->tunernumber);
+					model_print("place[%u]=Tuner<%p,%d>\n", k, tuner, tuner->getTunerNumber());
 					places.insertAt(k, tuner);
 				}
 			}
@@ -346,7 +168,7 @@ void MultiTuner::tuneComp() {
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
 				currScore += points;
-				model_print("Problem<%s>\tTuner<%p,%d>\tmetric<%d>\n", problem->problem, tuner, tuner->tunernumber,  currScore);
+				model_print("Problem<%s>\tTuner<%p,%d>\tmetric<%d>\n", problem->getProblem(), tuner, tuner->getTunerNumber(),  currScore);
 				model_print("**************************\n");
 				scores.put(tuner, currScore);
 				points = points / 3;
@@ -367,14 +189,14 @@ void MultiTuner::tuneComp() {
 				if (score > tscore)
 					break;
 			}
-			model_print("ranking[%u]=tuner<%p,%u>(Score=%d)\n", j, tuner, tuner->tunernumber, score);
+			model_print("ranking[%u]=tuner<%p,%u>(Score=%d)\n", j, tuner, tuner->getTunerNumber(), score);
 			model_print("************************\n");
 			ranking.insertAt(j, tuner);
 		}
 		model_print("tunerSize=%u\trankingSize=%u\ttunerVSize=%u\n", tuners.getSize(), ranking.getSize(), tunerV->getSize());
 		for (uint i = tuners.getSize(); i < ranking.getSize(); i++) {
 			TunerRecord *tuner = ranking.get(i);
-			model_print("Removing tuner %u\n", tuner->tunernumber);
+			model_print("Removing tuner %u\n", tuner->getTunerNumber());
 			for (uint j = 0; j < tunerV->getSize(); j++) {
 				if (tunerV->get(j) == tuner)
 					tunerV->removeAt(j);
@@ -406,7 +228,7 @@ void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
 			}
 		}
 		if (bestTuner != NULL)
-			bestTuner->problems.push(problem);
+			bestTuner->addProblem(problem);
 	}
 }
 
@@ -445,8 +267,8 @@ void MultiTuner::improveTuners(Vector<TunerRecord *> *tunerV) {
 
 double MultiTuner::evaluateAll(TunerRecord *tuner) {
 	double product = 1;
-	for (uint i = 0; i < tuner->problems.getSize(); i++) {
-		Problem *problem = tuner->problems.get(i);
+	for (uint i = 0; i < tuner->problemsSize(); i++) {
+		Problem *problem = tuner->getProblem(i);
 		long long metric = tuner->getTime(problem);
 		if (metric == -1) {
 			metric = evaluate(problem, tuner);
@@ -461,34 +283,7 @@ double MultiTuner::evaluateAll(TunerRecord *tuner) {
 			score = timeout;
 		product *= score;
 	}
-	return pow(product, 1 / ((double)tuner->problems.getSize()));
-}
-
-SearchTuner *MultiTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
-	SearchTuner *newTuner = oldTuner->copyUsed();
-	uint numSettings = oldTuner->getSize();
-	uint settingsToMutate = (uint)(AUTOTUNERFACTOR * (((double)numSettings) * (budget - k)) / (budget));
-	if (settingsToMutate < 1)
-		settingsToMutate = 1;
-	model_print("Mutating %u settings\n", settingsToMutate);
-	while (settingsToMutate-- != 0) {
-		newTuner->randomMutate();
-		if(hasExplored(newTuner)){
-			model_print("Note:A repetitive tuner has found\n");
-			settingsToMutate++;
-		}
-	}
-	return newTuner;
-}
-
-bool MultiTuner::hasExplored(SearchTuner *newTuner){
-	for (uint i=0; i< explored.getSize(); i++){
-		SearchTuner *tuner = explored.get(i)->getTuner();
-		if(tuner->isSubTunerof(newTuner)){
-			return true;
-		}
-	}
-	return false;
+	return pow(product, 1 / ((double)tuner->problemsSize()));
 }
 
 TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
@@ -502,10 +297,10 @@ TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
 	for (uint i = 0; i < budget; i++) {
 		SearchTuner *tmpTuner = mutateTuner(oldTuner->getTuner(), i);
 		TunerRecord *newTuner = oldTuner->changeTuner(tmpTuner);
-		newTuner->tunernumber = allTuners.getSize();
+		newTuner->setTunerNumber( allTuners.getSize() );
 		allTuners.push(newTuner);
 		double newScore = evaluateAll(newTuner);
-		newTuner->tuner->printUsed();
+		newTuner->getTuner()->printUsed();
 		model_print("Received score %f\n", newScore);
 		double scoreDiff = newScore - oldScore;	//smaller is better
 		if (newScore < bestScore) {
