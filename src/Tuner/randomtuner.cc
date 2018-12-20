@@ -1,7 +1,7 @@
 #include "randomtuner.h"
 #include "csolver.h"
 #include "searchtuner.h"
-#include "multituner.h"
+#include "comptuner.h"
 #include <math.h>
 #include <stdlib.h>
 #include <limits>
@@ -10,6 +10,10 @@
 
 RandomTuner::RandomTuner(uint _budget, uint _timeout) : 
 	BasicTuner(_budget, _timeout) {
+}
+
+RandomTuner::~RandomTuner(){
+	
 }
 
 void RandomTuner::tune() {

@@ -1,5 +1,5 @@
 #include "csolver.h"
-#include "multituner.h"
+#include "comptuner.h"
 #include "searchtuner.h"
 
 int main(int argc, char **argv) {

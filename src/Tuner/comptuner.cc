@@ -1,4 +1,4 @@
-#include "multituner.h"
+#include "comptuner.h"
 #include <float.h>
 #include <math.h>
 #include "searchtuner.h"
@@ -6,13 +6,16 @@
 #include <fstream>
 #include "solver_interface.h"
 
-MultiTuner::MultiTuner(uint _budget, uint _rounds, uint _timeout) :
-	BasicTuner(_budget, _timeout),
-	rounds(_rounds)
+CompTuner::CompTuner(uint _budget, uint _timeout) :
+	BasicTuner(_budget, _timeout)
 {
 }
 
-void MultiTuner::findBestThreeTuners() {
+CompTuner::~CompTuner(){
+	
+}
+
+void CompTuner::findBestThreeTuners() {
 	if (allTuners.getSize() < 3) {
 		printData();
 		return;
@@ -57,7 +60,7 @@ void MultiTuner::findBestThreeTuners() {
 	}
 }
 
-void MultiTuner::readData(uint numRuns) {
+void CompTuner::readData(uint numRuns) {
 	for (uint i = 0; i < numRuns; i++) {
 		ifstream myfile;
 		char buffer[512];
@@ -118,7 +121,7 @@ void MultiTuner::readData(uint numRuns) {
 
 }
 
-void MultiTuner::tune() {
+void CompTuner::tune() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
 	for (uint b = 0; b < budget; b++) {
 		model_print("Round %u of %u\n", b, budget);
@@ -205,123 +208,3 @@ void MultiTuner::tune() {
 	}
 	printData();
 }
-
-void MultiTuner::mapProblemsToTuners(Vector<TunerRecord *> *tunerV) {
-	for (uint i = 0; i < problems.getSize(); i++) {
-		Problem *problem = problems.get(i);
-		TunerRecord *bestTuner = NULL;
-		long long bestscore = 0;
-		for (uint j = 0; j < tunerV->getSize(); j++) {
-			TunerRecord *tuner = tunerV->get(j);
-			long long metric = tuner->getTime(problem);
-			if (metric == -1) {
-				metric = evaluate(problem, tuner);
-				if (metric != -1)
-					tuner->setTime(problem, metric);
-				else
-					tuner->setTime(problem, -2);
-			}
-			if ((bestTuner == NULL && metric >= 0) ||
-					(metric < bestscore && metric >= 0)) {
-				bestTuner = tuner;
-				bestscore = metric;
-			}
-		}
-		if (bestTuner != NULL)
-			bestTuner->addProblem(problem);
-	}
-}
-
-void clearVector(Vector<TunerRecord *> *tunerV) {
-	for (uint j = 0; j < tunerV->getSize(); j++) {
-		TunerRecord *tuner = tunerV->get(j);
-		tuner->problems.clear();
-	}
-}
-
-void MultiTuner::tuneK() {
-	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
-	for (uint i = 0; i < rounds; i++) {
-		clearVector(tunerV);
-		mapProblemsToTuners(tunerV);
-		improveTuners(tunerV);
-	}
-	model_print("Best tuners\n");
-	for (uint j = 0; j < tunerV->getSize(); j++) {
-		TunerRecord *tuner = tunerV->get(j);
-		char buffer[256];
-		sprintf(buffer, "tuner%u.conf", j);
-		tuner->getTuner()->serialize(buffer);
-		tuner->getTuner()->print();
-	}
-	delete tunerV;
-}
-
-void MultiTuner::improveTuners(Vector<TunerRecord *> *tunerV) {
-	for (uint j = 0; j < tunerV->getSize(); j++) {
-		TunerRecord *tuner = tunerV->get(j);
-		TunerRecord *newtuner = tune(tuner);
-		tunerV->set(j, newtuner);
-	}
-}
-
-double MultiTuner::evaluateAll(TunerRecord *tuner) {
-	double product = 1;
-	for (uint i = 0; i < tuner->problemsSize(); i++) {
-		Problem *problem = tuner->getProblem(i);
-		long long metric = tuner->getTime(problem);
-		if (metric == -1) {
-			metric = evaluate(problem, tuner);
-			if (metric != -1)
-				tuner->setTime(problem, metric);
-			else
-				tuner->setTime(problem, -2);
-		}
-
-		double score = metric;
-		if (metric < 0)
-			score = timeout;
-		product *= score;
-	}
-	return pow(product, 1 / ((double)tuner->problemsSize()));
-}
-
-TunerRecord *MultiTuner::tune(TunerRecord *tuner) {
-	TunerRecord *bestTuner = NULL;
-	double bestScore = DBL_MAX;
-
-	TunerRecord *oldTuner = tuner;
-	double base_temperature = evaluateAll(oldTuner);
-	double oldScore = base_temperature;
-
-	for (uint i = 0; i < budget; i++) {
-		SearchTuner *tmpTuner = mutateTuner(oldTuner->getTuner(), i);
-		TunerRecord *newTuner = oldTuner->changeTuner(tmpTuner);
-		newTuner->setTunerNumber( allTuners.getSize() );
-		allTuners.push(newTuner);
-		double newScore = evaluateAll(newTuner);
-		newTuner->getTuner()->printUsed();
-		model_print("Received score %f\n", newScore);
-		double scoreDiff = newScore - oldScore;	//smaller is better
-		if (newScore < bestScore) {
-			bestScore = newScore;
-			bestTuner = newTuner;
-		}
-
-		double acceptanceP;
-		if (scoreDiff < 0) {
-			acceptanceP = 1;
-		} else {
-			double currTemp = base_temperature * (((double)budget - i) / budget);
-			acceptanceP = exp(-scoreDiff / currTemp);
-		}
-		double ran = ((double)random()) / RAND_MAX;
-		if (ran <= acceptanceP) {
-			oldScore = newScore;
-			oldTuner = newTuner;
-		}
-	}
-
-	return bestTuner;
-}
-

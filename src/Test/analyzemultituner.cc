@@ -1,5 +1,5 @@
 #include "csolver.h"
-#include "multituner.h"
+#include "comptuner.h"
 #include "searchtuner.h"
 
 int main(int argc, char **argv) {
@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 	uint numruns;
 	sscanf(argv[1], "%u", &numruns);
 
-	MultiTuner *multituner = new MultiTuner(0, 0, 0);
+	CompTuner *multituner = new CompTuner(0, 0);
 	multituner->readData(numruns);
 	multituner->findBestThreeTuners();
 	delete multituner;

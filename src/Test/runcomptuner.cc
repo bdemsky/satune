@@ -1,5 +1,5 @@
 #include "csolver.h"
-#include "multituner.h"
+#include "comptuner.h"
 #include "searchtuner.h"
 
 int main(int argc, char **argv) {
@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	sscanf(argv[2], "%u", &rounds);
 	sscanf(argv[3], "%u", &timeout);
 
-	MultiTuner *multituner = new MultiTuner(budget, rounds, timeout);
+	CompTuner *multituner = new CompTuner(budget, timeout);
 	bool tunerfiles = false;
 	for (int i = 4; i < argc; i++) {
 		if (!tunerfiles) {

@@ -2,7 +2,7 @@
 #define RANDOMTUNER_H
 #include "classlist.h"
 #include "structs.h"
-#include "multituner.h"
+#include "comptuner.h"
 #include "basictuner.h"
 
 /**
@@ -11,6 +11,7 @@
 class RandomTuner : public BasicTuner {
 public:
 	RandomTuner(uint _budget, uint _timeout);
+	virtual ~RandomTuner();
 	void tune();
 protected:
         bool randomMutation(SearchTuner *tuner);        

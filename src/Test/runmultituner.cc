@@ -1,6 +1,6 @@
 #include "csolver.h"
-#include "multituner.h"
 #include "searchtuner.h"
+#include "kmeanstuner.h"
 
 int main(int argc, char **argv) {
 	if (argc < 7) {
@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	sscanf(argv[2], "%u", &rounds);
 	sscanf(argv[3], "%u", &timeout);
 
-	MultiTuner *multituner = new MultiTuner(budget, rounds, timeout);
+	KMeansTuner *multituner = new KMeansTuner(budget, rounds, timeout);
 	bool tunerfiles = false;
 	for (int i = 4; i < argc; i++) {
 		if (!tunerfiles) {
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 		exit(-1);
 	}
 
-	multituner->tuneK();
+	multituner->tune();
 	delete multituner;
 	return 0;
 }
