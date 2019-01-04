@@ -102,10 +102,13 @@ void BasicTuner::printData() {
 	}
 }
 
-bool BasicTuner::tunerExists(SearchTuner *tuner){
+bool BasicTuner::tunerExists(TunerRecord *tunerec){
+	SearchTuner *tuner = tunerec->getTuner();
 	for(uint i=0; i< explored.getSize(); i++){
-		if(explored.get(i)->getTuner()->equalUsed(tuner))
+		if(explored.get(i)->getTuner()->equalUsed(tuner)){
+			model_print("************Tuner <%d> is replicate of Tuner <%d>\n", tunerec->getTunerNumber(), explored.get(i)->getTunerNumber());
 			return true;
+		}
 	}
 	return false;
 }
@@ -206,14 +209,14 @@ SearchTuner *BasicTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
 	return newTuner;
 }
 
-bool BasicTuner::subTunerExist(SearchTuner *newTuner){
+int BasicTuner::subTunerIndex(SearchTuner *newTuner){
 	for (uint i=0; i< explored.getSize(); i++){
 		SearchTuner *tuner = explored.get(i)->getTuner();
 		if(tuner->isSubTunerof(newTuner)){
-			return true;
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
 

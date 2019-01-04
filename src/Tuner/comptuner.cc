@@ -125,22 +125,17 @@ void CompTuner::tune() {
 	Vector<TunerRecord *> *tunerV = new Vector<TunerRecord *>(&tuners);
 	for (uint b = 0; b < budget; b++) {
 		model_print("Round %u of %u\n", b, budget);
-		uint tSize = tunerV->getSize();
-		for (uint i = 0; i < tSize; i++) {
-			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
-			TunerRecord *tmp = new TunerRecord(tmpTuner);
-			tmp->setTunerNumber(allTuners.getSize());
-			model_print("Mutated tuner %u to generate tuner %u\n", tunerV->get(i)->getTunerNumber(), tmp->getTunerNumber());
-			allTuners.push(tmp);
-			tunerV->push(tmp);
-		}
-
 		Hashtable<TunerRecord *, int, uint64_t> scores;
-		for (uint i = 0; i < problems.getSize(); i++) {
-			Problem *problem = problems.get(i);
-			Vector<TunerRecord *> places;
-			for (uint j = 0; j < tunerV->getSize(); j++) {
-				TunerRecord *tuner = tunerV->get(j);
+		Vector<Vector<TunerRecord *> *> allplaces;
+		for(uint ii=0; ii< problems.getSize(); ii++){
+			allplaces.push(new Vector<TunerRecord *>());
+		}
+		for (uint j = 0; j < tunerV->getSize(); j++) {
+			TunerRecord *tuner = tunerV->get(j);
+			
+			for (uint i = 0; i < problems.getSize(); i++) {
+				Vector<TunerRecord *> *places = allplaces.get(i);
+				Problem *problem = problems.get(i);
 				long long metric = tuner->getTime(problem);
 				if (metric == -1) {
 					metric = evaluate(problem, tuner);
@@ -153,20 +148,34 @@ void CompTuner::tune() {
 						tuner->setTime(problem, metric);
 					else
 						tuner->setTime(problem, -2);
+					
+					if(tunerExists(tuner)){
+						//Solving the problem and noticing the tuner
+						//already exists
+						tuner->setDuplicate(true);
+						break;
+					}
 				}
 				if (metric >= 0) {
 					uint k = 0;
-					for (; k < places.getSize(); k++) {
-						if (metric < places.get(k)->getTime(problem))
+					for (; k < places->getSize(); k++) {
+						if (metric < places->get(k)->getTime(problem))
 							break;
 					}
 					model_print("place[%u]=Tuner<%p,%d>\n", k, tuner, tuner->getTunerNumber());
-					places.insertAt(k, tuner);
+					places->insertAt(k, tuner);
 				}
 			}
+		}
+		for(uint ii=0; ii < problems.getSize(); ii++){
+			Problem *problem = problems.get(ii);
+			Vector<TunerRecord *> *places = allplaces.get(ii);
 			int points = 9;
-			for (uint k = 0; k < places.getSize() && points; k++) {
-				TunerRecord *tuner = places.get(k);
+			for (uint k = 0; k < places->getSize() && points; k++) {
+				TunerRecord *tuner = places->get(k);
+				if(tuner->isDuplicate()){
+					continue;
+				}
 				int currScore = 0;
 				if (scores.contains(tuner))
 					currScore = scores.get(tuner);
@@ -176,6 +185,9 @@ void CompTuner::tune() {
 				scores.put(tuner, currScore);
 				points = points / 3;
 			}
+		}
+		for(uint ii=0; ii< problems.getSize(); ii++){
+			delete allplaces.get(ii);
 		}
 		Vector<TunerRecord *> ranking;
 		for (uint i = 0; i < tunerV->getSize(); i++) {
@@ -204,6 +216,20 @@ void CompTuner::tune() {
 				if (tunerV->get(j) == tuner)
 					tunerV->removeAt(j);
 			}
+		}
+		uint tSize = tunerV->getSize();
+		for (uint i = 0; i < tSize; i++) {
+			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
+			while(subTunerIndex(tmpTuner) != -1){
+				model_print("******** New Tuner already explored...\n");
+				delete tmpTuner;
+				tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
+			}
+			TunerRecord *tmp = new TunerRecord(tmpTuner);
+			tmp->setTunerNumber(allTuners.getSize());
+			model_print("Mutated tuner %u to generate tuner %u\n", tunerV->get(i)->getTunerNumber(), tmp->getTunerNumber());
+			allTuners.push(tmp);
+			tunerV->push(tmp);
 		}
 	}
 	printData();

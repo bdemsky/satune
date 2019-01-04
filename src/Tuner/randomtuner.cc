@@ -34,7 +34,7 @@ void RandomTuner::tune() {
 						tuner->setTime(problem, metric);
 					else
 						tuner->setTime(problem, -2);
-					if(tunerExists(tuner->getTuner())){
+					if(tunerExists(tuner)){
 						//Solving the problem and noticing the tuner
 						//already exists
 						isNew = false;
@@ -50,7 +50,7 @@ void RandomTuner::tune() {
 		uint tSize = tuners.getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tuners.get(i)->getTuner(), budget);
-			while(subTunerExist(tmpTuner)){
+			while(subTunerIndex(tmpTuner) != -1){
 				tmpTuner->randomMutate();
 			}
 			TunerRecord *tmp = new TunerRecord(tmpTuner);

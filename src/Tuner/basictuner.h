@@ -42,8 +42,8 @@ private:
 
 class TunerRecord {
 public:
-	TunerRecord(SearchTuner *_tuner) : tuner(_tuner), tunernumber(-1) {}
-	TunerRecord(SearchTuner *_tuner, int _tunernumber) : tuner(_tuner), tunernumber(_tunernumber) {}
+	TunerRecord(SearchTuner *_tuner) : tuner(_tuner), tunernumber(-1), isduplicate(false) {}
+	TunerRecord(SearchTuner *_tuner, int _tunernumber) : tuner(_tuner), tunernumber(_tunernumber), isduplicate(false) {}
 	SearchTuner *getTuner() {return tuner;}
 	void inline addProblem(Problem * problem){problems.push(problem);}
 	TunerRecord *changeTuner(SearchTuner *_newtuner);
@@ -53,6 +53,8 @@ public:
 	inline void setTunerNumber(int numb){tunernumber = numb;}
 	inline int getTunerNumber(){return tunernumber;}
 	inline uint problemsSize() {return problems.getSize();}
+	inline void setDuplicate(bool _duplicate) { isduplicate = _duplicate;}
+	inline bool isDuplicate() {return isduplicate;}
 	inline Problem *getProblem(uint index){return problems.get(index);}
         void print();
 	void printProblemsInfo();
@@ -63,6 +65,7 @@ private:
 	Hashtable<Problem *, long long, uint64_t> timetaken;
 	int tunernumber;
 	friend void clearVector(Vector<TunerRecord *> *tunerV);
+	bool isduplicate;
 };
 
 class BasicTuner {
@@ -82,8 +85,8 @@ protected:
          * @param newTuner
          * @return 
          */
-        bool subTunerExist(SearchTuner *newTuner);
-	bool tunerExists(SearchTuner *tunerRec);
+        int subTunerIndex(SearchTuner *newTuner);
+	bool tunerExists(TunerRecord *tunerRec);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
 	void updateTimeout(Problem *problem, long long metric);
 	Vector<TunerRecord *> allTuners;
