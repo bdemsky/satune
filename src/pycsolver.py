@@ -113,5 +113,7 @@ def loadCSolver():
 	csolverlb.clone.restype = c_void_p
 	csolverlb.serialize.argtypes = [c_void_p]
 	csolverlb.serialize.restype = None
+        csolverlb.setAlloyEncode.argtypes = [c_void_p]
+	csolverlb.setAlloyEncode.restype = None
 	return csolverlb
 

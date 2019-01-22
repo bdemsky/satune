@@ -29,6 +29,7 @@
 #include "varorderingopt.h"
 #include <time.h>
 #include <stdarg.h>
+#include "alloyenc.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -37,7 +38,8 @@ CSolver::CSolver() :
 	booleanVarUsed(false),
 	tuner(NULL),
 	elapsedTime(0),
-	satsolverTimeout(NOTIMEOUT)
+	satsolverTimeout(NOTIMEOUT),
+	alloyEncoder(NULL)
 {
 	satEncoder = new SATEncoder(this);
 }
@@ -638,16 +640,26 @@ int CSolver::solve() {
 	model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
 
 	model_print("Is problem UNSAT after encoding: %d\n", unsat);
-	int result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
-	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
-	time2 = getTimeNano();
-	elapsedTime = time2 - startTime;
-	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
+	int result = IS_INDETER;
+	if(alloyEncoder != NULL){
+		alloyEncoder->encode();
+		result = alloyEncoder->solve();
+	}else{
+		result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
+		model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
+		time2 = getTimeNano();
+		elapsedTime = time2 - startTime;
+		model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
+	}
 	if (deleteTuner) {
 		delete tuner;
 		tuner = NULL;
 	}
 	return result;
+}
+
+void CSolver::setAlloyEncode(){
+	alloyEncoder = new AlloyEnc(this);
 }
 
 void CSolver::printConstraints() {
@@ -668,7 +680,8 @@ uint64_t CSolver::getElementValue(Element *element) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
-		return getElementValueSATTranslator(this, element);
+		return alloyEncoder == NULL? getElementValueSATTranslator(this, element):
+			alloyEncoder->getValue(element);
 	default:
 		ASSERT(0);
 	}

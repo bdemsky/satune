@@ -165,7 +165,7 @@ public:
 	void autoTune(uint budget);
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);
-
+	void setAlloyEncode();
 
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
@@ -222,6 +222,7 @@ private:
         Tuner *tuner;
 	long long elapsedTime;
 	long satsolverTimeout;
+	AlloyEnc *alloyEncoder;
 	friend class ElementOpt;
 	friend class VarOrderingOpt;
 };

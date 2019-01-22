@@ -72,7 +72,10 @@ class EncodingGraph;
 class EncodingNode;
 class EncodingEdge;
 class EncodingSubGraph;
-
+class SignatureEnc;
+class Signature;
+class ElementSig;
+class SetSig;
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 struct TableEntry;
