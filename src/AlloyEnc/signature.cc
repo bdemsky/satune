@@ -3,7 +3,8 @@
 
 ElementSig::ElementSig(uint id, SetSig *_ssig): 
 	Signature(id),
-	ssig(_ssig)
+	ssig(_ssig),
+	value(0)
 {
 	
 }
