@@ -16,6 +16,7 @@ public:
 	uint64_t getValue(Element * element);
 	~AlloyEnc();
 private:
+	void dumpAlloyIntScope();
 	string encodeConstraint(BooleanEdge constraint);
 	int getResult();
 	string encodeBooleanLogic( BooleanLogic *bl);

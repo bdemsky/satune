@@ -11,10 +11,13 @@ public:
 	~SignatureEnc();
 	void setValue(uint id, uint64_t value);
 	ElementSig *getElementSignature(Element *element);
+	int getAlloyIntScope();
 	uint64_t getValue(Element *element);
 private:
+	void updateMaxValue(Set *set);
 	CloneMap encoded;
 	Vector<Signature*> signatures;
 	AlloyEnc *alloyEncoder;
+	uint64_t maxValue;
 };
 #endif

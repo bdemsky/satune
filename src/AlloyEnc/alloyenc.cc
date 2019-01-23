@@ -7,6 +7,7 @@
 #include "predicate.h"
 #include "element.h"
 #include "signature.h"
+#include "set.h"
 #include <fstream>
 #include <regex>
 
@@ -74,7 +75,13 @@ int AlloyEnc::getResult(){
 	return IS_SAT;
 }
 
+void AlloyEnc::dumpAlloyIntScope(){
+	output << "pred show {}" << endl;
+	output << "run show for " << sigEnc.getAlloyIntScope() << " int" << endl;
+}
+
 int AlloyEnc::solve(){
+	dumpAlloyIntScope();
 	int result = IS_INDETER;
 	char buffer [512];
 	if( output.is_open()){
@@ -177,6 +184,9 @@ void AlloyEnc::writeToFile(string str){
 }
 
 uint64_t AlloyEnc::getValue(Element * element){
+	ElementEncoding *elemEnc = element->getElementEncoding();
+	if (elemEnc->numVars == 0)//case when the set has only one item
+		return element->getRange()->getElement(0);
 	return sigEnc.getValue(element);
 }
 
