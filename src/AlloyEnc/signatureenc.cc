@@ -31,6 +31,17 @@ void SignatureEnc::updateMaxValue(Set *set){
 	}
 }
 
+BooleanSig *SignatureEnc::getBooleanSignature(Boolean *bvar){
+	BooleanSig *bsig = (BooleanSig *)encoded.get((void *)bvar);
+	if(bsig == NULL){
+		bsig = new BooleanSig(signatures.getSize());
+		encoded.put(bvar, bsig);
+		signatures.push(bsig);
+		alloyEncoder->writeToFile(bsig->getSignature());
+	}
+	return bsig;
+}
+
 ElementSig *SignatureEnc::getElementSignature(Element *element){
 	ElementSig *esig = (ElementSig *)encoded.get((void *)element);
 	if(esig == NULL){
@@ -44,8 +55,6 @@ ElementSig *SignatureEnc::getElementSignature(Element *element){
 			updateMaxValue(set);
 		}
 		esig = new ElementSig(signatures.getSize(), ssig);
-		element->print();
-		model_print(" = Element%u\n", signatures.getSize());
 		encoded.put(element, esig);
 		signatures.push(esig);
 		alloyEncoder->writeToFile(esig->getSignature());

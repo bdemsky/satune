@@ -658,7 +658,7 @@ int CSolver::solve() {
 	return result;
 }
 
-void CSolver::setAlloyEncode(){
+void CSolver::setAlloyEncoder(){
 	alloyEncoder = new AlloyEnc(this);
 }
 
@@ -680,8 +680,8 @@ uint64_t CSolver::getElementValue(Element *element) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
-		return alloyEncoder == NULL? getElementValueSATTranslator(this, element):
-			alloyEncoder->getValue(element);
+		return useAlloyCompiler()? alloyEncoder->getValue(element):
+			getElementValueSATTranslator(this, element);
 	default:
 		ASSERT(0);
 	}
@@ -692,7 +692,8 @@ bool CSolver::getBooleanValue(BooleanEdge bedge) {
 	Boolean *boolean = bedge.getBoolean();
 	switch (boolean->type) {
 	case BOOLEANVAR:
-		return getBooleanVariableValueSATTranslator(this, boolean);
+		return useAlloyCompiler()? alloyEncoder->getBooleanValue(boolean):
+			getBooleanVariableValueSATTranslator(this, boolean);
 	default:
 		ASSERT(0);
 	}

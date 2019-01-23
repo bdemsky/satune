@@ -11,6 +11,7 @@ public:
 	~SignatureEnc();
 	void setValue(uint id, uint64_t value);
 	ElementSig *getElementSignature(Element *element);
+	BooleanSig *getBooleanSignature(Boolean *bvar);
 	int getAlloyIntScope();
 	uint64_t getValue(Element *element);
 private:

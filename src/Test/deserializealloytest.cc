@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 	}
 	CSolver *solver = CSolver::deserialize(argv[1]);
 	if(argc == 3)
-		solver->setAlloyEncode();
+		solver->setAlloyEncoder();
 	int value = solver->solve();
 	if (value == 1) {
 		printf("%s is SAT\n", argv[1]);

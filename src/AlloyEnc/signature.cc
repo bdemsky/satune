@@ -1,12 +1,46 @@
 #include "signature.h"
 #include "set.h"
 
+bool BooleanSig::encodeSet = true;
+
+BooleanSig::BooleanSig(uint id):
+	Signature(id),
+	value(-1)
+{
+}
+
+bool BooleanSig::getValue(){
+	ASSERT(value != -1);
+	return (bool) value;
+}
+
+string BooleanSig::toString() const{
+	return "Boolean" + to_string(id) + ".value";
+}
+
+string BooleanSig::getSignature() const{
+	string str;
+	if(encodeSet){
+		encodeSet = false;
+		str += "one sig BooleanSet {\n\
+		domain: set Int\n\
+		}{\n\
+		domain = 0 + 1 \n\
+		}\n";
+	}
+	str += "one sig Boolean" + to_string(id) + " {\n\
+	value: Int\n\
+	}{\n\
+	value in BooleanSet.domain\n\
+	}";
+	return str;
+}
+
 ElementSig::ElementSig(uint id, SetSig *_ssig): 
 	Signature(id),
 	ssig(_ssig),
 	value(0)
 {
-	
 }
 
 string ElementSig::toString() const{

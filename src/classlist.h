@@ -76,6 +76,7 @@ class SignatureEnc;
 class Signature;
 class ElementSig;
 class SetSig;
+class BooleanSig;
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 struct TableEntry;

@@ -13,13 +13,15 @@ public:
 	void encode();
 	int solve();
 	void writeToFile(string str);
-	uint64_t getValue(Element * element);
+	uint64_t getValue(Element *element);
+	bool getBooleanValue(Boolean *element);
 	~AlloyEnc();
 private:
 	void dumpAlloyIntScope();
 	string encodeConstraint(BooleanEdge constraint);
 	int getResult();
 	string encodeBooleanLogic( BooleanLogic *bl);
+	string encodeBooleanVar( BooleanVar *bv);
 	string encodePredicate( BooleanPredicate *bp);
 	string encodeOperatorPredicate(BooleanPredicate *constraint);
 	CSolver *csolver;

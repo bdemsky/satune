@@ -87,7 +87,7 @@ int AlloyEnc::solve(){
 	if( output.is_open()){
 		output.close();
 	}
-	snprintf(buffer, sizeof(buffer), "./run.sh java edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", alloyFileName, solutionFile);
+	snprintf(buffer, sizeof(buffer), "./run.sh java -Xmx10000m edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", alloyFileName, solutionFile);
 	int status = system(buffer);
 	if (status == 0) {
 		//Read data in from results file
@@ -106,6 +106,10 @@ string AlloyEnc::encodeConstraint(BooleanEdge c){
 		}
 		case PREDICATEOP:{
 			res = encodePredicate((BooleanPredicate *) constraint);
+			break;
+		}
+		case BOOLEANVAR:{
+			res = encodeBooleanVar( (BooleanVar *) constraint);
 			break;
 		}
 		default:
@@ -157,6 +161,11 @@ string AlloyEnc::encodePredicate( BooleanPredicate *bp){
 	}
 }
 
+string AlloyEnc::encodeBooleanVar( BooleanVar *bv){
+	BooleanSig * boolSig = sigEnc.getBooleanSignature(bv);
+	return *boolSig + " = 1";
+}
+
 string AlloyEnc::encodeOperatorPredicate(BooleanPredicate *constraint){
 	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
 	ASSERT(constraint->inputs.getSize() == 2);
@@ -181,6 +190,14 @@ string AlloyEnc::encodeOperatorPredicate(BooleanPredicate *constraint){
 
 void AlloyEnc::writeToFile(string str){
 	output << str << endl;
+}
+
+bool AlloyEnc::getBooleanValue(Boolean *b){
+	if (b->boolVal == BV_MUSTBETRUE)
+		return true;
+	else if (b->boolVal == BV_MUSTBEFALSE)
+		return false;
+	return sigEnc.getBooleanSignature(b);
 }
 
 uint64_t AlloyEnc::getValue(Element * element){

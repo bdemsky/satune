@@ -165,8 +165,8 @@ public:
 	void autoTune(uint budget);
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);
-	void setAlloyEncode();
-
+	void setAlloyEncoder();
+	bool useAlloyCompiler() {return alloyEncoder != NULL;}
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();

@@ -16,6 +16,19 @@ protected:
 	uint id;
 };
 
+class BooleanSig: public Signature{
+public:
+	BooleanSig(uint id);
+	bool getValue();
+	void setValue(bool v) {value = v; }
+	virtual ~BooleanSig(){}
+	virtual string toString() const;
+	virtual string getSignature() const;
+private:
+	int value;
+	static bool encodeSet;
+};
+
 class SetSig: public Signature{
 public:
 	SetSig(uint id, Set *set);
