@@ -17,13 +17,15 @@ public:
 	bool getBooleanValue(Boolean *element);
 	~AlloyEnc();
 private:
-	void dumpAlloyIntScope();
+	void dumpAlloyFooter();
+	void dumpAlloyHeader();
 	string encodeConstraint(BooleanEdge constraint);
 	int getResult();
 	string encodeBooleanLogic( BooleanLogic *bl);
 	string encodeBooleanVar( BooleanVar *bv);
 	string encodePredicate( BooleanPredicate *bp);
 	string encodeOperatorPredicate(BooleanPredicate *constraint);
+	string processElementFunction(ElementFunction *element, ElementSig *signature);
 	CSolver *csolver;
 	SignatureEnc sigEnc;
 	ofstream output;

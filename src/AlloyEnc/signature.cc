@@ -1,7 +1,7 @@
 #include "signature.h"
 #include "set.h"
 
-bool BooleanSig::encodeSet = true;
+bool BooleanSig::encodeAbsSig = true;
 
 BooleanSig::BooleanSig(uint id):
 	Signature(id),
@@ -20,8 +20,8 @@ string BooleanSig::toString() const{
 
 string BooleanSig::getSignature() const{
 	string str;
-	if(encodeSet){
-		encodeSet = false;
+	if(encodeAbsSig){
+		encodeAbsSig = false;
 		str += "one sig BooleanSet {\n\
 		domain: set Int\n\
 		}{\n\

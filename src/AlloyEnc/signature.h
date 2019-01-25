@@ -26,7 +26,7 @@ public:
 	virtual string getSignature() const;
 private:
 	int value;
-	static bool encodeSet;
+	static bool encodeAbsSig;
 };
 
 class SetSig: public Signature{

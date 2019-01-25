@@ -8,6 +8,7 @@
 #include "element.h"
 #include "signature.h"
 #include "set.h"
+#include "function.h"
 #include <fstream>
 #include <regex>
 
@@ -34,6 +35,7 @@ AlloyEnc::~AlloyEnc(){
 }
 
 void AlloyEnc::encode(){
+	dumpAlloyHeader();
 	SetIteratorBooleanEdge *iterator = csolver->getConstraints();
 	Vector<char *> facts;
 	while(iterator->hasNext()){
@@ -75,13 +77,17 @@ int AlloyEnc::getResult(){
 	return IS_SAT;
 }
 
-void AlloyEnc::dumpAlloyIntScope(){
+void AlloyEnc::dumpAlloyFooter(){
 	output << "pred show {}" << endl;
 	output << "run show for " << sigEnc.getAlloyIntScope() << " int" << endl;
 }
 
+void AlloyEnc::dumpAlloyHeader(){
+	output << "open util/integer" << endl;
+}
+
 int AlloyEnc::solve(){
-	dumpAlloyIntScope();
+	dumpAlloyFooter();
 	int result = IS_INDETER;
 	char buffer [512];
 	if( output.is_open()){
@@ -166,26 +172,69 @@ string AlloyEnc::encodeBooleanVar( BooleanVar *bv){
 	return *boolSig + " = 1";
 }
 
-string AlloyEnc::encodeOperatorPredicate(BooleanPredicate *constraint){
-	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
-	ASSERT(constraint->inputs.getSize() == 2);
-	Element *elem0 = constraint->inputs.get(0);
-	ASSERT(elem0->type = ELEMSET);
-	ElementSig *elemSig1 = sigEnc.getElementSignature(elem0);
-	Element *elem1 = constraint->inputs.get(1);
-	ASSERT(elem1->type = ELEMSET);
-	ElementSig *elemSig2 = sigEnc.getElementSignature(elem1);
-	switch (predicate->getOp()) {
-		case SATC_EQUALS:
-			return *elemSig1 + " = " + *elemSig2;
-		case SATC_LT:
-			return *elemSig1 + " < " + *elemSig2;
-		case SATC_GT:
-			return *elemSig1 + " > " + *elemSig2; 
+string AlloyEnc::processElementFunction(ElementFunction* elemFunc, ElementSig *signature){
+	FunctionOperator *function = (FunctionOperator *) elemFunc->getFunction();
+	uint numDomains = elemFunc->inputs.getSize();
+	ASSERT(numDomains > 1);
+	ElementSig *inputs[numDomains];
+	string result;
+	for (uint i = 0; i < numDomains; i++) {
+		Element *elem = elemFunc->inputs.get(i);
+		inputs[i] = sigEnc.getElementSignature(elem);
+		if(elem->type == ELEMFUNCRETURN){
+			result += processElementFunction((ElementFunction *) elem, inputs[i]);
+		}
+	}
+	string op;
+	switch(function->op){
+		case SATC_ADD:
+			op = ".add";
+			break;
+		case SATC_SUB:
+			op = ".sub";
+			break;
 		default:
 			ASSERT(0);
 	}
-	exit(-1);
+	result += *signature + " = " + *inputs[0];
+	for (uint i = 1; i < numDomains; i++) {
+		result += op + "["+ *inputs[i] +"]";
+	}
+	result += "\n";
+	return result;
+}
+
+string AlloyEnc::encodeOperatorPredicate(BooleanPredicate *constraint){
+	constraint->print();
+	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
+	ASSERT(constraint->inputs.getSize() == 2);
+	string str;
+	Element *elem0 = constraint->inputs.get(0);
+	ASSERT(elem0->type == ELEMSET || elem0->type == ELEMFUNCRETURN || elem0->type == ELEMCONST);
+	ElementSig *elemSig1 = sigEnc.getElementSignature(elem0);
+	if(elem0->type == ELEMFUNCRETURN){
+		str += processElementFunction((ElementFunction *) elem0, elemSig1);
+	}
+	Element *elem1 = constraint->inputs.get(1);
+	ASSERT(elem1->type == ELEMSET || elem1->type == ELEMFUNCRETURN || elem1->type == ELEMCONST);
+	ElementSig *elemSig2 = sigEnc.getElementSignature(elem1);
+	if(elem1->type == ELEMFUNCRETURN){
+		str += processElementFunction((ElementFunction *) elem1, elemSig2);
+	}
+	switch (predicate->getOp()) {
+		case SATC_EQUALS:
+			str += *elemSig1 + " = " + *elemSig2;
+			break;
+		case SATC_LT:
+			str += *elemSig1 + " < " + *elemSig2;
+			break;
+		case SATC_GT:
+			str += *elemSig1 + " > " + *elemSig2;
+			break; 
+		default:
+			ASSERT(0);
+	}
+	return str;
 }
 
 void AlloyEnc::writeToFile(string str){
