@@ -10,6 +10,7 @@ public:
 	Signature(uint _id):id(_id){}
 	string operator+(const string& s);
 	virtual string toString() const = 0;
+	virtual string getAbsSignature() const =0;
 	virtual string getSignature() const =0;
 	virtual ~Signature(){}
 protected:
@@ -23,10 +24,11 @@ public:
 	void setValue(bool v) {value = v; }
 	virtual ~BooleanSig(){}
 	virtual string toString() const;
+	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
 private:
 	int value;
-	static bool encodeAbsSig;
+	static bool encodeAbs;
 };
 
 class SetSig: public Signature{
@@ -34,7 +36,9 @@ public:
 	SetSig(uint id, Set *set);
 	virtual ~SetSig(){}
 	virtual string toString() const;
+	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
+	static bool encodeAbs;
 private:
 	string domain;
 };
@@ -46,10 +50,12 @@ public:
 	void setValue(uint64_t v){value = v;}
 	virtual ~ElementSig(){}
 	virtual string toString() const;
+	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
 private:
 	SetSig *ssig;
 	uint64_t value;
+	static bool encodeAbs;
 };
 
 string operator+(const string& str, const Signature& sig);

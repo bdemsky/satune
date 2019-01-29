@@ -56,6 +56,18 @@ void AlloyEnc::encode(){
 	delete iterator;
 }
 
+void tokenize(string const &str, const char delim, vector<std::string> &out)
+{
+	size_t start;
+	size_t end = 0;
+
+	while ((start = str.find_first_not_of(delim, end)) != string::npos)
+	{
+		end = str.find(delim, start);
+		out.push_back(str.substr(start, end - start));
+	}
+}
+
 int AlloyEnc::getResult(){
 	ifstream input(solutionFile, ios::in);
 	string line;
@@ -63,14 +75,17 @@ int AlloyEnc::getResult(){
 		if(regex_match(line, regex("Unsatisfiable."))){
 			return IS_UNSAT;
 		}
-		if(regex_match(line, regex(".*Element\\d+.*value=.*Element\\d+.*->\\d+.*"))){
-			int tmp=0, index=0, value=0;
-			const char* s = line.c_str();
-			uint i1, i2, i3;
-			uint64_t i4;
-			if (4 == sscanf(s,"%*[^0123456789]%u%*[^0123456789]%d%*[^0123456789]%d%*[^0123456789]%" PRId64 "", &i1, &i2, &i3, &i4)){
-				model_print("Element%d = %" PRId64 "\n", i1, i4);
-				sigEnc.setValue(i1, i4);
+		if(regex_match(line, regex(".*Element.*value=.*Element\\d+.*->\\d+.*"))){
+			vector<string> values;
+			const char delim = ',';
+			tokenize(line, delim, values);
+			for (uint i=0; i<values.size(); i++){
+				uint i1, i2;
+				uint64_t i3;
+				if (3 == sscanf(values[i].c_str(),"%*[^0123456789]%d%*[^0123456789]%d%*[^0123456789]%" PRId64 "", &i1, &i2, &i3)){
+					model_print("Element%d = %" PRId64 "\n", i1, i3);
+					sigEnc.setValue(i1, i3);
+				}
 			}
 		}
 	}
@@ -205,7 +220,6 @@ string AlloyEnc::processElementFunction(ElementFunction* elemFunc, ElementSig *s
 }
 
 string AlloyEnc::encodeOperatorPredicate(BooleanPredicate *constraint){
-	constraint->print();
 	PredicateOperator *predicate = (PredicateOperator *) constraint->predicate;
 	ASSERT(constraint->inputs.getSize() == 2);
 	string str;
