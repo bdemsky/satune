@@ -19,7 +19,7 @@
  */
 class Deserializer {
 public:
-	Deserializer(const char *file);
+	Deserializer(const char *file, bool alloy = false);
 	CSolver *deserialize();
 	virtual ~Deserializer();
 private:

@@ -8,9 +8,12 @@ int main(int argc, char **argv) {
 		printf("./run.sh deserializer test.dump [--alloy]\n");
 		exit(-1);
 	}
-	CSolver *solver = CSolver::deserialize(argv[1]);
-	if(argc == 3)
-		solver->setAlloyEncoder();
+	CSolver *solver; 
+	if(argc == 3){
+		solver = CSolver::deserialize(argv[1], true);
+	} else {
+		solver = CSolver::deserialize(argv[1]);
+	}
 	int value = solver->solve();
 	if (value == 1) {
 		printf("%s is SAT\n", argv[1]);

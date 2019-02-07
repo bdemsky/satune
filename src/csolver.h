@@ -161,7 +161,7 @@ public:
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void serialize();
-	static CSolver *deserialize(const char *file);
+	static CSolver *deserialize(const char *file, bool alloy = false);
 	void autoTune(uint budget);
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);

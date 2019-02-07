@@ -158,9 +158,9 @@ CSolver *CSolver::clone() {
 	return copy;
 }
 
-CSolver *CSolver::deserialize(const char *file) {
+CSolver *CSolver::deserialize(const char *file, bool alloy) {
 	model_print("deserializing %s ...\n", file);
-	Deserializer deserializer(file);
+	Deserializer deserializer(file, alloy);
 	return deserializer.deserialize();
 }
 
@@ -676,7 +676,9 @@ int CSolver::solve() {
 }
 
 void CSolver::setAlloyEncoder(){
-	alloyEncoder = new AlloyEnc(this);
+	if(alloyEncoder == NULL){
+		alloyEncoder = new AlloyEnc(this);
+	}
 }
 
 void CSolver::printConstraints() {

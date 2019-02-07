@@ -17,7 +17,7 @@
 
 #define READBUFFERSIZE 16384
 
-Deserializer::Deserializer(const char *file) :
+Deserializer::Deserializer(const char *file, bool alloy) :
 	buffer((char *) ourmalloc(READBUFFERSIZE)),
 	bufferindex(0),
 	bufferbytes(0),
@@ -28,6 +28,9 @@ Deserializer::Deserializer(const char *file) :
 
 	if (filedesc < 0) {
 		exit(-1);
+	}
+	if(alloy){
+		solver->setAlloyEncoder();
 	}
 }
 
