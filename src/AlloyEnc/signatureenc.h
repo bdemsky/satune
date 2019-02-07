@@ -9,12 +9,14 @@ class SignatureEnc {
 public:
 	SignatureEnc(AlloyEnc *_alloyEncoder);
 	~SignatureEnc();
-	void setValue(uint id, uint64_t value);
+	void setValue(uint id, uint value);
 	ElementSig *getElementSignature(Element *element);
 	BooleanSig *getBooleanSignature(Boolean *bvar);
 	int getAlloyIntScope();
-	uint64_t getValue(Element *element);
+	int getValue(void *astnode);
 private:
+	ValuedSignature *getValuedSignature(uint uniqueID){return (ValuedSignature*)signatures.get(uniqueID-1);}
+	uint getUniqueSigID(){return signatures.getSize() +1;}
 	void updateMaxValue(Set *set);
 	CloneMap encoded;
 	Vector<Signature*> signatures;

@@ -5,15 +5,20 @@ bool BooleanSig::encodeAbs = true;
 bool SetSig::encodeAbs = true;
 bool ElementSig::encodeAbs = true;
 
-BooleanSig::BooleanSig(uint id):
-	Signature(id),
-	value(-1)
+ValuedSignature::ValuedSignature(uint id): 
+	Signature(id), 
+	value(-1) 
 {
 }
 
-bool BooleanSig::getValue(){
+int ValuedSignature::getValue(){
 	ASSERT(value != -1);
-	return (bool) value;
+	return value;
+}
+
+BooleanSig::BooleanSig(uint id):
+	ValuedSignature(id)
+{
 }
 
 string BooleanSig::toString() const{
@@ -50,9 +55,8 @@ string BooleanSig::getAbsSignature() const{
 }
 
 ElementSig::ElementSig(uint id, SetSig *_ssig): 
-	Signature(id),
-	ssig(_ssig),
-	value(0)
+	ValuedSignature(id),
+	ssig(_ssig)
 {
 }
 

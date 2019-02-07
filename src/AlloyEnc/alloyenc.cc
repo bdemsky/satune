@@ -10,7 +10,7 @@
 #include "set.h"
 #include "function.h"
 #include <fstream>
-#include <regex>
+#include <vector>
 
 using namespace std;
 
@@ -41,7 +41,6 @@ void AlloyEnc::encode(){
 	while(iterator->hasNext()){
 		BooleanEdge constraint = iterator->next();
 		string constr = encodeConstraint(constraint);
-		//model_print("constr=%s\n", constr.c_str());
 		char *cstr = new char [constr.length()+1];
 		strcpy (cstr, constr.c_str());
 		facts.push(cstr);
@@ -72,18 +71,20 @@ int AlloyEnc::getResult(){
 	ifstream input(solutionFile, ios::in);
 	string line;
 	while(getline(input, line)){
-		if(regex_match(line, regex("Unsatisfiable."))){
+		if(line.find("Unsatisfiable.")== 0){
 			return IS_UNSAT;
 		}
-		if(regex_match(line, regex(".*Element.*value=.*Element\\d+.*->\\d+.*"))){
+		if(line.find("univ") == 0){
+			continue;
+		}
+		if(line.find("this/AbsBool<:value") == 0 || line.find("this/AbsElement<:value=") == 0){
 			vector<string> values;
 			const char delim = ',';
 			tokenize(line, delim, values);
 			for (uint i=0; i<values.size(); i++){
-				uint i1, i2;
-				uint64_t i3;
-				if (3 == sscanf(values[i].c_str(),"%*[^0123456789]%d%*[^0123456789]%d%*[^0123456789]%" PRId64 "", &i1, &i2, &i3)){
-					model_print("Element%d = %" PRId64 "\n", i1, i3);
+				uint i1, i2, i3;
+				if (3 == sscanf(values[i].c_str(),"%*[^0123456789]%u%*[^0123456789]%d%*[^0123456789]%u", &i1, &i2, &i3)){
+					model_print("Signature%u = %u\n", i1, i3);
 					sigEnc.setValue(i1, i3);
 				}
 			}
@@ -147,24 +148,46 @@ string AlloyEnc::encodeBooleanLogic( BooleanLogic *bl){
 	string array[size];
 	for (uint i = 0; i < size; i++)
 		array[i] = encodeConstraint(bl->inputs.get(i));
+	string op;
+	switch (bl->op){
+		case SATC_OR:
+			op = " or ";
+			break;
+		case SATC_AND:
+			op = " and ";
+			break;
+		case SATC_NOT:
+			op = " not ";
+			break;
+		case SATC_IFF:
+			op = " iff ";
+			break;
+		case SATC_IMPLIES:
+			op = " implies ";
+			break;
+		case SATC_XOR:
+		default:
+			ASSERT(0);
+	}
 	switch (bl->op) {
+		case SATC_OR:
 		case SATC_AND:{
 			ASSERT(size >= 2);
-			string res = "";
+			string res = "( ";
 			res += array[0];
 			for( uint i=1; i< size; i++){
-				res += " and " + array[i];
+				res += op + array[i];
 			}
+			res += " )";
 			return res;
 		}
 		case SATC_NOT:{
-			return "not " + array[0];
+			return "not ( " + array[0] + " )";
 		}
-		case SATC_IFF:
-			return array[0] + " iff " + array[1];
-		case SATC_OR:
-		case SATC_XOR:
 		case SATC_IMPLIES:
+		case SATC_IFF:
+			return "( " + array[0] + op + array[1] + " )";
+		case SATC_XOR:
 		default:
 			ASSERT(0);
 
@@ -256,17 +279,10 @@ void AlloyEnc::writeToFile(string str){
 }
 
 bool AlloyEnc::getBooleanValue(Boolean *b){
-	if (b->boolVal == BV_MUSTBETRUE)
-		return true;
-	else if (b->boolVal == BV_MUSTBEFALSE)
-		return false;
-	return sigEnc.getBooleanSignature(b);
+	return (bool)sigEnc.getValue(b);
 }
 
 uint64_t AlloyEnc::getValue(Element * element){
-	ElementEncoding *elemEnc = element->getElementEncoding();
-	if (elemEnc->numVars == 0)//case when the set has only one item
-		return element->getRange()->getElement(0);
-	return sigEnc.getValue(element);
+	return (uint64_t)sigEnc.getValue(element);
 }
 

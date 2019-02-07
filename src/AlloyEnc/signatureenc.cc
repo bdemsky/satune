@@ -34,7 +34,7 @@ void SignatureEnc::updateMaxValue(Set *set){
 BooleanSig *SignatureEnc::getBooleanSignature(Boolean *bvar){
 	BooleanSig *bsig = (BooleanSig *)encoded.get((void *)bvar);
 	if(bsig == NULL){
-		bsig = new BooleanSig(signatures.getSize());
+		bsig = new BooleanSig(getUniqueSigID());
 		encoded.put(bvar, bsig);
 		signatures.push(bsig);
 		alloyEncoder->writeToFile(bsig->getSignature());
@@ -48,13 +48,13 @@ ElementSig *SignatureEnc::getElementSignature(Element *element){
 		Set *set = element->getRange();
 		SetSig *ssig = (SetSig *)encoded.get((void *)set);
 		if(ssig == NULL){
-			ssig = new SetSig(signatures.getSize(), set);
+			ssig = new SetSig(getUniqueSigID(), set);
 			encoded.put(set, ssig);
 			signatures.push(ssig);
 			alloyEncoder->writeToFile(ssig->getSignature());
 			updateMaxValue(set);
 		}
-		esig = new ElementSig(signatures.getSize(), ssig);
+		esig = new ElementSig(getUniqueSigID(), ssig);
 		encoded.put(element, esig);
 		signatures.push(esig);
 		alloyEncoder->writeToFile(esig->getSignature());
@@ -63,16 +63,14 @@ ElementSig *SignatureEnc::getElementSignature(Element *element){
 	return esig;
 }
 
-void SignatureEnc::setValue(uint id, uint64_t value){
-	ElementSig *sig = (ElementSig *)signatures.get(id);
+void SignatureEnc::setValue(uint id, uint value){
+	ValuedSignature *sig = getValuedSignature(id);
+	ASSERT(sig != NULL);
 	sig->setValue(value);
 }
 
-uint64_t SignatureEnc::getValue(Element *element){
-	ElementSig *sig = (ElementSig *)encoded.get((void *) element);
+int SignatureEnc::getValue(void *astnode){
+	ValuedSignature *sig = (ValuedSignature *)encoded.get(astnode);
 	ASSERT(sig != NULL);
-	model_print("******************\n");
-	element->print();
-	model_print("Value = %" PRId64 "\n", sig->getValue());
 	return sig->getValue();
 }

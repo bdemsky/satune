@@ -74,6 +74,7 @@ class EncodingEdge;
 class EncodingSubGraph;
 class SignatureEnc;
 class Signature;
+class ValuedSignature;
 class ElementSig;
 class SetSig;
 class BooleanSig;

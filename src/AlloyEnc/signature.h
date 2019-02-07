@@ -17,17 +17,23 @@ protected:
 	uint id;
 };
 
-class BooleanSig: public Signature{
+class ValuedSignature: public Signature{
+public:
+	ValuedSignature(uint id);
+	int getValue();
+	void setValue(int v){value = v;}
+protected:
+	int value;
+};
+
+class BooleanSig: public ValuedSignature{
 public:
 	BooleanSig(uint id);
-	bool getValue();
-	void setValue(bool v) {value = v; }
 	virtual ~BooleanSig(){}
 	virtual string toString() const;
 	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
 private:
-	int value;
 	static bool encodeAbs;
 };
 
@@ -43,18 +49,15 @@ private:
 	string domain;
 };
 
-class ElementSig: public Signature{
+class ElementSig: public ValuedSignature{
 public:
 	ElementSig(uint id, SetSig *ssig);
-	uint64_t getValue() { return value;}
-	void setValue(uint64_t v){value = v;}
 	virtual ~ElementSig(){}
 	virtual string toString() const;
 	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
 private:
 	SetSig *ssig;
-	uint64_t value;
 	static bool encodeAbs;
 };
 
