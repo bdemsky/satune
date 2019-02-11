@@ -171,6 +171,7 @@ public:
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();
 	long long getSolveTime();
+	long getSatSolverTimeout() { return satsolverTimeout;}
 
 	CMEMALLOC;
 

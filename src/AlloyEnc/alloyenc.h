@@ -19,6 +19,7 @@ public:
 private:
 	void dumpAlloyFooter();
 	void dumpAlloyHeader();
+	inline uint getTimeout();
 	string encodeConstraint(BooleanEdge constraint);
 	int getResult();
 	string encodeBooleanLogic( BooleanLogic *bl);

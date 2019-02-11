@@ -9,6 +9,7 @@
 #include "signature.h"
 #include "set.h"
 #include "function.h"
+#include "inc_solver.h"
 #include <fstream>
 #include <vector>
 
@@ -98,6 +99,11 @@ void AlloyEnc::dumpAlloyFooter(){
 	output << "run show for " << sigEnc.getAlloyIntScope() << " int" << endl;
 }
 
+uint AlloyEnc::getTimeout(){
+	uint timeout =csolver->getSatSolverTimeout(); 
+	return timeout == (uint)NOTIMEOUT? 1000: timeout;
+}
+
 void AlloyEnc::dumpAlloyHeader(){
 	output << "open util/integer" << endl;
 }
@@ -109,7 +115,7 @@ int AlloyEnc::solve(){
 	if( output.is_open()){
 		output.close();
 	}
-	snprintf(buffer, sizeof(buffer), "./run.sh java -Xmx10000m edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", alloyFileName, solutionFile);
+	snprintf(buffer, sizeof(buffer), "./run.sh timeout %u java -Xmx10000m edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", getTimeout(), alloyFileName, solutionFile);
 	int status = system(buffer);
 	if (status == 0) {
 		//Read data in from results file
