@@ -1,4 +1,4 @@
-#include "alloyenc.h"
+#include "alloyinterpreter.h"
 #include <string>
 #include "signatureenc.h"
 #include "structs.h"
@@ -15,26 +15,26 @@
 
 using namespace std;
 
-#define alloyFileName "satune.als"
-#define solutionFile "solution.sol"
+#define ALLOYFILENAME "satune.als"
+#define ALLOYSOLUTIONFILE "solution.sol"
 
-AlloyEnc::AlloyEnc(CSolver *_solver): 
+AlloyInterpreter::AlloyInterpreter(CSolver *_solver): 
 	Interpreter(_solver) 
 {
-	output.open(alloyFileName);
+	output.open(ALLOYFILENAME);
 	if(!output.is_open()){
 		model_print("AlloyEnc:Error in opening the dump file satune.als\n");
 		exit(-1);
 	}
 }
 
-AlloyEnc::~AlloyEnc(){
+AlloyInterpreter::~AlloyInterpreter(){
 	if(output.is_open()){
 		output.close();
 	}
 }
 
-void AlloyEnc::dumpAllConstraints(Vector<char *> &facts){
+void AlloyInterpreter::dumpAllConstraints(Vector<char *> &facts){
 	output << "fact {" << endl;
 	for(uint i=0; i< facts.getSize(); i++){
 		char *cstr = facts.get(i);
@@ -44,8 +44,8 @@ void AlloyEnc::dumpAllConstraints(Vector<char *> &facts){
 }
 
 
-int AlloyEnc::getResult(){
-	ifstream input(solutionFile, ios::in);
+int AlloyInterpreter::getResult(){
+	ifstream input(ALLOYSOLUTIONFILE, ios::in);
 	string line;
 	while(getline(input, line)){
 		if(line.find("Unsatisfiable.")== 0){
@@ -73,24 +73,24 @@ int AlloyEnc::getResult(){
 	return IS_SAT;
 }
 
-void AlloyEnc::dumpFooter(){
+void AlloyInterpreter::dumpFooter(){
 	output << "pred show {}" << endl;
 	output << "run show for " << sigEnc.getAlloyIntScope() << " int" << endl;
 }
 
-void AlloyEnc::dumpHeader(){
+void AlloyInterpreter::dumpHeader(){
 	output << "open util/integer" << endl;
 }
 
-void AlloyEnc::compileRunCommand(char * command, size_t size){
-	snprintf(command, size, "./run.sh timeout %u java -Xmx10000m edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", getTimeout(), alloyFileName, solutionFile);
+void AlloyInterpreter::compileRunCommand(char * command, size_t size){
+	snprintf(command, size, "./run.sh timeout %u java -Xmx10000m edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", getTimeout(), ALLOYFILENAME, ALLOYSOLUTIONFILE);
 }
 
-string AlloyEnc::negateConstraint(string constr){
+string AlloyInterpreter::negateConstraint(string constr){
 	return "not ( " + constr + " )";
 }
 
-string AlloyEnc::encodeBooleanLogic( BooleanLogic *bl){
+string AlloyInterpreter::encodeBooleanLogic( BooleanLogic *bl){
 	uint size = bl->inputs.getSize();
 	string array[size];
 	for (uint i = 0; i < size; i++)
@@ -141,12 +141,12 @@ string AlloyEnc::encodeBooleanLogic( BooleanLogic *bl){
 	}
 }
 
-string AlloyEnc::encodeBooleanVar( BooleanVar *bv){
+string AlloyInterpreter::encodeBooleanVar( BooleanVar *bv){
 	BooleanSig * boolSig = sigEnc.getBooleanSignature(bv);
 	return *boolSig + " = 1";
 }
 
-string AlloyEnc::processElementFunction(ElementFunction* elemFunc, ElementSig *signature){
+string AlloyInterpreter::processElementFunction(ElementFunction* elemFunc, ElementSig *signature){
 	FunctionOperator *function = (FunctionOperator *) elemFunc->getFunction();
 	uint numDomains = elemFunc->inputs.getSize();
 	ASSERT(numDomains > 1);
@@ -178,7 +178,7 @@ string AlloyEnc::processElementFunction(ElementFunction* elemFunc, ElementSig *s
 	return result;
 }
 
-string AlloyEnc::operatorPredicateConstraint(CompOp op, ElementSig *elemSig1, ElementSig *elemSig2){
+string AlloyInterpreter::operatorPredicateConstraint(CompOp op, ElementSig *elemSig1, ElementSig *elemSig2){
 	switch (op) {
 		case SATC_EQUALS:
 			return *elemSig1 + " = " + *elemSig2;

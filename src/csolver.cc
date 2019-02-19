@@ -29,7 +29,7 @@
 #include "varorderingopt.h"
 #include <time.h>
 #include <stdarg.h>
-#include "alloyenc.h"
+#include "alloyinterpreter.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -681,7 +681,7 @@ int CSolver::solve() {
 
 void CSolver::setAlloyEncoder(){
 	if(interpreter == NULL){
-		interpreter = new AlloyEnc(this);
+		interpreter = new AlloyInterpreter(this);
 	}
 }
 

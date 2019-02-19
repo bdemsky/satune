@@ -7,10 +7,10 @@
 #include <iostream>
 #include <fstream>
 
-class AlloyEnc: public Interpreter{
+class AlloyInterpreter: public Interpreter{
 public:
-	AlloyEnc(CSolver *solver);
-	virtual ~AlloyEnc();
+	AlloyInterpreter(CSolver *solver);
+	virtual ~AlloyInterpreter();
 protected:
 	virtual void dumpFooter();
 	virtual void dumpHeader();

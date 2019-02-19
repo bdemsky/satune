@@ -2,7 +2,7 @@
 #include "element.h"
 #include "set.h"
 #include "signature.h"
-#include "alloyenc.h"
+#include "alloyinterpreter.h"
 #include "math.h"
 
 SignatureEnc::SignatureEnc(Interpreter *inter): 
