@@ -166,7 +166,7 @@ public:
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);
 	void setAlloyEncoder();
-	bool useAlloyCompiler() {return alloyEncoder != NULL;}
+	bool useAlloyCompiler() {return interpreter != NULL;}
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();
@@ -223,7 +223,7 @@ private:
         Tuner *tuner;
 	long long elapsedTime;
 	long satsolverTimeout;
-	AlloyEnc *alloyEncoder;
+	Interpreter *interpreter;
 	friend class ElementOpt;
 	friend class VarOrderingOpt;
 };

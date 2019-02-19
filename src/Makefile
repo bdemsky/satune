@@ -4,17 +4,17 @@ PHONY += directories
 MKDIR_P = mkdir -p
 OBJ_DIR = bin
 
-CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard Translator/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard ASTAnalyses/Order/*.cc) $(wildcard ASTAnalyses/Encoding/*.cc) $(wildcard ASTAnalyses/Polarity/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc) $(wildcard Serialize/*.cc) $(wildcard AlloyEnc/*.cc)
+CPP_SOURCES := $(wildcard *.cc) $(wildcard AST/*.cc) $(wildcard ASTTransform/*.cc) $(wildcard Translator/*.cc) $(wildcard ASTAnalyses/*.cc) $(wildcard ASTAnalyses/Order/*.cc) $(wildcard ASTAnalyses/Encoding/*.cc) $(wildcard ASTAnalyses/Polarity/*.cc) $(wildcard Tuner/*.cc) $(wildcard Collections/*.cc) $(wildcard Backend/*.cc) $(wildcard Encoders/*.cc) $(wildcard Serialize/*.cc) $(wildcard Interpreter/*.cc)
 
-C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard Translator/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard ASTAnalyses/Order/*.c) $(wildcard ASTAnalyses/Encoding/*.c) $(wildcard ASTAnalyses/Polarity/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c) $(wildcard Serialize/*.c) $(wildcard AlloyEnc/*.c)
+C_SOURCES := $(wildcard *.c) $(wildcard AST/*.c) $(wildcard ASTTransform/*.c) $(wildcard Translator/*.c) $(wildcard ASTAnalyses/*.c) $(wildcard ASTAnalyses/Order/*.c) $(wildcard ASTAnalyses/Encoding/*.c) $(wildcard ASTAnalyses/Polarity/*.c) $(wildcard Tuner/*.c) $(wildcard Collections/*.c) $(wildcard Backend/*.c) $(wildcard Encoders/*.c) $(wildcard Serialize/*.c) $(wildcard Interpreter/*.c)
 
-HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard Translator/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard ASTAnalyses/Order/*.h) $(wildcard ASTAnalyses/Encoding/*.h) $(wildcard ASTAnalyses/Polarity/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h) $(wildcard Serialize/*.h) $(wildcard AlloyEnc/*.h)
+HEADERS := $(wildcard *.h) $(wildcard AST/*.h) $(wildcard ASTTransform/*.h) $(wildcard Translator/*.h) $(wildcard ASTAnalyses/*.h) $(wildcard ASTAnalyses/Order/*.h) $(wildcard ASTAnalyses/Encoding/*.h) $(wildcard ASTAnalyses/Polarity/*.h) $(wildcard Tuner/*.h) $(wildcard Collections/*.h) $(wildcard Backend/*.h) $(wildcard Encoders/*.h) $(wildcard Serialize/*.h) $(wildcard Interpreter/*.h)
 
 OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 CFLAGS := -Wall -O0 -g
 CXXFLAGS := -std=c++1y -pthread
-CFLAGS += -IAST -IASTTransform -IASTAnalyses -IASTAnalyses/Polarity -IASTAnalyses/Order -IASTAnalyses/Encoding -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner -ISerialize -IAlloyEnc
+CFLAGS += -IAST -IASTTransform -IASTAnalyses -IASTAnalyses/Polarity -IASTAnalyses/Order -IASTAnalyses/Encoding -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner -ISerialize -IInterpreter
 LDFLAGS := -ldl -lrt -rdynamic -g
 SHARED := -shared
 
@@ -44,7 +44,7 @@ ${OBJ_DIR}:
 	${MKDIR_P} ${OBJ_DIR}/Backend
 	${MKDIR_P} ${OBJ_DIR}/Encoders
 	${MKDIR_P} ${OBJ_DIR}/Serialize
-	${MKDIR_P} ${OBJ_DIR}/AlloyEnc
+	${MKDIR_P} ${OBJ_DIR}/Interpreter
 
 debug: CFLAGS += -DCONFIG_DEBUG
 debug: all

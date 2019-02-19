@@ -39,7 +39,7 @@ CSolver::CSolver() :
 	tuner(NULL),
 	elapsedTime(0),
 	satsolverTimeout(NOTIMEOUT),
-	alloyEncoder(NULL)
+	interpreter(NULL)
 {
 	satEncoder = new SATEncoder(this);
 }
@@ -81,6 +81,10 @@ CSolver::~CSolver() {
 	size = allFunctions.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allFunctions.get(i);
+	}
+	
+	if(interpreter != NULL){
+		delete interpreter;
 	}
 
 	delete boolTrue.getBoolean();
@@ -606,9 +610,9 @@ int CSolver::solve() {
 	}
 	int result = IS_INDETER;
 	if(useAlloyCompiler()){
-		alloyEncoder->encode();
+		interpreter->encode();
 		model_print("Problem encoded in Alloy\n");
-		result = alloyEncoder->solve();
+		result = interpreter->solve();
 		model_print("Problem solved by Alloy\n");
 	} else{
 
@@ -676,8 +680,8 @@ int CSolver::solve() {
 }
 
 void CSolver::setAlloyEncoder(){
-	if(alloyEncoder == NULL){
-		alloyEncoder = new AlloyEnc(this);
+	if(interpreter == NULL){
+		interpreter = new AlloyEnc(this);
 	}
 }
 
@@ -699,7 +703,7 @@ uint64_t CSolver::getElementValue(Element *element) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
-		return useAlloyCompiler()? alloyEncoder->getValue(element):
+		return useAlloyCompiler()? interpreter->getValue(element):
 			getElementValueSATTranslator(this, element);
 	default:
 		ASSERT(0);
@@ -711,7 +715,7 @@ bool CSolver::getBooleanValue(BooleanEdge bedge) {
 	Boolean *boolean = bedge.getBoolean();
 	switch (boolean->type) {
 	case BOOLEANVAR:
-		return useAlloyCompiler()? alloyEncoder->getBooleanValue(boolean):
+		return useAlloyCompiler()? interpreter->getBooleanValue(boolean):
 			getBooleanVariableValueSATTranslator(this, boolean);
 	default:
 		ASSERT(0);

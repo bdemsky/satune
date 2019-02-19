@@ -28,7 +28,7 @@ class Set;
 class BooleanLogic;
 class Serializer;
 class ElementFunction;
-class AlloyEnc;
+class Interpreter;
 
 typedef uint64_t VarType;
 typedef unsigned int uint;

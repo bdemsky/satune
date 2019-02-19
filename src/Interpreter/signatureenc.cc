@@ -5,8 +5,8 @@
 #include "alloyenc.h"
 #include "math.h"
 
-SignatureEnc::SignatureEnc(AlloyEnc *ae): 
-	alloyEncoder(ae),
+SignatureEnc::SignatureEnc(Interpreter *inter): 
+	interpreter(inter),
 	maxValue(0)
 {
 }
@@ -37,7 +37,7 @@ BooleanSig *SignatureEnc::getBooleanSignature(Boolean *bvar){
 		bsig = new BooleanSig(getUniqueSigID());
 		encoded.put(bvar, bsig);
 		signatures.push(bsig);
-		alloyEncoder->writeToFile(bsig->getSignature());
+		interpreter->writeToFile(bsig->getSignature());
 	}
 	return bsig;
 }
@@ -51,13 +51,13 @@ ElementSig *SignatureEnc::getElementSignature(Element *element){
 			ssig = new SetSig(getUniqueSigID(), set);
 			encoded.put(set, ssig);
 			signatures.push(ssig);
-			alloyEncoder->writeToFile(ssig->getSignature());
+			interpreter->writeToFile(ssig->getSignature());
 			updateMaxValue(set);
 		}
 		esig = new ElementSig(getUniqueSigID(), ssig);
 		encoded.put(element, esig);
 		signatures.push(esig);
-		alloyEncoder->writeToFile(esig->getSignature());
+		interpreter->writeToFile(esig->getSignature());
 
 	}
 	return esig;

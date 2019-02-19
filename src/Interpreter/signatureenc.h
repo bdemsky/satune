@@ -7,7 +7,7 @@
 
 class SignatureEnc {
 public:
-	SignatureEnc(AlloyEnc *_alloyEncoder);
+	SignatureEnc(Interpreter *_alloyEncoder);
 	~SignatureEnc();
 	void setValue(uint id, uint value);
 	ElementSig *getElementSignature(Element *element);
@@ -20,7 +20,7 @@ private:
 	void updateMaxValue(Set *set);
 	CloneMap encoded;
 	Vector<Signature*> signatures;
-	AlloyEnc *alloyEncoder;
+	Interpreter *interpreter;
 	uint64_t maxValue;
 };
 #endif
