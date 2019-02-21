@@ -15,9 +15,6 @@
 
 using namespace std;
 
-#define SMTFILENAME "satune.smt"
-#define SMTSOLUTIONFILE "solution.sol"
-
 SMTInterpreter::SMTInterpreter(CSolver *_solver): 
 	Interpreter(_solver) 
 {
@@ -82,7 +79,7 @@ int SMTInterpreter::getResult(){
 		if(line.find("unsat")!= line.npos){
 			return IS_UNSAT;
 		}
-		if(line.find("(define-fun") != line.npos){
+		if(line.find("(define-fun") != line.npos || line.find("( (") != line.npos){
 			string valueline;
 			ASSERT(getline(input, valueline));
 			char cline [line.size()+1];

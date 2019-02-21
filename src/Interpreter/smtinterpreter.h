@@ -7,6 +7,9 @@
 #include <iostream>
 #include <fstream>
 
+#define SMTFILENAME "satune.smt"
+#define SMTSOLUTIONFILE "solution.sol"
+
 class SMTInterpreter: public Interpreter{
 public:
 	SMTInterpreter(CSolver *solver);
@@ -23,7 +26,7 @@ protected:
 	virtual string negateConstraint(string constr);
 	virtual string encodeBooleanLogic( BooleanLogic *bl);
 	virtual string encodeBooleanVar( BooleanVar *bv);
-	void extractValue(char *idline, char *valueline);
+	virtual void extractValue(char *idline, char *valueline);
 	virtual string processElementFunction(ElementFunction *element, ValuedSignature *signature);
 	virtual string operatorPredicateConstraint(CompOp op, ValuedSignature *elemSig1, ValuedSignature *elemSig2);
 };

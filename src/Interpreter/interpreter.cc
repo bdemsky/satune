@@ -56,9 +56,12 @@ int Interpreter::solve(){
 	}
 	compileRunCommand(buffer, sizeof(buffer));
 	int status = system(buffer);
-	if (status == 0) {
+	if (status == 0 || status == 512 ) { //For some unknown reason, SMTSat returns 512 when the problem successfully gets solved
 		//Read data in from results file
 		result = getResult();
+	} else {
+		model_print("Error in running command<returned %d>: %s\n", status, buffer);
+		exit(-1);
 	}
 	return result;
 }

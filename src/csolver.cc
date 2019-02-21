@@ -31,6 +31,8 @@
 #include <stdarg.h>
 #include "alloyinterpreter.h"
 #include "smtinterpreter.h"
+#include "mathsatinterpreter.h"
+#include "smtratinterpreter.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -692,8 +694,14 @@ void CSolver::setInterpreter(InterpreterType type){
 				interpreter = new SMTInterpreter(this);
 				break;
 			}
-			case MATHSAT:
-			case SMTRAT:
+			case MATHSAT:{
+				interpreter = new MathSATInterpreter(this);
+				break;
+			}
+			case SMTRAT:{
+				interpreter = new SMTRatInterpreter(this);
+				break;
+			}
 			default:
 				ASSERT(0);
 		}
