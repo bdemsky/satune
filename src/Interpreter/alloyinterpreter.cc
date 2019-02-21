@@ -6,12 +6,13 @@
 #include "boolean.h"
 #include "predicate.h"
 #include "element.h"
-#include "signature.h"
+#include "alloysig.h"
 #include "set.h"
 #include "function.h"
 #include "inc_solver.h"
 #include <fstream>
 #include "cppvector.h"
+#include "math.h"
 
 using namespace std;
 
@@ -32,6 +33,18 @@ AlloyInterpreter::~AlloyInterpreter(){
 	if(output.is_open()){
 		output.close();
 	}
+}
+
+ValuedSignature *AlloyInterpreter::getBooleanSignature(uint id){
+	return new AlloyBoolSig(id);
+}
+
+ValuedSignature *AlloyInterpreter::getElementSignature(uint id, Signature *ssig){
+	return new AlloyElementSig(id, ssig);
+}
+
+Signature *AlloyInterpreter::getSetSignature(uint id, Set *set){
+	return new AlloySetSig(id, set);
 }
 
 void AlloyInterpreter::dumpAllConstraints(Vector<char *> &facts){
@@ -60,7 +73,6 @@ int AlloyInterpreter::getResult(){
 			strcpy ( cline, line.c_str() );
 			char *token = strtok(cline, delim);
 			while( token != NULL ) {
-				printf( " %s\n", token );
 				uint i1, i2, i3;
 				if (3 == sscanf(token,"%*[^0123456789]%u%*[^0123456789]%d%*[^0123456789]%u", &i1, &i2, &i3)){
 					model_print("Signature%u = %u\n", i1, i3);
@@ -73,9 +85,15 @@ int AlloyInterpreter::getResult(){
 	return IS_SAT;
 }
 
+
+int AlloyInterpreter::getAlloyIntScope(){
+	double mylog = log2(sigEnc.getMaxValue() + 1);
+	return floor(mylog) == mylog ? (int)mylog + 1: (int)mylog + 2;
+}
+
 void AlloyInterpreter::dumpFooter(){
 	output << "pred show {}" << endl;
-	output << "run show for " << sigEnc.getAlloyIntScope() << " int" << endl;
+	output << "run show for " << getAlloyIntScope() << " int" << endl;
 }
 
 void AlloyInterpreter::dumpHeader(){
@@ -142,15 +160,15 @@ string AlloyInterpreter::encodeBooleanLogic( BooleanLogic *bl){
 }
 
 string AlloyInterpreter::encodeBooleanVar( BooleanVar *bv){
-	BooleanSig * boolSig = sigEnc.getBooleanSignature(bv);
+	ValuedSignature * boolSig = sigEnc.getBooleanSignature(bv);
 	return *boolSig + " = 1";
 }
 
-string AlloyInterpreter::processElementFunction(ElementFunction* elemFunc, ElementSig *signature){
+string AlloyInterpreter::processElementFunction(ElementFunction* elemFunc, ValuedSignature *signature){
 	FunctionOperator *function = (FunctionOperator *) elemFunc->getFunction();
 	uint numDomains = elemFunc->inputs.getSize();
 	ASSERT(numDomains > 1);
-	ElementSig *inputs[numDomains];
+	ValuedSignature *inputs[numDomains];
 	string result;
 	for (uint i = 0; i < numDomains; i++) {
 		Element *elem = elemFunc->inputs.get(i);
@@ -178,7 +196,7 @@ string AlloyInterpreter::processElementFunction(ElementFunction* elemFunc, Eleme
 	return result;
 }
 
-string AlloyInterpreter::operatorPredicateConstraint(CompOp op, ElementSig *elemSig1, ElementSig *elemSig2){
+string AlloyInterpreter::operatorPredicateConstraint(CompOp op, ValuedSignature *elemSig1, ValuedSignature *elemSig2){
 	switch (op) {
 		case SATC_EQUALS:
 			return *elemSig1 + " = " + *elemSig2;

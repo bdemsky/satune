@@ -161,12 +161,12 @@ public:
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void serialize();
-	static CSolver *deserialize(const char *file, bool alloy = false);
+	static CSolver *deserialize(const char *file, InterpreterType itype = SATUNE);
 	void autoTune(uint budget);
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);
-	void setAlloyEncoder();
-	bool useAlloyCompiler() {return interpreter != NULL;}
+	void setInterpreter(InterpreterType type);
+	bool useInterpreter() {return interpreter != NULL;}
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();

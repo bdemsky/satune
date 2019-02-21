@@ -7,13 +7,13 @@
 
 class SignatureEnc {
 public:
-	SignatureEnc(Interpreter *_alloyEncoder);
+	SignatureEnc(Interpreter *_interpreter);
 	~SignatureEnc();
 	void setValue(uint id, uint value);
-	ElementSig *getElementSignature(Element *element);
-	BooleanSig *getBooleanSignature(Boolean *bvar);
-	int getAlloyIntScope();
+	ValuedSignature *getElementSignature(Element *element);
+	ValuedSignature *getBooleanSignature(Boolean *bvar);
 	int getValue(void *astnode);
+	uint64_t getMaxValue(){ return maxValue;}
 private:
 	ValuedSignature *getValuedSignature(uint uniqueID){return (ValuedSignature*)signatures.get(uniqueID-1);}
 	uint getUniqueSigID(){return signatures.getSize() +1;}

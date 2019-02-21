@@ -105,13 +105,13 @@ string Interpreter::encodeOperatorPredicate(BooleanPredicate *constraint){
 	string str;
 	Element *elem0 = constraint->inputs.get(0);
 	ASSERT(elem0->type == ELEMSET || elem0->type == ELEMFUNCRETURN || elem0->type == ELEMCONST);
-	ElementSig *elemSig1 = sigEnc.getElementSignature(elem0);
+	ValuedSignature *elemSig1 = sigEnc.getElementSignature(elem0);
 	if(elem0->type == ELEMFUNCRETURN){
 		str += processElementFunction((ElementFunction *) elem0, elemSig1);
 	}
 	Element *elem1 = constraint->inputs.get(1);
 	ASSERT(elem1->type == ELEMSET || elem1->type == ELEMFUNCRETURN || elem1->type == ELEMCONST);
-	ElementSig *elemSig2 = sigEnc.getElementSignature(elem1);
+	ValuedSignature *elemSig2 = sigEnc.getElementSignature(elem1);
 	if(elem1->type == ELEMFUNCRETURN){
 		str += processElementFunction((ElementFunction *) elem1, elemSig2);
 	}
@@ -120,7 +120,9 @@ string Interpreter::encodeOperatorPredicate(BooleanPredicate *constraint){
 }
 
 void Interpreter::writeToFile(string str){
-	output << str << endl;
+	if(!str.empty()){
+		output << str << endl;
+	}
 }
 
 bool Interpreter::getBooleanValue(Boolean *b){

@@ -145,8 +145,8 @@ void mustHaveValue(void *solver, void *element) {
 	CCSOLVER(solver)->mustHaveValue( (Element *) element);
 }
 
-void setAlloyEncoder(void *solver){
-	CCSOLVER(solver)->setAlloyEncoder();
+void setInterpreter(void *solver, unsigned int type){
+	CCSOLVER(solver)->setInterpreter((InterpreterType)type);
 }
 
 void *clone(void *solver) {

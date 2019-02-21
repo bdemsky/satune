@@ -26,4 +26,8 @@ typedef enum OverFlowBehavior OverFlowBehavior;
 enum UndefinedBehavior {SATC_IGNOREBEHAVIOR, SATC_FLAGFORCEUNDEFINED, SATC_UNDEFINEDSETSFLAG, SATC_FLAGIFFUNDEFINED};
 typedef enum UndefinedBehavior UndefinedBehavior;
 
+enum InterpreterType {SATUNE, ALLOY, Z3, MATHSAT, SMTRAT};
+typedef enum InterpreterType InterpreterType;
+
+
 #endif

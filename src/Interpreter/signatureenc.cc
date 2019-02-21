@@ -2,8 +2,7 @@
 #include "element.h"
 #include "set.h"
 #include "signature.h"
-#include "alloyinterpreter.h"
-#include "math.h"
+#include "interpreter.h"
 
 SignatureEnc::SignatureEnc(Interpreter *inter): 
 	interpreter(inter),
@@ -18,11 +17,6 @@ SignatureEnc::~SignatureEnc(){
 	}
 }
 
-int SignatureEnc::getAlloyIntScope(){
-	double mylog = log2(maxValue + 1);
-	return floor(mylog) == mylog ? (int)mylog + 1: (int)mylog + 2;
-}
-
 void SignatureEnc::updateMaxValue(Set *set){
 	for(uint i=0; i< set->getSize(); i++){
 		if(set->getElement(i) > maxValue){
@@ -31,10 +25,10 @@ void SignatureEnc::updateMaxValue(Set *set){
 	}
 }
 
-BooleanSig *SignatureEnc::getBooleanSignature(Boolean *bvar){
-	BooleanSig *bsig = (BooleanSig *)encoded.get((void *)bvar);
+ValuedSignature *SignatureEnc::getBooleanSignature(Boolean *bvar){
+	ValuedSignature *bsig = (ValuedSignature *)encoded.get((void *)bvar);
 	if(bsig == NULL){
-		bsig = new BooleanSig(getUniqueSigID());
+		bsig = interpreter->getBooleanSignature(getUniqueSigID());
 		encoded.put(bvar, bsig);
 		signatures.push(bsig);
 		interpreter->writeToFile(bsig->getSignature());
@@ -42,19 +36,19 @@ BooleanSig *SignatureEnc::getBooleanSignature(Boolean *bvar){
 	return bsig;
 }
 
-ElementSig *SignatureEnc::getElementSignature(Element *element){
-	ElementSig *esig = (ElementSig *)encoded.get((void *)element);
+ValuedSignature *SignatureEnc::getElementSignature(Element *element){
+	ValuedSignature *esig = (ValuedSignature *)encoded.get((void *)element);
 	if(esig == NULL){
 		Set *set = element->getRange();
-		SetSig *ssig = (SetSig *)encoded.get((void *)set);
+		Signature *ssig = (Signature *)encoded.get((void *)set);
 		if(ssig == NULL){
-			ssig = new SetSig(getUniqueSigID(), set);
+			ssig = interpreter->getSetSignature(getUniqueSigID(), set);
 			encoded.put(set, ssig);
 			signatures.push(ssig);
 			interpreter->writeToFile(ssig->getSignature());
 			updateMaxValue(set);
 		}
-		esig = new ElementSig(getUniqueSigID(), ssig);
+		esig = interpreter->getElementSignature(getUniqueSigID(), ssig);
 		encoded.put(element, esig);
 		signatures.push(esig);
 		interpreter->writeToFile(esig->getSignature());

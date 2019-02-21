@@ -30,6 +30,7 @@
 #include <time.h>
 #include <stdarg.h>
 #include "alloyinterpreter.h"
+#include "smtinterpreter.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
@@ -162,9 +163,9 @@ CSolver *CSolver::clone() {
 	return copy;
 }
 
-CSolver *CSolver::deserialize(const char *file, bool alloy) {
+CSolver *CSolver::deserialize(const char *file, InterpreterType itype) {
 	model_print("deserializing %s ...\n", file);
-	Deserializer deserializer(file, alloy);
+	Deserializer deserializer(file, itype);
 	return deserializer.deserialize();
 }
 
@@ -394,7 +395,7 @@ BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uin
 }
 
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
-	if(!useAlloyCompiler()){
+	if(!useInterpreter()){
 		BooleanEdge newarray[asize];
 		switch (op) {
 		case SATC_NOT: {
@@ -494,7 +495,7 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 		}
 	}
 	Boolean *constraint = new BooleanOrder(order, first, second);
-	if (!useAlloyCompiler() ){ 
+	if (!useInterpreter() ){ 
 		Boolean *b = boolMap.get(constraint);
 
 		if (b == NULL) {
@@ -531,7 +532,7 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if(!useAlloyCompiler()){
+	if(!useInterpreter()){
 		if (isTrue(constraint))
 			return;
 		else if (isFalse(constraint)) {
@@ -609,11 +610,11 @@ int CSolver::solve() {
 		deleteTuner = true;
 	}
 	int result = IS_INDETER;
-	if(useAlloyCompiler()){
+	if(useInterpreter()){
 		interpreter->encode();
-		model_print("Problem encoded in Alloy\n");
+		model_print("Problem encoded in Interpreter\n");
 		result = interpreter->solve();
-		model_print("Problem solved by Alloy\n");
+		model_print("Problem solved by Interpreter\n");
 	} else{
 
 		{
@@ -679,9 +680,23 @@ int CSolver::solve() {
 	return result;
 }
 
-void CSolver::setAlloyEncoder(){
+void CSolver::setInterpreter(InterpreterType type){
 	if(interpreter == NULL){
-		interpreter = new AlloyInterpreter(this);
+		switch(type){
+			case SATUNE:
+				break;
+			case ALLOY:{
+				interpreter = new AlloyInterpreter(this);
+				break;
+			}case Z3:{
+				interpreter = new SMTInterpreter(this);
+				break;
+			}
+			case MATHSAT:
+			case SMTRAT:
+			default:
+				ASSERT(0);
+		}
 	}
 }
 
@@ -703,7 +718,7 @@ uint64_t CSolver::getElementValue(Element *element) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
-		return useAlloyCompiler()? interpreter->getValue(element):
+		return useInterpreter()? interpreter->getValue(element):
 			getElementValueSATTranslator(this, element);
 	default:
 		ASSERT(0);
@@ -715,7 +730,7 @@ bool CSolver::getBooleanValue(BooleanEdge bedge) {
 	Boolean *boolean = bedge.getBoolean();
 	switch (boolean->type) {
 	case BOOLEANVAR:
-		return useAlloyCompiler()? interpreter->getBooleanValue(boolean):
+		return useInterpreter()? interpreter->getBooleanValue(boolean):
 			getBooleanVariableValueSATTranslator(this, boolean);
 	default:
 		ASSERT(0);

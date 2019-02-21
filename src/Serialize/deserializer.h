@@ -19,7 +19,7 @@
  */
 class Deserializer {
 public:
-	Deserializer(const char *file, bool alloy = false);
+	Deserializer(const char *file, InterpreterType itype = SATUNE);
 	CSolver *deserialize();
 	virtual ~Deserializer();
 private:

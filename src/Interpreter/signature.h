@@ -1,5 +1,5 @@
-#ifndef ELEMENTSIG_H
-#define ELEMENTSIG_H
+#ifndef SIGNATURE_H
+#define SIGNATURE_H
 #include <string>
 #include <iostream>
 #include "classlist.h"
@@ -24,41 +24,6 @@ public:
 	void setValue(int v){value = v;}
 protected:
 	int value;
-};
-
-class BooleanSig: public ValuedSignature{
-public:
-	BooleanSig(uint id);
-	virtual ~BooleanSig(){}
-	virtual string toString() const;
-	virtual string getAbsSignature() const;
-	virtual string getSignature() const;
-private:
-	static bool encodeAbs;
-};
-
-class SetSig: public Signature{
-public:
-	SetSig(uint id, Set *set);
-	virtual ~SetSig(){}
-	virtual string toString() const;
-	virtual string getAbsSignature() const;
-	virtual string getSignature() const;
-	static bool encodeAbs;
-private:
-	string domain;
-};
-
-class ElementSig: public ValuedSignature{
-public:
-	ElementSig(uint id, SetSig *ssig);
-	virtual ~ElementSig(){}
-	virtual string toString() const;
-	virtual string getAbsSignature() const;
-	virtual string getSignature() const;
-private:
-	SetSig *ssig;
-	static bool encodeAbs;
 };
 
 string operator+(const string& str, const Signature& sig);
