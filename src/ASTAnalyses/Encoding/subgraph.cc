@@ -4,8 +4,6 @@
 #include "qsort.h"
 
 EncodingSubGraph::EncodingSubGraph() :
-	encodingSize(0),
-	numElements(0),
 	maxEncodingVal(0) {
 }
 
@@ -109,101 +107,61 @@ void EncodingSubGraph::solveComparisons() {
 }
 
 uint EncodingSubGraph::estimateNewSize(EncodingSubGraph *sg) {
-	uint newSize = 0;
-	SetIteratorEncodingNode *nit = sg->nodes.iterator();
-	while (nit->hasNext()) {
-		EncodingNode *en = nit->next();
-		uint size = estimateNewSize(en);
-		if (size > newSize)
-			newSize = size;
+	uint newSize = sg->allValues.getSize() + allValues.getSize();
+	SetIterator64Int *it = sg->allValues.iterator();
+
+	while (it->hasNext()) {
+		uint64_t val = it->next();
+		if (allValues.contains(val))
+			newSize--;
 	}
-	delete nit;
+	delete it;
 	return newSize;
 }
 
 double EncodingSubGraph::measureSimilarity(EncodingNode *node) {
 	uint common = 0;
-	Hashset64Int intSet;
-	SetIteratorEncodingNode *nit = nodes.iterator();
-	while (nit->hasNext()) {
-		EncodingNode *en = nit->next();
-		for(uint i=0; i < en->getSize(); i++){
-			intSet.add(en->getIndex(i));
-		}
-	}
-	for(uint i=0; i < node->getSize(); i++){
-		if(intSet.contains( node->getIndex(i) )){
+	uint size = node->getSize();
+	for (uint i = 0; i < size; i++) {
+		uint64_t val = node->getIndex(i);
+		if (allValues.contains(val))
 			common++;
-		}
 	}
-//	model_print("measureSimilarity:139: common=%u\t GraphSize=%u\tnodeSize=%u\tGraphSim=%f\tnodeSim=%f\n", common, intSet.getSize(), node->getSize(), 1.0*common/intSet.getSize(), 1.0*common/node->getSize());
-	delete nit;
-	return common*1.0/intSet.getSize() + common*1.0/node->getSize();
+	return common * 1.0 / allValues.getSize() + common * 1.0 / node->getSize();
 }
 
 double EncodingSubGraph::measureSimilarity(EncodingSubGraph *sg) {
 	uint common = 0;
-	Hashset64Int set1;
-	Hashset64Int set2;
-	SetIteratorEncodingNode *nit = nodes.iterator();
-	while (nit->hasNext()) {
-		EncodingNode *en = nit->next();
-		for(uint i=0; i < en->getSize(); i++){
-			set1.add(en->getIndex(i));
-		}
-	}
-	delete nit;
-	nit = sg->nodes.iterator();
-	while (nit->hasNext()) {
-		EncodingNode *en = nit->next();
-		for(uint i=0; i < en->getSize(); i++){
-			set2.add(en->getIndex(i));
-		}
-	}
-	delete nit;
-	SetIterator64Int *setIter1 = set1.iterator();
-	while(setIter1->hasNext()){
+	SetIterator64Int *setIter1 = allValues.iterator();
+	while (setIter1->hasNext()) {
 		uint64_t item1 = setIter1->next();
-		if( set2.contains(item1)){
+		if ( sg->allValues.contains(item1)) {
 			common++;
 		}
 	}
 	delete setIter1;
-//	model_print("measureSimilarity:139: common=%u\tGraphSize1=%u\tGraphSize2=%u\tGraphSize1=%f\tGraphSize2=%f\n", common, set1.getSize(), set2.getSize(), 1.0*common/set1.getSize(), 1.0*common/set2.getSize());
-	return common*1.0/set1.getSize() + common*1.0/set2.getSize();
+	return common * 1.0 / allValues.getSize() + common * 1.0 / sg->allValues.getSize();
 }
 
 uint EncodingSubGraph::estimateNewSize(EncodingNode *n) {
-	SetIteratorEncodingEdge *eeit = n->edges.iterator();
-	uint newsize = n->getSize();
-	while (eeit->hasNext()) {
-		EncodingEdge *ee = eeit->next();
-		if (ee->left != NULL && ee->left != n && nodes.contains(ee->left)) {
-			uint intersectSize = n->s->getUnionSize(ee->left->s);
-			if (intersectSize > newsize)
-				newsize = intersectSize;
-		}
-		if (ee->right != NULL && ee->right != n && nodes.contains(ee->right)) {
-			uint intersectSize = n->s->getUnionSize(ee->right->s);
-			if (intersectSize > newsize)
-				newsize = intersectSize;
-		}
-		if (ee->dst != NULL && ee->dst != n && nodes.contains(ee->dst)) {
-			uint intersectSize = n->s->getUnionSize(ee->dst->s);
-			if (intersectSize > newsize)
-				newsize = intersectSize;
-		}
+	uint nSize = n->getSize();
+	uint newSize = allValues.getSize() + nSize;
+	for (uint i = 0; i < nSize; i++) {
+		if (allValues.contains(n->getIndex(i)))
+			newSize--;
 	}
-	delete eeit;
-	return newsize;
+	return newSize;
+}
+
+uint EncodingSubGraph::numValues() {
+	return allValues.getSize();
 }
 
 void EncodingSubGraph::addNode(EncodingNode *n) {
 	nodes.add(n);
-	uint newSize = estimateNewSize(n);
-	numElements += n->elements.getSize();
-	if (newSize > encodingSize)
-		encodingSize = newSize;
+	uint size = n->getSize();
+	for (uint i = 0; i < size; i++)
+		allValues.add(n->getIndex(i));
 }
 
 SetIteratorEncodingNode *EncodingSubGraph::nodeIterator() {

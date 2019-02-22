@@ -20,6 +20,12 @@ public:
 		memcpy(array, _array, capacity * sizeof(type));
 	}
 
+	Vector(Vector<type> *v) :
+		size(v->size),
+		capacity(v->capacity),
+		array((type *) ourmalloc(sizeof(type) * v->capacity)) {
+		memcpy(array, v->array, capacity * sizeof(type));
+	}
 	void pop() {
 		size--;
 	}
@@ -61,6 +67,21 @@ public:
 
 	void set(uint index, type item) {
 		array[index] = item;
+	}
+
+	void insertAt(uint index, type item) {
+		setSize(size + 1);
+		for (uint i = size - 1; i > index; i--) {
+			set(i, get(i - 1));
+		}
+		array[index] = item;
+	}
+
+	void removeAt(uint index) {
+		for (uint i = index; (i + 1) < size; i++) {
+			set(i, get(i + 1));
+		}
+		setSize(size - 1);
 	}
 
 	inline uint getSize() const {

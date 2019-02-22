@@ -1,0 +1,166 @@
+\section{Evaluation}\label{sec:eval}
+
+\subsection{Histogram Plots}\label{subsec:hist}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/EDGEENCODING-hist.pdf}
+	\caption{Encoding Edge Histogram: 0=Edge Unassiged, 1= Edge Break, 2= Edge Match}
+	\label{fig:edgeencoding}
+\end{figure}
+
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/ELEMENTOPTSETS-hist.pdf}
+	\caption{Element Opt Set Histogram: Whether tuner should update sets or not. 0= OFF, 1= ON}
+	\label{fig:elementoptset}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/ELEMENTOPT-hist.pdf}
+	\caption{Element Opt Histogram: 0 = OFF, 1= ON}
+	\label{fig:elementopt}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/ENCODINGGRAPHOPT-hist.pdf}
+	\caption{Encoding Graph Optimization Histogram: 0= OFF, 1=ON}
+	\label{fig:encodinggraph}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/MUSTEDGEPRUNE-hist.pdf}
+	\caption{Must Prune Histogram: 0= OFF, 1= ON}
+	\label{fig:mustedgeprune}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/MUSTVALUE-hist.pdf}
+	\caption{Must Value Histogram: Binary Index must have value heuristic. The value varies from 0-6}
+	\label{fig:mustvalue}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/NODEENCODING-hist.pdf}
+	\caption{Node Encoding Histogram: 0= Unassigned, 1= OneHot, 2= Unary, 3= BinaryIndex}
+	\label{fig:nodeencoding}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/NAIVEENCODER-hist.pdf}
+	\caption{Naive Encoder Histogram: 1= OneHot, 2=Unary, 3=BinaryIndex}
+	\label{fig:naiveencoder}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/PREPROCESS-hist.pdf}
+	\caption{Preprocess Histogram: Replace Boolean Variables with T or F based on their polarity. 0= OFF, 1= ON}
+	\label{fig:preprocess}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/PROXYVARIABLE-hist.pdf}
+	\caption{Proxy Variable Histogram: Threshold for using proxy variables. Value varies from 1 to 5}
+	\label{fig:proxyvariable}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/VARIABLEORDER-hist.pdf}
+	\caption{Variable Order Histogram: 0= ConstraintOrdering, 1= ElementOrdering, 2=ReverseOrdering}
+	\label{fig:variableorder}
+\end{figure}
+
+\clearpage
+\subsection{Scatter Plots}\label{subsec:scatter}
+
+Y axis represents execution time and X axis shows the possible value of for each knob.
+Geometric mean of each value has been calculated and they are connected with solid lines.
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/EDGEENCODING-scat.pdf}
+	\caption{Encoding Edge plot}
+	\label{fig:edgeencodings}
+\end{figure}
+
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/ELEMENTOPTSETS-scat.pdf}
+	\caption{Element Opt Set plot}
+	\label{fig:elementoptsets}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/ELEMENTOPT-scat.pdf}
+	\caption{Element Opt plot}
+	\label{fig:elementopts}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/ENCODINGGRAPHOPT-scat.pdf}
+	\caption{Encoding Graph Optimization plot}
+	\label{fig:encodinggraphs}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/MUSTEDGEPRUNE-scat.pdf}
+	\caption{Must Prune plot}
+	\label{fig:mustedgeprunes}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/MUSTVALUE-scat.pdf}
+	\caption{Must Value plot}
+	\label{fig:mustvalues}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/NODEENCODING-scat.pdf}
+	\caption{Node Encoding plot}
+	\label{fig:nodeencodings}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/NAIVEENCODER-scat.pdf}
+	\caption{Naive Encoder plot}
+	\label{fig:naiveencoders}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/PREPROCESS-scat.pdf}
+	\caption{Preprocess Plot}
+	\label{fig:preprocesss}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/PROXYVARIABLE-scat.pdf}
+	\caption{Proxy Variable plot}
+	\label{fig:proxyvariables}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{pics/VARIABLEORDER-scat.pdf}
+	\caption{Variable Order Plot}
+	\label{fig:variableorders}
+\end{figure}
+

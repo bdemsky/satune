@@ -1,25 +1,7 @@
 #include "searchtuner.h"
-#include "tunabledependent.h"
 #include <iostream>
 #include <fstream>
-#include <valarray>
 using namespace std;
-
-HashsetTunableDep initializeTunableDependencies()
-{
-  HashsetTunableDep dep;
-  dep.add(new TunableDependent(MUSTREACHGLOBAL, DECOMPOSEORDER));
-  dep.add(new TunableDependent(MUSTREACHLOCAL, DECOMPOSEORDER));
-  dep.add(new TunableDependent(MUSTREACHPRUNE, DECOMPOSEORDER));
-  dep.add(new TunableDependent(MUSTEDGEPRUNE, DECOMPOSEORDER));
-  dep.add(new TunableDependent(NODEENCODING, ENCODINGGRAPHOPT));
-  dep.add(new TunableDependent(EDGEENCODING, ENCODINGGRAPHOPT));
-  dep.add(new TunableDependent(ELEMENTOPTSETS, ELEMENTOPT));
-  return dep;
-}
-
-
-HashsetTunableDep SearchTuner::tunableDependency = initializeTunableDependencies();
 
 TunableSetting::TunableSetting(VarType _type, TunableParam _param) :
 	hasVar(true),
@@ -70,16 +52,6 @@ void TunableSetting::print() {
 	model_print("\n");
 }
 
-unsigned int tunableSettingHash(TunableSetting *setting) {
-	return setting->hasVar ^ setting->type1 ^ setting->type2 ^ setting->param;
-}
-
-bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2) {
-	return setting1->hasVar == setting2->hasVar &&
-				 setting1->type1 == setting2->type1 &&
-				 setting1->type2 == setting2->type2 &&
-				 setting1->param == setting2->param;
-}
 
 ostream &operator<<(ostream &os, const TunableSetting &ts)
 {
@@ -90,12 +62,11 @@ ostream &operator<<(ostream &os, const TunableSetting &ts)
 
 
 SearchTuner::SearchTuner() {
-#ifdef STATICENCGEN
-        graphEncoding =false;
-        naiveEncoding = ELEM_UNASSIGNED;
-#endif
+}
+
+SearchTuner::SearchTuner(const char *filename, bool addused) {
 	ifstream myfile;
-	myfile.open (TUNEFILE, ios::in);
+	myfile.open (filename, ios::in);
 	if (myfile.is_open()) {
 		bool hasVar;
 		VarType type1;
@@ -114,10 +85,92 @@ SearchTuner::SearchTuner() {
 				setting = new TunableSetting(param);
 			}
 			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);
-			usedSettings.add(setting);
+			settings.add(setting);
+			if(addused){
+				usedSettings.add(setting);
+			}
+		}
+		myfile.close();
+	} else {
+		model_print("Warning: Tuner %s couldn't be loaded ... Using default tuner instead ....\n", filename);
+	}
+}
+
+bool SearchTuner::equalUsed(SearchTuner* tuner){
+	if(tuner->usedSettings.getSize() != usedSettings.getSize()){
+		return false;
+	}
+	bool result = true;
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
+	while(iterator->hasNext()){
+		TunableSetting *setting = iterator->next();
+		if(!tuner->usedSettings.contains(setting)){
+			result = false;
+			break;
+		}else{
+			TunableSetting *tunerSetting = tuner->usedSettings.get(setting);
+			if(tunerSetting->selectedValue != setting->selectedValue){
+				result = false;
+				break;
+			}
+		}
+	}
+	delete iterator;
+	return result;
+}
+
+void SearchTuner::addUsed(const char *filename) {
+	ifstream myfile;
+	myfile.open (filename, ios::in);
+	if (myfile.is_open()) {
+		bool hasVar;
+		VarType type1;
+		VarType type2;
+		TunableParam param;
+		int lowValue;
+		int highValue;
+		int defaultValue;
+		int selectedValue;
+		while (myfile >> hasVar >> type1 >> type2 >> param >> lowValue >> highValue >> defaultValue >> selectedValue) {
+			TunableSetting *setting;
+
+			if (hasVar) {
+				setting = new TunableSetting(type1, type2, param);
+			} else {
+				setting = new TunableSetting(param);
+			}
+			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);
+			if (!settings.contains(setting)) {
+				settings.add(setting);
+				usedSettings.add(setting);
+			} else {
+				TunableSetting *tmp = settings.get(setting);
+				settings.remove(tmp);
+				usedSettings.remove(tmp);
+				delete tmp;
+				settings.add(setting);
+				usedSettings.add(setting);
+			}
 		}
 		myfile.close();
 	}
+}
+
+bool SearchTuner::isSubTunerof(SearchTuner *newTuner){
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
+		if(!newTuner->settings.contains(setting)){
+			return false;
+		} else{
+			TunableSetting *newSetting = newTuner->settings.get(setting);
+			if(newSetting->selectedValue != setting->selectedValue){
+				return false;
+			}
+		}
+	}
+	delete iterator;
+	return true;
 }
 
 SearchTuner *SearchTuner::copyUsed() {
@@ -128,12 +181,6 @@ SearchTuner *SearchTuner::copyUsed() {
 		TunableSetting *copy = new TunableSetting(setting);
 		tuner->settings.add(copy);
 	}
-#ifdef STATICENCGEN
-	if(naiveEncoding != ELEM_UNASSIGNED){
-		tuner->graphEncoding = graphEncoding;
-		tuner->naiveEncoding = naiveEncoding;
-	}
-#endif
 	delete iterator;
 	return tuner;
 }
@@ -145,6 +192,24 @@ SearchTuner::~SearchTuner() {
 		delete setting;
 	}
 	delete iterator;
+}
+
+void SearchTuner::setTunable(TunableParam param, TunableDesc *descriptor, uint value) {
+	TunableSetting *result = new TunableSetting(param);
+	result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
+	settings.add(result);
+	usedSettings.add(result);
+}
+
+void SearchTuner::setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value) {
+	setVarTunable(vartype, 0, param, descriptor, value);
+}
+
+void SearchTuner::setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value) {
+	TunableSetting *result = new TunableSetting(vartype1, vartype2, param);
+	result->setDecision(descriptor->lowValue, descriptor->highValue, descriptor->defaultValue, value);
+	settings.add(result);
+	usedSettings.add(result);
 }
 
 int SearchTuner::getTunable(TunableParam param, TunableDesc *descriptor) {
@@ -184,35 +249,8 @@ int SearchTuner::getVarTunable(VarType vartype1, VarType vartype2, TunableParam 
 	return result->selectedValue;
 }
 
-bool SearchTuner::validTunableSetting(TunableSetting* setting){
-	TunableDependent tuneDep((Tunables)setting->param);
-	bool result = true;
-	while(tunableDependency.contains(&tuneDep)){
-		TunableDependent *dependent = tunableDependency.get(&tuneDep);
-		TunableSetting p(dependent->parent);
-		if(!settings.contains(&p)){
-			SetIteratorTunableSetting *iter = settings.iterator();
-			while(iter->hasNext()){
-				model_print("*******************\n");
-				iter->next()->print();
-			}
-			delete iter;
-		}
-		ASSERT(settings.contains(&p));
-		TunableSetting *parent = settings.get(&p);
-		if(!(bool)parent->selectedValue){ //Check parent config is already off
-			return false;
-		}
-		tuneDep.dependent = dependent->parent;
-	}
-	return result;
-}
-
 void SearchTuner::randomMutate() {
-	TunableSetting *randomSetting;
-	do{
-		randomSetting= settings.getRandomElement();
-	}while(!validTunableSetting(randomSetting));
+	TunableSetting *randomSetting = settings.getRandomElement();
 	int range = randomSetting->highValue - randomSetting->lowValue;
 	int randomchoice = (random() % range) + randomSetting->lowValue;
 	if (randomchoice < randomSetting->selectedValue)
@@ -224,50 +262,6 @@ void SearchTuner::randomMutate() {
 	model_print("&&&&&&&&&&&&&&&&&&&&&&&\n");
 }
 
-#ifdef STATICENCGEN
-int SearchTuner::nextStaticTuner() {
-	if(naiveEncoding == ELEM_UNASSIGNED){
-		naiveEncoding = ONEHOT;
-		SetIteratorTunableSetting *iter = settings.iterator();
-		while(iter->hasNext()){
-			TunableSetting *setting = iter->next();
-			if (setting->param == NAIVEENCODER){
-				setting->selectedValue = ONEHOT;
-			} else if(setting->param == ENCODINGGRAPHOPT){
-				setting->selectedValue = false;
-			}
-		}
-		delete iter;
-		return EXIT_FAILURE;
-	}
-	int result=EXIT_FAILURE;
-	if(naiveEncoding == BINARYINDEX && graphEncoding){
-		model_print("Best tuner\n");
-		return EXIT_SUCCESS;
-	}else if (naiveEncoding == BINARYINDEX && !graphEncoding){
-		naiveEncoding = ONEHOT;
-		graphEncoding = true;
-	}else {
-		naiveEncoding = (ElementEncodingType)((int)naiveEncoding + 1);
-	}
-	SetIteratorTunableSetting *iter = settings.iterator();
-	uint count = 0;
-	while(iter->hasNext()){
-		TunableSetting * setting = iter->next();
-		if (setting->param == NAIVEENCODER){
-			setting->selectedValue = naiveEncoding;
-			count++;
-		} else if(setting->param == ENCODINGGRAPHOPT){
-			setting->selectedValue = graphEncoding;
-			count++;
-		}
-	}
-	model_print("Mutating %u settings\n", count);
-	delete iter;
-	return result;
-}
-#endif
-
 void SearchTuner::print() {
 	SetIteratorTunableSetting *iterator = settings.iterator();
 	while (iterator->hasNext()) {
@@ -278,10 +272,22 @@ void SearchTuner::print() {
 
 }
 
-void SearchTuner::serialize() {
+void SearchTuner::serialize(const char *filename) {
 	ofstream myfile;
-	myfile.open (TUNEFILE, ios::out | ios::trunc);
+	myfile.open (filename, ios::out | ios::trunc);
 	SetIteratorTunableSetting *iterator = settings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
+		myfile << *setting << endl;
+	}
+	myfile.close();
+	delete iterator;
+}
+
+void SearchTuner::serializeUsed(const char *filename) {
+	ofstream myfile;
+	myfile.open (filename, ios::out | ios::trunc);
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
 	while (iterator->hasNext()) {
 		TunableSetting *setting = iterator->next();
 		myfile << *setting << endl;

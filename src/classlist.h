@@ -57,11 +57,13 @@ class OrderEdge;
 class DOREdge;
 
 class AutoTuner;
+class CompTuner;
 class SearchTuner;
 class TunableSetting;
 
+class SerializeTuner;
+
 class TunableDesc;
-class TunableDependent;
 
 class OrderResolver;
 class DecomposeOrderResolver;
@@ -70,7 +72,12 @@ class EncodingGraph;
 class EncodingNode;
 class EncodingEdge;
 class EncodingSubGraph;
-
+class SignatureEnc;
+class Signature;
+class ValuedSignature;
+class AlloyElementSig;
+class AlloySetSig;
+class AlloyBoolSig;
 struct IncrementalSolver;
 typedef struct IncrementalSolver IncrementalSolver;
 struct TableEntry;

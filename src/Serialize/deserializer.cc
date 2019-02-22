@@ -17,7 +17,7 @@
 
 #define READBUFFERSIZE 16384
 
-Deserializer::Deserializer(const char *file) :
+Deserializer::Deserializer(const char *file, InterpreterType itype) :
 	buffer((char *) ourmalloc(READBUFFERSIZE)),
 	bufferindex(0),
 	bufferbytes(0),
@@ -28,6 +28,9 @@ Deserializer::Deserializer(const char *file) :
 
 	if (filedesc < 0) {
 		exit(-1);
+	}
+	if(itype != SATUNE){
+		solver->setInterpreter(itype);
 	}
 }
 
@@ -153,8 +156,8 @@ void Deserializer::deserializeBooleanConst() {
 	myread(&b, sizeof(BooleanVar *));
 	bool istrue;
 	myread(&istrue, sizeof(bool));
-	map.put(b, istrue?solver->getBooleanTrue().getBoolean():
-			solver->getBooleanFalse().getBoolean());
+	map.put(b, istrue ? solver->getBooleanTrue().getBoolean() :
+					solver->getBooleanFalse().getBoolean());
 }
 
 void Deserializer::deserializeBooleanOrder() {

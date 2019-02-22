@@ -63,13 +63,14 @@ private:
 	void encodeEnumTableElemFunctionSATEncoder(ElementFunction *This);
 	void encodeEnumEntriesTableElemFuncSATEncoder(ElementFunction *This);
 	void generateAnyValueBinaryIndexEncoding(ElementEncoding *encoding);
+	int getMaximumUsedSize(ElementEncoding *encoding);
 	void generateAnyValueBinaryIndexEncodingPositive(ElementEncoding *encoding);
 	void generateAnyValueBinaryValueEncoding(ElementEncoding *encoding);
 	CNF *cnf;
 	CSolver *solver;
 	BooleanToEdgeMap booledgeMap;
 	VectorEdge *vector;
-        friend class VarOrderingOpt;
+	friend class VarOrderingOpt;
 };
 
 void allocElementConstraintVariables(ElementEncoding *ee, uint numVars);

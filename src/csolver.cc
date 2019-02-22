@@ -29,14 +29,20 @@
 #include "varorderingopt.h"
 #include <time.h>
 #include <stdarg.h>
+#include "alloyinterpreter.h"
+#include "smtinterpreter.h"
+#include "mathsatinterpreter.h"
+#include "smtratinterpreter.h"
 
 CSolver::CSolver() :
 	boolTrue(BooleanEdge(new BooleanConst(true))),
 	boolFalse(boolTrue.negate()),
 	unsat(false),
+	booleanVarUsed(false),
 	tuner(NULL),
 	elapsedTime(0),
-	satsolverTimeout(NOTIMEOUT)
+	satsolverTimeout(NOTIMEOUT),
+	interpreter(NULL)
 {
 	satEncoder = new SATEncoder(this);
 }
@@ -78,6 +84,10 @@ CSolver::~CSolver() {
 	size = allFunctions.getSize();
 	for (uint i = 0; i < size; i++) {
 		delete allFunctions.get(i);
+	}
+	
+	if(interpreter != NULL){
+		delete interpreter;
 	}
 
 	delete boolTrue.getBoolean();
@@ -136,6 +146,7 @@ void CSolver::resetSolver() {
 	boolTrue = BooleanEdge(new BooleanConst(true));
 	boolFalse = boolTrue.negate();
 	unsat = false;
+	booleanVarUsed = false;
 	elapsedTime = 0;
 	tuner = NULL;
 	satEncoder->resetSATEncoder();
@@ -154,9 +165,9 @@ CSolver *CSolver::clone() {
 	return copy;
 }
 
-CSolver *CSolver::deserialize(const char *file) {
+CSolver *CSolver::deserialize(const char *file, InterpreterType itype) {
 	model_print("deserializing %s ...\n", file);
-	Deserializer deserializer(file);
+	Deserializer deserializer(file, itype);
 	return deserializer.deserialize();
 }
 
@@ -308,6 +319,8 @@ Function *CSolver::completeTable(Table *table, UndefinedBehavior behavior) {
 BooleanEdge CSolver::getBooleanVar(VarType type) {
 	Boolean *boolean = new BooleanVar(type);
 	allBooleans.push(boolean);
+	if(!booleanVarUsed)
+		booleanVarUsed = true;
 	return BooleanEdge(boolean);
 }
 
@@ -384,80 +397,88 @@ BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uin
 }
 
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
-	BooleanEdge newarray[asize];
-	switch (op) {
-	case SATC_NOT: {
-		return array[0].negate();
-	}
-	case SATC_IFF: {
-		for (uint i = 0; i < 2; i++) {
-			if (isTrue(array[i])) {	// It can be undefined
-				return array[1 - i];
-			} else if (isFalse(array[i])) {
-				newarray[0] = array[1 - i];
-				return applyLogicalOperation(SATC_NOT, newarray, 1);
-			} else if (array[i]->type == LOGICOP) {
-				BooleanLogic *b = (BooleanLogic *)array[i].getBoolean();
-				if (b->replaced) {
-					return rewriteLogicalOperation(op, array, asize);
+	if(!useInterpreter()){
+		BooleanEdge newarray[asize];
+		switch (op) {
+		case SATC_NOT: {
+			return array[0].negate();
+		}
+		case SATC_IFF: {
+			for (uint i = 0; i < 2; i++) {
+				if (isTrue(array[i])) {	// It can be undefined
+					return array[1 - i];
+				} else if (isFalse(array[i])) {
+					newarray[0] = array[1 - i];
+					return applyLogicalOperation(SATC_NOT, newarray, 1);
+				} else if (array[i]->type == LOGICOP) {
+					BooleanLogic *b = (BooleanLogic *)array[i].getBoolean();
+					if (b->replaced) {
+						return rewriteLogicalOperation(op, array, asize);
+					}
 				}
 			}
+			break;
 		}
-		break;
-	}
-	case SATC_OR: {
-		for (uint i = 0; i < asize; i++) {
-			newarray[i] = applyLogicalOperation(SATC_NOT, array[i]);
-		}
-		return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_AND, newarray, asize));
-	}
-	case SATC_AND: {
-		uint newindex = 0;
-		for (uint i = 0; i < asize; i++) {
-			BooleanEdge b = array[i];
-			if (b->type == LOGICOP) {
-				if (((BooleanLogic *)b.getBoolean())->replaced)
-					return rewriteLogicalOperation(op, array, asize);
+		case SATC_OR: {
+			for (uint i = 0; i < asize; i++) {
+				newarray[i] = applyLogicalOperation(SATC_NOT, array[i]);
 			}
-			if (isTrue(b))
-				continue;
-			else if (isFalse(b)) {
-				return boolFalse;
-			} else
-				newarray[newindex++] = b;
+			return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_AND, newarray, asize));
 		}
-		if (newindex == 0) {
-			return boolTrue;
-		} else if (newindex == 1) {
-			return newarray[0];
+		case SATC_AND: {
+			uint newindex = 0;
+			for (uint i = 0; i < asize; i++) {
+				BooleanEdge b = array[i];
+				if (b->type == LOGICOP) {
+					if (((BooleanLogic *)b.getBoolean())->replaced)
+						return rewriteLogicalOperation(op, array, asize);
+				}
+				if (isTrue(b))
+					continue;
+				else if (isFalse(b)) {
+					return boolFalse;
+				} else
+					newarray[newindex++] = b;
+			}
+			if (newindex == 0) {
+				return boolTrue;
+			} else if (newindex == 1) {
+				return newarray[0];
+			} else {
+				bsdqsort(newarray, newindex, sizeof(BooleanEdge), booleanEdgeCompares);
+				array = newarray;
+				asize = newindex;
+			}
+			break;
+		}
+		case SATC_XOR: {
+			//handle by translation
+			return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_IFF, array, asize));
+		}
+		case SATC_IMPLIES: {
+			//handle by translation
+			return applyLogicalOperation(SATC_OR, applyLogicalOperation(SATC_NOT, array[0]), array[1]);
+		}
+		}
+	
+		ASSERT(asize != 0);
+		Boolean *boolean = new BooleanLogic(this, op, array, asize);
+		Boolean *b = boolMap.get(boolean);
+		if (b == NULL) {
+			boolean->updateParents();
+			boolMap.put(boolean, boolean);
+			allBooleans.push(boolean);
+			return BooleanEdge(boolean);
 		} else {
-			bsdqsort(newarray, newindex, sizeof(BooleanEdge), booleanEdgeCompares);
-			array = newarray;
-			asize = newindex;
+			delete boolean;
+			return BooleanEdge(b);
 		}
-		break;
-	}
-	case SATC_XOR: {
-		//handle by translation
-		return applyLogicalOperation(SATC_NOT, applyLogicalOperation(SATC_IFF, array, asize));
-	}
-	case SATC_IMPLIES: {
-		//handle by translation
-		return applyLogicalOperation(SATC_OR, applyLogicalOperation(SATC_NOT, array[0]), array[1]);
-	}
-	}
-
-	ASSERT(asize != 0);
-	Boolean *boolean = new BooleanLogic(this, op, array, asize);
-	Boolean *b = boolMap.get(boolean);
-	if (b == NULL) {
-		boolean->updateParents();
-		boolMap.put(boolean, boolean);
+	} else {
+		ASSERT(asize != 0);
+		Boolean *boolean = new BooleanLogic(this, op, array, asize);
 		allBooleans.push(boolean);
 		return BooleanEdge(boolean);
-	} else {
-		delete boolean;
-		return BooleanEdge(b);
+	
 	}
 }
 
@@ -476,77 +497,83 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 		}
 	}
 	Boolean *constraint = new BooleanOrder(order, first, second);
-	Boolean *b = boolMap.get(constraint);
+	if (!useInterpreter() ){ 
+		Boolean *b = boolMap.get(constraint);
 
-	if (b == NULL) {
-		allBooleans.push(constraint);
-		boolMap.put(constraint, constraint);
-		constraint->updateParents();
-		if (order->graph != NULL) {
-			OrderGraph *graph = order->graph;
-			OrderNode *from = graph->lookupOrderNodeFromOrderGraph(first);
-			if (from != NULL) {
-				OrderNode *to = graph->lookupOrderNodeFromOrderGraph(second);
-				if (to != NULL) {
-					OrderEdge *edge = graph->lookupOrderEdgeFromOrderGraph(from, to);
-					OrderEdge *invedge;
+		if (b == NULL) {
+			allBooleans.push(constraint);
+			boolMap.put(constraint, constraint);
+			constraint->updateParents();
+			if ( order->graph != NULL) {
+				OrderGraph *graph = order->graph;
+				OrderNode *from = graph->lookupOrderNodeFromOrderGraph(first);
+				if (from != NULL) {
+					OrderNode *to = graph->lookupOrderNodeFromOrderGraph(second);
+					if (to != NULL) {
+						OrderEdge *edge = graph->lookupOrderEdgeFromOrderGraph(from, to);
+						OrderEdge *invedge;
 
-					if (edge != NULL && edge->mustPos) {
-						replaceBooleanWithTrueNoRemove(constraint);
-					} else if (edge != NULL && edge->mustNeg) {
-						replaceBooleanWithFalseNoRemove(constraint);
-					} else if ((invedge = graph->lookupOrderEdgeFromOrderGraph(to, from)) != NULL
-										 && invedge->mustPos) {
-						replaceBooleanWithFalseNoRemove(constraint);
+						if (edge != NULL && edge->mustPos) {
+							replaceBooleanWithTrueNoRemove(constraint);
+						} else if (edge != NULL && edge->mustNeg) {
+							replaceBooleanWithFalseNoRemove(constraint);
+						} else if ((invedge = graph->lookupOrderEdgeFromOrderGraph(to, from)) != NULL
+											 && invedge->mustPos) {
+							replaceBooleanWithFalseNoRemove(constraint);
+						}
 					}
 				}
 			}
+		} else {
+			delete constraint;
+			constraint = b;
 		}
-	} else {
-		delete constraint;
-		constraint = b;
 	}
-
 	BooleanEdge be = BooleanEdge(constraint);
 	return negate ? be.negate() : be;
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if (isTrue(constraint))
-		return;
-	else if (isFalse(constraint)) {
-		setUnSAT();
-	}
-	else {
-		if (constraint->type == LOGICOP) {
-			BooleanLogic *b = (BooleanLogic *) constraint.getBoolean();
-			if (!constraint.isNegated()) {
-				if (b->op == SATC_AND) {
-					uint size = b->inputs.getSize();
-					//Handle potential concurrent modification
-					BooleanEdge array[size];
-					for (uint i = 0; i < size; i++) {
-						array[i] = b->inputs.get(i);
+	if(!useInterpreter()){
+		if (isTrue(constraint))
+			return;
+		else if (isFalse(constraint)) {
+			setUnSAT();
+		}
+		else {
+			if (constraint->type == LOGICOP) {
+				BooleanLogic *b = (BooleanLogic *) constraint.getBoolean();
+				if (!constraint.isNegated()) {
+					if (b->op == SATC_AND) {
+						uint size = b->inputs.getSize();
+						//Handle potential concurrent modification
+						BooleanEdge array[size];
+						for (uint i = 0; i < size; i++) {
+							array[i] = b->inputs.get(i);
+						}
+						for (uint i = 0; i < size; i++) {
+							addConstraint(array[i]);
+						}
+						return;
 					}
-					for (uint i = 0; i < size; i++) {
-						addConstraint(array[i]);
-					}
+				}
+				if (b->replaced) {
+					addConstraint(doRewrite(constraint));
 					return;
 				}
 			}
-			if (b->replaced) {
-				addConstraint(doRewrite(constraint));
-				return;
+			constraints.add(constraint);
+			Boolean *ptr = constraint.getBoolean();
+
+			if (ptr->boolVal == BV_UNSAT) {
+				setUnSAT();
 			}
+
+			replaceBooleanWithTrueNoRemove(constraint);
+			constraint->parents.clear();
 		}
+	} else{
 		constraints.add(constraint);
-		Boolean *ptr = constraint.getBoolean();
-
-		if (ptr->boolVal == BV_UNSAT) {
-			setUnSAT();
-		}
-
-		replaceBooleanWithTrueNoRemove(constraint);
 		constraint->parents.clear();
 	}
 }
@@ -577,7 +604,6 @@ void CSolver::inferFixedOrders() {
 	}
 }
 
-#define NANOSEC 1000000000.0
 int CSolver::solve() {
 	long long startTime = getTimeNano();
 	bool deleteTuner = false;
@@ -585,66 +611,101 @@ int CSolver::solve() {
 		tuner = new DefaultTuner();
 		deleteTuner = true;
 	}
+	int result = IS_INDETER;
+	if(useInterpreter()){
+		interpreter->encode();
+		model_print("Problem encoded in Interpreter\n");
+		result = interpreter->solve();
+		model_print("Problem solved by Interpreter\n");
+	} else{
 
-
-	{
-		SetIteratorOrder *orderit = activeOrders.iterator();
-		while (orderit->hasNext()) {
-			Order *order = orderit->next();
-			if (order->graph != NULL) {
-				delete order->graph;
-				order->graph = NULL;
+		{
+			SetIteratorOrder *orderit = activeOrders.iterator();
+			while (orderit->hasNext()) {
+				Order *order = orderit->next();
+				if (order->graph != NULL) {
+					delete order->graph;
+					order->graph = NULL;
+				}
 			}
+			delete orderit;
 		}
-		delete orderit;
+		computePolarities(this);
+		long long time1 = getTimeNano();
+		model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
+		Preprocess pp(this);
+		pp.doTransform();
+		long long time2 = getTimeNano();
+		model_print("Preprocess time: %f\n", (time2 - time1) / NANOSEC);
+
+		DecomposeOrderTransform dot(this);
+		dot.doTransform();
+		time1 = getTimeNano();
+		model_print("Decompose Order: %f\n", (time1 - time2) / NANOSEC);
+
+		IntegerEncodingTransform iet(this);
+		iet.doTransform();
+
+		ElementOpt eop(this);
+		eop.doTransform();
+
+		EncodingGraph eg(this);
+		eg.encode();
+
+		naiveEncodingDecision(this);
+	//	eg.validate();
+
+		VarOrderingOpt bor(this, satEncoder);
+		bor.doTransform();
+
+		time2 = getTimeNano();
+		model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
+
+		satEncoder->encodeAllSATEncoder(this);
+		time1 = getTimeNano();
+
+		model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
+
+		model_print("Is problem UNSAT after encoding: %d\n", unsat);
+		
+
+		result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
+		model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
+		time2 = getTimeNano();
+		elapsedTime = time2 - startTime;
+		model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
 	}
-	computePolarities(this);
-	long long time1 = getTimeNano();
-	model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
-	Preprocess pp(this);
-	pp.doTransform();
-	long long time2 = getTimeNano();
-	model_print("Preprocess time: %f\n", (time2 - time1) / NANOSEC);
-
-	DecomposeOrderTransform dot(this);
-	dot.doTransform();
-	time1 = getTimeNano();
-	model_print("Decompose Order: %f\n", (time1 - time2) / NANOSEC);
-
-	IntegerEncodingTransform iet(this);
-	iet.doTransform();
-
-	ElementOpt eop(this);
-	eop.doTransform();
-
-	EncodingGraph eg(this);
-	eg.encode();
-
-	naiveEncodingDecision(this);
-//	eg.validate();
-
-	VarOrderingOpt bor(this, satEncoder);
-	bor.doTransform();
-	
-	time2 = getTimeNano();
-	model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
-	
-	satEncoder->encodeAllSATEncoder(this);
-	time1 = getTimeNano();
-
-	model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
-
-	model_print("Is problem UNSAT after encoding: %d\n", unsat);
-	int result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
-	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT? "SAT" : result == IS_INDETER? "INDETERMINATE" : " UNSAT");
-	time2 = getTimeNano();
-	elapsedTime = time2 - startTime;
-	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
 	if (deleteTuner) {
 		delete tuner;
 		tuner = NULL;
 	}
 	return result;
+}
+
+void CSolver::setInterpreter(InterpreterType type){
+	if(interpreter == NULL){
+		switch(type){
+			case SATUNE:
+				break;
+			case ALLOY:{
+				interpreter = new AlloyInterpreter(this);
+				break;
+			}case Z3:{
+				interpreter = new SMTInterpreter(this);
+				break;
+			}
+			case MATHSAT:{
+				interpreter = new MathSATInterpreter(this);
+				break;
+			}
+			case SMTRAT:{
+				interpreter = new SMTRatInterpreter(this);
+				break;
+			}
+			default:
+				ASSERT(0);
+		}
+	}
 }
 
 void CSolver::printConstraints() {
@@ -665,7 +726,8 @@ uint64_t CSolver::getElementValue(Element *element) {
 	case ELEMSET:
 	case ELEMCONST:
 	case ELEMFUNCRETURN:
-		return getElementValueSATTranslator(this, element);
+		return useInterpreter()? interpreter->getValue(element):
+			getElementValueSATTranslator(this, element);
 	default:
 		ASSERT(0);
 	}
@@ -676,7 +738,8 @@ bool CSolver::getBooleanValue(BooleanEdge bedge) {
 	Boolean *boolean = bedge.getBoolean();
 	switch (boolean->type) {
 	case BOOLEANVAR:
-		return getBooleanVariableValueSATTranslator(this, boolean);
+		return useInterpreter()? interpreter->getBooleanValue(boolean):
+			getBooleanVariableValueSATTranslator(this, boolean);
 	default:
 		ASSERT(0);
 	}

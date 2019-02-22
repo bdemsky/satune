@@ -9,16 +9,14 @@
 class AutoTuner {
 public:
 	AutoTuner(uint budget);
+	virtual ~AutoTuner();
 	void addProblem(CSolver *solver);
-	void tune();
+	virtual void tune();
 	CMEMALLOC;
-private:
+protected:
 	long long evaluate(CSolver *problem, SearchTuner *tuner);
 	double evaluateAll(SearchTuner *tuner);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
-#ifdef STATICENCGEN
-	SearchTuner *mutateTuner(SearchTuner *oldTuner);
-#endif
 	Vector<CSolver *> solvers;
 	uint budget;
 	int result;

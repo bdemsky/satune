@@ -45,8 +45,9 @@ public:
 	void encode();
 	uint getEncoding(EncodingNode *n, uint64_t val);
 	uint getEncodingMaxVal(EncodingNode *n) { return maxEncodingVal;}
-        double measureSimilarity(EncodingNode *n);
-        double measureSimilarity(EncodingSubGraph *sg);
+	double measureSimilarity(EncodingNode *n);
+	double measureSimilarity(EncodingSubGraph *sg);
+	uint numValues();
 	CMEMALLOC;
 private:
 	uint estimateNewSize(EncodingNode *n);
@@ -64,10 +65,8 @@ private:
 	HashsetEncodingValue values;
 	HashsetEncodingNode nodes;
 	NVPMap map;
-	uint encodingSize;
-	uint numElements;
 	uint maxEncodingVal;
-
+	Hashset64Int allValues;
 	friend class EncodingGraph;
 };
 

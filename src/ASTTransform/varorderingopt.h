@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   VarOrderingOpt.h
  * Author: hamed
  *
@@ -17,14 +17,14 @@
 #include "transform.h"
 
 
-class VarOrderingOpt :Transform {
+class VarOrderingOpt : Transform {
 public:
-        VarOrderingOpt(CSolver *_solver, SATEncoder *_satencoder);
-        void doTransform();
-        virtual ~VarOrderingOpt();
+	VarOrderingOpt(CSolver *_solver, SATEncoder *_satencoder);
+	void doTransform();
+	virtual ~VarOrderingOpt();
 private:
-        SATEncoder* satencoder;
+	SATEncoder *satencoder;
 };
 
-#endif /* VARORDERINGOPT_H */
+#endif/* VARORDERINGOPT_H */
 

@@ -139,9 +139,9 @@ public:
 	bool isFalse(BooleanEdge b);
 
 	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
-        void setSatSolverTimeout(long seconds){ satsolverTimeout = seconds;}
+	void setSatSolverTimeout(long seconds) { satsolverTimeout = seconds;}
 	bool isUnSAT() { return unsat; }
-
+        bool isBooleanVarUsed(){return booleanVarUsed;}
 	void printConstraint(BooleanEdge boolean);
 	void printConstraints();
 
@@ -161,16 +161,17 @@ public:
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
 	void serialize();
-	static CSolver *deserialize(const char *file);
+	static CSolver *deserialize(const char *file, InterpreterType itype = SATUNE);
 	void autoTune(uint budget);
 	void inferFixedOrders();
 	void inferFixedOrder(Order *order);
-
-
+	void setInterpreter(InterpreterType type);
+	bool useInterpreter() {return interpreter != NULL;}
 	void setTuner(Tuner *_tuner) { tuner = _tuner; }
 	long long getElapsedTime() { return elapsedTime; }
 	long long getEncodeTime();
 	long long getSolveTime();
+	long getSatSolverTimeout() { return satsolverTimeout;}
 
 	CMEMALLOC;
 
@@ -218,11 +219,13 @@ private:
 
 	SATEncoder *satEncoder;
 	bool unsat;
-	Tuner *tuner;
+        bool booleanVarUsed;
+        Tuner *tuner;
 	long long elapsedTime;
-        long satsolverTimeout;
+	long satsolverTimeout;
+	Interpreter *interpreter;
 	friend class ElementOpt;
-        friend class VarOrderingOpt;
+	friend class VarOrderingOpt;
 };
 
 inline CompOp flipOp(CompOp op) {

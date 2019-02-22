@@ -41,6 +41,7 @@ int getOrderConstraintValue(void *solver,void *order, long first, long second);
 void printConstraints(void *solver);
 void serialize(void *solver);
 void mustHaveValue(void *solver, void *element);
+void setAlloyEncoder(void *solver);
 void *clone(void *solver);
 #ifdef __cplusplus
 }

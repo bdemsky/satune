@@ -5,7 +5,6 @@
 #include "structs.h"
 #include <ostream>
 using namespace std;
-#define TUNEFILE "tune.conf"
 
 class TunableSetting {
 public:
@@ -29,45 +28,38 @@ private:
 	friend unsigned int tunableSettingHash(TunableSetting *setting);
 	friend bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
 	friend class SearchTuner;
+	friend class SerializeTuner;
 };
-
-unsigned int tunableSettingHash(TunableSetting *setting);
-bool tunableSettingEquals(TunableSetting *setting1, TunableSetting *setting2);
-
-typedef Hashset<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> HashsetTunableSetting;
-typedef SetIterator<TunableSetting *, uintptr_t, 4, tunableSettingHash, tunableSettingEquals> SetIteratorTunableSetting;
 
 class SearchTuner : public Tuner {
 public:
 	SearchTuner();
+	SearchTuner(const char *filename, bool addused = false);
 	~SearchTuner();
-	int getTunable(TunableParam param, TunableDesc *descriptor);
+	virtual int getTunable(TunableParam param, TunableDesc *descriptor);
 	int getVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor);
-	int getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor);
+	virtual int getVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor);
+	void setTunable(TunableParam param, TunableDesc *descriptor, uint value);
+	void setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value);
+	void setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value);
 	SearchTuner *copyUsed();
+        bool isSubTunerof(SearchTuner *newTuner);
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}
 	void print();
 	void printUsed();
-	void serialize();
-
+	void serialize(const char *file);
+	void serializeUsed(const char *file);
+	void addUsed(const char *file);
+        bool equalUsed(SearchTuner *tuner);
 	CMEMALLOC;
-private:
-        bool validTunableSetting(TunableSetting* setting);
-        static HashsetTunableDep tunableDependency;
+protected:
 	/** Used Settings keeps track of settings that were actually used by
 	   the example. Mutating settings may cause the Constraint Compiler
 	   not to query other settings.*/
 	HashsetTunableSetting usedSettings;
 	/** Settings contains all settings. */
 	HashsetTunableSetting settings;
-#ifdef STATICENCGEN
-        bool graphEncoding;
-        ElementEncodingType naiveEncoding;
-public:
-        int nextStaticTuner();
-#endif
 };
-
 
 #endif
