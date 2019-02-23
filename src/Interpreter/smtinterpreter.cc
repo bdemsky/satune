@@ -101,7 +101,8 @@ void SMTInterpreter::dumpHeader(){
 }
 
 void SMTInterpreter::compileRunCommand(char * command, size_t size){
-	snprintf(command, size, "./z3 -T:%u -in < %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
+	model_print("Calling Z3...\n");
+	snprintf(command, size, "./run.sh z3 -T:%u -in < %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
 }
 
 string SMTInterpreter::negateConstraint(string constr){

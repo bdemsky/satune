@@ -19,7 +19,8 @@ SMTRatInterpreter::SMTRatInterpreter(CSolver *solver):
 }
 
 void SMTRatInterpreter::compileRunCommand(char * command , size_t size){
-	snprintf(command, size, "timeout %u ./smtrat %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
+	model_print("Calling SMTRat...\n");
+	snprintf(command, size, "./run.sh timeout %u smtrat %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
 }
 
 SMTRatInterpreter::~SMTRatInterpreter(){

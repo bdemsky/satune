@@ -20,7 +20,8 @@ MathSATInterpreter::MathSATInterpreter(CSolver *solver):
 }
 
 void MathSATInterpreter::compileRunCommand(char * command , size_t size){
-	snprintf(command, size, "timeout %u ./mathsat -model %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
+	model_print("Calling MathSAT...\n");
+	snprintf(command, size, "./run.sh timeout %u mathsat -model %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
 }
 
 MathSATInterpreter::~MathSATInterpreter(){
@@ -38,7 +39,7 @@ int MathSATInterpreter::getResult(){
 			strcpy ( cline, line.c_str() );
 			char valuestr [512];
 			uint id;
-			if (2 == sscanf(cline,"%*[^0123456789]%u%*[^0123456789]%s", &id, valuestr)){
+			if (2 == sscanf(cline,"%*[^0123456789]%u %s", &id, valuestr)){
 				uint value;
 				if (strcmp (valuestr, "true)") == 0 ){
 					value =1;

@@ -101,6 +101,7 @@ void AlloyInterpreter::dumpHeader(){
 }
 
 void AlloyInterpreter::compileRunCommand(char * command, size_t size){
+	model_print("Calling Alloy...\n");
 	snprintf(command, size, "./run.sh timeout %u java -Xmx10000m edu.mit.csail.sdg.alloy4whole.ExampleAlloyCompilerNoViz %s > %s", getTimeout(), ALLOYFILENAME, ALLOYSOLUTIONFILE);
 }
 
