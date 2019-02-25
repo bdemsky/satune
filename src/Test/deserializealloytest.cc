@@ -19,14 +19,17 @@ InterpreterType getInterpreterType(char * itype){
 
 int main(int argc, char **argv) {
 	printf("%d\n", argc);
-	if (argc != 2 && argc != 3) {
+	if (argc < 2 && argc > 4) {
 		printf("You only specify the name of the file ...\n");
-		printf("./run.sh deserializer test.dump [--alloy/--z3/--smtrat/--mathsat]\n");
+		printf("./run.sh deserializer test.dump [--alloy/--z3/--smtrat/--mathsat] [timeout]\n");
 		exit(-1);
 	}
 	CSolver *solver; 
-	if(argc == 3){
+	if(argc >= 3){
 		solver = CSolver::deserialize(argv[1], getInterpreterType(argv[2]));
+		if(argc == 4){
+			solver->setSatSolverTimeout(atol(argv[3]));
+		}
 	} else {
 		solver = CSolver::deserialize(argv[1]);
 	}
