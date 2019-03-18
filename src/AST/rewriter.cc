@@ -23,7 +23,7 @@ void CSolver::replaceBooleanWithFalseNoRemove(BooleanEdge bexpr) {
 void CSolver::replaceBooleanWithTrueNoRemove(BooleanEdge bexpr) {
 	updateMustValue(bexpr.getBoolean(), bexpr.isNegated() ? BV_MUSTBEFALSE : BV_MUSTBETRUE);
 
-	ASSERT(bexpr->boolVal != BV_UNSAT);
+	ASSERT((bexpr->boolVal != BV_UNSAT ) || unsat);
 
 	uint size = bexpr->parents.getSize();
 	for (uint i = 0; i < size; i++) {
