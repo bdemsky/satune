@@ -330,7 +330,12 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		BooleanEdge be = solver->orderConstraint(graph->getOrder(), source->getID(), dstnode->getID());
 		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), source->getID(), node->getID());
 		updateEdgePolarity(benew, be);
-		solver->replaceBooleanWithBoolean(be, benew);
+		if (solver->isTrue(benew))
+		  solver->replaceBooleanWithTrue(be);
+		else if (solver->isFalse(benew))
+		  solver->replaceBooleanWithFalse(be);
+		else
+		  solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->inEdges.reset();
 	delete inedgeit;
@@ -360,7 +365,12 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		BooleanEdge be = solver->orderConstraint(graph->getOrder(), dstnode->getID(), sink->getID());
 		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), node->getID(), sink->getID());
 		updateEdgePolarity(benew, be);
-		solver->replaceBooleanWithBoolean(be, benew);
+		if (solver->isTrue(benew))
+		  solver->replaceBooleanWithTrue(be);
+		else if (solver->isFalse(benew))
+		  solver->replaceBooleanWithFalse(be);
+		else
+		  solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->outEdges.reset();
 	delete outedgeit;
