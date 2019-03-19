@@ -33,7 +33,7 @@ void IntegerEncodingTransform::doTransform() {
 
 void IntegerEncodingTransform::integerEncode(Order *currOrder) {
 	IntegerEncodingRecord *encodingRecord =  new IntegerEncodingRecord(
-		solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize() - 1));
+		solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->getNumUsed() - 1));
 	currOrder->setOrderEncodingType( INTEGERENCODING );
 
 	Vector<BooleanOrder *> *constraints = currOrder->getConstraints();

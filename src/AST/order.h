@@ -24,12 +24,15 @@ public:
 	void addOrderConstraint(BooleanOrder *constraint);
 	void setOrderEncodingType(OrderEncodingType type);
 	HashtableOrderPair *getOrderPairTable();
+	SetIterator64Int *getUsedIterator();
 	CMEMALLOC;
 private:
 	Hashset64Int useditems;
 	Vector<BooleanOrder *> constraints;
 public:
 	Vector<BooleanOrder *> *getConstraints() {return &constraints;}
+	uint getNumUsed() {return constraints.getSize();}
+
 };
 
 #endif

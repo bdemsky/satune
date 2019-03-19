@@ -30,6 +30,11 @@ public:
 	{
 	}
 
+	SetIterator(SetIterator *s) : curr(s->curr),
+		last(s->last),
+		set(s->set) {
+	}
+
 	/** Override: new operator */
 	void *operator new(size_t size) {
 		return ourmalloc(size);

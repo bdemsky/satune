@@ -16,6 +16,8 @@ Order::Order(OrderType _type, Set *_set) :
 
 void Order::addOrderConstraint(BooleanOrder *constraint) {
 	constraints.push(constraint);
+	useditems.add(constraint->first);
+	useditems.add(constraint->second);
 }
 
 void Order::setOrderEncodingType(OrderEncodingType type) {

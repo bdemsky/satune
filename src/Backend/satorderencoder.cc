@@ -121,16 +121,17 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 	model_print("in total order ...\n");
 #endif
 	ASSERT(order->type == SATC_TOTAL);
-	Set *set = order->set;
-	uint size = order->set->getSize();
-	for (uint i = 0; i < size; i++) {
-		uint64_t valueI = set->getElement(i);
-		for (uint j = i + 1; j < size; j++) {
-			uint64_t valueJ = set->getElement(j);
+	SetIterator64Int *iti = order->getUsedIterator();
+	while (iti->hasNext()) {
+		uint64_t valueI = iti->next();
+		SetIterator64Int *itj = new SetIterator64Int(iti);
+		while (itj->hasNext()) {
+			uint64_t valueJ = itj->next();
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			Edge constIJ = getPairConstraint(order, &pairIJ);
-			for (uint k = j + 1; k < size; k++) {
-				uint64_t valueK = set->getElement(k);
+			SetIterator64Int *itk = new SetIterator64Int(itj);
+			while (itk->hasNext()) {
+				uint64_t valueK = itk->next();
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPairConstraint(order, &pairIK);
@@ -227,18 +228,19 @@ void SATEncoder::createAllPartialOrderConstraintsSATEncoder(Order *order) {
 	model_print("in partial order ...\n");
 #endif
 	ASSERT(order->type == SATC_TOTAL);
-	Set *set = order->set;
-	uint size = order->set->getSize();
-	for (uint i = 0; i < size; i++) {
-		uint64_t valueI = set->getElement(i);
-		for (uint j = i + 1; j < size; j++) {
-			uint64_t valueJ = set->getElement(j);
+	SetIterator64Int *iti = order->getUsedIterator();
+	while (iti->hasNext()) {
+		uint64_t valueI = iti->next();
+		SetIterator64Int *itj = new SetIterator64Int(iti);
+		while (itj->hasNext()) {
+			uint64_t valueJ = itj->next();
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			OrderPair pairJI(valueJ, valueI, E_NULL);
 			Edge constIJ = getPartialPairConstraint(order, &pairIJ);
 			Edge constJI = getPartialPairConstraint(order, &pairJI);
-			for (uint k = j + 1; k < size; k++) {
-				uint64_t valueK = set->getElement(k);
+			SetIterator64Int *itk = new SetIterator64Int(itj);
+			while (itk->hasNext()) {
+				uint64_t valueK = itk->next();
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPartialPairConstraint(order, &pairIK);
