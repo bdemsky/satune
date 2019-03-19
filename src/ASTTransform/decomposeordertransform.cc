@@ -88,9 +88,10 @@ void DecomposeOrderTransform::doTransform() {
 
 void DecomposeOrderTransform::decomposeOrder(Order *currOrder, OrderGraph *currGraph, DecomposeOrderResolver *dor) {
 	Vector<Order *> partialcandidatevec;
-	uint size = currOrder->constraints.getSize();
+	Vector<BooleanOrder *> *constraints = currOrder->getConstraints();
+	uint size = constraints->getSize();
 	for (uint i = 0; i < size; i++) {
-		BooleanOrder *orderconstraint = currOrder->constraints.get(i);
+		BooleanOrder *orderconstraint = constraints->get(i);
 		OrderNode *from = currGraph->getOrderNodeFromOrderGraph(orderconstraint->first);
 		OrderNode *to = currGraph->getOrderNodeFromOrderGraph(orderconstraint->second);
 		OrderEdge *edge = currGraph->lookupOrderEdgeFromOrderGraph(from, to);

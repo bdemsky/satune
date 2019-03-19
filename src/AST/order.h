@@ -15,18 +15,21 @@ public:
 	OrderType type;
 	Set *set;
 	OrderGraph *graph;
+	OrderEncoding encoding;
 	Order *clone(CSolver *solver, CloneMap *map);
 	void serialize(Serializer *serializer );
 	void print();
-	Vector<BooleanOrder *> constraints;
-	OrderEncoding encoding;
-
-	void setOrderResolver(OrderResolver *_resolver) { ASSERT(encoding.resolver == NULL); encoding.resolver = _resolver;};
+	void setOrderResolver(OrderResolver *_resolver) { ASSERT(encoding.resolver == NULL); encoding.resolver = _resolver;}
 	void initializeOrderElementsHashtable();
 	void addOrderConstraint(BooleanOrder *constraint);
 	void setOrderEncodingType(OrderEncodingType type);
 	HashtableOrderPair *getOrderPairTable();
 	CMEMALLOC;
+private:
+	Hashset64Int useditems;
+	Vector<BooleanOrder *> constraints;
+public:
+	Vector<BooleanOrder *> *getConstraints() {return &constraints;}
 };
 
 #endif

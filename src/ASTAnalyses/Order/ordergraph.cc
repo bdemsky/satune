@@ -12,9 +12,10 @@ OrderGraph::OrderGraph(Order *_order) :
 OrderGraph *buildOrderGraph(Order *order) {
 	ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
-	uint constrSize = order->constraints.getSize();
+	Vector<BooleanOrder *> *constraints = order->getConstraints();
+	uint constrSize = constraints->getSize();
 	for (uint j = 0; j < constrSize; j++) {
-		orderGraph->addOrderConstraintToOrderGraph(order->constraints.get(j));
+		orderGraph->addOrderConstraintToOrderGraph(constraints->get(j));
 	}
 	return orderGraph;
 }
@@ -23,9 +24,10 @@ OrderGraph *buildOrderGraph(Order *order) {
 OrderGraph *buildMustOrderGraph(Order *order) {
 	ASSERT(order->graph == NULL);
 	OrderGraph *orderGraph = new OrderGraph(order);
-	uint constrSize = order->constraints.getSize();
+	Vector<BooleanOrder *> *constraints = order->getConstraints();
+	uint constrSize = constraints->getSize();
 	for (uint j = 0; j < constrSize; j++) {
-		orderGraph->addMustOrderConstraintToOrderGraph(order->constraints.get(j));
+		orderGraph->addMustOrderConstraintToOrderGraph(constraints->get(j));
 	}
 	return orderGraph;
 }

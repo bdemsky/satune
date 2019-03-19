@@ -35,9 +35,11 @@ void IntegerEncodingTransform::integerEncode(Order *currOrder) {
 	IntegerEncodingRecord *encodingRecord =  new IntegerEncodingRecord(
 		solver->createRangeSet(currOrder->set->getType(), 0, (uint64_t) currOrder->set->getSize() - 1));
 	currOrder->setOrderEncodingType( INTEGERENCODING );
-	uint size = currOrder->constraints.getSize();
+
+	Vector<BooleanOrder *> *constraints = currOrder->getConstraints();
+	uint size = constraints->getSize();
 	for (uint i = 0; i < size; i++) {
-		orderIntegerEncodingSATEncoder(currOrder->constraints.get(i), encodingRecord);
+		orderIntegerEncodingSATEncoder(constraints->get(i), encodingRecord);
 	}
 	currOrder->setOrderResolver(new IntegerEncOrderResolver(solver, encodingRecord));
 	solver->getActiveOrders()->remove(currOrder);
