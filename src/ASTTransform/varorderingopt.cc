@@ -26,7 +26,7 @@ VarOrderingOpt::~VarOrderingOpt() {
 }
 
 void VarOrderingOpt::doTransform() {
-	if(solver->isUnSAT()){
+	if (solver->isUnSAT()) {
 		return;
 	}
 	BooleanVarOrdering direction = (BooleanVarOrdering)solver->getTuner()->getTunable(VARIABLEORDER, &boolVarOrderingDesc);

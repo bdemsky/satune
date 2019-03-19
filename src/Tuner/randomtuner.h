@@ -6,7 +6,7 @@
 #include "basictuner.h"
 
 /**
- * This is a Tuner which is being used for 
+ * This is a Tuner which is being used for
  */
 class RandomTuner : public BasicTuner {
 public:
@@ -14,7 +14,7 @@ public:
 	virtual ~RandomTuner();
 	void tune();
 protected:
-        bool randomMutation(SearchTuner *tuner);        
+	bool randomMutation(SearchTuner *tuner);
 	TunerRecord *tune(SearchTuner *tuner);
 };
 

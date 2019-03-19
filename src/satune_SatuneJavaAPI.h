@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createCCSolver
-  (JNIEnv *, jobject);
+	(JNIEnv *, jobject);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -21,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createCCSolver
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_deleteCCSolver
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 
 /*
@@ -30,7 +30,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_deleteCCSolver
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_resetCCSolver
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -38,7 +38,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_resetCCSolver
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createSet
-  (JNIEnv *, jobject, jlong, jint, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -46,7 +46,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createSet
  * Signature: (JIJJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createRangeSet
-  (JNIEnv *, jobject, jlong, jint, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jint, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -54,7 +54,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createRangeSet
  * Signature: (JIJJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createRangeVar
-  (JNIEnv *, jobject, jlong, jint, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jint, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -62,7 +62,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createRangeVar
  * Signature: (JI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createMutableSet
-  (JNIEnv *, jobject, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -70,7 +70,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createMutableSet
  * Signature: (JJJ)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_addItem
-  (JNIEnv *, jobject, jlong, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -78,7 +78,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_addItem
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_finalizeMutableSet
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -86,7 +86,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_finalizeMutableSet
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementVar
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -94,7 +94,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementVar
  * Signature: (JIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementConst
-  (JNIEnv *, jobject, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jint, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -102,7 +102,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementConst
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementRange
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -110,7 +110,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementRange
  * Signature: (JI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getBooleanVar
-  (JNIEnv *, jobject, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -118,7 +118,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getBooleanVar
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getBooleanTrue
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -126,7 +126,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getBooleanTrue
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getBooleanFalse
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -134,7 +134,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getBooleanFalse
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createFunctionOperator
-  (JNIEnv *, jobject, jlong, jint, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -142,7 +142,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createFunctionOperator
  * Signature: (JI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createPredicateOperator
-  (JNIEnv *, jobject, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -150,7 +150,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createPredicateOperator
  * Signature: (JJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createPredicateTable
-  (JNIEnv *, jobject, jlong, jlong, jint);
+	(JNIEnv *, jobject, jlong, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -158,7 +158,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createPredicateTable
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createTable
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -166,7 +166,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createTable
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createTableForPredicate
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -174,7 +174,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createTableForPredicate
  * Signature: (JJJIJ)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_addTableEntry
-  (JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -182,7 +182,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_addTableEntry
  * Signature: (JJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_completeTable
-  (JNIEnv *, jobject, jlong, jlong, jint);
+	(JNIEnv *, jobject, jlong, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -190,7 +190,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_completeTable
  * Signature: (JJJIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyFunction
-  (JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -198,7 +198,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyFunction
  * Signature: (JJJIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicateTable
-  (JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -206,7 +206,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicateTable
  * Signature: (JJJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicate
-  (JNIEnv *, jobject, jlong, jlong, jlong, jint);
+	(JNIEnv *, jobject, jlong, jlong, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -214,7 +214,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicate
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperation
-  (JNIEnv *, jobject, jlong, jint, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -222,7 +222,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperation
  * Signature: (JIJJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperationTwo
-  (JNIEnv *, jobject, jlong, jint, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jint, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -230,7 +230,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperationTwo
  * Signature: (JIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperationOne
-  (JNIEnv *, jobject, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jint, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -238,7 +238,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperationOne
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_addConstraint
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -246,7 +246,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_addConstraint
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_printConstraint
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -254,7 +254,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_printConstraint
  * Signature: (JIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createOrder
-  (JNIEnv *, jobject, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jint, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -262,7 +262,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createOrder
  * Signature: (JJJJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_orderConstraint
-  (JNIEnv *, jobject, jlong, jlong, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -270,7 +270,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_orderConstraint
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_solve
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -278,7 +278,7 @@ JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_solve
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementValue
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -286,7 +286,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementValue
  * Signature: (JJ)I
  */
 JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_getBooleanValue
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -294,7 +294,7 @@ JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_getBooleanValue
  * Signature: (JJJJ)I
  */
 JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_getOrderConstraintValue
-  (JNIEnv *, jobject, jlong, jlong, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -302,7 +302,7 @@ JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_getOrderConstraintValue
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_printConstraints
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -310,7 +310,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_printConstraints
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_serialize
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -318,7 +318,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_serialize
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_mustHaveValue
-  (JNIEnv *, jobject, jlong, jlong);
+	(JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -326,7 +326,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_mustHaveValue
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_setInterpreter
-  (JNIEnv *, jobject, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -334,7 +334,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_setInterpreter
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_clone
-  (JNIEnv *, jobject, jlong);
+	(JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

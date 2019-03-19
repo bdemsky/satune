@@ -35,7 +35,7 @@ int SATEncoder::solve(long timeout) {
 }
 
 void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
-	if(csolver->isUnSAT()){
+	if (csolver->isUnSAT()) {
 		return;
 	}
 	SetIteratorBooleanEdge *iterator = csolver->getConstraints();

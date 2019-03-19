@@ -13,7 +13,7 @@ public:
 	void tune();
 	void findBestThreeTuners();
 protected:
-	
+
 };
 
 inline long long min(long long num1, long long num2, long long num3) {

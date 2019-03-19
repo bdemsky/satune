@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   basictuner.cc
  * Author: hamed
- * 
+ *
  * Created on December 17, 2018, 2:02 PM
  */
 
@@ -38,7 +38,7 @@ void TunerRecord::setTime(Problem *problem, long long time) {
 	timetaken.put(problem, time);
 }
 
-void TunerRecord::print(){
+void TunerRecord::print() {
 	model_print("*************TUNER NUMBER=%d***********\n", tunernumber);
 	tuner->print();
 	model_print("&&&&&&&&&&&&&USED SETTINGS &&&&&&&&&&&&\n");
@@ -46,7 +46,7 @@ void TunerRecord::print(){
 	model_print("\n");
 }
 
-void TunerRecord::printProblemsInfo(){
+void TunerRecord::printProblemsInfo() {
 	for (uint j = 0; j < problems.getSize(); j++) {
 		Problem *problem = problems.get(j);
 		model_print("Problem %s\n", problem->getProblem());
@@ -70,7 +70,7 @@ TunerRecord *TunerRecord::changeTuner(SearchTuner *_newtuner) {
 
 
 BasicTuner::BasicTuner(uint _budget, uint _timeout) :
-	budget(_budget), timeout(_timeout), execnum(0){
+	budget(_budget), timeout(_timeout), execnum(0) {
 }
 
 BasicTuner::~BasicTuner() {
@@ -102,10 +102,10 @@ void BasicTuner::printData() {
 	}
 }
 
-bool BasicTuner::tunerExists(TunerRecord *tunerec){
+bool BasicTuner::tunerExists(TunerRecord *tunerec) {
 	SearchTuner *tuner = tunerec->getTuner();
-	for(uint i=0; i< explored.getSize(); i++){
-		if(explored.get(i)->getTuner()->equalUsed(tuner)){
+	for (uint i = 0; i < explored.getSize(); i++) {
+		if (explored.get(i)->getTuner()->equalUsed(tuner)) {
 			model_print("************Tuner <%d> is replicate of Tuner <%d>\n", tunerec->getTunerNumber(), explored.get(i)->getTunerNumber());
 			return true;
 		}
@@ -209,10 +209,10 @@ SearchTuner *BasicTuner::mutateTuner(SearchTuner *oldTuner, uint k) {
 	return newTuner;
 }
 
-int BasicTuner::subTunerIndex(SearchTuner *newTuner){
-	for (uint i=0; i< explored.getSize(); i++){
+int BasicTuner::subTunerIndex(SearchTuner *newTuner) {
+	for (uint i = 0; i < explored.getSize(); i++) {
 		SearchTuner *tuner = explored.get(i)->getTuner();
-		if(tuner->isSubTunerof(newTuner)){
+		if (tuner->isSubTunerof(newTuner)) {
 			return i;
 		}
 	}

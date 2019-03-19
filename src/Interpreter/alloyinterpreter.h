@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 
-class AlloyInterpreter: public Interpreter{
+class AlloyInterpreter : public Interpreter {
 public:
 	AlloyInterpreter(CSolver *solver);
 	virtual ValuedSignature *getBooleanSignature(uint id);
@@ -18,7 +18,7 @@ protected:
 	virtual void dumpFooter();
 	virtual void dumpHeader();
 	int getAlloyIntScope();
-	virtual void compileRunCommand(char * command , size_t size);
+	virtual void compileRunCommand(char *command, size_t size);
 	virtual int getResult();
 	virtual void dumpAllConstraints(Vector<char *> &facts);
 	virtual string negateConstraint(string constr);

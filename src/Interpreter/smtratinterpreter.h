@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   smtratinterpreter.h
  * Author: hamed
  *
@@ -15,13 +15,13 @@
 #define SMTRATINTERPRETER_H
 #include "smtinterpreter.h"
 
-class SMTRatInterpreter: public SMTInterpreter{
+class SMTRatInterpreter : public SMTInterpreter {
 public:
 	SMTRatInterpreter(CSolver *solver);
 	virtual ~SMTRatInterpreter();
 protected:
-	void compileRunCommand(char * command , size_t size);
+	void compileRunCommand(char *command, size_t size);
 };
 
-#endif /* SMTRATINTERPRETER_H */
+#endif/* SMTRATINTERPRETER_H */
 

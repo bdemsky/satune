@@ -28,7 +28,7 @@ DecomposeOrderTransform::~DecomposeOrderTransform() {
 }
 
 void DecomposeOrderTransform::doTransform() {
-	if(solver->isUnSAT())
+	if (solver->isUnSAT())
 		return;
 	HashsetOrder *orders = solver->getActiveOrders()->copy();
 	SetIteratorOrder *orderit = orders->iterator();
@@ -331,11 +331,11 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), source->getID(), node->getID());
 		updateEdgePolarity(benew, be);
 		if (solver->isTrue(benew))
-		  solver->replaceBooleanWithTrue(be);
+			solver->replaceBooleanWithTrue(be);
 		else if (solver->isFalse(benew))
-		  solver->replaceBooleanWithFalse(be);
+			solver->replaceBooleanWithFalse(be);
 		else
-		  solver->replaceBooleanWithBoolean(be, benew);
+			solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->inEdges.reset();
 	delete inedgeit;
@@ -366,11 +366,11 @@ void DecomposeOrderTransform::mergeNodes(OrderGraph *graph, OrderNode *node, Ord
 		BooleanEdge benew = solver->orderConstraint(graph->getOrder(), node->getID(), sink->getID());
 		updateEdgePolarity(benew, be);
 		if (solver->isTrue(benew))
-		  solver->replaceBooleanWithTrue(be);
+			solver->replaceBooleanWithTrue(be);
 		else if (solver->isFalse(benew))
-		  solver->replaceBooleanWithFalse(be);
+			solver->replaceBooleanWithFalse(be);
 		else
-		  solver->replaceBooleanWithBoolean(be, benew);
+			solver->replaceBooleanWithBoolean(be, benew);
 	}
 	dstnode->outEdges.reset();
 	delete outedgeit;

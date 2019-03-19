@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   TunableDependent.h
  * Author: hamed
  *
@@ -18,12 +18,12 @@
 
 class TunableDependent {
 public:
-        TunableDependent(Tunables dependent, Tunables parent = (Tunables) -1);
-        TunableDependent(TunableDependent &setting);
-        virtual ~TunableDependent();
-        Tunables dependent;
-        Tunables parent;
+	TunableDependent(Tunables dependent, Tunables parent = (Tunables) - 1);
+	TunableDependent(TunableDependent &setting);
+	virtual ~TunableDependent();
+	Tunables dependent;
+	Tunables parent;
 };
 
-#endif /* TUNABLEDEPENDENT_H */
+#endif/* TUNABLEDEPENDENT_H */
 

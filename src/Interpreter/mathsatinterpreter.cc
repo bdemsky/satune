@@ -4,48 +4,48 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   smtsolvers.cc
  * Author: hamed
- * 
+ *
  * Created on February 21, 2019, 12:26 PM
  */
 
 #include "mathsatinterpreter.h"
 #include "solver_interface.h"
 
-MathSATInterpreter::MathSATInterpreter(CSolver *solver):
+MathSATInterpreter::MathSATInterpreter(CSolver *solver) :
 	SMTInterpreter(solver)
-{	
+{
 }
 
-void MathSATInterpreter::compileRunCommand(char * command , size_t size){
+void MathSATInterpreter::compileRunCommand(char *command, size_t size) {
 	model_print("Calling MathSAT...\n");
 	snprintf(command, size, "./run.sh timeout %u mathsat -model %s > %s", getTimeout(), SMTFILENAME, SMTSOLUTIONFILE);
 }
 
-MathSATInterpreter::~MathSATInterpreter(){
+MathSATInterpreter::~MathSATInterpreter() {
 }
 
-int MathSATInterpreter::getResult(){
+int MathSATInterpreter::getResult() {
 	ifstream input(SMTSOLUTIONFILE, ios::in);
 	string line;
-	while(getline(input, line)){
-		if(line.find("unsat")!= line.npos){
+	while (getline(input, line)) {
+		if (line.find("unsat") != line.npos) {
 			return IS_UNSAT;
 		}
-		if(line.find("(") != line.npos){
-			char cline [line.size()+1];
+		if (line.find("(") != line.npos) {
+			char cline [line.size() + 1];
 			strcpy ( cline, line.c_str() );
 			char valuestr [512];
 			uint id;
-			if (2 == sscanf(cline,"%*[^0123456789]%u %s", &id, valuestr)){
+			if (2 == sscanf(cline,"%*[^0123456789]%u %s", &id, valuestr)) {
 				uint value;
-				if (strcmp (valuestr, "true)") == 0 ){
-					value =1;
-				}else if (strcmp(valuestr, "false)") == 0){
+				if (strcmp (valuestr, "true)") == 0 ) {
+					value = 1;
+				} else if (strcmp(valuestr, "false)") == 0) {
 					value = 0;
-				}else {
+				} else {
 					ASSERT(2 == sscanf(cline, "%*[^0123456789]%u%*[^0123456789]%u", &id, &value));
 				}
 

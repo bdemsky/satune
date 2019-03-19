@@ -43,7 +43,7 @@ public:
 	void setVarTunable(VarType vartype, TunableParam param, TunableDesc *descriptor, uint value);
 	void setVarTunable(VarType vartype1, VarType vartype2, TunableParam param, TunableDesc *descriptor, uint value);
 	SearchTuner *copyUsed();
-        bool isSubTunerof(SearchTuner *newTuner);
+	bool isSubTunerof(SearchTuner *newTuner);
 	void randomMutate();
 	uint getSize() { return usedSettings.getSize();}
 	void print();
@@ -51,7 +51,7 @@ public:
 	void serialize(const char *file);
 	void serializeUsed(const char *file);
 	void addUsed(const char *file);
-        bool equalUsed(SearchTuner *tuner);
+	bool equalUsed(SearchTuner *tuner);
 	CMEMALLOC;
 protected:
 	/** Used Settings keeps track of settings that were actually used by

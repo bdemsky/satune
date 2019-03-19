@@ -5,9 +5,9 @@
 #include "basictuner.h"
 
 /**
-*This tuner has the simulated annealing in its core
-*
-*/
+ * This tuner has the simulated annealing in its core
+ *
+ */
 class SATuner : public BasicTuner {
 public:
 	SATuner(uint budget, uint timeout);

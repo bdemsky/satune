@@ -4,30 +4,30 @@
 #include "signature.h"
 #include "interpreter.h"
 
-SignatureEnc::SignatureEnc(Interpreter *inter): 
+SignatureEnc::SignatureEnc(Interpreter *inter) :
 	interpreter(inter),
 	maxValue(0)
 {
 }
 
-SignatureEnc::~SignatureEnc(){
-	for(uint i=0; i<signatures.getSize(); i++){
+SignatureEnc::~SignatureEnc() {
+	for (uint i = 0; i < signatures.getSize(); i++) {
 		Signature *s = signatures.get(i);
 		delete s;
 	}
 }
 
-void SignatureEnc::updateMaxValue(Set *set){
-	for(uint i=0; i< set->getSize(); i++){
-		if(set->getElement(i) > maxValue){
+void SignatureEnc::updateMaxValue(Set *set) {
+	for (uint i = 0; i < set->getSize(); i++) {
+		if (set->getElement(i) > maxValue) {
 			maxValue = set->getElement(i);
 		}
 	}
 }
 
-ValuedSignature *SignatureEnc::getBooleanSignature(Boolean *bvar){
+ValuedSignature *SignatureEnc::getBooleanSignature(Boolean *bvar) {
 	ValuedSignature *bsig = (ValuedSignature *)encoded.get((void *)bvar);
-	if(bsig == NULL){
+	if (bsig == NULL) {
 		bsig = interpreter->getBooleanSignature(getUniqueSigID());
 		encoded.put(bvar, bsig);
 		signatures.push(bsig);
@@ -36,12 +36,12 @@ ValuedSignature *SignatureEnc::getBooleanSignature(Boolean *bvar){
 	return bsig;
 }
 
-ValuedSignature *SignatureEnc::getElementSignature(Element *element){
+ValuedSignature *SignatureEnc::getElementSignature(Element *element) {
 	ValuedSignature *esig = (ValuedSignature *)encoded.get((void *)element);
-	if(esig == NULL){
+	if (esig == NULL) {
 		Set *set = element->getRange();
 		Signature *ssig = (Signature *)encoded.get((void *)set);
-		if(ssig == NULL){
+		if (ssig == NULL) {
 			ssig = interpreter->getSetSignature(getUniqueSigID(), set);
 			encoded.put(set, ssig);
 			signatures.push(ssig);
@@ -57,13 +57,13 @@ ValuedSignature *SignatureEnc::getElementSignature(Element *element){
 	return esig;
 }
 
-void SignatureEnc::setValue(uint id, uint value){
+void SignatureEnc::setValue(uint id, uint value) {
 	ValuedSignature *sig = getValuedSignature(id);
 	ASSERT(sig != NULL);
 	sig->setValue(value);
 }
 
-int SignatureEnc::getValue(void *astnode){
+int SignatureEnc::getValue(void *astnode) {
 	ValuedSignature *sig = (ValuedSignature *)encoded.get(astnode);
 	ASSERT(sig != NULL);
 	return sig->getValue();

@@ -8,7 +8,7 @@
 #include <fstream>
 using namespace std;
 
-class Interpreter{
+class Interpreter {
 public:
 	Interpreter(CSolver *solver);
 	void encode();
@@ -24,7 +24,7 @@ protected:
 	virtual void dumpFooter() = 0;
 	virtual void dumpHeader() = 0;
 	uint getTimeout();
-	virtual void compileRunCommand(char * command, size_t size) = 0;
+	virtual void compileRunCommand(char *command, size_t size) = 0;
 	string encodeConstraint(BooleanEdge constraint);
 	virtual int getResult() = 0;
 	virtual string negateConstraint(string constr) = 0;
