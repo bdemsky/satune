@@ -10,6 +10,10 @@ void deleteCCSolver(void *solver) {
 	delete CCSOLVER(solver);
 }
 
+void resetCCSolver(void *solver) {
+	CCSOLVER(solver)->resetSolver();
+}
+
 void *createSet(void *solver,unsigned int type, long *elements, unsigned int num) {
 	return CCSOLVER(solver)->createSet((VarType) type, (uint64_t *)elements, (uint) num);
 }
@@ -48,6 +52,14 @@ void *getElementRange (void *solver,void *element) {
 
 void *getBooleanVar(void *solver,unsigned int type) {
 	return CCSOLVER(solver)->getBooleanVar((VarType) type).getRaw();
+}
+
+void *getBooleanTrue(void *solver){
+	return CCSOLVER(solver)->getBooleanTrue().getRaw();
+}
+
+void *getBooleanFalse(void *solver){
+	return CCSOLVER(solver)->getBooleanFalse().getRaw();
 }
 
 void *createFunctionOperator(void *solver,unsigned int op, void *range,unsigned int overflowbehavior) {
@@ -104,6 +116,10 @@ void *applyLogicalOperationOne(void *solver,unsigned int op, void *arg) {
 
 void addConstraint(void *solver,void *constraint) {
 	CCSOLVER(solver)->addConstraint(BooleanEdge((Boolean *) constraint));
+}
+
+void printConstraint(void *solver,void *constraint) {
+	CCSOLVER(solver)->printConstraint(BooleanEdge((Boolean *) constraint));
 }
 
 void *createOrder(void *solver,unsigned int type, void *set) {

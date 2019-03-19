@@ -8,6 +8,7 @@ extern "C" {
 #endif
 void *createCCSolver();
 void deleteCCSolver(void *solver);
+void resetCCSolver(void *solver);
 void *createSet(void *solver,unsigned int type, long *elements, unsigned int num);
 void *createRangeSet(void *solver,unsigned int type, long lowrange, long highrange);
 void *createRangeVar(void *solver,unsigned int type, long lowrange, long highrange);
@@ -18,6 +19,8 @@ void *getElementVar(void *solver,void *set);
 void *getElementConst(void *solver,unsigned int type, long value);
 void *getElementRange (void *solver,void *element);
 void *getBooleanVar(void *solver,unsigned int type);
+void *getBooleanTrue(void *solver);
+void *getBooleanFalse(void *solver);
 void *createFunctionOperator(void *solver,unsigned int op, void *range,unsigned int overflowbehavior);
 void *createPredicateOperator(void *solver,unsigned int op);
 void *createPredicateTable(void *solver,void *table, unsigned int behavior);
@@ -32,6 +35,7 @@ void *applyLogicalOperation(void *solver,unsigned int op, void *array, unsigned 
 void *applyLogicalOperationTwo(void *solver,unsigned int op, void *arg1, void *arg2);
 void *applyLogicalOperationOne(void *solver,unsigned int op, void *arg);
 void addConstraint(void *solver,void *constraint);
+void printConstraint(void *solver,void *constraint);
 void *createOrder(void *solver,unsigned int type, void *set);
 void *orderConstraint(void *solver,void *order, long first, long second);
 int solve(void *solver);
