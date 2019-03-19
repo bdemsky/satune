@@ -17,7 +17,7 @@ ElementOpt::~ElementOpt() {
 }
 
 void ElementOpt::doTransform() {
-	if (solver->getTuner()->getTunable(ELEMENTOPT, &onoff) == 0)
+	if (solver->isUnSAT() || solver->getTuner()->getTunable(ELEMENTOPT, &onoff) == 0)
 		return;
 
 	//Set once we know we are going to use it.

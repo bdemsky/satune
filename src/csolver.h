@@ -126,7 +126,7 @@ public:
 
 	/** When everything is done, the client calls this function and then csolver starts to encode*/
 	int solve();
-
+	
 	/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 	uint64_t getElementValue(Element *element);
 

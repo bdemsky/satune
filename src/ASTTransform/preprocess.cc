@@ -13,7 +13,7 @@ Preprocess::~Preprocess() {
 }
 
 void Preprocess::doTransform() {
-	if (!solver->isBooleanVarUsed() || solver->getTuner()->getTunable(PREPROCESS, &onoff) == 0)
+	if (solver->isUnSAT() || !solver->isBooleanVarUsed() || solver->getTuner()->getTunable(PREPROCESS, &onoff) == 0)
 		return;
 
 	BooleanIterator bit(solver);

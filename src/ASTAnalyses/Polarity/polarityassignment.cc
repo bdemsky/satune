@@ -2,6 +2,9 @@
 #include "csolver.h"
 
 void computePolarities(CSolver *This) {
+	if(This->isUnSAT()){
+		return;
+	}
 	SetIteratorBooleanEdge *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge boolean = iterator->next();

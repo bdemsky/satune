@@ -8,13 +8,13 @@ int main(int argc, char **argv) {
 	}
 	for (int i = 1; i < argc; i++) {
 		CSolver *solver = CSolver::deserialize(argv[i]);
+		solver->printConstraints();
 		int value = solver->solve();
 		if (value == 1) {
 			printf("%s is SAT\n", argv[i]);
 		} else {
 			printf("%s is UNSAT\n", argv[i]);
 		}
-		solver->printConstraints();
 
 		delete solver;
 	}

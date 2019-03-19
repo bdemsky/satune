@@ -17,6 +17,9 @@ IntegerEncodingTransform::~IntegerEncodingTransform() {
 }
 
 void IntegerEncodingTransform::doTransform() {
+	if(solver->isUnSAT()){
+		return;
+	}
 	HashsetOrder *orders = solver->getActiveOrders()->copy();
 	SetIteratorOrder *orderit = orders->iterator();
 	while (orderit->hasNext()) {

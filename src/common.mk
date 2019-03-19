@@ -5,7 +5,7 @@ CXX := g++
 JAVAC := javac
 
 UNAME := $(shell uname)
-JAVA_INC := /usr/lib/jvm/java-1.8.0-openjdk-amd64/include/
+JAVA_INC := /usr/lib/jvm/default-java/include/
 LIB_NAME := cons_comp
 LIB_SO := lib_$(LIB_NAME).so
 

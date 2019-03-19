@@ -15,6 +15,9 @@
 #include <strings.h>
 
 void naiveEncodingDecision(CSolver *This) {
+	if(This->isUnSAT()){
+		return;
+	}
 	SetIteratorBooleanEdge *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge b = iterator->next();

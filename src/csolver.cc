@@ -605,6 +605,9 @@ void CSolver::inferFixedOrders() {
 }
 
 int CSolver::solve() {
+	if(isUnSAT()){
+		return IS_UNSAT;
+	}
 	long long startTime = getTimeNano();
 	bool deleteTuner = false;
 	if (tuner == NULL) {
@@ -660,7 +663,7 @@ int CSolver::solve() {
 
 		time2 = getTimeNano();
 		model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
-
+		
 		satEncoder->encodeAllSATEncoder(this);
 		time1 = getTimeNano();
 
