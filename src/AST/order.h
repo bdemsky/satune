@@ -24,7 +24,6 @@ public:
 	void addOrderConstraint(BooleanOrder *constraint);
 	void setOrderEncodingType(OrderEncodingType type);
 	HashtableOrderPair *getOrderPairTable();
-	SetIterator64Int *getUsedIterator();
 	CMEMALLOC;
 private:
 	Hashset64Int useditems;
@@ -32,6 +31,7 @@ private:
 public:
 	Vector<BooleanOrder *> *getConstraints() {return &constraints;}
 	uint getNumUsed() {return constraints.getSize();}
+	SetIterator64Int *getUsedIterator() {return useditems.iterator();}
 
 };
 
