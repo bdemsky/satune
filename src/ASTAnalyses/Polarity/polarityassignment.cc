@@ -2,7 +2,7 @@
 #include "csolver.h"
 
 void computePolarities(CSolver *This) {
-	if(This->isUnSAT()){
+	if (This->isUnSAT()) {
 		return;
 	}
 	SetIteratorBooleanEdge *iterator = This->getConstraints();

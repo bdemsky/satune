@@ -5,20 +5,20 @@
 #include "comptuner.h"
 #include "randomtuner.h"
 
-void printKnownTunerTypes(){
+void printKnownTunerTypes() {
 	printf("Known Tuner Types:\nRandom Tuner=1\nComp Tuner=2\nKmeans Tuner=3\nSimulated Annealing Tuner=4\n");
 }
 
-BasicTuner *createTuner(uint tunertype, uint budget, uint rounds, uint timeout){
-	switch(tunertype){
-		case 1: return new RandomTuner(budget, timeout);
-		case 2: return new CompTuner(budget, timeout);
-		case 3: return new KMeansTuner(budget, rounds, timeout);
-		case 4: return new SATuner(budget, timeout);
-		default:
-			printf("Tuner type %u is unknown\n", tunertype);
-			printKnownTunerTypes();
-			exit(-1);
+BasicTuner *createTuner(uint tunertype, uint budget, uint rounds, uint timeout) {
+	switch (tunertype) {
+	case 1: return new RandomTuner(budget, timeout);
+	case 2: return new CompTuner(budget, timeout);
+	case 3: return new KMeansTuner(budget, rounds, timeout);
+	case 4: return new SATuner(budget, timeout);
+	default:
+		printf("Tuner type %u is unknown\n", tunertype);
+		printKnownTunerTypes();
+		exit(-1);
 	}
 
 }
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 			else
 				multituner->addProblem(argv[i]);
 		} else
-			multituner->addTuner(new SearchTuner(argv[i], true )); //add settings to usedsettigs
+			multituner->addTuner(new SearchTuner(argv[i], true ));//add settings to usedsettigs
 	}
 
 	if (!tunerfiles) {

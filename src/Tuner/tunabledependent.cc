@@ -4,16 +4,16 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   TunableDependent.cc
  * Author: hamed
- * 
+ *
  * Created on October 5, 2018, 11:26 AM
  */
 
 #include "tunabledependent.h"
 
-TunableDependent::TunableDependent(Tunables dependent, Tunables parent):
+TunableDependent::TunableDependent(Tunables dependent, Tunables parent) :
 	dependent(dependent),
 	parent(parent)
 {

@@ -33,7 +33,7 @@ BooleanOrder::BooleanOrder(Order *_order, uint64_t _first, uint64_t _second) :
 }
 
 void BooleanOrder::updateParents() {
-	order->constraints.push(this);
+	order->addOrderConstraint(this);
 }
 
 BooleanPredicate::BooleanPredicate(Predicate *_predicate, Element **_inputs, uint _numInputs, BooleanEdge _undefinedStatus) :

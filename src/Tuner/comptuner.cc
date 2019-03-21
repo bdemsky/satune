@@ -11,8 +11,8 @@ CompTuner::CompTuner(uint _budget, uint _timeout) :
 {
 }
 
-CompTuner::~CompTuner(){
-	
+CompTuner::~CompTuner() {
+
 }
 
 void CompTuner::findBestThreeTuners() {
@@ -127,12 +127,12 @@ void CompTuner::tune() {
 		model_print("Round %u of %u\n", b, budget);
 		Hashtable<TunerRecord *, int, uint64_t> scores;
 		Vector<Vector<TunerRecord *> *> allplaces;
-		for(uint ii=0; ii< problems.getSize(); ii++){
+		for (uint ii = 0; ii < problems.getSize(); ii++) {
 			allplaces.push(new Vector<TunerRecord *>());
 		}
 		for (uint j = 0; j < tunerV->getSize(); j++) {
 			TunerRecord *tuner = tunerV->get(j);
-			
+
 			for (uint i = 0; i < problems.getSize(); i++) {
 				Vector<TunerRecord *> *places = allplaces.get(i);
 				Problem *problem = problems.get(i);
@@ -148,8 +148,8 @@ void CompTuner::tune() {
 						tuner->setTime(problem, metric);
 					else
 						tuner->setTime(problem, -2);
-					
-					if(tunerExists(tuner)){
+
+					if (tunerExists(tuner)) {
 						//Solving the problem and noticing the tuner
 						//already exists
 						tuner->setDuplicate(true);
@@ -167,13 +167,13 @@ void CompTuner::tune() {
 				}
 			}
 		}
-		for(uint ii=0; ii < problems.getSize(); ii++){
+		for (uint ii = 0; ii < problems.getSize(); ii++) {
 			Problem *problem = problems.get(ii);
 			Vector<TunerRecord *> *places = allplaces.get(ii);
 			int points = 9;
 			for (uint k = 0; k < places->getSize() && points; k++) {
 				TunerRecord *tuner = places->get(k);
-				if(tuner->isDuplicate()){
+				if (tuner->isDuplicate()) {
 					continue;
 				}
 				int currScore = 0;
@@ -186,7 +186,7 @@ void CompTuner::tune() {
 				points = points / 3;
 			}
 		}
-		for(uint ii=0; ii< problems.getSize(); ii++){
+		for (uint ii = 0; ii < problems.getSize(); ii++) {
 			delete allplaces.get(ii);
 		}
 		Vector<TunerRecord *> ranking;
@@ -220,7 +220,7 @@ void CompTuner::tune() {
 		uint tSize = tunerV->getSize();
 		for (uint i = 0; i < tSize; i++) {
 			SearchTuner *tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);
-			while(subTunerIndex(tmpTuner) != -1){
+			while (subTunerIndex(tmpTuner) != -1) {
 				model_print("******** New Tuner already explored...\n");
 				delete tmpTuner;
 				tmpTuner = mutateTuner(tunerV->get(i)->getTuner(), b);

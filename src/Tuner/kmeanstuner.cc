@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   kmeanstuner.cc
  * Author: hamed
- * 
+ *
  * Created on December 19, 2018, 4:16 PM
  */
 
@@ -16,7 +16,7 @@
 #include "searchtuner.h"
 #include "math.h"
 
-KMeansTuner::KMeansTuner(uint budget, uint _rounds, uint timeout) : 
+KMeansTuner::KMeansTuner(uint budget, uint _rounds, uint timeout) :
 	BasicTuner(budget, timeout),
 	rounds(_rounds) {
 }

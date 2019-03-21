@@ -13,13 +13,13 @@ public:
 	ValuedSignature *getElementSignature(Element *element);
 	ValuedSignature *getBooleanSignature(Boolean *bvar);
 	int getValue(void *astnode);
-	uint64_t getMaxValue(){ return maxValue;}
+	uint64_t getMaxValue() { return maxValue;}
 private:
-	ValuedSignature *getValuedSignature(uint uniqueID){return (ValuedSignature*)signatures.get(uniqueID-1);}
-	uint getUniqueSigID(){return signatures.getSize() +1;}
+	ValuedSignature *getValuedSignature(uint uniqueID) {return (ValuedSignature *)signatures.get(uniqueID - 1);}
+	uint getUniqueSigID() {return signatures.getSize() + 1;}
 	void updateMaxValue(Set *set);
 	CloneMap encoded;
-	Vector<Signature*> signatures;
+	Vector<Signature *> signatures;
 	Interpreter *interpreter;
 	uint64_t maxValue;
 };

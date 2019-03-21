@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   mathsatinterpreter.h
  * Author: hamed
  *
@@ -17,15 +17,15 @@
 #include "smtinterpreter.h"
 
 
-class MathSATInterpreter: public SMTInterpreter{
+class MathSATInterpreter : public SMTInterpreter {
 public:
 	MathSATInterpreter(CSolver *solver);
 	virtual ~MathSATInterpreter();
 protected:
-	virtual void compileRunCommand(char * command , size_t size);
+	virtual void compileRunCommand(char *command, size_t size);
 	virtual int getResult();
 };
 
 
-#endif /* SMTSOLVERS_H */
+#endif/* SMTSOLVERS_H */
 

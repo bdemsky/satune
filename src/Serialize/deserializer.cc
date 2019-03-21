@@ -29,7 +29,7 @@ Deserializer::Deserializer(const char *file, InterpreterType itype) :
 	if (filedesc < 0) {
 		exit(-1);
 	}
-	if(itype != SATUNE){
+	if (itype != SATUNE) {
 		solver->setInterpreter(itype);
 	}
 }

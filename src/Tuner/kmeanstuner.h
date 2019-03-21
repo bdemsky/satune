@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   kmeanstuner.h
  * Author: hamed
  *
@@ -30,5 +30,5 @@ private:
 	uint rounds;
 };
 
-#endif /* KMEANSTUNER_H */
+#endif/* KMEANSTUNER_H */
 

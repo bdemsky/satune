@@ -20,6 +20,7 @@ public:
 	void print();
 	Vector<BooleanOrder *> constraints;
 	OrderEncoding encoding;
+
 	void setOrderResolver(OrderResolver *_resolver) { ASSERT(encoding.resolver == NULL); encoding.resolver = _resolver;};
 	void initializeOrderElementsHashtable();
 	void addOrderConstraint(BooleanOrder *constraint);

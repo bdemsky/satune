@@ -54,11 +54,11 @@ void *getBooleanVar(void *solver,unsigned int type) {
 	return CCSOLVER(solver)->getBooleanVar((VarType) type).getRaw();
 }
 
-void *getBooleanTrue(void *solver){
+void *getBooleanTrue(void *solver) {
 	return CCSOLVER(solver)->getBooleanTrue().getRaw();
 }
 
-void *getBooleanFalse(void *solver){
+void *getBooleanFalse(void *solver) {
 	return CCSOLVER(solver)->getBooleanFalse().getRaw();
 }
 
@@ -160,7 +160,7 @@ void mustHaveValue(void *solver, void *element) {
 	CCSOLVER(solver)->mustHaveValue( (Element *) element);
 }
 
-void setInterpreter(void *solver, unsigned int type){
+void setInterpreter(void *solver, unsigned int type) {
 	CCSOLVER(solver)->setInterpreter((InterpreterType)type);
 }
 

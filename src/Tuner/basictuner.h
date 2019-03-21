@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   basictuner.h
  * Author: hamed
  *
@@ -25,11 +25,11 @@ class Problem {
 public:
 	Problem(const char *problem);
 	char *getProblem() {return problem;}
-	inline int getResult(){return result;}
-	inline int getProblemNumber(){return problemnumber;}
-	inline void setResult(int res){result = res;}
-	inline void setProblemNumber(int probNum){problemnumber = probNum;}
-	inline long long getBestTime() {return besttime ;} 
+	inline int getResult() {return result;}
+	inline int getProblemNumber() {return problemnumber;}
+	inline void setResult(int res) {result = res;}
+	inline void setProblemNumber(int probNum) {problemnumber = probNum;}
+	inline long long getBestTime() {return besttime ;}
 	inline void setBestTime(long long time) {besttime = time;}
 	~Problem();
 	CMEMALLOC;
@@ -45,18 +45,18 @@ public:
 	TunerRecord(SearchTuner *_tuner) : tuner(_tuner), tunernumber(-1), isduplicate(false) {}
 	TunerRecord(SearchTuner *_tuner, int _tunernumber) : tuner(_tuner), tunernumber(_tunernumber), isduplicate(false) {}
 	SearchTuner *getTuner() {return tuner;}
-	void inline addProblem(Problem * problem){problems.push(problem);}
+	void inline addProblem(Problem *problem) {problems.push(problem);}
 	TunerRecord *changeTuner(SearchTuner *_newtuner);
 	void updateTuner(SearchTuner *_newtuner) {tuner = _newtuner;}
 	long long getTime(Problem *problem);
 	void setTime(Problem *problem, long long time);
-	inline void setTunerNumber(int numb){tunernumber = numb;}
-	inline int getTunerNumber(){return tunernumber;}
+	inline void setTunerNumber(int numb) {tunernumber = numb;}
+	inline int getTunerNumber() {return tunernumber;}
 	inline uint problemsSize() {return problems.getSize();}
 	inline void setDuplicate(bool _duplicate) { isduplicate = _duplicate;}
 	inline bool isDuplicate() {return isduplicate;}
-	inline Problem *getProblem(uint index){return problems.get(index);}
-        void print();
+	inline Problem *getProblem(uint index) {return problems.get(index);}
+	void print();
 	void printProblemsInfo();
 	CMEMALLOC;
 private:
@@ -80,12 +80,12 @@ public:
 protected:
 	long long evaluate(Problem *problem, TunerRecord *tuner);
 	/**
-         * returns the index of the tuner which is subtune of
-         * the newTuner 
-         * @param newTuner
-         * @return 
-         */
-        int subTunerIndex(SearchTuner *newTuner);
+	 * returns the index of the tuner which is subtune of
+	 * the newTuner
+	 * @param newTuner
+	 * @return
+	 */
+	int subTunerIndex(SearchTuner *newTuner);
 	bool tunerExists(TunerRecord *tunerRec);
 	SearchTuner *mutateTuner(SearchTuner *oldTuner, uint k);
 	void updateTimeout(Problem *problem, long long metric);
@@ -98,5 +98,5 @@ protected:
 	int execnum;
 };
 
-#endif /* BASICTUNER_H */
+#endif/* BASICTUNER_H */
 

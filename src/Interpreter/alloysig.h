@@ -6,10 +6,10 @@
 #include "classlist.h"
 using namespace std;
 
-class AlloyBoolSig: public ValuedSignature{
+class AlloyBoolSig : public ValuedSignature {
 public:
 	AlloyBoolSig(uint id);
-	virtual ~AlloyBoolSig(){}
+	virtual ~AlloyBoolSig() {}
 	virtual string toString() const;
 	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
@@ -17,10 +17,10 @@ private:
 	static bool encodeAbs;
 };
 
-class AlloySetSig: public Signature{
+class AlloySetSig : public Signature {
 public:
 	AlloySetSig(uint id, Set *set);
-	virtual ~AlloySetSig(){}
+	virtual ~AlloySetSig() {}
 	virtual string toString() const;
 	virtual string getAbsSignature() const;
 	virtual string getSignature() const;
@@ -29,10 +29,10 @@ private:
 	string domain;
 };
 
-class AlloyElementSig: public ValuedSignature{
+class AlloyElementSig : public ValuedSignature {
 public:
 	AlloyElementSig(uint id, Signature *ssig);
-	virtual ~AlloyElementSig(){}
+	virtual ~AlloyElementSig() {}
 	virtual string toString() const;
 	virtual string getAbsSignature() const;
 	virtual string getSignature() const;

@@ -10,7 +10,7 @@
 #define SMTFILENAME "satune.smt"
 #define SMTSOLUTIONFILE "solution.sol"
 
-class SMTInterpreter: public Interpreter{
+class SMTInterpreter : public Interpreter {
 public:
 	SMTInterpreter(CSolver *solver);
 	virtual ValuedSignature *getBooleanSignature(uint id);
@@ -20,7 +20,7 @@ public:
 protected:
 	virtual void dumpFooter();
 	virtual void dumpHeader();
-	virtual void compileRunCommand(char * command , size_t size);
+	virtual void compileRunCommand(char *command, size_t size);
 	virtual int getResult();
 	virtual void dumpAllConstraints(Vector<char *> &facts);
 	virtual string negateConstraint(string constr);

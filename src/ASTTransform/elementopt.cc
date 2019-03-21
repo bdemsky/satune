@@ -9,7 +9,7 @@
 
 ElementOpt::ElementOpt(CSolver *_solver)
 	: Transform(_solver),
-	  updateSets(false)
+	updateSets(false)
 {
 }
 
@@ -22,7 +22,7 @@ void ElementOpt::doTransform() {
 
 	//Set once we know we are going to use it.
 	updateSets = solver->getTuner()->getTunable(ELEMENTOPTSETS, &onoff) == 1;
-	
+
 	SetIteratorBooleanEdge *iterator = solver->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge constraint = iterator->next();

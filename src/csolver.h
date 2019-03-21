@@ -126,7 +126,7 @@ public:
 
 	/** When everything is done, the client calls this function and then csolver starts to encode*/
 	int solve();
-	
+
 	/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 	uint64_t getElementValue(Element *element);
 
@@ -141,7 +141,7 @@ public:
 	void setUnSAT() { model_print("Setting UNSAT %%%%%%\n"); unsat = true; }
 	void setSatSolverTimeout(long seconds) { satsolverTimeout = seconds;}
 	bool isUnSAT() { return unsat; }
-        bool isBooleanVarUsed(){return booleanVarUsed;}
+	bool isBooleanVarUsed() {return booleanVarUsed;}
 	void printConstraint(BooleanEdge boolean);
 	void printConstraints();
 
@@ -219,8 +219,8 @@ private:
 
 	SATEncoder *satEncoder;
 	bool unsat;
-        bool booleanVarUsed;
-        Tuner *tuner;
+	bool booleanVarUsed;
+	Tuner *tuner;
 	long long elapsedTime;
 	long satsolverTimeout;
 	Interpreter *interpreter;

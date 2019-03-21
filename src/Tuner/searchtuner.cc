@@ -86,7 +86,7 @@ SearchTuner::SearchTuner(const char *filename, bool addused) {
 			}
 			setting->setDecision(lowValue, highValue, defaultValue, selectedValue);
 			settings.add(setting);
-			if(addused){
+			if (addused) {
 				usedSettings.add(setting);
 			}
 		}
@@ -96,20 +96,20 @@ SearchTuner::SearchTuner(const char *filename, bool addused) {
 	}
 }
 
-bool SearchTuner::equalUsed(SearchTuner* tuner){
-	if(tuner->usedSettings.getSize() != usedSettings.getSize()){
+bool SearchTuner::equalUsed(SearchTuner *tuner) {
+	if (tuner->usedSettings.getSize() != usedSettings.getSize()) {
 		return false;
 	}
 	bool result = true;
 	SetIteratorTunableSetting *iterator = usedSettings.iterator();
-	while(iterator->hasNext()){
+	while (iterator->hasNext()) {
 		TunableSetting *setting = iterator->next();
-		if(!tuner->usedSettings.contains(setting)){
+		if (!tuner->usedSettings.contains(setting)) {
 			result = false;
 			break;
-		}else{
+		} else {
 			TunableSetting *tunerSetting = tuner->usedSettings.get(setting);
-			if(tunerSetting->selectedValue != setting->selectedValue){
+			if (tunerSetting->selectedValue != setting->selectedValue) {
 				result = false;
 				break;
 			}
@@ -156,15 +156,15 @@ void SearchTuner::addUsed(const char *filename) {
 	}
 }
 
-bool SearchTuner::isSubTunerof(SearchTuner *newTuner){
+bool SearchTuner::isSubTunerof(SearchTuner *newTuner) {
 	SetIteratorTunableSetting *iterator = usedSettings.iterator();
 	while (iterator->hasNext()) {
 		TunableSetting *setting = iterator->next();
-		if(!newTuner->settings.contains(setting)){
+		if (!newTuner->settings.contains(setting)) {
 			return false;
-		} else{
+		} else {
 			TunableSetting *newSetting = newTuner->settings.get(setting);
-			if(newSetting->selectedValue != setting->selectedValue){
+			if (newSetting->selectedValue != setting->selectedValue) {
 				return false;
 			}
 		}
