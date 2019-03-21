@@ -55,6 +55,8 @@ private:
 	Edge encodePartialOrderSATEncoder(BooleanOrder *constraint);
 	void createAllTotalOrderConstraintsSATEncoder(Order *order);
 	void createAllPartialOrderConstraintsSATEncoder(Order *order);
+	void createAllTotalOrderConstraintsSATEncoderSparse(Order *order);
+	void createAllPartialOrderConstraintsSATEncoderSparse(Order *order);
 	Edge getOrderConstraint(HashtableOrderPair *table, OrderPair *pair);
 	Edge generateTransOrderConstraintSATEncoder(Edge constIJ, Edge constJK, Edge constIK);
 	Edge generatePartialOrderConstraintsSATEncoder(Edge ij,Edge ji, Edge jk, Edge kj,Edge ik, Edge ki);

@@ -108,7 +108,10 @@ Edge SATEncoder::encodeTotalOrderSATEncoder(BooleanOrder *boolOrder) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
 			reachMustAnalysis(solver, boolOrder->order->graph, true);
 		}
-		createAllTotalOrderConstraintsSATEncoder(boolOrder->order);
+		if (GETVARTUNABLE(solver->getTuner(), order->type, DECOMPOSEORDER, &onoff) == 0)
+			createAllTotalOrderConstraintsSATEncoderSparse(boolOrder->order);
+		else
+			createAllTotalOrderConstraintsSATEncoder(boolOrder->order);
 	}
 	OrderPair pair(boolOrder->first, boolOrder->second, E_NULL);
 	Edge constraint = getPairConstraint(boolOrder->order, &pair);
@@ -121,17 +124,16 @@ void SATEncoder::createAllTotalOrderConstraintsSATEncoder(Order *order) {
 	model_print("in total order ...\n");
 #endif
 	ASSERT(order->type == SATC_TOTAL);
-	SetIterator64Int *iti = order->getUsedIterator();
-	while (iti->hasNext()) {
-		uint64_t valueI = iti->next();
-		SetIterator64Int *itj = new SetIterator64Int(iti);
-		while (itj->hasNext()) {
-			uint64_t valueJ = itj->next();
+	Set *set = order->set;
+	uint size = order->set->getSize();
+	for (uint i = 0; i < size; i++) {
+		uint64_t valueI = set->getElement(i);
+		for (uint j = i + 1; j < size; j++) {
+			uint64_t valueJ = set->getElement(j);
 			OrderPair pairIJ(valueI, valueJ, E_NULL);
 			Edge constIJ = getPairConstraint(order, &pairIJ);
-			SetIterator64Int *itk = new SetIterator64Int(itj);
-			while (itk->hasNext()) {
-				uint64_t valueK = itk->next();
+			for (uint k = j + 1; k < size; k++) {
+				uint64_t valueK = set->getElement(k);
 				OrderPair pairJK(valueJ, valueK, E_NULL);
 				OrderPair pairIK(valueI, valueK, E_NULL);
 				Edge constIK = getPairConstraint(order, &pairIK);
@@ -215,7 +217,10 @@ Edge SATEncoder::encodePartialOrderSATEncoder(BooleanOrder *boolOrder) {
 			boolOrder->order->graph = buildMustOrderGraph(boolOrder->order);
 			reachMustAnalysis(solver, boolOrder->order->graph, true);
 		}
-		createAllPartialOrderConstraintsSATEncoder(boolOrder->order);
+		if (GETVARTUNABLE(solver->getTuner(), order->type, DECOMPOSEORDER, &onoff) == 0)
+			createAllPartialOrderConstraintsSATEncoderSparse(boolOrder->order);
+		else
+			createAllPartialOrderConstraintsSATEncoder(boolOrder->order);
 	}
 	OrderPair pair(boolOrder->first, boolOrder->second, E_NULL);
 	Edge constraint = getPartialPairConstraint(boolOrder->order, &pair);
@@ -224,6 +229,64 @@ Edge SATEncoder::encodePartialOrderSATEncoder(BooleanOrder *boolOrder) {
 
 
 void SATEncoder::createAllPartialOrderConstraintsSATEncoder(Order *order) {
+#ifdef CONFIG_DEBUG
+	model_print("in partial order ...\n");
+#endif
+	ASSERT(order->type == SATC_TOTAL);
+	Set *set = order->set;
+	uint size = order->set->getSize();
+	for (uint i = 0; i < size; i++) {
+		uint64_t valueI = set->getElement(i);
+		for (uint j = i + 1; j < size; j++) {
+			uint64_t valueJ = set->getElement(j);
+			OrderPair pairIJ(valueI, valueJ, E_NULL);
+			OrderPair pairJI(valueJ, valueI, E_NULL);
+			Edge constIJ = getPartialPairConstraint(order, &pairIJ);
+			Edge constJI = getPartialPairConstraint(order, &pairJI);
+			for (uint k = j + 1; k < size; k++) {
+				uint64_t valueK = set->getElement(k);
+				OrderPair pairJK(valueJ, valueK, E_NULL);
+				OrderPair pairIK(valueI, valueK, E_NULL);
+				Edge constIK = getPartialPairConstraint(order, &pairIK);
+				Edge constJK = getPartialPairConstraint(order, &pairJK);
+				OrderPair pairKJ(valueK, valueJ, E_NULL);
+				OrderPair pairKI(valueK, valueI, E_NULL);
+				Edge constKI = getPartialPairConstraint(order, &pairKI);
+				Edge constKJ = getPartialPairConstraint(order, &pairKJ);
+				addConstraintCNF(cnf, generatePartialOrderConstraintsSATEncoder(constIJ, constJI,
+																																				constJK, constKJ, constIK, constKI));
+			}
+		}
+	}
+}
+
+void SATEncoder::createAllTotalOrderConstraintsSATEncoderSparse(Order *order) {
+#ifdef CONFIG_DEBUG
+	model_print("in total order ...\n");
+#endif
+	ASSERT(order->type == SATC_TOTAL);
+	SetIterator64Int *iti = order->getUsedIterator();
+	while (iti->hasNext()) {
+		uint64_t valueI = iti->next();
+		SetIterator64Int *itj = new SetIterator64Int(iti);
+		while (itj->hasNext()) {
+			uint64_t valueJ = itj->next();
+			OrderPair pairIJ(valueI, valueJ, E_NULL);
+			Edge constIJ = getPairConstraint(order, &pairIJ);
+			SetIterator64Int *itk = new SetIterator64Int(itj);
+			while (itk->hasNext()) {
+				uint64_t valueK = itk->next();
+				OrderPair pairJK(valueJ, valueK, E_NULL);
+				OrderPair pairIK(valueI, valueK, E_NULL);
+				Edge constIK = getPairConstraint(order, &pairIK);
+				Edge constJK = getPairConstraint(order, &pairJK);
+				addConstraintCNF(cnf, generateTransOrderConstraintSATEncoder(constIJ, constJK, constIK));
+			}
+		}
+	}
+}
+
+void SATEncoder::createAllPartialOrderConstraintsSATEncoderSparse(Order *order) {
 #ifdef CONFIG_DEBUG
 	model_print("in partial order ...\n");
 #endif
@@ -250,10 +313,10 @@ void SATEncoder::createAllPartialOrderConstraintsSATEncoder(Order *order) {
 				Edge constKI = getPartialPairConstraint(order, &pairKI);
 				Edge constKJ = getPartialPairConstraint(order, &pairKJ);
 				addConstraintCNF(cnf, generatePartialOrderConstraintsSATEncoder(constIJ, constJI,
+
+
 																																				constJK, constKJ, constIK, constKI));
 			}
 		}
 	}
 }
-
-
