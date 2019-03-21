@@ -160,6 +160,7 @@ long long BasicTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 
 	//Do run
 	snprintf(buffer, sizeof(buffer), "./run.sh deserializerun %s %u tuner%u result%u > log%u", problem->getProblem(), maxtime, execnum, execnum, execnum);
+	model_print("Running: %s\n", buffer);
 	int status = system(buffer);
 
 	long long metric = -1;
