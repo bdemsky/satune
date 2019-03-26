@@ -192,13 +192,24 @@ Edge createNode(NodeType type, uint numEdges, Edge *edges) {
 }
 
 Edge constraintOR(CNF *cnf, uint numEdges, Edge *edges) {
-	Edge edgearray[numEdges];
+	if (numEdges < 200000) {
+		Edge edgearray[numEdges];
 
-	for (uint i = 0; i < numEdges; i++) {
-		edgearray[i] = constraintNegate(edges[i]);
+		for (uint i = 0; i < numEdges; i++) {
+			edgearray[i] = constraintNegate(edges[i]);
+		}
+		Edge eand = constraintAND(cnf, numEdges, edgearray);
+		return constraintNegate(eand);
+	} else {
+		Edge * edgearray=(Edge *)ourmalloc(numEdges*sizeof(Edge));
+		
+		for (uint i = 0; i < numEdges; i++) {
+			edgearray[i] = constraintNegate(edges[i]);
+		}
+		Edge eand = constraintAND(cnf, numEdges, edgearray);
+		ourfree(edgearray);
+		return constraintNegate(eand);
 	}
-	Edge eand = constraintAND(cnf, numEdges, edgearray);
-	return constraintNegate(eand);
 }
 
 Edge constraintOR2(CNF *cnf, Edge left, Edge right) {
