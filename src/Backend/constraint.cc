@@ -201,8 +201,8 @@ Edge constraintOR(CNF *cnf, uint numEdges, Edge *edges) {
 		Edge eand = constraintAND(cnf, numEdges, edgearray);
 		return constraintNegate(eand);
 	} else {
-		Edge * edgearray=(Edge *)ourmalloc(numEdges*sizeof(Edge));
-		
+		Edge *edgearray = (Edge *)ourmalloc(numEdges * sizeof(Edge));
+
 		for (uint i = 0; i < numEdges; i++) {
 			edgearray[i] = constraintNegate(edges[i]);
 		}

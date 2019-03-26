@@ -157,7 +157,7 @@ long long BasicTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	uint timeinsecs = problem->getBestTime() / NANOSEC;
 	uint adaptive = (timeinsecs > 30) ? timeinsecs * 5 : 150;
 	uint maxtime = (adaptive < timeout) ? adaptive : timeout;
-	uint satuneTimeout = 2*maxtime;
+	uint satuneTimeout = 2 * maxtime;
 	//Do run
 	snprintf(buffer, sizeof(buffer), "timeout %u ./run.sh deserializerun %s %u tuner%u result%u > log%u", satuneTimeout, problem->getProblem(), maxtime, execnum, execnum, execnum);
 	model_print("Running: %s\n", buffer);

@@ -153,20 +153,20 @@ void SATuner::tune() {
 			TunerRecord *tuner2 = tunerV->get(tunerNumber + i);
 			ASSERT( tunerNumber + i < tunerV->getSize());
 			model_print("Tuner1 = %d \tTuner2 = %d\n", tuner1->getTunerNumber(), tuner2->getTunerNumber());
-			
+
 			int score1, score2;
-			if(!scores.contains(tuner1)){
+			if (!scores.contains(tuner1)) {
 				score1 = 0;
-			}else {
+			} else {
 				score1 = scores.get(tuner1);
 			}
-			if(!scores.contains(tuner2)){
-				score2=0;
-			}else {
-				score2= scores.get(tuner2);
+			if (!scores.contains(tuner2)) {
+				score2 = 0;
+			} else {
+				score2 = scores.get(tuner2);
 			}
-			
-			if( score2 > score1 ){
+
+			if ( score2 > score1 ) {
 				removeTunerIndex(tunerV, i, allplaces);
 			} else if ( score2 < score1) {
 				model_print("score1=%d\tscore2=%d\tt=%u\texp=%f\n", score1, score2, t, exp((score1 - score2) * 1.0 / t));
