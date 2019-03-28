@@ -44,6 +44,7 @@ private:
 	void generateElementEncoding(Element *element);
 	Edge encodeOperatorPredicateSATEncoder(BooleanPredicate *constraint);
 	Edge encodeEnumOperatorPredicateSATEncoder(BooleanPredicate *constraint);
+	Edge encodeUnaryPredicateSATEncoder(BooleanPredicate *constraint);
 	Edge encodeEnumEqualsPredicateSATEncoder(BooleanPredicate *constraint);
 	void encodeOperatorElementFunctionSATEncoder(ElementFunction *This);
 	Edge encodeCircuitOperatorPredicateEncoder(BooleanPredicate *constraint);
