@@ -182,7 +182,10 @@ long long BasicTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 		updateTimeout(problem, metric);
 		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
 		tuner->getTuner()->addUsed(buffer);
+	} else if (status == 124 << 8){ // timeout happens ...
+		tuner->getTuner()->copySettingstoUsedSettings();
 	}
+	
 	//Increment execution count
 	execnum++;
 

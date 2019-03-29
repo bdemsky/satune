@@ -175,8 +175,7 @@ bool SearchTuner::isSubTunerof(SearchTuner *newTuner) {
 
 SearchTuner *SearchTuner::copyUsed() {
 	SearchTuner *tuner = new SearchTuner();
-	
-	SetIteratorTunableSetting *iterator = !usedSettings.isEmpty()? usedSettings.iterator():settings.iterator();
+	SetIteratorTunableSetting *iterator = usedSettings.iterator();
 	while (iterator->hasNext()) {
 		TunableSetting *setting = iterator->next();
 		TunableSetting *copy = new TunableSetting(setting);
@@ -184,6 +183,16 @@ SearchTuner *SearchTuner::copyUsed() {
 	}
 	delete iterator;
 	return tuner;
+}
+
+void SearchTuner::copySettingstoUsedSettings() {
+	SetIteratorTunableSetting *iterator = settings.iterator();
+	while (iterator->hasNext()) {
+		TunableSetting *setting = iterator->next();
+		TunableSetting *copy = new TunableSetting(setting);
+		usedSettings.add(copy);
+	}
+	delete iterator;
 }
 
 SearchTuner::~SearchTuner() {
