@@ -264,7 +264,6 @@ Element *CSolver::getElementConst(VarType type, uint64_t value) {
 
 
 Element *CSolver::applyFunction(Function *function, Element **array, uint numArrays, BooleanEdge overflowstatus) {
-	ASSERT(numArrays == 2);
 	Element *element = new ElementFunction(function,array,numArrays,overflowstatus);
 	Element *e = elemMap.get(element);
 	if (e == NULL) {
