@@ -38,7 +38,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_resetCCSolver
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createSet
-	(JNIEnv *, jobject, jlong, jint, jlong, jint);
+	(JNIEnv *, jobject , jlong , jint , jlongArray arr);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -198,7 +198,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyFunction
  * Signature: (JJJIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicateTable
-	(JNIEnv *, jobject, jlong, jlong, jlong, jint, jlong);
+	(JNIEnv *, jobject, jlong, jlong, jlongArray, jlong);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -206,7 +206,7 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicateTable
  * Signature: (JJJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicate
-	(JNIEnv *, jobject, jlong, jlong, jlong, jint);
+	(JNIEnv *, jobject, jlong, jlong, jlongArray);
 
 /*
  * Class:     satune_SatuneJavaAPI
@@ -214,7 +214,15 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicate
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperation
-	(JNIEnv *, jobject, jlong, jint, jlong, jint);
+	(JNIEnv *, jobject, jlong, jint, jlongArray);
+
+/*
+ * Class:     satune_SatuneJavaAPI
+ * Method:    applyExactlyOneConstraint
+ * Signature: (JIJI)J
+ */
+JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyExactlyOneConstraint
+	(JNIEnv *, jobject, jlong, jlongArray );
 
 /*
  * Class:     satune_SatuneJavaAPI

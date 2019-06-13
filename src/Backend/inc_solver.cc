@@ -102,6 +102,16 @@ int getSolution(IncrementalSolver *This) {
 		}
 		readSolver(This, &This->solution[1], numVars * sizeof(int));
 		This->solutionsize = numVars;
+	} else { //Reading unsat explanation
+		int numVars = readIntSolver(This);
+		if (numVars > This->solutionsize) {
+			if (This->solution != NULL)
+				ourfree(This->solution);
+			This->solution = (int *) ourmalloc((numVars + 1) * sizeof(int));
+			This->solution[0] = 0;
+		}
+		readSolver(This, &This->solution[1], numVars * sizeof(int));
+		This->solutionsize = numVars;
 	}
 	return result;
 }

@@ -87,6 +87,8 @@ def loadCSolver():
 	csolverlb.applyPredicate.restype = c_void_p
 	csolverlb.applyLogicalOperation.argtypes = [c_void_p, c_uint, c_void_p, c_uint]
 	csolverlb.applyLogicalOperation.restype = c_void_p
+	csolverlb.applyExactlyOneConstraint.argtypes = [c_void_p, c_void_p, c_uint]
+	csolverlb.applyExactlyOneConstraint.restype = c_void_p
 	csolverlb.applyLogicalOperationTwo.argtypes = [c_void_p, c_uint, c_void_p, c_void_p]
 	csolverlb.applyLogicalOperationTwo.restype = c_void_p
 	csolverlb.applyLogicalOperationOne.argtypes = [c_void_p, c_uint, c_void_p]

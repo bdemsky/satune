@@ -101,8 +101,11 @@ public:
 
 	BooleanEdge applyPredicate(Predicate *predicate, Element **inputs, uint numInputs);
 
+	/** This exactly one element of array can be true! (i.e. a1 + a2 + a3 + ... + an = 1)*/
+	BooleanEdge applyExactlyOneConstraint (BooleanEdge *array, uint asize);
+	
 	/** This function applies a logical operation to the Booleans in its input. */
-
+	
 	BooleanEdge applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
 
 	/** This function applies a logical operation to the Booleans in its input. */

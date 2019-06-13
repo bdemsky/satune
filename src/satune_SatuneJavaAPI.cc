@@ -45,9 +45,11 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_resetCCSolver
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createSet
-	(JNIEnv *env, jobject obj, jlong solver, jint type, jlong elements, jint num)
+	(JNIEnv *env, jobject obj, jlong solver, jint type, jlongArray arr)
 {
-	return (jlong)createSet((void *)solver,(unsigned int) type, (long *)elements, (unsigned int) num);
+	jsize num = env->GetArrayLength(arr);
+	jlong *elements = env->GetLongArrayElements(arr, 0);
+	return (jlong)createSet((void *)solver,(unsigned int) type, elements, (unsigned int) num);
 }
 
 /*
@@ -266,8 +268,10 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyFunction
  * Signature: (JJJIJ)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicateTable
-	(JNIEnv *env, jobject obj, jlong solver, jlong predicate, jlong inputs, jint numInputs, jlong undefinedStatus)
+	(JNIEnv *env, jobject obj, jlong solver, jlong predicate, jlongArray arr, jlong undefinedStatus)
 {
+	jsize numInputs = env->GetArrayLength(arr);
+	jlong *inputs = env->GetLongArrayElements(arr, 0);
 	return (jlong) applyPredicateTable((void *)solver,(void *)predicate, (void **)inputs, (unsigned int) numInputs, (void *)undefinedStatus);
 }
 
@@ -277,8 +281,10 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicateTable
  * Signature: (JJJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicate
-	(JNIEnv *env, jobject obj, jlong solver, jlong predicate, jlong inputs, jint numInputs)
+	(JNIEnv *env, jobject obj, jlong solver, jlong predicate, jlongArray arr)
 {
+	jsize numInputs = env->GetArrayLength(arr);
+	jlong *inputs = env->GetLongArrayElements(arr, 0);
 	return (jlong)applyPredicate((void *)solver,(void *)predicate, (void **)inputs, (unsigned int) numInputs);
 }
 
@@ -288,9 +294,24 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyPredicate
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyLogicalOperation
-	(JNIEnv *env, jobject obj, jlong solver, jint op, jlong array, jint asize)
+	(JNIEnv *env, jobject obj, jlong solver, jint op, jlongArray arr)
 {
-	return (jlong)applyLogicalOperation((void *)solver,(unsigned int) op, (void *)array, (unsigned int) asize);
+	jsize asize = env->GetArrayLength(arr);
+	jlong *array = env->GetLongArrayElements(arr, 0);
+	return (jlong)applyLogicalOperation((void *)solver,(unsigned int) op, (void **)array, (unsigned int) asize);
+}
+
+/*
+ * Class:     SatuneJavaAPI
+ * Method:    applyLogicalOperation
+ * Signature: (JIJI)J
+ */
+JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_applyExactlyOneConstraint
+	(JNIEnv *env, jobject obj, jlong solver, jlongArray arr)
+{
+	jsize asize = env->GetArrayLength(arr);
+	jlong *array = env->GetLongArrayElements(arr, 0);
+	return (jlong)applyExactlyOneConstraint((void *)solver,(void **)array, (unsigned int) asize);
 }
 
 /*
