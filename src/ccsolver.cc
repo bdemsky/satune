@@ -146,8 +146,16 @@ int solve(void *solver) {
 	return CCSOLVER(solver)->solve();
 }
 
+int solveIncremental(void *solver) {
+	return CCSOLVER(solver)->solveIncremental();
+}
+
 long getElementValue(void *solver,void *element) {
 	return (long) CCSOLVER(solver)->getElementValue((Element *)element);
+}
+
+void freezeElement(void *solver,void *element) {
+	CCSOLVER(solver)->freezeElement((Element *)element);
 }
 
 int getBooleanValue(void *solver, void *boolean) {

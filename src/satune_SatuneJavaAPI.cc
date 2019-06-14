@@ -393,6 +393,17 @@ JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_solve
 
 /*
  * Class:     SatuneJavaAPI
+ * Method:    solveIncremental
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_satune_SatuneJavaAPI_solveIncremental
+	(JNIEnv *env, jobject obj, jlong solver)
+{
+	return (jint) solveIncremental((void *)solver);
+}
+
+/*
+ * Class:     SatuneJavaAPI
  * Method:    getElementValue
  * Signature: (JJ)J
  */
@@ -400,6 +411,17 @@ JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_getElementValue
 	(JNIEnv *env, jobject obj, jlong solver, jlong element)
 {
 	return (jlong) getElementValue((void *)solver,(void *)element);
+}
+
+/*
+ * Class:     SatuneJavaAPI
+ * Method:    freezeElement
+ * Signature: (JJ)J
+ */
+JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_freezeElement
+	(JNIEnv *env, jobject obj, jlong solver, jlong element)
+{
+	freezeElement((void *)solver,(void *)element);
 }
 
 /*

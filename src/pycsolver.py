@@ -101,10 +101,14 @@ def loadCSolver():
 	csolverlb.orderConstraint.restype = c_void_p
 	csolverlb.solve.argtypes = [c_void_p]
 	csolverlb.solve.restype = c_int
+	csolverlb.solveIncremental.argtypes = [c_void_p]
+	csolverlb.solveIncremental.restype = c_int
         csolverlb.mustHaveValue.argtypes = [c_void_p, c_void_p]
 	csolverlb.mustHaveValue.restype = c_void_p
 	csolverlb.getElementValue.argtypes = [c_void_p, c_void_p]
-	csolverlb.getElementValue.restype = c_long
+	csolverlb.getElementValue.restype = c_void_p
+	csolverlb.freezeElement.argtypes = [c_void_p, c_void_p]
+	csolverlb.freezeElement.restype = c_long
 	csolverlb.getBooleanValue.argtypes = [c_void_p, c_void_p]
 	csolverlb.getBooleanValue.restype = c_int
 	csolverlb.getOrderConstraintValue.argtypes = [c_void_p, c_void_p, c_long, c_long]
