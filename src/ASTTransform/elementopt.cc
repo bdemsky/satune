@@ -26,7 +26,7 @@ void ElementOpt::doTransform() {
 	SetIteratorBooleanEdge *iterator = solver->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge constraint = iterator->next();
-		if (constraint->type == PREDICATEOP)
+		if (!solver->isConstraintEncoded(constraint) && constraint->type == PREDICATEOP)
 			workList.push((BooleanPredicate *)constraint.getBoolean());
 	}
 	while (workList.getSize() != 0) {

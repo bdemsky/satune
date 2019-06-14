@@ -220,6 +220,15 @@ void SATEncoder::generateBinaryValueEncodingVars(ElementEncoding *encoding) {
 		generateAnyValueBinaryValueEncoding(encoding);
 }
 
+void SATEncoder::freezeElementVariables(ElementEncoding *encoding){
+	ASSERT(encoding->element->frozen);
+	for(uint i=0; i< encoding->numVars; i++){
+		Edge e = encoding->variables[i];
+		ASSERT(edgeIsVarConst(e));
+		freezeVariable(cnf, e);
+	}
+}
+
 void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
 	ASSERT(encoding->type == BINARYINDEX);
 	allocElementConstraintVariables(encoding, NUMBITS(encoding->encArraySize - 1));

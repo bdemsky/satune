@@ -19,6 +19,7 @@ public:
 	CNF *getCNF() { return cnf;}
 	long long getSolveTime() { return cnf->solveTime; }
 	long long getEncodeTime() { return cnf->encodeTime; }
+	void freezeElementVariables(ElementEncoding *encoding);
 
 	CMEMALLOC;
 private:

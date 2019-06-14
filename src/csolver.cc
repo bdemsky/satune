@@ -39,6 +39,7 @@ CSolver::CSolver() :
 	boolFalse(boolTrue.negate()),
 	unsat(false),
 	booleanVarUsed(false),
+	incrementalMode(false),
 	tuner(NULL),
 	elapsedTime(0),
 	satsolverTimeout(NOTIMEOUT),
@@ -139,6 +140,7 @@ void CSolver::resetSolver() {
 	allOrders.clear();
 	allFunctions.clear();
 	constraints.reset();
+	encodedConstraints.reset();
 	activeOrders.reset();
 	boolMap.reset();
 	elemMap.reset();
@@ -239,6 +241,17 @@ Element *CSolver::getElementVar(Set *set) {
 void CSolver::mustHaveValue(Element *element) {
 	element->anyValue = true;
 }
+
+void CSolver::freezeElementsVariables() {
+	
+	for(uint i=0; i< allElements.getSize(); i++){
+		Element *e = allElements.get(i);
+		if(e->frozen){
+			satEncoder->freezeElementVariables(&e->encoding);
+		}
+	}
+}
+
 
 Set *CSolver::getElementRange (Element *element) {
 	return element->getRange();
@@ -623,6 +636,74 @@ void CSolver::inferFixedOrders() {
 	}
 }
 
+int CSolver::solveIncremental() {
+	if (isUnSAT()) {
+		return IS_UNSAT;
+	}
+	
+	
+	long long startTime = getTimeNano();
+	bool deleteTuner = false;
+	if (tuner == NULL) {
+		tuner = new DefaultTuner();
+		deleteTuner = true;
+	}
+	int result = IS_INDETER;
+	ASSERT (!useInterpreter());
+	
+	computePolarities(this);
+//	long long time1 = getTimeNano();
+//	model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
+//	Preprocess pp(this);
+//	pp.doTransform();
+//	long long time2 = getTimeNano();
+//	model_print("Preprocess time: %f\n", (time2 - time1) / NANOSEC);
+
+//	DecomposeOrderTransform dot(this);
+//	dot.doTransform();
+//	time1 = getTimeNano();
+//	model_print("Decompose Order: %f\n", (time1 - time2) / NANOSEC);
+
+//	IntegerEncodingTransform iet(this);
+//	iet.doTransform();
+
+	//Doing element optimization on new constraints
+//	ElementOpt eop(this);
+//	eop.doTransform();
+	
+	//Since no new element is added, we assuming adding new constraint
+	//has no impact on previous encoding decisions
+//	EncodingGraph eg(this);
+//	eg.encode();
+
+	naiveEncodingDecision(this);
+	//	eg.validate();
+	//Order of sat solver variables don't change!
+//	VarOrderingOpt bor(this, satEncoder);
+//	bor.doTransform();
+
+	long long time2 = getTimeNano();
+	//Encoding newly added constraints
+	satEncoder->encodeAllSATEncoder(this);
+	long long time1 = getTimeNano();
+
+	model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
+
+	model_print("Is problem UNSAT after encoding: %d\n", unsat);
+
+	result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
+	model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
+	time2 = getTimeNano();
+	elapsedTime = time2 - startTime;
+	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
+	
+	if (deleteTuner) {
+		delete tuner;
+		tuner = NULL;
+	}
+	return result;
+}
+
 int CSolver::solve() {
 	if (isUnSAT()) {
 		return IS_UNSAT;
@@ -689,7 +770,7 @@ int CSolver::solve() {
 		model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
 
 		model_print("Is problem UNSAT after encoding: %d\n", unsat);
-
+		
 
 		result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
 		model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
@@ -754,6 +835,13 @@ uint64_t CSolver::getElementValue(Element *element) {
 		ASSERT(0);
 	}
 	exit(-1);
+}
+
+void CSolver::freezeElement(Element *e){
+	e->freezeElement();
+	if(!incrementalMode){
+		incrementalMode = true;
+	}
 }
 
 bool CSolver::getBooleanValue(BooleanEdge bedge) {

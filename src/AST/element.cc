@@ -9,7 +9,8 @@
 Element::Element(ASTNodeType _type) :
 	ASTNode(_type),
 	encoding(this),
-	anyValue(false) {
+	anyValue(false),
+	frozen(false){
 }
 
 ElementSet::ElementSet(Set *s) :

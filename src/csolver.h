@@ -58,7 +58,7 @@ public:
 	Set *getElementRange (Element *element);
 
 	void mustHaveValue(Element *element);
-
+	
 	BooleanEdge getBooleanTrue();
 
 	BooleanEdge getBooleanFalse();
@@ -129,10 +129,19 @@ public:
 
 	/** When everything is done, the client calls this function and then csolver starts to encode*/
 	int solve();
-
+	/**
+	 * Incremental Solving for SATUNE.
+	 * It only supports incremental solving for elements!
+	 * No support for BooleanVar, BooleanOrder or using interpreters
+	 * @return 
+	 */
+	int solveIncremental();
+	
 	/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 	uint64_t getElementValue(Element *element);
 
+	void freezeElement(Element *e);
+	
 	/** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
 	bool getBooleanValue(BooleanEdge boolean);
 
@@ -154,7 +163,9 @@ public:
 	Tuner *getTuner() { return tuner; }
 
 	SetIteratorBooleanEdge *getConstraints() { return constraints.iterator(); }
-
+	bool isConstraintEncoded(BooleanEdge be) { return encodedConstraints.contains(be);}
+	void addEncodedConstraint(BooleanEdge be) {encodedConstraints.add(be);}
+	
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
 	void replaceBooleanWithTrue(BooleanEdge bexpr);
@@ -175,20 +186,22 @@ public:
 	long long getEncodeTime();
 	long long getSolveTime();
 	long getSatSolverTimeout() { return satsolverTimeout;}
-
+	bool isIncrementalMode() {return incrementalMode;}
+	void freezeElementsVariables();
 	CMEMALLOC;
 
 private:
 	void handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child);
 	void handleANDTrue(BooleanLogic *bexpr, BooleanEdge child);
 	void handleFunction(ElementFunction *ef, BooleanEdge child);
-
+	
 	//These two functions are helpers if the client has a pointer to a
 	//Boolean object that we have since replaced
 	BooleanEdge rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
 	BooleanEdge doRewrite(BooleanEdge b);
 	/** This is a vector of constraints that must be satisfied. */
 	HashsetBooleanEdge constraints;
+	HashsetBooleanEdge encodedConstraints;
 
 	/** This is a vector of all boolean structs that we have allocated. */
 	Vector<Boolean *> allBooleans;
@@ -223,6 +236,7 @@ private:
 	SATEncoder *satEncoder;
 	bool unsat;
 	bool booleanVarUsed;
+	bool incrementalMode;
 	Tuner *tuner;
 	long long elapsedTime;
 	long satsolverTimeout;

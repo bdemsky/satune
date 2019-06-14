@@ -589,6 +589,11 @@ void addClause(CNF *cnf, uint numliterals, int *literals) {
 	addArrayClauseLiteral(cnf->solver, numliterals, literals);
 }
 
+void freezeVariable(CNF *cnf, Edge e){
+	int literal = getEdgeVar(e);
+	freeze(cnf->solver, literal);
+}
+
 void outputCNFOR(CNF *cnf, Edge cnfform, Edge eorvar) {
 	Node *andNode = cnfform.node_ptr;
 	int orvar = getEdgeVar(eorvar);
@@ -696,13 +701,10 @@ Edge constraintNewVar(CNF *cnf) {
 }
 
 int solveCNF(CNF *cnf) {
-	long long startTime = getTimeNano();
-	finishedClauses(cnf->solver);
 	long long startSolve = getTimeNano();
 	model_print("#Clauses = %u\t#Vars = %u\n", cnf->clausecount, cnf->varcount);
 	int result = cnf->unsat ? IS_UNSAT : solve(cnf->solver);
 	long long finishTime = getTimeNano();
-	cnf->encodeTime = startSolve - startTime;
 	model_print("CNF Encode time: %f\n", cnf->encodeTime / 1000000000.0);
 	cnf->solveTime = finishTime - startSolve;
 	model_print("SAT Solving time: %f\n", cnf->solveTime / 1000000000.0);
