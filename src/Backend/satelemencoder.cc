@@ -227,6 +227,15 @@ void SATEncoder::freezeElementVariables(ElementEncoding *encoding){
 		ASSERT(edgeIsVarConst(e));
 		freezeVariable(cnf, e);
 	}
+	for(uint i=0; i< encoding->encArraySize; i++){
+		if(encoding->isinUseElement(i) && encoding->encoding != EENC_NONE && encoding->numVars > 1){
+			Edge e = encoding->edgeArray[i];
+			if(!edgeIsNull(e)){
+				ASSERT(edgeIsVarConst(e));
+				freezeVariable(cnf, e);
+			}
+		}
+	}
 }
 
 void SATEncoder::generateBinaryIndexEncodingVars(ElementEncoding *encoding) {
@@ -294,6 +303,9 @@ void SATEncoder::generateElementEncoding(Element *element) {
 }
 
 int SATEncoder::getMaximumUsedSize(ElementEncoding *encoding) {
+	if(encoding->encArraySize == 1){
+		return 1;
+	}
 	for (int i = encoding->encArraySize - 1; i >= 0; i--) {
 		if (encoding->isinUseElement(i))
 			return i + 1;
