@@ -11,7 +11,9 @@ class AutoTunerArgParser:
         
     def getFileName(self):
         return self.args.file[0]
-       
+
+HEADER = ["TESTCASE", "SATTIME", "EXECTIME", "PREPROCESS", "ELEMENTOPT", "ELEMENTOPTSETS", "PROXYVARIABLE", "#SubGraph", "NODEENCODING", "EDGEENCODING", "NAIVEENCODER", "ENCODINGGRAPHOPT"]
+
 configs = {"EXECTIME": "-",
 		"SATTIME":"-",
 		"TESTCASE":"-",
@@ -39,32 +41,41 @@ REGEXES = {"EXECTIME": "CSOLVER solve time: (.*)",
 		"NAIVEENCODER" : "Param NAIVEENCODER = (.*)range=\[1,3\](.*)",
 		"ENCODINGGRAPHOPT" : "Param ENCODINGGRAPHOPT = (.*)range=\[0,1\]"
 		}
+def reorderEntry(entry):
+	global HEADER
+	result = []
+	for key in HEADER:
+		result.append(entry[key])
+	return result
+
 
 def printHeader(file):
-	global configs
+	global HEADER
 	mystr=""
-	for config in configs:
-		 mystr+=str(config)+","
+	for key in HEADER:
+		 mystr+=key+","
 	print >>file, mystr
 	
 def printConfig(file, data):
 	print data
 	mystr=""
-	for config in data:
-		 mystr+=str(data[config])+","
+	for val  in data:
+		 mystr+=str(val)+","
 	print >> file, mystr
+
 
 def main():
 	global configs
 	argprocess = AutoTunerArgParser()
 	output = open("tuner.csv", "w")
 	printHeader(output)
+	result = []
 	with open(argprocess.getFileName()) as file:
 		for line in file:
 			if line.startswith("Mutating"):
-				printConfig(output,configs)
+				result.append(reorderEntry(configs))
 			elif line.startswith("Best tuner"):
-				printConfig(output,configs);
+				result.append(reorderEntry(configs))
 			else :
 				for regex in REGEXES:
 					p = re.compile(REGEXES[regex])
@@ -75,8 +86,11 @@ def main():
 						else:
 							configs[regex] = re.findall("\d+\.?\d*", line)[0]
 
- 	configs["EXECTIME"] = "BEST TUNE:"
-	printConfig(output, configs)
+	#configs["EXECTIME"] = "BEST TUNE:"
+	result.append(reorderEntry(configs))
+	result.sort(key = lambda entry: entry[0])
+	for entry in result:
+		printConfig(output, entry)
 	print "Done with parsing " + argprocess.getFileName()
 
 if __name__ == "__main__":
