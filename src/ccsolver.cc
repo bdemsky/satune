@@ -170,6 +170,10 @@ void printConstraints(void *solver) {
 	CCSOLVER(solver)->printConstraints();
 }
 
+void turnoffOptimizations(void *solver) {
+	CCSOLVER(solver)->turnoffOptimizations();
+}
+
 
 void serialize(void *solver) {
 	CCSOLVER(solver)->serialize();

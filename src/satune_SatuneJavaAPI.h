@@ -331,6 +331,14 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_printConstraints
 
 /*
  * Class:     satune_SatuneJavaAPI
+ * Method:    turnoffOptimizations
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_turnoffOptimizations
+	(JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     satune_SatuneJavaAPI
  * Method:    serialize
  * Signature: (J)V
  */

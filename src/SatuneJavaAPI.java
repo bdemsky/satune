@@ -43,6 +43,10 @@ public class SatuneJavaAPI{
             printConstraints(satune);
         }
 	
+        public void turnoffOptimizations(){
+            turnoffOptimizations(satune);
+        }
+	
         public int solve(){
             return solve(satune);
         }
@@ -81,6 +85,7 @@ public class SatuneJavaAPI{
 	private native int getBooleanValue(long solver,long bool);
 	private native int getOrderConstraintValue(long solver,long order, long first, long second);
 	private native void printConstraints(long solver);
+	private native void turnoffOptimizations(long solver);
 	private native void serialize(long solver);
 	private native void mustHaveValue(long solver, long element);
 	private native void setInterpreter(long solver, int type);

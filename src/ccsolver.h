@@ -46,6 +46,7 @@ void freezeElement(void *solver,void *element);
 int getBooleanValue(void *solver,void *boolean);
 int getOrderConstraintValue(void *solver,void *order, long first, long second);
 void printConstraints(void *solver);
+void turnoffOptimizations(void *solver);
 void serialize(void *solver);
 void mustHaveValue(void *solver, void *element);
 void setInterpreter(void *solver, unsigned int type);

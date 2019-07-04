@@ -142,6 +142,8 @@ public:
 
 	void freezeElement(Element *e);
 	
+	void turnoffOptimizations(){optimizationsOff = true;}
+	
 	/** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
 	bool getBooleanValue(BooleanEdge boolean);
 
@@ -237,10 +239,12 @@ private:
 	bool unsat;
 	bool booleanVarUsed;
 	bool incrementalMode;
+	bool optimizationsOff;
 	Tuner *tuner;
 	long long elapsedTime;
 	long satsolverTimeout;
 	Interpreter *interpreter;
+	bool noOptimization;
 	friend class ElementOpt;
 	friend class VarOrderingOpt;
 };

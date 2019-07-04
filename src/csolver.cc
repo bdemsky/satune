@@ -40,6 +40,7 @@ CSolver::CSolver() :
 	unsat(false),
 	booleanVarUsed(false),
 	incrementalMode(false),
+	optimizationsOff(false),
 	tuner(NULL),
 	elapsedTime(0),
 	satsolverTimeout(NOTIMEOUT),
@@ -566,7 +567,7 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 }
 
 void CSolver::addConstraint(BooleanEdge constraint) {
-	if (!useInterpreter()) {
+	if (!useInterpreter() && !optimizationsOff) {
 		if (isTrue(constraint))
 			return;
 		else if (isFalse(constraint)) {
@@ -650,8 +651,9 @@ int CSolver::solveIncremental() {
 	}
 	int result = IS_INDETER;
 	ASSERT (!useInterpreter());
-	
-	computePolarities(this);
+	if(!optimizationsOff){
+		computePolarities(this);
+	}
 //	long long time1 = getTimeNano();
 //	model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
 //	Preprocess pp(this);
@@ -733,36 +735,39 @@ int CSolver::solve() {
 			}
 			delete orderit;
 		}
+		long long time1, time2;
+		
 		computePolarities(this);
-		long long time1 = getTimeNano();
-		model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
-		Preprocess pp(this);
-		pp.doTransform();
-		long long time2 = getTimeNano();
-		model_print("Preprocess time: %f\n", (time2 - time1) / NANOSEC);
-
-		DecomposeOrderTransform dot(this);
-		dot.doTransform();
 		time1 = getTimeNano();
-		model_print("Decompose Order: %f\n", (time1 - time2) / NANOSEC);
+		model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
+		if(!optimizationsOff){
+			Preprocess pp(this);
+			pp.doTransform();
+			time2 = getTimeNano();
+			model_print("Preprocess time: %f\n", (time2 - time1) / NANOSEC);
 
-		IntegerEncodingTransform iet(this);
-		iet.doTransform();
+			DecomposeOrderTransform dot(this);
+			dot.doTransform();
+			time1 = getTimeNano();
+			model_print("Decompose Order: %f\n", (time1 - time2) / NANOSEC);
 
-		ElementOpt eop(this);
-		eop.doTransform();
+			IntegerEncodingTransform iet(this);
+			iet.doTransform();
 
-		EncodingGraph eg(this);
-		eg.encode();
+			ElementOpt eop(this);
+			eop.doTransform();
 
+			EncodingGraph eg(this);
+			eg.encode();
+		}
 		naiveEncodingDecision(this);
 		//	eg.validate();
-
-		VarOrderingOpt bor(this, satEncoder);
-		bor.doTransform();
-
-		time2 = getTimeNano();
-		model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
+		if(!optimizationsOff){
+			VarOrderingOpt bor(this, satEncoder);
+			bor.doTransform();
+			time2 = getTimeNano();
+			model_print("Encoding Graph Time: %f\n", (time2 - time1) / NANOSEC);
+		}
 
 		satEncoder->encodeAllSATEncoder(this);
 		time1 = getTimeNano();
