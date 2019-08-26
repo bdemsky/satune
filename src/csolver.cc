@@ -243,10 +243,10 @@ void CSolver::mustHaveValue(Element *element) {
 }
 
 void CSolver::freezeElementsVariables() {
-	
-	for(uint i=0; i< allElements.getSize(); i++){
+
+	for (uint i = 0; i < allElements.getSize(); i++) {
 		Element *e = allElements.get(i);
-		if(e->frozen){
+		if (e->frozen) {
 			satEncoder->freezeElementVariables(&e->encoding);
 		}
 	}
@@ -408,24 +408,24 @@ BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uin
 	return applyLogicalOperation(op, newarray, asize);
 }
 
-BooleanEdge CSolver::applyExactlyOneConstraint (BooleanEdge *array, uint asize){
+BooleanEdge CSolver::applyExactlyOneConstraint (BooleanEdge *array, uint asize) {
 	BooleanEdge newarray[asize + 1];
 
 	newarray[asize] = applyLogicalOperation(SATC_OR, array, asize);
-	for (uint i=0; i< asize; i++){
+	for (uint i = 0; i < asize; i++) {
 		BooleanEdge oprand1 = array[i];
-		BooleanEdge carray [asize -1];
+		BooleanEdge carray [asize - 1];
 		uint index = 0;
-		for( uint j =0; j< asize; j++){
-			if(i != j){
+		for ( uint j = 0; j < asize; j++) {
+			if (i != j) {
 				BooleanEdge oprand2 = applyLogicalOperation(SATC_NOT, array[j]);
 				carray[index++] = applyLogicalOperation(SATC_IMPLIES, oprand1, oprand2);
 			}
 		}
-		ASSERT(index == asize -1);
-		newarray[i] = applyLogicalOperation(SATC_AND, carray, asize-1);
+		ASSERT(index == asize - 1);
+		newarray[i] = applyLogicalOperation(SATC_AND, carray, asize - 1);
 	}
-	return applyLogicalOperation(SATC_AND, newarray, asize+1);
+	return applyLogicalOperation(SATC_AND, newarray, asize + 1);
 }
 
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
@@ -640,8 +640,8 @@ int CSolver::solveIncremental() {
 	if (isUnSAT()) {
 		return IS_UNSAT;
 	}
-	
-	
+
+
 	long long startTime = getTimeNano();
 	bool deleteTuner = false;
 	if (tuner == NULL) {
@@ -650,7 +650,7 @@ int CSolver::solveIncremental() {
 	}
 	int result = IS_INDETER;
 	ASSERT (!useInterpreter());
-	
+
 	computePolarities(this);
 //	long long time1 = getTimeNano();
 //	model_print("Polarity time: %f\n", (time1 - startTime) / NANOSEC);
@@ -670,7 +670,7 @@ int CSolver::solveIncremental() {
 	//Doing element optimization on new constraints
 //	ElementOpt eop(this);
 //	eop.doTransform();
-	
+
 	//Since no new element is added, we assuming adding new constraint
 	//has no impact on previous encoding decisions
 //	EncodingGraph eg(this);
@@ -696,7 +696,7 @@ int CSolver::solveIncremental() {
 	time2 = getTimeNano();
 	elapsedTime = time2 - startTime;
 	model_print("CSOLVER solve time: %f\n", elapsedTime / NANOSEC);
-	
+
 	if (deleteTuner) {
 		delete tuner;
 		tuner = NULL;
@@ -770,7 +770,7 @@ int CSolver::solve() {
 		model_print("Elapse Encode time: %f\n", (time1 - startTime) / NANOSEC);
 
 		model_print("Is problem UNSAT after encoding: %d\n", unsat);
-		
+
 
 		result = unsat ? IS_UNSAT : satEncoder->solve(satsolverTimeout);
 		model_print("Result Computed in SAT solver:\t%s\n", result == IS_SAT ? "SAT" : result == IS_INDETER ? "INDETERMINATE" : " UNSAT");
@@ -837,9 +837,9 @@ uint64_t CSolver::getElementValue(Element *element) {
 	exit(-1);
 }
 
-void CSolver::freezeElement(Element *e){
+void CSolver::freezeElement(Element *e) {
 	e->freezeElement();
-	if(!incrementalMode){
+	if (!incrementalMode) {
 		incrementalMode = true;
 	}
 }

@@ -104,16 +104,16 @@ void *applyPredicate(void *solver,void *predicate, void **inputs, unsigned int n
 
 void *applyLogicalOperation(void *solver,unsigned int op, void **array, unsigned int asize) {
 	BooleanEdge constr [asize];
-	for(uint i=0; i< asize; i++){
-		constr[i] = BooleanEdge((Boolean*)array[i]);
+	for (uint i = 0; i < asize; i++) {
+		constr[i] = BooleanEdge((Boolean *)array[i]);
 	}
 	return CCSOLVER(solver)->applyLogicalOperation((LogicOp) op, constr, (uint) asize).getRaw();
 }
 
 void *applyExactlyOneConstraint(void *solver, void **array, unsigned int asize) {
 	BooleanEdge constr [asize];
-	for(uint i=0; i< asize; i++){
-		constr[i] = BooleanEdge((Boolean*)array[i]);
+	for (uint i = 0; i < asize; i++) {
+		constr[i] = BooleanEdge((Boolean *)array[i]);
 	}
 	return CCSOLVER(solver)->applyExactlyOneConstraint( constr, (uint) asize).getRaw();
 }

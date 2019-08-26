@@ -25,7 +25,7 @@ void IntegerEncodingTransform::doTransform() {
 	while (orderit->hasNext()) {
 		Order *order = orderit->next();
 		if (order->type == SATC_PARTIAL)
-		  continue;
+			continue;
 		if (GETVARTUNABLE(solver->getTuner(), order->set->type, ORDERINTEGERENCODING, &offon))
 			integerEncode(order);
 	}

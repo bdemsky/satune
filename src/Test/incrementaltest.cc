@@ -17,21 +17,21 @@ int main(int numargs, char **argv) {
 	solver->addConstraint(b);
 	solver->freezeElement(e1);
 	solver->freezeElement(e2);
-	if (solver->solve() == 1){
+	if (solver->solve() == 1) {
 		int run = 1;
-		do{
+		do {
 			printf("result %d: e1=%" PRIu64 " e2=%" PRIu64 "\n", run, solver->getElementValue(e1), solver->getElementValue(e2));
-			for(int i=0; i< INPUTSIZE; i++){
+			for (int i = 0; i < INPUTSIZE; i++) {
 				uint64_t val = solver->getElementValue(inputs[i]);
 				Element *econst = solver->getElementConst(0, val);
-				Element * tmpInputs[] = {inputs[i], econst};
+				Element *tmpInputs[] = {inputs[i], econst};
 				BooleanEdge b = solver->applyPredicate(equals, tmpInputs, INPUTSIZE);
 				solver->addConstraint(solver->applyLogicalOperation(SATC_NOT, b));
 			}
 			run++;
-		}while(solver->solveIncremental() == 1);
+		} while (solver->solveIncremental() == 1);
 		printf("After %d runs, there are no more models to find ...\n", run);
-	}else{
+	} else {
 		printf("UNSAT\n");
 	}
 	delete solver;

@@ -34,7 +34,7 @@ int SATEncoder::solve(long timeout) {
 	long long startTime = getTimeNano();
 	finishedClauses(cnf->solver);
 	cnf->encodeTime = getTimeNano() - startTime;
-	if(solver->isIncrementalMode()){
+	if (solver->isIncrementalMode()) {
 		solver->freezeElementsVariables();
 	}
 	return solveCNF(cnf);
@@ -47,7 +47,7 @@ void SATEncoder::encodeAllSATEncoder(CSolver *csolver) {
 	SetIteratorBooleanEdge *iterator = csolver->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge constraint = iterator->next();
-		if(!csolver->isConstraintEncoded(constraint)){
+		if (!csolver->isConstraintEncoded(constraint)) {
 			Edge c = encodeConstraintSATEncoder(constraint);
 			addConstraintCNF(cnf, c);
 			csolver->addEncodedConstraint(constraint);

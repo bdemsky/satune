@@ -58,7 +58,7 @@ public:
 	Set *getElementRange (Element *element);
 
 	void mustHaveValue(Element *element);
-	
+
 	BooleanEdge getBooleanTrue();
 
 	BooleanEdge getBooleanFalse();
@@ -103,9 +103,9 @@ public:
 
 	/** This exactly one element of array can be true! (i.e. a1 + a2 + a3 + ... + an = 1)*/
 	BooleanEdge applyExactlyOneConstraint (BooleanEdge *array, uint asize);
-	
+
 	/** This function applies a logical operation to the Booleans in its input. */
-	
+
 	BooleanEdge applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
 
 	/** This function applies a logical operation to the Booleans in its input. */
@@ -133,15 +133,15 @@ public:
 	 * Incremental Solving for SATUNE.
 	 * It only supports incremental solving for elements!
 	 * No support for BooleanVar, BooleanOrder or using interpreters
-	 * @return 
+	 * @return
 	 */
 	int solveIncremental();
-	
+
 	/** After getting the solution from the SAT solver, client can get the value of an element via this function*/
 	uint64_t getElementValue(Element *element);
 
 	void freezeElement(Element *e);
-	
+
 	/** After getting the solution from the SAT solver, client can get the value of a boolean via this function*/
 	bool getBooleanValue(BooleanEdge boolean);
 
@@ -165,7 +165,7 @@ public:
 	SetIteratorBooleanEdge *getConstraints() { return constraints.iterator(); }
 	bool isConstraintEncoded(BooleanEdge be) { return encodedConstraints.contains(be);}
 	void addEncodedConstraint(BooleanEdge be) {encodedConstraints.add(be);}
-	
+
 	SATEncoder *getSATEncoder() {return satEncoder;}
 
 	void replaceBooleanWithTrue(BooleanEdge bexpr);
@@ -194,7 +194,7 @@ private:
 	void handleIFFTrue(BooleanLogic *bexpr, BooleanEdge child);
 	void handleANDTrue(BooleanLogic *bexpr, BooleanEdge child);
 	void handleFunction(ElementFunction *ef, BooleanEdge child);
-	
+
 	//These two functions are helpers if the client has a pointer to a
 	//Boolean object that we have since replaced
 	BooleanEdge rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uint asize);
