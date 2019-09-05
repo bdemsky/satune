@@ -15,8 +15,8 @@ public:
 	Vector<ASTNode *> parents;
 	ElementEncoding encoding;
 	inline ElementEncoding *getElementEncoding() { return &encoding; }
-	inline void freezeElement(){frozen = true;}
-	inline bool isFrozen(){return frozen;}
+	inline void freezeElement() {frozen = true;}
+	inline bool isFrozen() {return frozen;}
 	virtual Element *clone(CSolver *solver, CloneMap *map) {ASSERT(0); return NULL;};
 	virtual void serialize(Serializer *serializer) = 0;
 	virtual void print() = 0;

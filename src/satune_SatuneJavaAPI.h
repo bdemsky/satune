@@ -38,7 +38,7 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_resetCCSolver
  * Signature: (JIJI)J
  */
 JNIEXPORT jlong JNICALL Java_satune_SatuneJavaAPI_createSet
-	(JNIEnv *, jobject , jlong , jint , jlongArray arr);
+	(JNIEnv *, jobject, jlong, jint, jlongArray arr);
 
 /*
  * Class:     satune_SatuneJavaAPI

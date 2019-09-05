@@ -589,7 +589,7 @@ void addClause(CNF *cnf, uint numliterals, int *literals) {
 	addArrayClauseLiteral(cnf->solver, numliterals, literals);
 }
 
-void freezeVariable(CNF *cnf, Edge e){
+void freezeVariable(CNF *cnf, Edge e) {
 	int literal = getEdgeVar(e);
 	freeze(cnf->solver, literal);
 }

@@ -9,9 +9,9 @@
 		type *array;                                                       \
 	};                                                                    \
 	typedef struct Vector ## name Vector ## name;                         \
-	Vector ## name *allocVector ## name(uint capacity);                  \
-	Vector ## name *allocDefVector ## name();                            \
-	Vector ## name *allocVectorArray ## name(uint capacity, type * array); \
+	Vector ## name * allocVector ## name(uint capacity);                  \
+	Vector ## name * allocDefVector ## name();                            \
+	Vector ## name * allocVectorArray ## name(uint capacity, type * array); \
 	void pushVector ## name(Vector ## name * vector, type item);           \
 	type lastVector ## name(Vector ## name * vector);                      \
 	void popVector ## name(Vector ## name * vector);                       \
@@ -29,18 +29,18 @@
 	void initVectorArray ## name(Vector ## name * vector, uint capacity, type * array);
 
 #define VectorImpl(name, type, defcap)                                  \
-	Vector ## name *allocDefVector ## name() {                           \
+	Vector ## name * allocDefVector ## name() {                           \
 		return allocVector ## name(defcap);                                 \
 	}                                                                     \
-	Vector ## name *allocVector ## name(uint capacity) {                 \
-		Vector ## name *tmp = (Vector ## name *)ourmalloc(sizeof(Vector ## name));  \
+	Vector ## name * allocVector ## name(uint capacity) {                 \
+		Vector ## name * tmp = (Vector ## name *)ourmalloc(sizeof(Vector ## name));  \
 		tmp->size = 0;                                                      \
 		tmp->capacity = capacity;                                           \
 		tmp->array = (type *) ourmalloc(sizeof(type) * capacity);           \
 		return tmp;                                                         \
 	}                                                                     \
-	Vector ## name *allocVectorArray ## name(uint capacity, type * array)  { \
-		Vector ## name *tmp = allocVector ## name(capacity);               \
+	Vector ## name * allocVectorArray ## name(uint capacity, type * array)  { \
+		Vector ## name * tmp = allocVector ## name(capacity);               \
 		tmp->size = capacity;                                                 \
 		memcpy(tmp->array, array, capacity * sizeof(type));                 \
 		return tmp;                                                         \

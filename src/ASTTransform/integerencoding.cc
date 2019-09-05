@@ -24,7 +24,9 @@ void IntegerEncodingTransform::doTransform() {
 	SetIteratorOrder *orderit = orders->iterator();
 	while (orderit->hasNext()) {
 		Order *order = orderit->next();
-		if (GETVARTUNABLE(solver->getTuner(), order->type, ORDERINTEGERENCODING, &offon))
+		if (order->type == SATC_PARTIAL)
+			continue;
+		if (GETVARTUNABLE(solver->getTuner(), order->set->type, ORDERINTEGERENCODING, &offon))
 			integerEncode(order);
 	}
 	delete orders;
