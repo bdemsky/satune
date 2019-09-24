@@ -3,7 +3,11 @@
 #include "csolver.h"
 #include "hashset.h"
 #include "cppvector.h"
-
+#include <dirent.h>
+#include <string>
+#include <sstream>
+#include "common.h"
+using namespace std;
 const char * assertstart = "ASSERTSTART";
 const char * assertend = "ASSERTEND";
 const char * satstart = "SATSTART";
@@ -13,6 +17,7 @@ int skipahead(const char * token1, const char * token2);
 char * readuntilend(const char * token);
 BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset);
 void processEquality(char * constraint, int &offset);
+void dumpSMTproblem(char * sat, char * assert);
 
 std::ifstream * file;
 Order * order;
@@ -33,7 +38,7 @@ bool iw_equals(intwrapper *key1, intwrapper *key2) {
 }
 
 typedef Hashset<intwrapper *, uintptr_t, PTRSHIFT, iw_hash_function, iw_equals> HashsetIW;
-
+typedef SetIterator<intwrapper *, uintptr_t, PTRSHIFT, iw_hash_function, iw_equals> HashsetIWIterator;
 class OrderRec {
 public:
   OrderRec() : set (NULL), value(-1), alloced(false) {
@@ -54,6 +59,8 @@ typedef Hashtable<intwrapper *, Boolean *, uintptr_t, PTRSHIFT, iw_hash_function
 Vector<OrderRec*> * orderRecVector = NULL;
 HashtableIW * ordertable = NULL;
 HashtableBV * vartable = new HashtableBV();
+HashsetIW * intSet = new HashsetIW();
+HashsetIW * boolSet = new HashsetIW();
 
 void cleanAndFreeOrderRecVector(){
 	for(uint i=0; i< orderRecVector->getSize(); i++){
@@ -108,6 +115,7 @@ int main(int numargs, char ** argv) {
       solver->finalizeMutableSet(set);
       solver->serialize();
       solver->printConstraints();
+      dumpSMTproblem(sat, assert);
       delete solver;
     }
   }
@@ -128,15 +136,99 @@ int main(int numargs, char ** argv) {
   delete file;
 }
 
+void doExit(const char * message){
+	printf("%s", message);
+	exit(-1);
+}
+
+void doExit() {
+	doExit("Parse Error\n");
+}
+
+void renameDumpFile(const char *path, long long id) {
+	struct dirent *entry;
+	DIR *dir = opendir(path);
+	if (dir == NULL) {
+		return;
+	}
+	char newname[128] ={0};
+	sprintf(newname, "%lld.dump", id);
+	bool duplicate = false;
+	while ((entry = readdir(dir)) != NULL) {
+		 if(strstr(entry->d_name, "DUMP") != NULL){
+		 	if(duplicate){
+				doExit("Multiplle DUMP file exists. Make sure to clean them all before running the program");
+			}
+		 	int result= rename( entry->d_name , newname );
+			if ( result == 0 )
+				printf ( "File successfully renamed to %s\n" , newname);
+			else
+				doExit( "Error renaming file" );
+			duplicate = true;
+		 }
+	}
+	closedir(dir);
+}
+template <class MyType>
+string to_string(MyType value){
+	string number;
+	std::stringstream strstream;
+	strstream << value;
+	strstream >> number;
+	return number;
+}
+
+void dumpDeclarations(std::ofstream& smtfile){
+	HashsetIWIterator* iterator = intSet->iterator();
+	while(iterator->hasNext()){
+		intwrapper * iw = iterator->next();
+		string declare = "(declare-const O!"+ to_string<uint32_t>(iw->value) + " Int)\n";
+		smtfile << declare;
+	}
+	delete iterator;
+
+	iterator = boolSet->iterator();
+        while(iterator->hasNext()){
+                intwrapper * iw = iterator->next();
+                string declare = "(declare-const S!" + to_string<uint32_t>(iw->value) + " Bool)\n";
+                smtfile << declare;
+        }
+        delete iterator;
+}
+
+void dumpFooter(std::ofstream& smtfile){
+	smtfile << "(check-sat)" << endl;
+}
+
+
+
+void dumpSMTproblem(char * sat, char * assert){
+	long long id = getTimeNano();
+	cout << "Here's the ID= " << id << endl;
+	cout <<"************here is the SMT file*********" << endl << sat << endl << assert <<endl << "****************************" << endl;;
+	renameDumpFile("./", id);
+	string smtfilename = to_string<long long>(id) + ".smt";
+	std::ofstream smtfile;
+  	smtfile.open (smtfilename.c_str());
+	if(!smtfile.is_open())
+	{
+		doExit("Unable to create file.\n");
+	}
+	dumpDeclarations(smtfile);
+	string ssat(sat);
+	string satStatement = "(assert "+ ssat + "\n)\n";
+	smtfile << satStatement;
+	string sassert(assert);
+	string assertStatement = "(assert " + sassert + "\n)\n";
+	smtfile << assertStatement;
+	dumpFooter(smtfile);
+	smtfile.close();
+}
+
 void skipwhitespace(char * constraint, int & offset) {
   //skip whitespace
   while (constraint[offset] == ' ' || constraint[offset] == '\n')
     offset++;
-}
-
-void doExit() {
-  printf("PARSE ERROR\n");
-  exit(-1);
 }
 
 int32_t getOrderVar(char *constraint, int & offset) {
@@ -155,9 +247,10 @@ int32_t getOrderVar(char *constraint, int & offset) {
 }
 
 int32_t getBooleanVar(char *constraint, int & offset) {
-  if (constraint[offset++] != 'S' || constraint[offset++] != '!' ) {
-    doExit();
-  }
+	if (constraint[offset++] != 'S' || constraint[offset++] != '!' ) {
+		cout << "Constraint= " << constraint << "\toffset=" << constraint[offset - 1] << " ******\n";
+		doExit();
+	}
   int32_t num = 0;
   while(true) {
     char next = constraint[offset];
@@ -259,24 +352,42 @@ void processEquality(char * constraint, int &offset) {
     skipwhitespace(constraint, offset);
     getOrderVar(constraint, offset);
     skipwhitespace(constraint, offset);
-    if (constraint[offset++] != ')')
-      doExit();
+    if (constraint[offset++] != ')'){
+	    doExit();
+    }
     return;
   } else if (strncmp(&constraint[offset], "(=", 2) == 0) {
     offset+=2;
     skipwhitespace(constraint, offset);
     int v1=getOrderVar(constraint, offset);
+    intwrapper iwv1(v1);
+    if(intSet->get(&iwv1) == NULL){
+	intSet->add(new intwrapper(v1));
+    }
     skipwhitespace(constraint, offset);
     int v2=getOrderVar(constraint, offset);
+    intwrapper iwv2(v2);
+    if(intSet->get(&iwv2) == NULL){
+	intSet->add(new intwrapper(v2));
+    }
     skipwhitespace(constraint, offset);
     if (constraint[offset++] != ')')
       doExit();
     mergeVars(v1, v2);
     return;
-  } else {
-    getBooleanVar(constraint, offset);
-    skipwhitespace(constraint, offset);
-    return;
+  } else if (strncmp(&constraint[offset], "tr", 2) == 0){
+	offset+=4;
+	skipwhitespace(constraint, offset);
+	return;
+  }
+  else{
+	int32_t b1 = getBooleanVar(constraint, offset);
+	intwrapper iwb1(b1);
+	if(boolSet->get(&iwb1) == NULL){
+	    boolSet->add(new intwrapper(b1));
+	}
+	skipwhitespace(constraint, offset);
+return;
   }
 }
 
@@ -297,8 +408,16 @@ BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset) {
     offset+=2;
     skipwhitespace(constraint, offset);
     int32_t v1 = getOrderVar(constraint, offset);
+    intwrapper iwv1(v1);
+    if(intSet->get(&iwv1) == NULL){
+        intSet->add(new intwrapper(v1));
+    }
     skipwhitespace(constraint, offset);
     int32_t v2 = getOrderVar(constraint, offset);
+    intwrapper iwv2(v2);
+    if(intSet->get(&iwv2) == NULL){
+        intSet->add(new intwrapper(v2));
+    }
     skipwhitespace(constraint, offset);
     if (constraint[offset++] != ')')
       doExit();
@@ -313,8 +432,17 @@ BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset) {
     if (constraint[offset++] != ')')
       doExit();
     return solver->getBooleanTrue();
-  } else {
+  }else if (strncmp(&constraint[offset], "tr", 2) == 0){
+	offset+=4;
+	skipwhitespace(constraint, offset);
+	return solver->getBooleanTrue();
+  }
+  else {
     int32_t v = getBooleanVar(constraint, offset);
+    intwrapper iwb1(v);
+    if(boolSet->get(&iwb1) == NULL){
+        boolSet->add(new intwrapper(v));
+    }
     skipwhitespace(constraint, offset);
     return checkBooleanVar(solver, v);
   }
