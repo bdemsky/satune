@@ -17,7 +17,11 @@ int skipahead(const char * token1, const char * token2);
 char * readuntilend(const char * token);
 BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset);
 void processEquality(char * constraint, int &offset);
-void dumpSMTproblem(char * sat, char * assert);
+void dumpSMTproblem(string &smtProblem, long long id);
+void renameDumpFile(const char *path, long long id);
+void addASSERTConstraintToSMTProblem(string & smtProblem, char * assert);
+void addSATConstraintToSMTProblem(string &smtProblem, char * sat);
+void createSATtuneDumps (char *assert, char *sat, long long &smtID);
 
 std::ifstream * file;
 Order * order;
@@ -73,6 +77,8 @@ int main(int numargs, char ** argv) {
   file = new std::ifstream(argv[1]);
   char * assert = NULL;
   char * sat = NULL;
+  string smtProblem = "";
+  long long smtID=0L;
   Vector<OrderRec*> orderRecs;
   orderRecVector = &orderRecs;
   while(true) {
@@ -85,8 +91,14 @@ int main(int numargs, char ** argv) {
       if (assert != NULL){
 	free(assert);
 	assert = NULL;
+	dumpSMTproblem(smtProblem, smtID);
+	smtProblem = "";
+	intSet->reset();
+	boolSet->reset();
       }
       assert = readuntilend(assertend);
+      addASSERTConstraintToSMTProblem(smtProblem, assert);
+      //cout << "INFO: SMTProblem After adding ASSERT Constraints\n" << smtProblem << "\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
       printf("[%s]\n", assert);
     } else if (retval == 2) {
       if (sat != NULL) {
@@ -99,27 +111,19 @@ int main(int numargs, char ** argv) {
 	ordertable = new HashtableIW();
       }
       sat = readuntilend(satend);
-      CSolver *solver = new CSolver();
-      solver->turnoffOptimizations();
-      set = solver->createMutableSet(1);
-      order = solver->createOrder(SATC_TOTAL, (Set *) set);
-      int offset = 0;
-      processEquality(sat, offset);
-      offset = 0;
-      processEquality(assert, offset);
-      offset = 0;
-      solver->addConstraint(parseConstraint(solver, sat, offset));
-      offset = 0;
-      solver->addConstraint(parseConstraint(solver, assert, offset));
-      printf("[%s]\n", sat);
-      solver->finalizeMutableSet(set);
-      solver->serialize();
-      solver->printConstraints();
-      dumpSMTproblem(sat, assert);
-      delete solver;
+      createSATtuneDumps(assert, sat, smtID);
+      addSATConstraintToSMTProblem(smtProblem, sat);
+      //cout << "INFO: SMTProblem After adding SAT Constraints\n" << smtProblem << "\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
     }
   }
-
+  
+  if(smtID == 0L){
+  	char trueString [] = "true";
+	ordertable = new HashtableIW();
+  	createSATtuneDumps(assert, trueString, smtID);
+	addSATConstraintToSMTProblem(smtProblem, trueString);
+  }
+  dumpSMTproblem(smtProblem, smtID);
   cleanAndFreeOrderRecVector();
   if(ordertable != NULL){
   	delete ordertable;
@@ -134,6 +138,28 @@ int main(int numargs, char ** argv) {
   delete vartable;
   file->close();
   delete file;
+}
+
+void createSATtuneDumps (char *assert, char *sat, long long &smtID){
+	CSolver *solver = new CSolver();
+	solver->turnoffOptimizations();
+	set = solver->createMutableSet(1);
+	order = solver->createOrder(SATC_TOTAL, (Set *) set);
+	int offset = 0;
+	processEquality(sat, offset);
+	offset = 0;
+	processEquality(assert, offset);
+	offset = 0;
+	solver->addConstraint(parseConstraint(solver, sat, offset));
+	offset = 0;
+	solver->addConstraint(parseConstraint(solver, assert, offset));
+	printf("[%s]\n", sat);
+	solver->finalizeMutableSet(set);
+	solver->serialize();
+	solver->printConstraints();
+	smtID= getTimeNano();
+	renameDumpFile("./", smtID);
+      	delete solver;
 }
 
 void doExit(const char * message){
@@ -180,9 +206,10 @@ string to_string(MyType value){
 
 void dumpDeclarations(std::ofstream& smtfile){
 	HashsetIWIterator* iterator = intSet->iterator();
+	smtfile << "(set-logic QF_LRA)" << endl;
 	while(iterator->hasNext()){
 		intwrapper * iw = iterator->next();
-		string declare = "(declare-const O!"+ to_string<uint32_t>(iw->value) + " Int)\n";
+		string declare = "(declare-const O!"+ to_string<uint32_t>(iw->value) + " Real)\n";
 		smtfile << declare;
 	}
 	delete iterator;
@@ -196,34 +223,33 @@ void dumpDeclarations(std::ofstream& smtfile){
         delete iterator;
 }
 
-void dumpFooter(std::ofstream& smtfile){
-	smtfile << "(check-sat)" << endl;
+void addASSERTConstraintToSMTProblem(string & smtProblem, char * assert){
+	string ssat(assert);
+	string assertStatement = "(assert "+ ssat + "\n)\n";
+	smtProblem += assertStatement;
 }
 
-
-
-void dumpSMTproblem(char * sat, char * assert){
-	long long id = getTimeNano();
-	cout << "Here's the ID= " << id << endl;
-	cout <<"************here is the SMT file*********" << endl << sat << endl << assert <<endl << "****************************" << endl;;
-	renameDumpFile("./", id);
-	string smtfilename = to_string<long long>(id) + ".smt";
-	std::ofstream smtfile;
-  	smtfile.open (smtfilename.c_str());
-	if(!smtfile.is_open())
-	{
-		doExit("Unable to create file.\n");
-	}
-	dumpDeclarations(smtfile);
+void addSATConstraintToSMTProblem(string &smtProblem, char * sat){
 	string ssat(sat);
-	string satStatement = "(assert "+ ssat + "\n)\n";
-	smtfile << satStatement;
-	string sassert(assert);
-	string assertStatement = "(assert " + sassert + "\n)\n";
-	smtfile << assertStatement;
-	dumpFooter(smtfile);
-	smtfile.close();
+        string satStatement = "(push)\n(assert "+ ssat + "\n)\n(check-sat)\n(get-model)\n(pop)\n";
+        smtProblem += satStatement;
 }
+
+
+void dumpSMTproblem(string &smtProblem, long long id){
+	std::ofstream smtfile;
+	string smtfilename = to_string<long long>(id) + ".smt";
+        smtfile.open (smtfilename.c_str());
+        if(!smtfile.is_open())
+        {
+                doExit("Unable to create file.\n");
+        }
+	dumpDeclarations(smtfile);
+	smtfile << smtProblem;
+	smtfile.close();
+	cout <<"************here is the SMT file*********" << endl << smtProblem  <<endl << "****************************" << endl;;
+}
+
 
 void skipwhitespace(char * constraint, int & offset) {
   //skip whitespace
