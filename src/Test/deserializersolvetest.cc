@@ -18,5 +18,5 @@ int main(int argc, char **argv) {
 		}
 		delete solver;
 	}
-	return 1;
+	return 0;
 }
