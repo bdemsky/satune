@@ -67,7 +67,7 @@ def startLearningProcess(benchmark, server, learningSet):
 	LOGFILE= benchmark + "-" + str(learningSet) + ".log"
 	print("Running benchmark " + benchmark + "(Set="+ str(learningSet)+") on server")
 	COMMAND=("cd "+SRCDIR+"; ./Scripts/learnresultgen.sh " +
-		benchmark + " " + str(learningSet) + " " + ALGORITHM + " &> " + LOGFILE + "; mv *.csv ~/; echo 'SUCCESS'")
+		benchmark + " " + str(learningSet) + " " + ALGORITHM + " &> " + LOGFILE + "; mv *.csv /rscratch/hamed/; echo 'SUCCESS'")
 	print("Calling the following command:\n" + COMMAND)
 	ssh = subprocess.Popen(["ssh", "%s" % HOST, COMMAND],
 		shell=False,
@@ -88,11 +88,12 @@ def moveCSVFiles():
 
 def main():
 	benchmark = ArgParser().getBenchmarkName()
-#	print("Deploying on all the servers ...")
-#	deploy()
+	#print("Deploying on all the servers ...")
+	#deploy()
 	serverNumber = getServerNeeded(benchmark)
 	print("Learning on " + benchmark + " needs " + str(serverNumber) + " servers.")
-	availableServers = getAvailableServerList(serverNumber)
+	#availableServers = getAvailableServerList(serverNumber)
+	availableServers = [4, 5, 6, 7]
 	print ("Available Server:" + str(availableServers))
 	if serverNumber > len(availableServers):
 		print("Servers are busy. We don't have enough server available for learning ...")
