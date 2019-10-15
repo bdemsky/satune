@@ -102,6 +102,8 @@ int getSolution(IncrementalSolver *This) {
 		}
 		readSolver(This, &This->solution[1], numVars * sizeof(int));
 		This->solutionsize = numVars;
+	} else if (result == IS_INDETER){
+		return result;	
 	} else {//Reading unsat explanation
 		int numVars = readIntSolver(This);
 		if (numVars > This->solutionsize) {
