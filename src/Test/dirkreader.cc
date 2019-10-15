@@ -6,26 +6,33 @@
 #include <dirent.h>
 #include <string>
 #include <sstream>
+#include <sstream>
+#include <string.h>
 #include "common.h"
+
 using namespace std;
 const char * assertstart = "ASSERTSTART";
 const char * assertend = "ASSERTEND";
 const char * satstart = "SATSTART";
 const char * satend = "SATEND";
+const char * varstart = "VARSTART";
+const char * varend = "VAREND";
 
-int skipahead(const char * token1, const char * token2);
+int skipahead(const char * token1, const char * token2, const char * token3);
 char * readuntilend(const char * token);
 BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset);
 void processEquality(char * constraint, int &offset);
 void dumpSMTproblem(string &smtProblem, long long id);
 void renameDumpFile(const char *path, long long id);
 void addASSERTConstraintToSMTProblem(string & smtProblem, char * assert);
+void addVarConstraintToSMTProblem(string & smtProblem, Vector<char *> & varconstraint);
 void addSATConstraintToSMTProblem(string &smtProblem, char * sat);
-void createSATtuneDumps (char *assert, char *sat, long long &smtID);
+void createSATtuneDumps (char *assert, char *sat, Vector<char *> & varconstraints, long long &smtID);
 
 std::ifstream * file;
 Order * order;
 MutableSet * set;
+bool incremental = true;
 class intwrapper {
 public:
   intwrapper(int _val) : value(_val) {
@@ -75,15 +82,20 @@ void cleanAndFreeOrderRecVector(){
 
 int main(int numargs, char ** argv) {
   file = new std::ifstream(argv[1]);
+  if(numargs > 2){
+  	incremental = false;
+  }
   char * assert = NULL;
   char * sat = NULL;
+  char * var = NULL;
+  Vector<char *> varconstraints;
   string smtProblem = "";
   long long smtID=0L;
   Vector<OrderRec*> orderRecs;
   orderRecVector = &orderRecs;
   while(true) {
-    int retval = skipahead(assertstart, satstart);
-    printf("%d\n", retval);
+    int retval = skipahead(assertstart, satstart, varstart);
+    //printf("%d\n", retval);
     if (retval == 0){
       break;
     }
@@ -93,13 +105,17 @@ int main(int numargs, char ** argv) {
 	assert = NULL;
 	dumpSMTproblem(smtProblem, smtID);
 	smtProblem = "";
+	for(uint i=0; i< varconstraints.getSize(); i++){
+		free(varconstraints.get(i));
+	}
+	varconstraints.clear();
 	intSet->reset();
 	boolSet->reset();
       }
       assert = readuntilend(assertend);
       addASSERTConstraintToSMTProblem(smtProblem, assert);
       //cout << "INFO: SMTProblem After adding ASSERT Constraints\n" << smtProblem << "\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
-      printf("[%s]\n", assert);
+      //printf("[%s]\n", assert);
     } else if (retval == 2) {
       if (sat != NULL) {
 	free(sat);
@@ -109,21 +125,30 @@ int main(int numargs, char ** argv) {
 	cleanAndFreeOrderRecVector();
       } else {
 	ordertable = new HashtableIW();
+	addVarConstraintToSMTProblem(smtProblem, varconstraints);
       }
       sat = readuntilend(satend);
-      createSATtuneDumps(assert, sat, smtID);
+      createSATtuneDumps(assert, sat, varconstraints, smtID);
       addSATConstraintToSMTProblem(smtProblem, sat);
+      if(!incremental){
+      	dumpSMTproblem(smtProblem, smtID);
+      }
       //cout << "INFO: SMTProblem After adding SAT Constraints\n" << smtProblem << "\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n";
+    } else if (retval == 3) {
+      var = readuntilend(varend);
+      varconstraints.push(var);
     }
   }
   
   if(smtID == 0L){
   	char trueString [] = "true";
 	ordertable = new HashtableIW();
-  	createSATtuneDumps(assert, trueString, smtID);
+  	createSATtuneDumps(assert, trueString, varconstraints, smtID);
 	addSATConstraintToSMTProblem(smtProblem, trueString);
   }
-  dumpSMTproblem(smtProblem, smtID);
+  if(incremental){
+  	dumpSMTproblem(smtProblem, smtID);
+  }
   cleanAndFreeOrderRecVector();
   if(ordertable != NULL){
   	delete ordertable;
@@ -140,9 +165,9 @@ int main(int numargs, char ** argv) {
   delete file;
 }
 
-void createSATtuneDumps (char *assert, char *sat, long long &smtID){
+void createSATtuneDumps (char *assert, char *sat, Vector<char *> & varconstraints, long long &smtID){
 	CSolver *solver = new CSolver();
-	solver->turnoffOptimizations();
+//	solver->turnoffOptimizations();
 	set = solver->createMutableSet(1);
 	order = solver->createOrder(SATC_TOTAL, (Set *) set);
 	int offset = 0;
@@ -153,12 +178,19 @@ void createSATtuneDumps (char *assert, char *sat, long long &smtID){
 	solver->addConstraint(parseConstraint(solver, sat, offset));
 	offset = 0;
 	solver->addConstraint(parseConstraint(solver, assert, offset));
-	printf("[%s]\n", sat);
+	for(uint i=0; i<varconstraints.getSize(); i++){
+		offset = 0;
+		processEquality(varconstraints.get(i),offset);
+		offset = 0;
+		solver->addConstraint(parseConstraint(solver, varconstraints.get(i), offset));
+	}
+	//printf("[%s]\n", sat);
 	solver->finalizeMutableSet(set);
 	solver->serialize();
-	solver->printConstraints();
+	//solver->printConstraints();
 	smtID= getTimeNano();
 	renameDumpFile("./", smtID);
+	//solver->solve();
       	delete solver;
 }
 
@@ -223,6 +255,14 @@ void dumpDeclarations(std::ofstream& smtfile){
         delete iterator;
 }
 
+
+void addVarConstraintToSMTProblem(string & smtProblem, Vector<char *> & varconstraints){
+	for(uint i=0; i<varconstraints.getSize(); i++){
+		//cout << "[ " << varconstraints.get(i) << " ]" << endl;
+		smtProblem += "(assert "+ string(varconstraints.get(i)) +")\n";
+	}
+}
+
 void addASSERTConstraintToSMTProblem(string & smtProblem, char * assert){
 	string ssat(assert);
 	string assertStatement = "(assert "+ ssat + "\n)\n";
@@ -231,7 +271,12 @@ void addASSERTConstraintToSMTProblem(string & smtProblem, char * assert){
 
 void addSATConstraintToSMTProblem(string &smtProblem, char * sat){
 	string ssat(sat);
-        string satStatement = "(push)\n(assert "+ ssat + "\n)\n(check-sat)\n(get-model)\n(pop)\n";
+	string satStatement;
+	if(incremental){
+        	satStatement = "(push)\n(assert "+ ssat + "\n)\n(check-sat)\n(pop)\n";
+	} else {
+		satStatement = "(assert "+ ssat + "\n)\n(check-sat)\n";
+	}
         smtProblem += satStatement;
 }
 
@@ -274,7 +319,7 @@ int32_t getOrderVar(char *constraint, int & offset) {
 
 int32_t getBooleanVar(char *constraint, int & offset) {
 	if (constraint[offset++] != 'S' || constraint[offset++] != '!' ) {
-		cout << "Constraint= " << constraint << "\toffset=" << constraint[offset - 1] << " ******\n";
+		cout << "Constraint= " << constraint << "\tconstraint[offset=" << offset - 1 << "]" << &constraint[offset -1] <<"\n";
 		doExit();
 	}
   int32_t num = 0;
@@ -358,6 +403,47 @@ int32_t checkordervar(CSolver * solver, int32_t value) {
   return rec->value;
 }
 
+void processLetExpression (char * constraint){
+	int constrSize = strlen(constraint);
+	char * replace = (char *) malloc(constrSize);
+	for (int i=0; i< constrSize; i++){
+		replace[i] = 0;
+	}
+	int offset = 1;
+	offset +=4;
+	skipwhitespace(constraint, offset);
+	ASSERT(strncmp(&constraint[offset], "((a!1",5) == 0);
+	offset +=5;
+	skipwhitespace(constraint, offset);
+	int startOffset = offset;
+	processEquality(constraint, offset);
+	strncpy(replace, &constraint[startOffset], offset-startOffset);
+	while(constraint[offset] == ')')
+		offset++;
+	skipwhitespace(constraint, offset);
+	string modified = "";
+	while(offset < constrSize){
+		bool done = false;
+		while(strncmp(&constraint[offset], "a!1",3) != 0){
+			modified += constraint[offset++];
+			if(offset >= constrSize -2){ //Not considering ) and \n ...
+				ASSERT(constraint[constrSize-1] == '\n');
+				ASSERT(constraint[constrSize-2] == ')');
+				done = true;
+				break;
+			}
+		}
+		if(done){
+			break;
+		}
+		offset += 3;
+		modified += replace;
+	}
+	strcpy(constraint, modified.c_str());
+	cout << "modified:*****" << modified << "****\n";
+	free(replace);
+}
+
 void processEquality(char * constraint, int &offset) {
   skipwhitespace(constraint, offset);
   if (strncmp(&constraint[offset], "(and",4) == 0) {
@@ -371,6 +457,35 @@ void processEquality(char * constraint, int &offset) {
       }
       processEquality(constraint, offset);
     }
+  } else if (strncmp(&constraint[offset], "(or",3) == 0) {
+    offset +=3;
+    Vector<BooleanEdge> vec;
+    while(true) {
+      skipwhitespace(constraint, offset);
+      if (constraint[offset] == ')') {
+        offset++;
+        return;
+      }
+      processEquality(constraint, offset);
+    }
+  } else if (strncmp(&constraint[offset], "(let",4) == 0){
+    ASSERT(offset == 1);
+    cout << "Before: " << constraint << endl;
+    processLetExpression(constraint);
+    cout << "After: " << constraint << endl;
+    offset=0;
+    processEquality(constraint, offset);
+  } else if (strncmp(&constraint[offset], "(=>",3) == 0){
+    offset +=3;
+    skipwhitespace(constraint, offset);
+    processEquality(constraint, offset);
+    skipwhitespace(constraint, offset);
+    processEquality(constraint, offset);
+    skipwhitespace(constraint, offset);
+    if (constraint[offset++] != ')'){
+            doExit();
+    }
+    return;
   } else if (strncmp(&constraint[offset], "(<", 2) == 0) {
     offset+=2;
     skipwhitespace(constraint, offset);
@@ -430,6 +545,27 @@ BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset) {
       }
       vec.push(parseConstraint(solver, constraint, offset));
     }
+  } else if (strncmp(&constraint[offset], "(or", 3) == 0) {
+    offset +=3;
+    Vector<BooleanEdge> vec;
+    while(true) {
+      skipwhitespace(constraint, offset);
+      if (constraint[offset] == ')') {
+        offset++;
+        return solver->applyLogicalOperation(SATC_OR, vec.expose(), vec.getSize());
+      }
+      vec.push(parseConstraint(solver, constraint, offset));
+    }
+  } else if (strncmp(&constraint[offset], "(=>", 3) == 0){
+    offset += 3;
+    skipwhitespace(constraint, offset);
+    BooleanEdge b1 = parseConstraint(solver, constraint, offset);
+    skipwhitespace(constraint, offset);
+    BooleanEdge b2 = parseConstraint(solver, constraint, offset);
+    skipwhitespace(constraint, offset);
+    if (constraint[offset++] != ')')
+      doExit();
+    return solver->applyLogicalOperation(SATC_IMPLIES, b1, b2);
   } else if (strncmp(&constraint[offset], "(<", 2) == 0) {
     offset+=2;
     skipwhitespace(constraint, offset);
@@ -447,6 +583,10 @@ BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset) {
     skipwhitespace(constraint, offset);
     if (constraint[offset++] != ')')
       doExit();
+//    int32_t o1 = checkordervar(solver, v1);
+//    int32_t o2 = checkordervar(solver, v2);
+//    cout << "V1=" << v1 << ",V2=" << v2 << ",O1=" << o1 << ",O2=" << o2<< endl;
+//    ASSERT( o1 != o2); 
     return solver->orderConstraint(order, checkordervar(solver, v1), checkordervar(solver, v2));
   } else if (strncmp(&constraint[offset], "(=", 2) == 0) {
     offset+=2;
@@ -474,14 +614,16 @@ BooleanEdge parseConstraint(CSolver * solver, char * constraint, int & offset) {
   }
 }
 
-int skipahead(const char * token1, const char * token2) {
-  int index1 = 0, index2 = 0;
+int skipahead(const char * token1, const char * token2, const char * token3) {
+  int index1 = 0, index2 = 0, index3 = 0;
   char buffer[256];
   while(true) {
     if (token1[index1] == 0)
       return 1;
     if (token2[index2] == 0)
       return 2;
+    if (token3[index3] == 0)
+      return 3;
     if (file->eof())
       return 0;
     file->read(buffer, 1);
@@ -493,6 +635,10 @@ int skipahead(const char * token1, const char * token2) {
       index2++;
     else
       index2 = 0;
+    if (buffer[0] == token3[index3])
+      index3++;
+    else
+      index3 = 0;
   }
 }
 
