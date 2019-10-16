@@ -29,7 +29,8 @@ SerializeTuner::SerializeTuner(const char *filename) {
 		}
 		myfile.close();
 	} else {
-		model_print("Warning: Tuner %s couldn't be loaded ... Using default tuner instead ....\n", filename);
+		model_print("Error: Tuner %s cannot be found ...\n", filename);
+		exit(1);
 	}
 }
 
