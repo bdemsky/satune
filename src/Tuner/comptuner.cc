@@ -15,39 +15,35 @@ CompTuner::~CompTuner() {
 
 }
 
-void CompTuner::findBestThreeTuners() {
-	if (allTuners.getSize() < 3) {
+void CompTuner::findBestTwoTuners() {
+	if (allTuners.getSize() < 2) {
 		printData();
 		return;
 	}
-	TunerRecord *bestTuners[3];
+	TunerRecord *bestTuners[2];
 	double score = DBL_MAX;
-	for (uint i = 0; i < allTuners.getSize() - 2; i++) {
-		for (uint j = i + 1; j < allTuners.getSize() - 1; j++) {
-			for (uint k = j + 1; k < allTuners.getSize(); k++) {
-				TunerRecord *tuner1 = allTuners.get(i);
-				TunerRecord *tuner2 = allTuners.get(j);
-				TunerRecord *tuner3 = allTuners.get(k);
-				double mintimes[problems.getSize()];
-				for (uint l = 0; l < problems.getSize(); l++) {
-					Problem *problem = problems.get(l);
-					mintimes[l] = pow(min(tuner1->getTime(problem), tuner2->getTime(problem), tuner3->getTime(problem)), (double)1 / problems.getSize());
-				}
-				double result = 1;
-				for (uint l = 0; l < problems.getSize(); l++) {
-					result *= mintimes[l];
-				}
-				if (result < score) {
-					score = result;
-					bestTuners[0] = tuner1;
-					bestTuners[1] = tuner2;
-					bestTuners[2] = tuner3;
-				}
+	for (uint j = 0; j < allTuners.getSize() - 1; j++) {
+		for (uint k = j + 1; k < allTuners.getSize(); k++) {
+			TunerRecord *tuner1 = allTuners.get(j);
+			TunerRecord *tuner2 = allTuners.get(k);
+			double mintimes[problems.getSize()];
+			for (uint l = 0; l < problems.getSize(); l++) {
+				Problem *problem = problems.get(l);
+				mintimes[l] = pow(min(tuner1->getTime(problem), tuner2->getTime(problem)), (double)1 / problems.getSize());
+			}
+			double result = 1;
+			for (uint l = 0; l < problems.getSize(); l++) {
+				result *= mintimes[l];
+			}
+			if (result < score) {
+				score = result;
+				bestTuners[0] = tuner1;
+				bestTuners[1] = tuner2;
 			}
 		}
 	}
-	model_print("Best 3 tuners:\n");
-	for (uint i = 0; i < 3; i++) {
+	model_print("Best 2 tuners:\n");
+	for (uint i = 0; i < 2; i++) {
 		TunerRecord *tuner = bestTuners[i];
 		SearchTuner *stun = tuner->getTuner();
 		char buffer[512];
@@ -59,6 +55,7 @@ void CompTuner::findBestThreeTuners() {
 		model_print("----------------------------------\n\n\n");
 	}
 }
+
 
 void CompTuner::readData(uint numRuns) {
 	for (uint i = 0; i < numRuns; i++) {

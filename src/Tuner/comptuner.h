@@ -11,7 +11,7 @@ public:
 	virtual ~CompTuner();
 	void readData(uint numRuns);
 	void tune();
-	void findBestThreeTuners();
+	void findBestTwoTuners();
 protected:
 
 };
