@@ -29,7 +29,13 @@ void CompTuner::findBestTwoTuners() {
 			double mintimes[problems.getSize()];
 			for (uint l = 0; l < problems.getSize(); l++) {
 				Problem *problem = problems.get(l);
-				mintimes[l] = pow(min(tuner1->getTime(problem), tuner2->getTime(problem)), (double)1 / problems.getSize());
+				long long time1 = tuner1->getTime(problem);
+				long long time2 = tuner2->getTime(problem);
+				long long minTime =DBL_MAX;
+				if(time1 != -1 || time2 != -1){
+					minTime = min(time1,time2);
+				}
+				mintimes[l] = pow(minTime, (double)1 / problems.getSize());
 			}
 			double result = 1;
 			for (uint l = 0; l < problems.getSize(); l++) {
