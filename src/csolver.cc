@@ -409,28 +409,30 @@ BooleanEdge CSolver::rewriteLogicalOperation(LogicOp op, BooleanEdge *array, uin
 	return applyLogicalOperation(op, newarray, asize);
 }
 
-BooleanEdge CSolver::applyExactlyOneConstraint (BooleanEdge *array, uint asize) {
-	BooleanEdge newarray[asize + 1];
-
-	newarray[asize] = applyLogicalOperation(SATC_OR, array, asize);
-	for (uint i = 0; i < asize; i++) {
-		BooleanEdge oprand1 = array[i];
-		BooleanEdge carray [asize - 1];
-		uint index = 0;
-		for ( uint j = 0; j < asize; j++) {
-			if (i != j) {
-				BooleanEdge oprand2 = applyLogicalOperation(SATC_NOT, array[j]);
-				carray[index++] = applyLogicalOperation(SATC_IMPLIES, oprand1, oprand2);
-			}
-		}
-		ASSERT(index == asize - 1);
-		newarray[i] = applyLogicalOperation(SATC_AND, carray, asize - 1);
+BooleanEdge CSolver::applyAtMostOneConstraint (BooleanEdge *array, uint asize) {
+	if(asize == 0 || asize == 1){
+		return getBooleanTrue();
 	}
-	return applyLogicalOperation(SATC_AND, newarray, asize + 1);
+	BooleanEdge newarray[asize*(asize-1)];
+	uint newsize = 0;
+	for (uint i = 0; i < asize -1; i++) {
+		for(uint j = i +1; j < asize; j++){
+			BooleanEdge oprand1 = array[i];
+			BooleanEdge oprand2 = applyLogicalOperation(SATC_NOT, array[j]);
+			newarray[newsize++] = applyLogicalOperation(SATC_IMPLIES, oprand1, oprand2);
+		}
+	}
+	return applyLogicalOperation(SATC_AND, newarray, newsize);
+}
+
+BooleanEdge CSolver::applyExactlyOneConstraint (BooleanEdge *array, uint asize) {
+	BooleanEdge atleastOne = applyLogicalOperation(SATC_OR, array, asize);
+	BooleanEdge atmostOne = applyAtMostOneConstraint (array, asize);
+	return applyLogicalOperation(SATC_AND, atleastOne, atmostOne);
 }
 
 BooleanEdge CSolver::applyLogicalOperation(LogicOp op, BooleanEdge *array, uint asize) {
-	if (!useInterpreter()) {
+	if (!useInterpreter() && !optimizationsOff) {
 		BooleanEdge newarray[asize];
 		switch (op) {
 		case SATC_NOT: {
@@ -530,7 +532,7 @@ BooleanEdge CSolver::orderConstraint(Order *order, uint64_t first, uint64_t seco
 		}
 	}
 	Boolean *constraint = new BooleanOrder(order, first, second);
-	if (!useInterpreter() ) {
+	if (!useInterpreter() && !optimizationsOff ) {
 		Boolean *b = boolMap.get(constraint);
 
 		if (b == NULL) {

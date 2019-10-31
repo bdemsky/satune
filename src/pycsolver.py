@@ -65,6 +65,10 @@ def loadCSolver():
 	csolverlb.getElementRange.restype = c_void_p
 	csolverlb.getBooleanVar.argtypes = [c_void_p, c_uint]
 	csolverlb.getBooleanVar.restype = c_void_p
+	csolverlb.getBooleanTrue.argtypes = [c_void_p]
+	csolverlb.getBooleanTrue.restype = c_void_p
+	csolverlb.getBooleanFalse.argtypes = [c_void_p]
+	csolverlb.getBooleanFalse.restype = c_void_p
 	csolverlb.createFunctionOperator.argtypes = [c_void_p, c_uint, c_void_p, c_uint]
 	csolverlb.createFunctionOperator.restype = c_void_p
 	csolverlb.createPredicateOperator.argtypes = [c_void_p, c_uint]
@@ -89,6 +93,8 @@ def loadCSolver():
 	csolverlb.applyLogicalOperation.restype = c_void_p
 	csolverlb.applyExactlyOneConstraint.argtypes = [c_void_p, c_void_p, c_uint]
 	csolverlb.applyExactlyOneConstraint.restype = c_void_p
+	csolverlb.applyAtMostOneConstraint.argtypes = [c_void_p, c_void_p, c_uint]
+	csolverlb.applyAtMostOneConstraint.restype = c_void_p
 	csolverlb.applyLogicalOperationTwo.argtypes = [c_void_p, c_uint, c_void_p, c_void_p]
 	csolverlb.applyLogicalOperationTwo.restype = c_void_p
 	csolverlb.applyLogicalOperationOne.argtypes = [c_void_p, c_uint, c_void_p]

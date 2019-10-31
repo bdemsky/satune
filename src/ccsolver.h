@@ -33,6 +33,7 @@ void *applyPredicateTable(void *solver,void *predicate, void **inputs, unsigned 
 void *applyPredicate(void *solver,void *predicate, void **inputs, unsigned int numInputs);
 void *applyLogicalOperation(void *solver,unsigned int op, void **array, unsigned int asize);
 void *applyExactlyOneConstraint(void *solver,void **array, unsigned int asize);
+void *applyAtMostOneConstraint(void *solver,void **array, unsigned int asize);
 void *applyLogicalOperationTwo(void *solver,unsigned int op, void *arg1, void *arg2);
 void *applyLogicalOperationOne(void *solver,unsigned int op, void *arg);
 void addConstraint(void *solver,void *constraint);

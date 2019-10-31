@@ -118,6 +118,14 @@ void *applyExactlyOneConstraint(void *solver, void **array, unsigned int asize) 
 	return CCSOLVER(solver)->applyExactlyOneConstraint( constr, (uint) asize).getRaw();
 }
 
+void *applyAtMostOneConstraint(void *solver, void **array, unsigned int asize) {
+	BooleanEdge constr [asize];
+	for (uint i = 0; i < asize; i++) {
+		constr[i] = BooleanEdge((Boolean *)array[i]);
+	}
+	return CCSOLVER(solver)->applyAtMostOneConstraint( constr, (uint) asize).getRaw();
+}
+
 void *applyLogicalOperationTwo(void *solver,unsigned int op, void *arg1, void *arg2) {
 	return CCSOLVER(solver)->applyLogicalOperation((LogicOp) op, BooleanEdge((Boolean *) arg1), BooleanEdge((Boolean *) arg2)).getRaw();
 }

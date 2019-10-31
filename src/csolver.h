@@ -103,6 +103,9 @@ public:
 
 	/** This exactly one element of array can be true! (i.e. a1 + a2 + a3 + ... + an = 1)*/
 	BooleanEdge applyExactlyOneConstraint (BooleanEdge *array, uint asize);
+	
+	/** This exactly one element of array can be true! (i.e. a1 => !a2 & !a3 & ... & !an)*/
+	BooleanEdge applyAtMostOneConstraint (BooleanEdge *array, uint asize);
 
 	/** This function applies a logical operation to the Booleans in its input. */
 
