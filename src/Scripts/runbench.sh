@@ -4,7 +4,6 @@
 # ./runbench.sh [nqueens] [timeout] [tuner.conf]
 # ./runbench.sh [sudoku-csolver] [timeout] [tuner.conf]
 # ./runbench.sh [killerSudoku] [timeout] [tuner.conf]
-set -e
 
 if [ "$#" -lt 3 ]; then
         echo "Illegal number of argument"
@@ -20,6 +19,13 @@ for d in $DUMP; do
 	if [[ $d = *$1* ]]; then
 		echo "Running: ./run.sh tunerrun "."$d $2 $3 out.out"
 		./run.sh tunerrun "."$d $2 $3 out.out
+		echo "Return code: $?"
+		if [ $? -eq 141 ]; then #Dump info when SAT Solver gets killed by OS ....
+			echo "Satune got out of memory"
+			echo "deserializing $d ..."
+			echo "SAT Solving time: 400000000.0"
+			echo "CSOLVER solve time: 400000000.0"
+		fi
 		echo "Best tuner"
 	fi
 done
