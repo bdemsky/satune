@@ -18,15 +18,17 @@ void naiveEncodingDecision(CSolver *This) {
 	if (This->isUnSAT()) {
 		return;
 	}
+	HashsetBoolean *visited = new HashsetBoolean();
 	SetIteratorBooleanEdge *iterator = This->getConstraints();
 	while (iterator->hasNext()) {
 		BooleanEdge b = iterator->next();
-		naiveEncodingConstraint(This, b.getBoolean());
+		naiveEncodingConstraint(This, visited, b.getBoolean());
 	}
 	delete iterator;
+	delete visited;
 }
 
-void naiveEncodingConstraint(CSolver *csolver, Boolean *This) {
+void naiveEncodingConstraint(CSolver *csolver, HashsetBoolean *visited, Boolean *This) {
 	switch (This->type) {
 	case BOOLEANVAR: {
 		return;
@@ -37,7 +39,7 @@ void naiveEncodingConstraint(CSolver *csolver, Boolean *This) {
 		return;
 	}
 	case LOGICOP: {
-		naiveEncodingLogicOp(csolver, (BooleanLogic *) This);
+		naiveEncodingLogicOp(csolver, visited, (BooleanLogic *) This);
 		return;
 	}
 	case PREDICATEOP: {
@@ -49,9 +51,12 @@ void naiveEncodingConstraint(CSolver *csolver, Boolean *This) {
 	}
 }
 
-void naiveEncodingLogicOp(CSolver *csolver, BooleanLogic *This) {
+void naiveEncodingLogicOp(CSolver *csolver, HashsetBoolean *visited, BooleanLogic *This) {
+	if (!visited->add(This))
+		return;
+
 	for (uint i = 0; i < This->inputs.getSize(); i++) {
-		naiveEncodingConstraint(csolver, This->inputs.get(i).getBoolean());
+		naiveEncodingConstraint(csolver, visited, This->inputs.get(i).getBoolean());
 	}
 }
 
