@@ -2,6 +2,8 @@
 # ./learnresultgen.sh [sypet] [learning set = 1, 2, 3, etc.] [algorithm= 1, 2, 3, 4]
 set -e
 
+ulimit -d 31500000
+
 if [ "$#" -lt 3 ]; then
         echo "Illegal number of argument"
         echo "./learnresultgen.sh [sypet] [learning set = 0, 1, 2, 3, etc.] [algorithm = Known Tuner Types: Random Tuner=1, Comp Tuner=2, Kmeans Tuner=3, Simulated Annealing Tuner=4]"
@@ -13,6 +15,7 @@ BENCHDIR=$SATUNEDIR/Benchmarks/$1
 BIN=$SATUNEDIR/bin
 
 source $SATUNEDIR/Benchmarks/common.sh
+$SATUNEDIR/Scripts/setup.sh
 cd $BENCHDIR
 ./learn.sh $2 $3
 cd $BIN
