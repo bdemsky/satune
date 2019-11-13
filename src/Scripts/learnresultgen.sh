@@ -2,7 +2,7 @@
 # ./learnresultgen.sh [sypet] [learning set = 1, 2, 3, etc.] [algorithm= 1, 2, 3, 4]
 set -e
 
-ulimit -d 31500000
+ulimit -m 31500000
 
 if [ "$#" -lt 3 ]; then
         echo "Illegal number of argument"
