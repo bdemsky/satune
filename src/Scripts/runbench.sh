@@ -16,7 +16,7 @@ BIN=./bin
 DUMP=$(find . -name "*.dump")
 cd $BIN
 for d in $DUMP; do
-	if [[ $d = *$1* ]]; then
+	if [[ $d = *$1* ]] && [[ $d = *learningset* ]]; then
 		echo "Running: ./run.sh tunerrun "."$d $2 $3 out.out"
 		./run.sh tunerrun "."$d $2 $3 out.out
 		RETCODE=$?
