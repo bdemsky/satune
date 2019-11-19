@@ -9,9 +9,24 @@ int main(int argc, char **argv) {
 		SearchTuner *elem_onehot = new SearchTuner();
 		SearchTuner *elem_unary = new SearchTuner();
 		elem_bin->setTunable(NAIVEENCODER, &NaiveEncodingDesc, BINARYINDEX);
+		elem_bin->setTunable(PREPROCESS, &onoff, 1);
+		elem_bin->setTunable(DECOMPOSEORDER, &onoff, 1);
+		elem_bin->setTunable(ORDERINTEGERENCODING, &offon, 0);
+		elem_bin->setTunable(ELEMENTOPT, &onoff, 1);
+		elem_bin->setTunable(ELEMENTOPTSETS, &onoff, 1);
+		elem_bin->setTunable(ENCODINGGRAPHOPT, &offon, 0);
+		elem_bin->setTunable(NODEENCODING, &NodeEncodingDesc, ELEM_UNASSIGNED);
+		elem_bin->setTunable(VARIABLEORDER, &boolVarOrderingDesc, REVERSEORDERING);
+		elem_bin->setTunable(PROXYVARIABLE, &proxyparameter, 2);
+		elem_bin->setTunable(MUSTREACHGLOBAL, &onoff, 1);
+                elem_bin->setTunable(MUSTREACHLOCAL, &onoff, 1);
+                elem_bin->setTunable(MUSTREACHPRUNE, &onoff, 1);
+                elem_bin->setTunable(MUSTEDGEPRUNE, &onoff, 1);
+                elem_bin->setTunable(OPTIMIZEORDERSTRUCTURE, &onoff, 1);
+                elem_bin->setTunable(MUSTVALUE, &mustValueBinaryIndex, 3);
+
 		elem_onehot->setTunable(NAIVEENCODER, &NaiveEncodingDesc, ONEHOT);
 		elem_unary->setTunable(NAIVEENCODER, &NaiveEncodingDesc, UNARY);
-
 		elem_bin->serialize("binarytuner.conf");
 		elem_onehot->serialize("onehottuner.conf");
 		elem_unary->serialize("unarytuner.conf");
@@ -58,6 +73,19 @@ int main(int argc, char **argv) {
 		elem_onehot->setTunable(NAIVEENCODER, &NaiveEncodingDesc, ONEHOT);
 		elem_unary->setTunable(NAIVEENCODER, &NaiveEncodingDesc, UNARY);
 		elem_bin->setTunable(ORDERINTEGERENCODING, &offon, 1);
+                elem_bin->setTunable(PREPROCESS, &onoff, 1);
+                elem_bin->setTunable(DECOMPOSEORDER, &onoff, 1);
+                elem_bin->setTunable(ELEMENTOPT, &onoff, 1);
+                elem_bin->setTunable(ELEMENTOPTSETS, &onoff, 1);
+                elem_bin->setTunable(ENCODINGGRAPHOPT, &offon, 0);
+                elem_bin->setTunable(NODEENCODING, &NodeEncodingDesc, ELEM_UNASSIGNED);
+                elem_bin->setTunable(VARIABLEORDER, &boolVarOrderingDesc, REVERSEORDERING);
+                elem_bin->setTunable(PROXYVARIABLE, &proxyparameter, 2);
+                elem_bin->setTunable(MUSTREACHGLOBAL, &onoff, 1);
+                elem_bin->setTunable(MUSTREACHLOCAL, &onoff, 1);
+                elem_bin->setTunable(MUSTREACHPRUNE, &onoff, 1);
+                elem_bin->setTunable(MUSTEDGEPRUNE, &onoff, 1);
+                elem_bin->setTunable(OPTIMIZEORDERSTRUCTURE, &onoff, 1);
 		elem_onehot->setTunable(ORDERINTEGERENCODING, &offon, 1);
 		elem_unary->setTunable(ORDERINTEGERENCODING, &offon, 1);
 
