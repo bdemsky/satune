@@ -18,7 +18,7 @@ cd $BIN
 for d in $DUMP; do
 	if [[ $d = *$1* ]] && [[ $d = *learningset* ]]; then
 		echo "Running: ./run.sh tunerrun "."$d $2 $3 out.out"
-		./run.sh tunerrun "."$d $2 $3 out.out
+		./run.sh timeout $2 tunerrun "."$d $2 $3 out.out
 		RETCODE=$?
 		echo "Return code: $RETCODE"
 		if [ $RETCODE -eq 141 ]; then #Dump info when SAT Solver gets killed by OS ....
