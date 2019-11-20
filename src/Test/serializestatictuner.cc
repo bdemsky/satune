@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
                 elem_bin->setTunable(DECOMPOSEORDER, &onoff, 1);
                 elem_bin->setTunable(ELEMENTOPT, &onoff, 1);
                 elem_bin->setTunable(ELEMENTOPTSETS, &onoff, 1);
-                elem_bin->setTunable(ENCODINGGRAPHOPT, &offon, 0);
+                elem_bin->setTunable(ENCODINGGRAPHOPT, &onoff, 1);
 		elem_bin->setVarTunable(0, NODEENCODING, &NodeEncodingDesc, ELEM_UNASSIGNED);
                 elem_bin->setVarTunable(1, NODEENCODING, &NodeEncodingDesc, ELEM_UNASSIGNED);
                 elem_bin->setVarTunable(2, NODEENCODING, &NodeEncodingDesc, ELEM_UNASSIGNED);
