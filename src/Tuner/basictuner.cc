@@ -179,7 +179,9 @@ long long BasicTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 			myfile >> sat;
 			myfile.close();
 		}
-		updateTimeout(problem, metric);
+		if(sat != IS_INDETER){
+			updateTimeout(problem, metric);
+		}
 		snprintf(buffer, sizeof(buffer), "tuner%uused", execnum);
 		tuner->getTuner()->addUsed(buffer);
 	} else if (status == 124 << 8) {// timeout happens ...
@@ -192,7 +194,8 @@ long long BasicTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 	if (problem->getResult() == TUNERUNSETVALUE && sat != IS_INDETER) {
 		problem->setResult( sat );
 	} else if (problem->getResult() != sat && sat != IS_INDETER) {
-		model_print("******** Result has changed ********\n");
+		model_print("******** Result has changed ******** Found a bug!!\n");
+		ASSERT(0)
 	}
 	if (sat == IS_INDETER && metric != -1) {//The case when we have a timeout
 		metric = -1;
