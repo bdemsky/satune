@@ -195,7 +195,7 @@ long long BasicTuner::evaluate(Problem *problem, TunerRecord *tuner) {
 		problem->setResult( sat );
 	} else if (problem->getResult() != sat && sat != IS_INDETER) {
 		model_print("******** Result has changed ******** Found a bug!!\n");
-		ASSERT(0)
+		ASSERT(0);
 	}
 	if (sat == IS_INDETER && metric != -1) {//The case when we have a timeout
 		metric = -1;

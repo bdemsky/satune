@@ -31,7 +31,7 @@ void CompTuner::findBestTwoTuners() {
 			for (uint l = 0; l < problems.getSize(); l++) {
 				Problem *problem = problems.get(l);
 				long long time1 = tuner1->getTime(problem);
-				if(time1 == -1 || time2 == -2){
+				if(time1 == -1 || time1 == -2){
 					time1=LLONG_MAX;
 				}
 				long long time2 = tuner2->getTime(problem);
