@@ -67,7 +67,7 @@ def startLearningProcess(benchmark, server, learningSet):
 	LOGFILE= benchmark + "-" + str(learningSet) + ".log"
 	print("Running benchmark " + benchmark + "(Set="+ str(learningSet)+") on server")
 	COMMAND=("cd "+SRCDIR+"; ./Scripts/learnresultgen.sh " +
-		benchmark + " " + str(learningSet) + " " + ALGORITHM + " &> " + LOGFILE + "; mv *.csv /rscratch/hamed/; echo 'SUCCESS'")
+		benchmark + " " + str(learningSet) + " " + ALGORITHM + " &> " + "bin/" + LOGFILE + "; mv *.csv /rscratch/hamed/; echo 'SUCCESS'")
 	print("Calling the following command:\n" + COMMAND)
 	ssh = subprocess.Popen(["ssh", "%s" % HOST, COMMAND],
 		shell=False,
