@@ -31,11 +31,11 @@ void CompTuner::findBestTwoTuners() {
 			for (uint l = 0; l < problems.getSize(); l++) {
 				Problem *problem = problems.get(l);
 				long long time1 = tuner1->getTime(problem);
-				if(time1 == -1 || time1 == -2){
+				if(time1 < 0){
 					time1=LLONG_MAX;
 				}
 				long long time2 = tuner2->getTime(problem);
-				if(time2 == -1 || time2 == -2){
+				if(time2 < 0){
 					time2 = LLONG_MAX;
 				}
 				mintimes[l] = pow(min(time1,time2), (double)1 / problems.getSize());
