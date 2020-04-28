@@ -71,4 +71,6 @@ void ElementEncoding::print() {
 				model_print("_");
 		}
 	}
+	model_print("numVars= %u ", numEncodingVars());
+	model_print("encArraySize= %u", encArraySize);
 }
