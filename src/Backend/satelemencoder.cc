@@ -228,7 +228,7 @@ void SATEncoder::freezeElementVariables(ElementEncoding *encoding) {
 		freezeVariable(cnf, e);
 	}
 	for(uint i=0; i< encoding->encArraySize; i++){
-		if(encoding->isinUseElement(i) && encoding->encoding != EENC_NONE && encoding->numVars > 1){
+		if(encoding->isinUseElement(i) && encoding->encoding != EENC_NONE && encoding->numVars > 1 && encoding->edgeArray!= NULL){
 			Edge e = encoding->edgeArray[i];
 			if(!edgeIsNull(e)){
 				ASSERT(edgeIsVarConst(e));
