@@ -40,9 +40,8 @@ private:
 	Edge getElementValueConstraint(Element *element, Polarity p, uint64_t value);
 	void generateOneHotAtMostOne(ElementEncoding *encoding);
 	void generateOneHotBinomialAtMostOne(Edge *array, uint size, uint offset = 0);
-	void generateOneHotCommanderAtMostOneRecursive(Edge *array, uint size);
-	void generateOneHotSequentialAtMostOne(ElementEncoding *encoding);
-	void generateOneHotCommanderEncodingVars(ElementEncoding *encoding);
+	void generateOneHotCommanderAtMostOne(Edge *array, uint size);
+	void generateOneHotSequentialAtMostOne(Edge *array, uint size);
 	void generateOneHotEncodingVars(ElementEncoding *encoding);
 	void generateUnaryEncodingVars(ElementEncoding *encoding);
 	void generateBinaryIndexEncodingVars(ElementEncoding *encoding);

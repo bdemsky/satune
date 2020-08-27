@@ -266,15 +266,13 @@ void SATEncoder::generateOneHotAtMostOne(ElementEncoding *encoding) {
 	switch (enc)
 	{
 	case ONEHOT_BINOMIAL:
-		model_print("Encode using bionomial encoding\n");
-		model_print("size = %u\n", encoding->numVars);
 		generateOneHotBinomialAtMostOne(encoding->variables, encoding->numVars);
 		break;
 	case ONEHOT_COMMANDER:
-		generateOneHotCommanderEncodingVars(encoding);
+		generateOneHotCommanderAtMostOne(encoding->variables, encoding->numVars);
 		break;
 	case ONEHOT_SEQ_COUNTER:
-		generateOneHotSequentialAtMostOne(encoding);
+		generateOneHotSequentialAtMostOne(encoding->variables, encoding->numVars);
 		break;
 	default:
 		ASSERT(0);
@@ -290,7 +288,8 @@ void SATEncoder::generateOneHotBinomialAtMostOne(Edge *array, uint size, uint of
 	}
 }
 
-void SATEncoder::generateOneHotCommanderAtMostOneRecursive(Edge *array, uint size) {
+void SATEncoder::generateOneHotCommanderAtMostOne(Edge *array, uint size) {
+	//For more detail look at paper "Efficient CNF Encoding for Selecting 1 from N Objects"
 	ASSERT(size > 1);
 	if (size <= SEQ_COUNTER_GROUP_SIZE) {
 		//Using binomial encoding
@@ -329,18 +328,14 @@ void SATEncoder::generateOneHotCommanderAtMostOneRecursive(Edge *array, uint siz
 		}
 		ASSERT(commanderSize <= (size/SEQ_COUNTER_GROUP_SIZE + 1));
 		if(commanderSize > 1) {
-			generateOneHotCommanderAtMostOneRecursive(commanders, commanderSize);
+			generateOneHotCommanderAtMostOne(commanders, commanderSize);
 		}
 	}
 }
 
-void SATEncoder::generateOneHotSequentialAtMostOne(ElementEncoding *encoding) {
-	model_print("At-Most-One constraint using sequential counter\n");
-	model_print("size = %u\n", encoding->numVars);
+void SATEncoder::generateOneHotSequentialAtMostOne(Edge *array, uint size) {
 	// for more information, look at "Towards an Optimal CNF Encoding of Boolean Cardinality Constraints" paper
-	ASSERT(encoding->numVars > 1);
-	Edge *array = encoding->variables;
-	uint size = encoding->numVars;
+	ASSERT(size > 1);
 	Edge s [size -1 ];
 	getArrayNewVarsSATEncoder(size-1, s);
 	addConstraintCNF(cnf, constraintOR2(cnf, constraintNegate(array[0]), s[0]));
@@ -350,14 +345,6 @@ void SATEncoder::generateOneHotSequentialAtMostOne(ElementEncoding *encoding) {
 		addConstraintCNF(cnf, constraintOR2(cnf, constraintNegate(s[i-1]), s[i]));
 		addConstraintCNF(cnf, constraintOR2(cnf, constraintNegate(array[i]), constraintNegate(s[i-1])));
 	}
-}
-
-void SATEncoder::generateOneHotCommanderEncodingVars(ElementEncoding *encoding) {
-	//For more detail look at paper "Efficient CNF Encoding for Selecting 1 from N Objects"
-	model_print("At-Most-One constraint using commander\n");
-	model_print("size = %u\n", encoding->numVars);
-	ASSERT(encoding->numVars > 1);
-	generateOneHotCommanderAtMostOneRecursive(encoding->variables, encoding->numVars);
 }
 
 void SATEncoder::generateOneHotEncodingVars(ElementEncoding *encoding) {
