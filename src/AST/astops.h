@@ -28,6 +28,11 @@ typedef enum ElementEncodingType ElementEncodingType;
 enum BooleanVarOrdering {CONSTRAINTORDERING=0, ELEMENTORDERING=1, REVERSEORDERING=2};
 typedef enum BooleanVarOrdering BooleanVarOrdering;
 
+enum AMOOneHot {
+	ONEHOT_BINOMIAL, ONEHOT_COMMANDER, ONEHOT_SEQ_COUNTER 
+};
+typedef enum AMOOneHot AMOOneHot;
+
 Polarity negatePolarity(Polarity This);
 bool impliesPolarity(Polarity curr, Polarity goal);
 

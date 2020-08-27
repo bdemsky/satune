@@ -51,6 +51,8 @@ const char *tunableParameterToString(Tunables tunable) {
 		return "MUSTVALUE";
 	case VARIABLEORDER:
 		return "VARIABLEORDER";
+	case ONEHOTATMOSTONE:
+		return "ONEHOTATMOSTONE";
 	default:
 		ASSERT(0);
 	}

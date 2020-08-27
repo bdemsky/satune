@@ -38,8 +38,10 @@ int main(int argc, char **argv) {
 		elem_onehot->setTunable(NAIVEENCODER, &NaiveEncodingDesc, ONEHOT);
 		elem_unary->setTunable(NAIVEENCODER, &NaiveEncodingDesc, UNARY);
 		elem_bin->serialize("binarytuner.conf");
-		elem_onehot->serialize("onehottuner.conf");
 		elem_unary->serialize("unarytuner.conf");
+		elem_onehot->serialize("onehottuner.conf");
+		elem_onehot->setTunable(ONEHOTATMOSTONE, &OneHotAtMostOneDesc, ONEHOT_COMMANDER);
+		elem_onehot->serialize("onehottunercommander.conf");
 		elem_bin->setTunable(ENCODINGGRAPHOPT, &offon, 1);
 		elem_onehot->setTunable(ENCODINGGRAPHOPT, &offon, 1);
 		elem_unary->setTunable(ENCODINGGRAPHOPT, &offon, 1);

@@ -3,10 +3,10 @@
 
 int main(int numargs, char **argv) {
 	CSolver *solver = new CSolver();
-	uint64_t set1[] = {10, 8, 18};
-	uint64_t set2[] = {10, 13, 7};
-	Set *s1 = solver->createSet(0, set1, 3);
-	Set *s2 = solver->createSet(1, set2, 3);
+	uint64_t set1[] = {10, 8, 18, 20, 21, 22, 23, 24, 25, 26};
+	uint64_t set2[] = {10, 13, 7, 30, 31, 32};
+	Set *s1 = solver->createSet(0, set1, 10);
+	Set *s2 = solver->createSet(1, set2, 6);
 	Element *e1 = solver->getElementVar(s1);
 	Element *e2 = solver->getElementVar(s2);
 	solver->mustHaveValue(e1);
