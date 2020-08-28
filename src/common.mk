@@ -9,7 +9,7 @@ JAVA_INC := /usr/lib/jvm/default-java/include/
 LIB_NAME := cons_comp
 LIB_SO := lib_$(LIB_NAME).so
 
-CPPFLAGS += -Wall -g -O0
+CPPFLAGS += -Wall -g -O3
 
 # Mac OSX options
 ifeq ($(UNAME), Darwin)

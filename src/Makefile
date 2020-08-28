@@ -16,7 +16,7 @@ OBJECTS := $(CPP_SOURCES:%.cc=$(OBJ_DIR)/%.o) $(C_SOURCES:%.c=$(OBJ_DIR)/%.o)
 
 J_OBJECTS := $(J_SOURCES:%.java=$(OBJ_DIR)/%.class)
 
-CFLAGS := -Wall -O0 -g
+CFLAGS := -Wall -O3 -g
 CXXFLAGS := -std=c++1y -pthread
 CFLAGS += -IAST -IASTTransform -IASTAnalyses -IASTAnalyses/Polarity -IASTAnalyses/Order -IASTAnalyses/Encoding -ITranslator -ICollections -IBackend -I. -IEncoders -ITuner -ISerialize -IInterpreter -I$(JAVA_INC) -I$(JAVA_INC)/linux
 LDFLAGS := -ldl -lrt -rdynamic -g
