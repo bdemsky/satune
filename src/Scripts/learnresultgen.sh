@@ -17,7 +17,13 @@ BIN=$SATUNEDIR/bin
 source $SATUNEDIR/Benchmarks/common.sh
 $SATUNEDIR/Scripts/setup.sh
 cd $BENCHDIR
-./learn.sh $2 $3
+
+START=$(date +%s.%N)
+time ./learn.sh $2 $3
+END=$(date +%s.%N)
+DIFF=$(echo "$END - $START" | bc)
+echo "SATUNE Learning Time $1-$2: $DIFF"
+
 cd $BIN
 ./run.sh analyzemultituner
 cd $SATUNEDIR
