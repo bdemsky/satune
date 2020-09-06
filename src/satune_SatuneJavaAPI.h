@@ -347,6 +347,14 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_serialize
 
 /*
  * Class:     satune_SatuneJavaAPI
+ * Method:    serialize
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_serializeID
+	(JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     satune_SatuneJavaAPI
  * Method:    mustHaveValue
  * Signature: (JJ)V
  */

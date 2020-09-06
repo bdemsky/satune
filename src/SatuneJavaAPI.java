@@ -87,6 +87,7 @@ public class SatuneJavaAPI{
 	private native void printConstraints(long solver);
 	private native void turnoffOptimizations(long solver);
 	private native void serialize(long solver);
+	private native void serializeID(long solver, long id);
 	private native void mustHaveValue(long solver, long element);
 	private native void setInterpreter(long solver, int type);
 	private native long clone(long solver);

@@ -177,6 +177,7 @@ public:
 	void replaceBooleanWithFalse(BooleanEdge bexpr);
 	void replaceBooleanWithBoolean(BooleanEdge oldb, BooleanEdge newb);
 	CSolver *clone();
+	void serializeID(long long id);
 	void serialize();
 	static CSolver *deserialize(const char *file, InterpreterType itype = SATUNE);
 	void autoTune(uint budget);

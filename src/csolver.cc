@@ -174,11 +174,10 @@ CSolver *CSolver::deserialize(const char *file, InterpreterType itype) {
 	return deserializer.deserialize();
 }
 
-void CSolver::serialize() {
+void CSolver::serializeID(long long id) {
 	model_print("serializing ...\n");
 	char buffer[255];
-	long long nanotime = getTimeNano();
-	int numchars = sprintf(buffer, "DUMP%llu", nanotime);
+	int numchars = sprintf(buffer, "%llu.dump", id);
 	Serializer serializer(buffer);
 	SetIteratorBooleanEdge *it = getConstraints();
 	while (it->hasNext()) {
@@ -186,6 +185,11 @@ void CSolver::serialize() {
 		serializeBooleanEdge(&serializer, b, true);
 	}
 	delete it;
+}
+
+void CSolver::serialize() {
+	long long nanotime = getTimeNano();
+	serializeID(nanotime);
 }
 
 Set *CSolver::createSet(VarType type, uint64_t *elements, uint numelements) {

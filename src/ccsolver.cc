@@ -182,6 +182,9 @@ void turnoffOptimizations(void *solver) {
 	CCSOLVER(solver)->turnoffOptimizations();
 }
 
+void serializeID(void *solver, long id) {
+	CCSOLVER(solver)->serializeID(id);
+}
 
 void serialize(void *solver) {
 	CCSOLVER(solver)->serialize();

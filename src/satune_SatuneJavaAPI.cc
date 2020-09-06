@@ -473,6 +473,17 @@ JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_turnoffOptimizations
  * Method:    serialize
  * Signature: (J)V
  */
+JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_serializeID
+	(JNIEnv *env, jobject obj, jlong solver, jlong id)
+{
+	serializeID((void *)solver, id);
+}
+
+/*
+ * Class:     SatuneJavaAPI
+ * Method:    serialize
+ * Signature: (J)V
+ */
 JNIEXPORT void JNICALL Java_satune_SatuneJavaAPI_serialize
 	(JNIEnv *env, jobject obj, jlong solver)
 {
