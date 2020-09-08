@@ -16,6 +16,45 @@ CompTuner::~CompTuner() {
 
 }
 
+void CompTuner::findTheBestTuner() {
+	if (allTuners.getSize() < 1) {
+		printData();
+		return;
+	}
+	TunerRecord *bestTuner = NULL;
+	double score = DBL_MAX;
+	for (uint j = 0; j < allTuners.getSize() - 1; j++) {
+		TunerRecord *tuner1 = allTuners.get(j);
+		double mintimes[problems.getSize()];
+		for (uint l = 0; l < problems.getSize(); l++) {
+			Problem *problem = problems.get(l);
+			long long time1 = tuner1->getTime(problem);
+			if(time1 < 0){
+				time1=LLONG_MAX;
+			}
+			mintimes[l] = pow(time1, (double)1 / problems.getSize());
+		}
+		double result = 1;
+		for (uint l = 0; l < problems.getSize(); l++) {
+			result *= mintimes[l];
+		}
+		if (result < score) {
+			score = result;
+			bestTuner = tuner1;
+		}
+	}
+	model_print("The Best tuner:\n");
+	
+	SearchTuner *stun = bestTuner->getTuner();
+	char buffer[512];
+	snprintf(buffer, sizeof(buffer), "best.tuner");
+	stun->serialize(buffer);
+	model_print("Tuner %u\n", bestTuner->getTunerNumber());
+	stun->print();
+	bestTuner->printProblemsInfo();
+	model_print("----------------------------------\n\n\n");
+}
+
 void CompTuner::findBestTwoTuners() {
 	if (allTuners.getSize() < 2) {
 		printData();

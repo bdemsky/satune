@@ -27,7 +27,8 @@ int main(int argc, char **argv) {
 	printf("Number of Runs: %u\n", numruns);
 	CompTuner *multituner = new CompTuner(0, 0);
 	multituner->readData(numruns);
-	multituner->findBestTwoTuners();
+	//multituner->findBestTwoTuners();
+	multituner->findTheBestTuner();
 	delete multituner;
 	return 0;
 }

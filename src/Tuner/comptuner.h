@@ -12,6 +12,7 @@ public:
 	void readData(uint numRuns);
 	void tune();
 	void findBestTwoTuners();
+	void findTheBestTuner();
 protected:
 
 };
