@@ -163,7 +163,10 @@ void ElementOpt::constrainVarWithConst(BooleanPredicate *pred, ElementSet *var, 
 	}
 	if (size == count)
 		return;
-
+	if(count == 0 ){
+    	solver->setUnSAT();
+		return;
+	}
 	Set *newset = solver->createSet(s->type, elemArray, count);
 	solver->elemMap.remove(var);
 	var->set = newset;
