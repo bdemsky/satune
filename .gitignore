@@ -1,7 +1,6 @@
 #Ignoring netbeans configs
 nbproject/
 sat_solver*
-setup.sh
 
 #Ignoring binary files
 src/bin/
